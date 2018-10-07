@@ -1,7 +1,8 @@
-import styled from 'styled-components'
-import * as ss from 'styled-system'
+import styled from 'react-emotion'
 
-export const Image = styled.img`
+import * as ss from './styleSystem'
+
+export const Image = styled('img')`
   ${ss.color}
   ${ss.space}
   ${ss.width}

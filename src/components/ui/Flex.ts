@@ -1,5 +1,5 @@
-import styled from 'styled-components'
-import * as ss from 'styled-system'
+import styled from 'react-emotion'
+import * as ss from './styleSystem'
 import * as recompose from 'recompose'
 
 import { Box, BoxProps } from './Box'
@@ -12,6 +12,7 @@ type FlexProps = BoxProps &
 
 const FlexUnenhanced = styled(Box)<FlexProps>`
   ${ss.flexWrap}
+  ${ss.display}
   ${ss.flexDirection}
   ${ss.alignItems}
   ${ss.justifyContent}

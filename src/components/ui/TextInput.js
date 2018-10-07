@@ -1,7 +1,8 @@
-import styled from 'styled-components'
-import * as ss from 'styled-system'
+import styled from 'react-emotion'
 
-const TextInput = styled.input`
+import * as ss from './styleSystem'
+
+const TextInput = styled('input')`
   ${ss.color}
   ${ss.fontWeight}
   ${ss.fontSize}

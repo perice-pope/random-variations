@@ -1,7 +1,7 @@
-import styled from 'styled-components'
-import * as ss from 'styled-system'
+import styled from 'react-emotion'
+import * as ss from './styleSystem'
 
-export const Form = styled.form`
+export const Form = styled('form')`
   ${ss.color}
   ${ss.space}
   ${ss.borders}

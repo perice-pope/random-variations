@@ -1,8 +1,9 @@
-import styled from 'styled-components'
+import styled from 'react-emotion'
+import * as recompose from 'recompose'
 
 import { Box } from './ui'
 
-const NoteCard = styled(Box)`
+export default recompose.setDisplayName('NoteCard')(styled(Box)`
   display: inline-flex;
   background-color: salmon;
   padding: 10px;
@@ -10,11 +11,4 @@ const NoteCard = styled(Box)`
   min-height: 100px;
   align-items: center;
   justify-content: center;
-`
-
-NoteCard.defaultProps = {
-  width: 1 / 4,
-  m: 1,
-}
-
-export default NoteCard
+`)

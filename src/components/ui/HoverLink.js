@@ -1,7 +1,8 @@
-import styled from 'styled-components'
-import * as ss from 'styled-system'
+import styled from 'react-emotion'
 
-export const HoverLink = styled.a`
+import * as ss from './styleSystem'
+
+export const HoverLink = styled('a')`
   ${ss.opacity} text-decoration: none;
   display: inline-block;
   transition: all ${({ transitionSpeed }) => transitionSpeed};

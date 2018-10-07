@@ -1,6 +1,7 @@
-import styled from 'styled-components'
-import * as ss from 'styled-system'
+import styled from 'react-emotion'
+import * as ss from './styleSystem'
 import * as recompose from 'recompose'
+import isPropValid from '@emotion/is-prop-valid'
 
 import { BoxProps } from './Box'
 
@@ -12,7 +13,9 @@ export type BaseButtonProps = BoxProps &
     variant?: string
   }
 
-const StyledButton = styled.button<BaseButtonProps>`
+const StyledButton = styled('button', {
+  shouldForwardProp: isPropValid,
+})<BaseButtonProps>`
   ${ss.color}
   ${ss.width}
   ${ss.height}
@@ -42,6 +45,7 @@ const enhance = recompose.compose(
   recompose.defaultProps<BaseButtonProps>({
     border: 'none',
     p: '1rem 2rem',
+    fontSize: 3,
     fontWeight: 'bold',
     borderRadius: '0.25rem',
   }),

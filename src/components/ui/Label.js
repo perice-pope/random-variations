@@ -1,7 +1,8 @@
-import styled from 'styled-components'
-import * as ss from 'styled-system'
+import styled from 'react-emotion'
 
-const Label = styled.label`
+import * as ss from './styleSystem'
+
+const Label = styled('label')`
   ${ss.color}
   ${ss.fontWeight}
   ${ss.fontSize}

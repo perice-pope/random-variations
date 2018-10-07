@@ -1,5 +1,5 @@
-import styled from 'styled-components'
-import * as ss from 'styled-system'
+import styled from 'react-emotion'
+import * as ss from './styleSystem'
 
 export type BoxProps = ss.SizeProps &
   ss.ColorProps &
@@ -21,7 +21,7 @@ export type BoxProps = ss.SizeProps &
   ss.BottomProps &
   ss.ZIndexProps
 
-export const Box = styled.div<BoxProps>`
+export const Box = styled('div')<BoxProps>`
   ${ss.size}
   ${ss.color}
   ${ss.space}

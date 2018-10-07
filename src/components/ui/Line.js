@@ -1,7 +1,8 @@
-import styled from 'styled-components'
-import * as ss from 'styled-system'
+import styled from 'react-emotion'
 
-const Line = styled.div`
+import * as ss from './styleSystem'
+
+const Line = styled('div')`
   ${ss.color}
   ${ss.space}
   ${ss.borderRadius}

@@ -1,11 +1,11 @@
-import { injectGlobal } from 'styled-components';
-import theme from './theme';
-import futuraMediumWoff2 from '../assets/fonts/FuturaStd-Medium.woff2';
-import futuraMediumWoff from '../assets/fonts/FuturaStd-Medium.woff';
-import futuraBoldWoff2 from '../assets/fonts/FuturaStd-Bold.woff2';
-import futuraBoldWoff from '../assets/fonts/FuturaStd-Bold.woff';
-import futuraHeavyWoff2 from '../assets/fonts/FuturaStd-Heavy.woff2';
-import futuraHeavyWoff from '../assets/fonts/FuturaStd-Heavy.woff';
+import { injectGlobal } from 'emotion'
+import theme from './theme'
+import futuraMediumWoff2 from '../assets/fonts/FuturaStd-Medium.woff2'
+import futuraMediumWoff from '../assets/fonts/FuturaStd-Medium.woff'
+import futuraBoldWoff2 from '../assets/fonts/FuturaStd-Bold.woff2'
+import futuraBoldWoff from '../assets/fonts/FuturaStd-Bold.woff'
+import futuraHeavyWoff2 from '../assets/fonts/FuturaStd-Heavy.woff2'
+import futuraHeavyWoff from '../assets/fonts/FuturaStd-Heavy.woff'
 
 export default () => injectGlobal`
   @font-face {
@@ -56,4 +56,4 @@ export default () => injectGlobal`
     -webkit-appearance: none;
     margin: 0;
   }
-`;
+`

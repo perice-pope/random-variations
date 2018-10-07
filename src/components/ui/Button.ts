@@ -9,7 +9,7 @@ export const Button = recompose.compose(
   recompose.defaultProps({
     bg: theme.colors.lightGray,
     p: 3,
-    fontSize: 3,
+    fontSize: 4,
     hoverBg: darken(0.1, theme.colors.lightGray),
   }),
 )(HoverButton) as typeof HoverButton

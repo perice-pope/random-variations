@@ -1,7 +1,8 @@
-import styled from 'styled-components'
-import * as ss from 'styled-system'
+import styled from 'react-emotion'
 
-const Text = styled.span`
+import * as ss from './styleSystem'
+
+const Text = styled('span')`
   ${ss.color}
   ${ss.fontWeight}
   ${ss.fontSize}
