@@ -1,7 +1,7 @@
-import { darken } from 'polished'
+import { lighten, darken, getLuminance } from 'polished'
 import * as recompose from 'recompose'
 
-import { HoverButton } from './HoverButton'
+import { HoverButton, HoverButtonProps } from './HoverButton'
 import theme from '../../styles/theme'
 
 export const Button = recompose.compose(
@@ -10,6 +10,24 @@ export const Button = recompose.compose(
     bg: theme.colors.lightGray,
     p: 3,
     fontSize: 4,
-    hoverBg: darken(0.1, theme.colors.lightGray),
+  }),
+  recompose.mapProps((props: HoverButtonProps) => {
+    const newProps: HoverButtonProps = {}
+
+    if (props.bg && !props.hoverBg) {
+      newProps.hoverBg =
+        getLuminance(props.bg as string) < 0.3
+          ? lighten(0.1, props.bg as string)
+          : darken(0.1, props.bg as string)
+    }
+
+    if (!props.color && props.bg) {
+      newProps.color =
+        getLuminance(props.bg as string) < 0.3 ? 'white' : 'black'
+    }
+    return {
+      ...props,
+      ...newProps,
+    }
   }),
 )(HoverButton) as typeof HoverButton
