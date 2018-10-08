@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@emotion/is-prop-valid": "^0.6.8",
+    "@types/lodash": "^4.14.116",
     "@types/recompose": "^0.27.0",
     "@types/styled-system": "^3.0.4",
     "emotion": "^9.2.12",
@@ -16,7 +17,8 @@
     "react-flip-toolkit": "^5.0.2",
     "react-scripts-ts": "3.1.0",
     "recompose": "^0.30.0",
-    "styled-system": "^3.1.6"
+    "styled-system": "^3.1.6",
+    "tone": "^0.12.80"
   },
   "scripts": {
     "start": "react-scripts-ts start",
