@@ -45,6 +45,7 @@ type AppState = {
   bpm: number
   isPlaying: boolean
   noteCards: NoteCard[]
+  currentNoteCardPlaying: number
 }
 
 class App extends React.Component<{}, AppState> {
@@ -53,19 +54,46 @@ class App extends React.Component<{}, AppState> {
 
   constructor(props) {
     super(props)
+
     this.state = {
       bpm: 120,
       isPlaying: false,
       // 12 random note cards
       noteCards: new Array(12)
         .fill(null)
-        .map(() => sample(['A', 'B', 'C', 'D', 'E', 'F', 'G']))
+        .map(() =>
+          sample([
+            'Bb',
+            'A',
+            'A#',
+            'Bb',
+            'B',
+            'B#',
+            'Cb',
+            'C',
+            'C#',
+            'Db',
+            'D',
+            'D#',
+            'Eb',
+            'E',
+            'E#',
+            'Fb',
+            'F',
+            'F#',
+            'Gb',
+            'G',
+            'G#',
+          ]),
+        )
         .map((noteName: string, index) => ({
           id: `${index}`,
           text: noteName,
           note: `${noteName}4`,
         })),
+      currentNoteCardPlaying: 0,
     }
+
     this.initSynth()
     this.scheduleNotes()
   }
@@ -79,6 +107,8 @@ class App extends React.Component<{}, AppState> {
 
     Tone.Transport.loopEnd = '3m'
     Tone.Transport.loop = true
+
+    Tone.Transport.bpm.value = this.state.bpm
   }
 
   handleShuffleClick = () => {
@@ -87,21 +117,47 @@ class App extends React.Component<{}, AppState> {
         noteCards: shuffle([...state.noteCards]),
       }),
       () => {
-        this.stopPlaying()
+        const hasBeenPlaying = this.state.isPlaying
+        if (hasBeenPlaying) {
+          this.stopPlaying()
+        }
+
         this.scheduleNotes()
-        this.startPlaying()
+
+        if (hasBeenPlaying) {
+          this.startPlaying()
+        }
       },
     )
   }
 
-  scheduleNote = (note: string, time: string, duration: string = '4n') => {
+  scheduleNote = (
+    note: string,
+    time: string = '0:0',
+    duration: string = '4n',
+  ) => {
     console.log(`Scheduling note: ${note} ${time}`)
-    return Tone.Transport.schedule(time => {
-      this.synth.triggerAttackRelease(note, duration, time)
+
+    return Tone.Transport.schedule(contextTime => {
+      this.synth.triggerAttackRelease(note, duration, contextTime)
+
+      Tone.Draw.schedule(() => this.drawAnimation(time), contextTime)
     }, Tone.Time(time))
   }
 
+  drawAnimation = time => {
+    console.log('drawAnimation', time)
+    if (time === '0:0' && this.state.currentNoteCardPlaying === 0) {
+      return
+    }
+
+    this.setState(state => ({
+      currentNoteCardPlaying: (state.currentNoteCardPlaying + 1) % 12,
+    }))
+  }
+
   scheduleNotes = () => {
+    console.log('scheduleNotes is called\n---------\n')
     this.scheduledEvents.forEach(eventId => Tone.Transport.clear(eventId))
 
     this.state.noteCards.forEach(({ note }, index) => {
@@ -112,24 +168,21 @@ class App extends React.Component<{}, AppState> {
   }
 
   startPlaying = () => {
-    Tone.Transport.start()
+    this.setState({ isPlaying: true }, () => Tone.Transport.start())
   }
 
   stopPlaying = () => {
-    Tone.Transport.stop()
+    this.setState({ isPlaying: false, currentNoteCardPlaying: 0 }, () =>
+      Tone.Transport.stop(),
+    )
   }
 
   togglePlayback = () => {
-    this.setState(
-      state => ({ isPlaying: !state.isPlaying }),
-      () => {
-        if (this.state.isPlaying) {
-          this.startPlaying()
-        } else {
-          this.stopPlaying()
-        }
-      },
-    )
+    if (this.state.isPlaying) {
+      this.stopPlaying()
+    } else {
+      this.startPlaying()
+    }
   }
 
   handleBpmChange = e => {
@@ -152,11 +205,18 @@ class App extends React.Component<{}, AppState> {
   }
 
   public render() {
-    const { isPlaying } = this.state
+    const { bpm, noteCards, isPlaying, currentNoteCardPlaying } = this.state
 
     return (
       <ThemeProvider theme={theme}>
-        <Flex flexDirection="column" mt={2}>
+        <Flex
+          height="100vh"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          maxWidth={960}
+          mx="auto"
+        >
           <Flex flexDirection="row">
             <Button
               title="Shuffle note cards"
@@ -183,17 +243,27 @@ class App extends React.Component<{}, AppState> {
                 step="1"
                 min="0"
                 max="400"
-                value={`${this.state.bpm}`}
+                value={`${bpm}`}
                 onChange={this.handleBpmChange}
               />
             </Label>
           </Flex>
 
-          <FlipperStyled flipKey={this.state.noteCards}>
-            {this.state.noteCards.map(({ id, text }) => (
+          <FlipperStyled flipKey={noteCards}>
+            {noteCards.map(({ id, text }, index) => (
               <Flipped key={id} flipId={id}>
-                <Box p={2} width={1 / 4}>
-                  <NoteCard width={1}>{text}</NoteCard>
+                <Box
+                  p={2}
+                  width={1 / 4}
+                  position="relative"
+                  zIndex={currentNoteCardPlaying === index ? 2 : 1}
+                >
+                  <NoteCard
+                    width={1}
+                    playing={isPlaying && currentNoteCardPlaying === index}
+                  >
+                    {text}
+                  </NoteCard>
                 </Box>
               </Flipped>
             ))}

@@ -9,6 +9,8 @@ export type BoxProps = ss.SizeProps &
   ss.BorderRadiusProps &
   ss.WidthProps &
   ss.HeightProps &
+  ss.MaxWidthProps &
+  ss.MaxHeightProps &
   ss.FlexProps &
   ss.DisplayProps &
   ss.JustifyContentProps &
@@ -29,6 +31,8 @@ export const Box = styled('div')<BoxProps>`
   ${ss.borderColor}
   ${ss.borderRadius}
   ${ss.width}
+  ${ss.maxHeight}
+  ${ss.maxWidth}
   ${ss.height}
   ${ss.flex}
   ${ss.display}
