@@ -164,7 +164,10 @@ class App extends React.Component<{}, AppState> {
   private handleShuffleClick = () => {
     this.setState(
       state => ({
-        noteCards: shuffle([...state.noteCards]),
+        noteCards: [
+          state.noteCards[0],
+          ...shuffle([...state.noteCards.slice(1)]),
+        ],
       }),
       () => {
         const hasBeenPlaying = this.state.isPlaying
