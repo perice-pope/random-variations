@@ -1,16 +1,21 @@
 import * as React from 'react'
 import { Flipper, Flipped } from 'react-flip-toolkit'
+// import styled, { css } from 'react-emotion'
 import styled from 'react-emotion'
 import { ThemeProvider } from 'emotion-theming'
 import withProps from 'recompose/withProps'
-import { sample } from 'lodash'
+import * as _ from 'lodash'
 import Tone from 'tone'
+import * as ReactPiano from 'react-piano'
+import * as tonal from 'tonal'
+import * as TonalRange from 'tonal-range'
 
 import theme from '../styles/theme'
 import globalStyles from '../styles/globalStyles'
 
 import { Flex, Box, Button, TextInput, Label } from './ui'
 import NoteCard from './NoteCard'
+import MeasureScreenSize from './MeasureScreenSize'
 
 globalStyles()
 
@@ -46,7 +51,11 @@ type AppState = {
   isPlaying: boolean
   noteCards: NoteCard[]
   currentNoteCardPlaying: number
+  height: number
+  width: number
 }
+
+const chromaticNotes = TonalRange.chromatic(['C4', 'C5'], true)
 
 class App extends React.Component<{}, AppState> {
   synth: any
@@ -56,49 +65,36 @@ class App extends React.Component<{}, AppState> {
     super(props)
 
     this.state = {
+      // Screen size
+      height: 0,
+      width: 0,
+
       bpm: 120,
       isPlaying: false,
       // 12 random note cards
-      noteCards: new Array(12)
-        .fill(null)
-        .map(() =>
-          sample([
-            'Bb',
-            'A',
-            'A#',
-            'Bb',
-            'B',
-            'B#',
-            'Cb',
-            'C',
-            'C#',
-            'Db',
-            'D',
-            'D#',
-            'Eb',
-            'E',
-            'E#',
-            'Fb',
-            'F',
-            'F#',
-            'Gb',
-            'G',
-            'G#',
-          ]),
-        )
-        .map((noteName: string, index) => ({
+      noteCards: _.sampleSize(chromaticNotes, 12).map(
+        (noteName: string, index) => ({
           id: `${index}`,
           text: noteName,
-          note: `${noteName}4`,
-        })),
+          note: `${noteName}`,
+        }),
+      ),
       currentNoteCardPlaying: 0,
     }
+  }
 
+  componentDidMount() {
     this.initSynth()
     this.scheduleNotes()
   }
 
-  initSynth = () => {
+  componentWillUnmount() {
+    this.cleanUp()
+  }
+
+  private initSynth = () => {
+    this.cleanUp()
+
     this.synth = new Tone.PolySynth(10, Tone.Synth, {
       oscillator: {
         partials: [0, 2, 3, 4],
@@ -111,7 +107,15 @@ class App extends React.Component<{}, AppState> {
     Tone.Transport.bpm.value = this.state.bpm
   }
 
-  handleShuffleClick = () => {
+  private cleanUp = () => {
+    if (this.synth) {
+      this.synth.disconnect(Tone.Master)
+      this.synth.dispose()
+      this.synth = null
+    }
+  }
+
+  private handleShuffleClick = () => {
     this.setState(
       state => ({
         noteCards: shuffle([...state.noteCards]),
@@ -139,7 +143,9 @@ class App extends React.Component<{}, AppState> {
     console.log(`Scheduling note: ${note} ${time}`)
 
     return Tone.Transport.schedule(contextTime => {
-      this.synth.triggerAttackRelease(note, duration, contextTime)
+      if (this.synth) {
+        this.synth.triggerAttackRelease(note, duration, contextTime)
+      }
 
       Tone.Draw.schedule(() => this.drawAnimation(time), contextTime)
     }, Tone.Time(time))
@@ -204,71 +210,117 @@ class App extends React.Component<{}, AppState> {
     }
   }
 
+  private handleScreenSizeUpdate = ({ height, width }) => {
+    this.setState({ height, width })
+  }
+
   public render() {
     const { bpm, noteCards, isPlaying, currentNoteCardPlaying } = this.state
 
+    const activeNoteCard = this.state.noteCards[currentNoteCardPlaying]
+
+    const pianoNoteRange = {
+      first: tonal.Note.midi('C3'),
+      last: tonal.Note.midi('C6'),
+    }
+    const keyboardShortcuts = ReactPiano.KeyboardShortcuts.create({
+      first: pianoNoteRange.first,
+      last: pianoNoteRange.last,
+      keyboardConfig: ReactPiano.KeyboardShortcuts.HOME_ROW,
+    })
+
     return (
       <ThemeProvider theme={theme}>
-        <Flex
-          height="100vh"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-          maxWidth={960}
-          mx="auto"
-        >
-          <Flex flexDirection="row">
-            <Button
-              title="Shuffle note cards"
-              m={2}
-              onClick={this.handleShuffleClick}
-            >
-              shuffle!
-            </Button>
-
-            <Button
-              width={120}
-              title={isPlaying ? 'Stop' : 'Play'}
-              bg={isPlaying ? 'red' : 'green'}
-              m={2}
-              onClick={this.togglePlayback}
-            >
-              {isPlaying ? 'Stop' : 'Play'}
-            </Button>
-
-            <Label>
-              BPM:
-              <BpmInput
-                type="number"
-                step="1"
-                min="0"
-                max="400"
-                value={`${bpm}`}
-                onChange={this.handleBpmChange}
-              />
-            </Label>
-          </Flex>
-
-          <FlipperStyled flipKey={noteCards}>
-            {noteCards.map(({ id, text }, index) => (
-              <Flipped key={id} flipId={id}>
-                <Box
-                  p={2}
-                  width={1 / 4}
-                  position="relative"
-                  zIndex={currentNoteCardPlaying === index ? 2 : 1}
-                >
-                  <NoteCard
-                    width={1}
-                    playing={isPlaying && currentNoteCardPlaying === index}
+        <>
+          <MeasureScreenSize onUpdate={this.handleScreenSizeUpdate} fireOnMount>
+            <Flex height="100vh" flexDirection="column">
+              <Flex
+                flex="1"
+                justifyContent="center"
+                alignItems="center"
+                flexDirection="column"
+                maxWidth={960}
+                mx="auto"
+              >
+                <Flex flexDirection="row" mb={3}>
+                  <Button
+                    title="Shuffle note cards"
+                    m={2}
+                    onClick={this.handleShuffleClick}
                   >
-                    {text}
-                  </NoteCard>
-                </Box>
-              </Flipped>
-            ))}
-          </FlipperStyled>
-        </Flex>
+                    shuffle!
+                  </Button>
+
+                  <Button
+                    width={120}
+                    title={isPlaying ? 'Stop' : 'Play'}
+                    bg={isPlaying ? 'red' : 'green'}
+                    m={2}
+                    onClick={this.togglePlayback}
+                  >
+                    {isPlaying ? 'Stop' : 'Play'}
+                  </Button>
+
+                  <Label>
+                    BPM:
+                    <BpmInput
+                      type="number"
+                      step="1"
+                      min="0"
+                      max="400"
+                      value={`${bpm}`}
+                      onChange={this.handleBpmChange}
+                    />
+                  </Label>
+                </Flex>
+
+                <FlipperStyled flipKey={noteCards}>
+                  {noteCards.map(({ id, text }, index) => (
+                    <Flipped key={id} flipId={id}>
+                      <Box
+                        p={2}
+                        width={1 / 4}
+                        position="relative"
+                        zIndex={currentNoteCardPlaying === index ? 2 : 1}
+                      >
+                        <NoteCard
+                          width={1}
+                          playing={
+                            isPlaying && currentNoteCardPlaying === index
+                          }
+                        >
+                          {text}
+                        </NoteCard>
+                      </Box>
+                    </Flipped>
+                  ))}
+                </FlipperStyled>
+              </Flex>
+
+              <Box>
+                <ReactPiano.Piano
+                  // className={`${css({ height: '300px' })}`}
+                  noteRange={pianoNoteRange}
+                  playNote={midiNumber => {
+                    // Play a given note - see notes below
+                    console.log('Piano / play: ', midiNumber)
+                  }}
+                  stopNote={midiNumber => {
+                    // Stop playing a given note - see notes below
+                    console.log('Piano / stop: ', midiNumber)
+                  }}
+                  activeNotes={
+                    isPlaying
+                      ? [tonal.Note.midi(activeNoteCard.note)]
+                      : undefined
+                  }
+                  width={this.state.width}
+                  keyboardShortcuts={keyboardShortcuts}
+                />
+              </Box>
+            </Flex>
+          </MeasureScreenSize>
+        </>
       </ThemeProvider>
     )
   }

@@ -7,6 +7,8 @@ import futuraBoldWoff from '../assets/fonts/FuturaStd-Bold.woff'
 import futuraHeavyWoff2 from '../assets/fonts/FuturaStd-Heavy.woff2'
 import futuraHeavyWoff from '../assets/fonts/FuturaStd-Heavy.woff'
 
+import 'react-piano/dist/styles.css'
+
 export default () => injectGlobal`
   @font-face {
     font-family: 'Futura';

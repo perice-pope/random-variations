@@ -15,9 +15,12 @@
     "react-dom": "^16.5.2",
     "react-emotion": "^9.2.12",
     "react-flip-toolkit": "^5.0.2",
+    "react-piano": "^3.1.0",
     "react-scripts-ts": "3.1.0",
     "recompose": "^0.30.0",
     "styled-system": "^3.1.6",
+    "tonal": "^2.0.0",
+    "tonal-range": "^2.0.0",
     "tone": "^0.12.80"
   },
   "scripts": {
