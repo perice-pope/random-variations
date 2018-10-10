@@ -177,16 +177,14 @@ class App extends React.Component<{}, AppState> {
 
   private onNoteCardsUpdated = () => {
     const hasBeenPlaying = this.state.isPlaying
-    if (hasBeenPlaying) {
-      this.stopPlaying()
-    }
+    this.stopPlaying(() => {
+      this.renderNotation()
+      this.scheduleNotes()
 
-    this.renderNotation()
-    this.scheduleNotes()
-
-    if (hasBeenPlaying) {
-      this.startPlaying()
-    }
+      if (hasBeenPlaying) {
+        setTimeout(this.startPlaying, 200)
+      }
+    })
   }
 
   scheduleNote = (
@@ -212,7 +210,9 @@ class App extends React.Component<{}, AppState> {
     }
 
     this.setState(state => ({
-      currentNoteCardPlaying: (state.currentNoteCardPlaying + 1) % 12,
+      currentNoteCardPlaying: state.isPlaying
+        ? (state.currentNoteCardPlaying + 1) % 12
+        : state.currentNoteCardPlaying,
     }))
   }
 
@@ -234,10 +234,14 @@ class App extends React.Component<{}, AppState> {
     })
   }
 
-  stopPlaying = () => {
+  stopPlaying = (cb?: () => any) => {
     this.setState({ isPlaying: false, currentNoteCardPlaying: 0 }, () => {
       Tone.Master.mute = true
       Tone.Transport.stop()
+
+      if (cb) {
+        cb()
+      }
     })
   }
 
