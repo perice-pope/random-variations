@@ -7,6 +7,7 @@
     "@types/lodash": "^4.14.116",
     "@types/recompose": "^0.27.0",
     "@types/styled-system": "^3.0.4",
+    "@types/vexflow": "^1.2.32",
     "emotion": "^9.2.12",
     "emotion-theming": "^9.2.9",
     "lodash": "^4.17.11",
@@ -21,7 +22,8 @@
     "styled-system": "^3.1.6",
     "tonal": "^2.0.0",
     "tonal-range": "^2.0.0",
-    "tone": "^0.12.80"
+    "tone": "^0.12.80",
+    "vexflow": "^1.2.87"
   },
   "scripts": {
     "start": "react-scripts-ts start",

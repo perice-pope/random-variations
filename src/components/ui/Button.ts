@@ -8,8 +8,8 @@ export const Button = recompose.compose(
   recompose.setDisplayName('Button'),
   recompose.defaultProps({
     bg: theme.colors.lightGray,
-    p: 3,
-    fontSize: 4,
+    p: [2, 2, 3],
+    fontSize: [2, 3, 3],
   }),
   recompose.mapProps((props: HoverButtonProps) => {
     const newProps: HoverButtonProps = {}

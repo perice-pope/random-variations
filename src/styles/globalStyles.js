@@ -44,7 +44,8 @@ export default () => injectGlobal`
   }
 
   body { 
-    min-width: 750px;
+    width: 100%;
+    height: 100%;
     box-sizing: border-box;
   }
 

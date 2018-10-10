@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Flipper, Flipped } from 'react-flip-toolkit'
 import styled, { css } from 'react-emotion'
 import { ThemeProvider } from 'emotion-theming'
-import withProps from 'recompose/withProps'
+import { withProps } from 'recompose'
 import * as _ from 'lodash'
 import Tone from 'tone'
 import * as ReactPiano from 'react-piano'
@@ -15,6 +15,8 @@ import globalStyles from '../styles/globalStyles'
 import { Flex, Box, Button, TextInput, Label } from './ui'
 import NoteCard from './NoteCard'
 import MeasureScreenSize from './MeasureScreenSize'
+
+import * as Vex from 'vexflow'
 
 globalStyles()
 
@@ -33,10 +35,10 @@ const FlipperStyled = styled(Flipper)`
 `
 
 const BpmInput = withProps({
-  fontSize: 4,
-  p: 2,
-  px: 4,
-  mx: 3,
+  p: [2, 2, 2],
+  fontSize: [2, 3, 3],
+  mx: [2, 2, 2],
+  px: [2, 3, 3],
 })(TextInput)
 
 type NoteCard = {
@@ -52,23 +54,48 @@ type AppState = {
   currentNoteCardPlaying: number
   height: number
   width: number
+  notationRootWidth: number
 }
 
-const chromaticNotes = TonalRange.chromatic(['C4', 'C5'], true)
+const chromaticNotes = TonalRange.chromatic(['C4', 'B4'], true)
 
-const pianoNoteRange = {
+const pianoNoteRangeWide = {
   first: tonal.Note.midi('C3'),
-  last: tonal.Note.midi('C6'),
+  last: tonal.Note.midi('B5'),
 }
+
+const pianoNoteRangeMiddle = {
+  first: tonal.Note.midi('G3'),
+  last: tonal.Note.midi('E5'),
+}
+
+const pianoNoteRangeNarrow = {
+  first: tonal.Note.midi('C4'),
+  last: tonal.Note.midi('B4'),
+}
+
 const keyboardShortcuts = ReactPiano.KeyboardShortcuts.create({
-  first: pianoNoteRange.first,
-  last: pianoNoteRange.last,
+  first: pianoNoteRangeNarrow.first,
+  last: pianoNoteRangeNarrow.last,
   keyboardConfig: ReactPiano.KeyboardShortcuts.QWERTY_ROW,
 })
 
+const layoutMinWidth = 320
+
+const ContentContainer = withProps({
+  mx: 'auto',
+  maxWidth: '960px',
+  width: 1,
+  px: 4,
+  // @ts-ignore
+})(Box)
+
 class App extends React.Component<{}, AppState> {
-  synth: any
-  scheduledEvents: any[] = []
+  private synth: any
+  private scheduledEvents: any[] = []
+  private notationRoot: HTMLElement
+  private renderer: Vex.Flow.Renderer
+  private renderContext: Vex.IRenderContext
 
   constructor(props) {
     super(props)
@@ -77,6 +104,7 @@ class App extends React.Component<{}, AppState> {
       // Screen size
       height: 0,
       width: 0,
+      notationRootWidth: 0,
 
       bpm: 120,
       isPlaying: false,
@@ -93,12 +121,21 @@ class App extends React.Component<{}, AppState> {
   }
 
   componentDidMount() {
+    this.initNotationRenderer()
     this.initSynth()
     this.scheduleNotes()
   }
 
   componentWillUnmount() {
     this.cleanUp()
+  }
+
+  private initNotationRenderer = () => {
+    this.notationRoot = document.getElementById('notation') as HTMLElement
+    this.renderer = new Vex.Flow.Renderer(
+      this.notationRoot,
+      Vex.Flow.Renderer.Backends.SVG,
+    )
   }
 
   private initSynth = () => {
@@ -135,6 +172,7 @@ class App extends React.Component<{}, AppState> {
           this.stopPlaying()
         }
 
+        this.renderNotation()
         this.scheduleNotes()
 
         if (hasBeenPlaying) {
@@ -183,13 +221,17 @@ class App extends React.Component<{}, AppState> {
   }
 
   startPlaying = () => {
-    this.setState({ isPlaying: true }, () => Tone.Transport.start())
+    this.setState({ isPlaying: true }, () => {
+      Tone.Master.mute = false
+      Tone.Transport.start()
+    })
   }
 
   stopPlaying = () => {
-    this.setState({ isPlaying: false, currentNoteCardPlaying: 0 }, () =>
-      Tone.Transport.stop(),
-    )
+    this.setState({ isPlaying: false, currentNoteCardPlaying: 0 }, () => {
+      Tone.Master.mute = true
+      Tone.Transport.stop()
+    })
   }
 
   togglePlayback = () => {
@@ -220,7 +262,49 @@ class App extends React.Component<{}, AppState> {
   }
 
   private handleScreenSizeUpdate = ({ height, width }) => {
-    this.setState({ height, width })
+    const stateUpdate: Partial<AppState> = { height, width }
+    if (this.notationRoot) {
+      const {
+        width: notationRootWidth,
+      } = this.notationRoot.getBoundingClientRect()
+      stateUpdate.notationRootWidth = notationRootWidth
+    }
+    this.setState(stateUpdate as any, this.renderNotation)
+  }
+
+  private renderNotation = () => {
+    const width = this.state.notationRootWidth
+
+    // Configure the rendering context
+    this.renderer.resize(width, 300)
+
+    this.renderContext = this.renderer.getContext()
+    this.renderContext.clear()
+    this.renderContext.setFont('Arial', 10).setBackgroundFillStyle('white')
+
+    // Create a stave of at position 10, 40 on the canvas.
+    const stave = new Vex.Flow.Stave(10, 40, width)
+
+    // Add a clef and time signature.
+    stave.addClef('treble').addTimeSignature('4/4')
+
+    // Connect it to the rendering context and draw!
+    stave.setContext(this.renderContext).draw()
+
+    const noteConfigs = this.state.noteCards.map(noteCard => ({
+      keys: [
+        `${tonal.Note.pc(noteCard.note)}/${tonal.Note.oct(noteCard.note)}`,
+      ],
+      duration: '4',
+    }))
+
+    const notes = noteConfigs.map(nc => new Vex.Flow.StaveNote(nc))
+
+    var beams = Vex.Flow.Beam.generateBeams(notes)
+    Vex.Flow.Formatter.FormatAndDraw(this.renderContext, stave, notes)
+    beams.forEach(b => {
+      b.setContext(this.renderContext).draw()
+    })
   }
 
   public render() {
@@ -232,76 +316,89 @@ class App extends React.Component<{}, AppState> {
       <ThemeProvider theme={theme}>
         <>
           <MeasureScreenSize onUpdate={this.handleScreenSizeUpdate} fireOnMount>
-            <Flex height="100vh" flexDirection="column">
-              <Flex
-                flex="1"
-                justifyContent="center"
-                alignItems="center"
-                flexDirection="column"
-                maxWidth={960}
-                mx="auto"
-              >
-                <Flex flexDirection="row" mb={3} width={1}>
-                  <Box flex="1">
-                    <Button
-                      title="Shuffle note cards"
-                      m={2}
-                      onClick={this.handleShuffleClick}
-                    >
-                      shuffle!
-                    </Button>
-
-                    <Button
-                      width={120}
-                      title={isPlaying ? 'Stop' : 'Play'}
-                      bg={isPlaying ? 'red' : 'green'}
-                      m={2}
-                      onClick={this.togglePlayback}
-                    >
-                      {isPlaying ? 'Stop' : 'Play'}
-                    </Button>
-                  </Box>
-
-                  <Label>
-                    BPM:
-                    <BpmInput
-                      type="number"
-                      step="1"
-                      min="0"
-                      max="400"
-                      value={`${bpm}`}
-                      onChange={this.handleBpmChange}
-                    />
-                  </Label>
-                </Flex>
-
-                <FlipperStyled flipKey={noteCards}>
-                  {noteCards.map(({ id, text }, index) => (
-                    <Flipped key={id} flipId={id}>
-                      <Box
-                        p={2}
-                        width={1 / 4}
-                        position="relative"
-                        zIndex={currentNoteCardPlaying === index ? 2 : 1}
+            <Flex
+              height="100vh"
+              width="100vw"
+              flexDirection="column"
+              css="overflow: hidden;"
+            >
+              <ContentContainer flex="1">
+                <Flex
+                  py={4}
+                  // height="100%"
+                  flex="1"
+                  justifyContent="center"
+                  alignItems="center"
+                  flexDirection="column"
+                >
+                  <Flex flexDirection="row" mb={3} width={1}>
+                    <Box flex="1">
+                      <Button
+                        title={isPlaying ? 'Stop' : 'Play'}
+                        bg={isPlaying ? 'red' : 'green'}
+                        m={[1, 2]}
+                        onClick={this.togglePlayback}
                       >
-                        <NoteCard
-                          width={1}
-                          playing={
-                            isPlaying && currentNoteCardPlaying === index
-                          }
+                        {isPlaying ? 'Stop' : 'Play'}
+                      </Button>
+
+                      <Button
+                        title="Shuffle note cards"
+                        m={[1, 2]}
+                        onClick={this.handleShuffleClick}
+                      >
+                        Shuffle!
+                      </Button>
+                    </Box>
+
+                    <Label>
+                      BPM:
+                      <BpmInput
+                        type="number"
+                        step="1"
+                        min="0"
+                        max="400"
+                        value={`${bpm}`}
+                        onChange={this.handleBpmChange}
+                      />
+                    </Label>
+                  </Flex>
+
+                  <FlipperStyled flipKey={noteCards}>
+                    {noteCards.map(({ id, text }, index) => (
+                      <Flipped key={id} flipId={id}>
+                        <Box
+                          p={2}
+                          width={1 / 4}
+                          position="relative"
+                          zIndex={currentNoteCardPlaying === index ? 2 : 1}
                         >
-                          {text}
-                        </NoteCard>
-                      </Box>
-                    </Flipped>
-                  ))}
-                </FlipperStyled>
-              </Flex>
+                          <NoteCard
+                            width={1}
+                            playing={
+                              isPlaying && currentNoteCardPlaying === index
+                            }
+                          >
+                            {text}
+                          </NoteCard>
+                        </Box>
+                      </Flipped>
+                    ))}
+                  </FlipperStyled>
+
+                  <Box width={1} height="200px" id="notation" />
+                </Flex>
+              </ContentContainer>
 
               <Box>
                 <ReactPiano.Piano
-                  // className={`${css({ height: '300px' })}`}
-                  noteRange={pianoNoteRange}
+                  noteRange={
+                    this.state.width > 900
+                      ? pianoNoteRangeWide
+                      : this.state.width > 600
+                        ? pianoNoteRangeMiddle
+                        : pianoNoteRangeNarrow
+                  }
                   className={`${css`
                     .ReactPiano__Key {
                       transition: background-color 300ms;
@@ -323,7 +420,7 @@ class App extends React.Component<{}, AppState> {
                       ? [tonal.Note.midi(activeNoteCard.note)]
                       : undefined
                   }
-                  width={this.state.width}
+                  width={Math.max(layoutMinWidth, this.state.width)}
                   keyboardShortcuts={keyboardShortcuts}
                 />
               </Box>
