@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Flipper, Flipped } from 'react-flip-toolkit'
-// import styled, { css } from 'react-emotion'
-import styled from 'react-emotion'
+import styled, { css } from 'react-emotion'
 import { ThemeProvider } from 'emotion-theming'
 import withProps from 'recompose/withProps'
 import * as _ from 'lodash'
@@ -56,6 +55,16 @@ type AppState = {
 }
 
 const chromaticNotes = TonalRange.chromatic(['C4', 'C5'], true)
+
+const pianoNoteRange = {
+  first: tonal.Note.midi('C3'),
+  last: tonal.Note.midi('C6'),
+}
+const keyboardShortcuts = ReactPiano.KeyboardShortcuts.create({
+  first: pianoNoteRange.first,
+  last: pianoNoteRange.last,
+  keyboardConfig: ReactPiano.KeyboardShortcuts.QWERTY_ROW,
+})
 
 class App extends React.Component<{}, AppState> {
   synth: any
@@ -219,16 +228,6 @@ class App extends React.Component<{}, AppState> {
 
     const activeNoteCard = this.state.noteCards[currentNoteCardPlaying]
 
-    const pianoNoteRange = {
-      first: tonal.Note.midi('C3'),
-      last: tonal.Note.midi('C6'),
-    }
-    const keyboardShortcuts = ReactPiano.KeyboardShortcuts.create({
-      first: pianoNoteRange.first,
-      last: pianoNoteRange.last,
-      keyboardConfig: ReactPiano.KeyboardShortcuts.HOME_ROW,
-    })
-
     return (
       <ThemeProvider theme={theme}>
         <>
@@ -242,24 +241,26 @@ class App extends React.Component<{}, AppState> {
                 maxWidth={960}
                 mx="auto"
               >
-                <Flex flexDirection="row" mb={3}>
-                  <Button
-                    title="Shuffle note cards"
-                    m={2}
-                    onClick={this.handleShuffleClick}
-                  >
-                    shuffle!
-                  </Button>
+                <Flex flexDirection="row" mb={3} width={1}>
+                  <Box flex="1">
+                    <Button
+                      title="Shuffle note cards"
+                      m={2}
+                      onClick={this.handleShuffleClick}
+                    >
+                      shuffle!
+                    </Button>
 
-                  <Button
-                    width={120}
-                    title={isPlaying ? 'Stop' : 'Play'}
-                    bg={isPlaying ? 'red' : 'green'}
-                    m={2}
-                    onClick={this.togglePlayback}
-                  >
-                    {isPlaying ? 'Stop' : 'Play'}
-                  </Button>
+                    <Button
+                      width={120}
+                      title={isPlaying ? 'Stop' : 'Play'}
+                      bg={isPlaying ? 'red' : 'green'}
+                      m={2}
+                      onClick={this.togglePlayback}
+                    >
+                      {isPlaying ? 'Stop' : 'Play'}
+                    </Button>
+                  </Box>
 
                   <Label>
                     BPM:
@@ -301,6 +302,14 @@ class App extends React.Component<{}, AppState> {
                 <ReactPiano.Piano
                   // className={`${css({ height: '300px' })}`}
                   noteRange={pianoNoteRange}
+                  className={`${css`
+                    .ReactPiano__Key {
+                      transition: background-color 300ms;
+                    }
+                    .ReactPiano__Key--active {
+                      background-color: #4de779;
+                    }
+                  `}`}
                   playNote={midiNumber => {
                     // Play a given note - see notes below
                     console.log('Piano / play: ', midiNumber)
