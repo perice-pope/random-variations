@@ -1,13 +1,15 @@
 import styled from 'react-emotion'
 import * as recompose from 'recompose'
 
-import { Box } from './ui'
+import { BaseButton } from './ui'
 
 type NoteCardProps = {
   playing: boolean
 }
 
-export default recompose.setDisplayName('NoteCard')(styled(Box)<NoteCardProps>`
+export default recompose.setDisplayName('NoteCard')(styled(BaseButton)<
+  NoteCardProps
+>`
   transition: all 300ms;
 
   display: inline-flex;

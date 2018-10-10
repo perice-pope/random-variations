@@ -45,6 +45,7 @@ type NoteCard = {
   id: string
   note: string
   text: string
+  midi: number
 }
 
 type AppState = {
@@ -112,8 +113,9 @@ class App extends React.Component<{}, AppState> {
       noteCards: _.sampleSize(chromaticNotes, 12).map(
         (noteName: string, index) => ({
           id: `${index}`,
-          text: noteName,
-          note: `${noteName}`,
+          text: tonal.Note.pc(noteName),
+          note: noteName,
+          midi: tonal.Note.midi(noteName),
         }),
       ),
       currentNoteCardPlaying: 0,
@@ -169,20 +171,22 @@ class App extends React.Component<{}, AppState> {
           ...shuffle([...state.noteCards.slice(1)]),
         ],
       }),
-      () => {
-        const hasBeenPlaying = this.state.isPlaying
-        if (hasBeenPlaying) {
-          this.stopPlaying()
-        }
-
-        this.renderNotation()
-        this.scheduleNotes()
-
-        if (hasBeenPlaying) {
-          this.startPlaying()
-        }
-      },
+      this.onNoteCardsUpdated,
     )
+  }
+
+  private onNoteCardsUpdated = () => {
+    const hasBeenPlaying = this.state.isPlaying
+    if (hasBeenPlaying) {
+      this.stopPlaying()
+    }
+
+    this.renderNotation()
+    this.scheduleNotes()
+
+    if (hasBeenPlaying) {
+      this.startPlaying()
+    }
   }
 
   scheduleNote = (
@@ -262,6 +266,18 @@ class App extends React.Component<{}, AppState> {
         bpm: bpmValue,
       })
     }
+  }
+
+  private handleNoteCardClick = (noteCard: NoteCard) => {
+    this.setState(
+      state => ({
+        noteCards: [
+          noteCard,
+          ...this.state.noteCards.filter(nc => nc.id !== noteCard.id),
+        ],
+      }),
+      this.onNoteCardsUpdated,
+    )
   }
 
   private handleScreenSizeUpdate = ({ height, width }) => {
@@ -368,8 +384,8 @@ class App extends React.Component<{}, AppState> {
                   </Flex>
 
                   <FlipperStyled flipKey={noteCards}>
-                    {noteCards.map(({ id, text }, index) => (
-                      <Flipped key={id} flipId={id}>
+                    {noteCards.map((noteCard, index) => (
+                      <Flipped key={noteCard.id} flipId={noteCard.id}>
                         <Box
                           p={2}
                           width={1 / 4}
@@ -377,12 +393,14 @@ class App extends React.Component<{}, AppState> {
                           zIndex={currentNoteCardPlaying === index ? 2 : 1}
                         >
                           <NoteCard
+                            tabIndex={0}
+                            onClick={() => this.handleNoteCardClick(noteCard)}
                             width={1}
                             playing={
                               isPlaying && currentNoteCardPlaying === index
                             }
                           >
-                            {text}
+                            {noteCard.text}
                           </NoteCard>
                         </Box>
                       </Flipped>
@@ -418,11 +436,7 @@ class App extends React.Component<{}, AppState> {
                     // Stop playing a given note - see notes below
                     console.log('Piano / stop: ', midiNumber)
                   }}
-                  activeNotes={
-                    isPlaying
-                      ? [tonal.Note.midi(activeNoteCard.note)]
-                      : undefined
-                  }
+                  activeNotes={isPlaying ? [activeNoteCard.midi] : undefined}
                   width={Math.max(layoutMinWidth, this.state.width)}
                   keyboardShortcuts={keyboardShortcuts}
                 />
