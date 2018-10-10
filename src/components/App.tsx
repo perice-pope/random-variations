@@ -8,15 +8,15 @@ import Tone from 'tone'
 import * as ReactPiano from 'react-piano'
 import * as tonal from 'tonal'
 import * as TonalRange from 'tonal-range'
-
-import theme from '../styles/theme'
-import globalStyles from '../styles/globalStyles'
+import * as Vex from 'vexflow'
+import { darken } from 'polished'
 
 import { Flex, Box, Button, TextInput, Label } from './ui'
 import NoteCard from './NoteCard'
 import MeasureScreenSize from './MeasureScreenSize'
 
-import * as Vex from 'vexflow'
+import theme from '../styles/theme'
+import globalStyles from '../styles/globalStyles'
 
 globalStyles()
 
@@ -178,9 +178,6 @@ class App extends React.Component<{}, AppState> {
   private onNoteCardsUpdated = () => {
     const hasBeenPlaying = this.state.isPlaying
     this.stopPlaying(() => {
-      this.renderNotation()
-      this.scheduleNotes()
-
       if (hasBeenPlaying) {
         setTimeout(this.startPlaying, 200)
       }
@@ -206,14 +203,18 @@ class App extends React.Component<{}, AppState> {
   drawAnimation = time => {
     console.log('drawAnimation', time)
     if (time === '0:0' && this.state.currentNoteCardPlaying === 0) {
+      this.renderNotation()
       return
     }
 
-    this.setState(state => ({
-      currentNoteCardPlaying: state.isPlaying
-        ? (state.currentNoteCardPlaying + 1) % 12
-        : state.currentNoteCardPlaying,
-    }))
+    this.setState(
+      state => ({
+        currentNoteCardPlaying: state.isPlaying
+          ? (state.currentNoteCardPlaying + 1) % 12
+          : state.currentNoteCardPlaying,
+      }),
+      this.renderNotation,
+    )
   }
 
   scheduleNotes = () => {
@@ -228,6 +229,7 @@ class App extends React.Component<{}, AppState> {
   }
 
   startPlaying = () => {
+    this.scheduleNotes()
     this.setState({ isPlaying: true }, () => {
       Tone.Master.mute = false
       Tone.Transport.start()
@@ -238,6 +240,8 @@ class App extends React.Component<{}, AppState> {
     this.setState({ isPlaying: false, currentNoteCardPlaying: 0 }, () => {
       Tone.Master.mute = true
       Tone.Transport.stop()
+
+      this.renderNotation()
 
       if (cb) {
         cb()
@@ -322,12 +326,42 @@ class App extends React.Component<{}, AppState> {
     }))
 
     const notes = noteConfigs.map(nc => new Vex.Flow.StaveNote(nc))
+    if (this.state.isPlaying) {
+      notes[this.state.currentNoteCardPlaying].setStyle({
+        fillStyle: darken(0.1, '#4de779'),
+        strokeStyle: darken(0.1, '#4de779'),
+      })
+    }
 
     var beams = Vex.Flow.Beam.generateBeams(notes)
     Vex.Flow.Formatter.FormatAndDraw(this.renderContext, stave, notes)
     beams.forEach(b => {
       b.setContext(this.renderContext).draw()
     })
+
+    if (this.state.isPlaying) {
+      const notePosition = notes[
+        this.state.currentNoteCardPlaying
+      ].getBoundingBox()
+      const x = notePosition.getX() + notePosition.getW() / 2
+
+      this.renderContext.save()
+      this.renderContext.setLineWidth(1)
+      this.renderContext.setStrokeStyle('salmon')
+
+      this.renderContext
+        .beginPath()
+        // @ts-ignore
+        .moveTo(x, stave.getBoundingBox().getY())
+        .lineTo(
+          x,
+          // @ts-ignore
+          stave.getBoundingBox().getY() + stave.getBoundingBox().getH(),
+        )
+        .stroke()
+
+      this.renderContext.restore()
+    }
   }
 
   public render() {
