@@ -6,8 +6,6 @@ import isPropValid from '@emotion/is-prop-valid'
 import { BoxProps } from './Box'
 
 export type BaseButtonProps = BoxProps &
-  ss.FontWeightProps &
-  ss.FontSizeProps &
   ss.JustifyContentProps & {
     outline?: string
     variant?: string
@@ -38,6 +36,7 @@ const StyledButton = styled('button', {
   ${ss.justifyContent}
   outline: ${({ outline }) => outline};
   cursor: pointer;
+  user-select: none;
 `
 
 const enhance = recompose.compose(

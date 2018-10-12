@@ -2,7 +2,7 @@ import styled from 'react-emotion'
 import * as recompose from 'recompose'
 import { lighten } from 'polished'
 
-import { BaseButton } from './ui'
+import { Box } from './ui'
 
 type NoteCardProps = {
   bgColor: string
@@ -16,11 +16,16 @@ const enhance = recompose.compose(
   }),
 )
 
-const NoteCard = styled(BaseButton)<NoteCardProps>`
+const NoteCard = styled(Box)<NoteCardProps>`
   transition: all 300ms;
 
   display: inline-flex;
-  border-radius: 15px;
+  cursor: pointer;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
   border: 2px solid #eee;
   background-color: ${({ bgColor, active }) =>
     active ? lighten(0.13, bgColor) : bgColor};
@@ -28,30 +33,32 @@ const NoteCard = styled(BaseButton)<NoteCardProps>`
   align-items: center;
   justify-content: center;
 
-  padding: 15px 10px;
-  font-size: 50px;
+  padding: 3px 3px;
+  border-radius: 15px;
+  font-size: 18px;
+  user-select: none;
 
-  @media screen and (max-height: 900px), screen and (max-width: 900px) {
-    font-size: 40px;
-    padding: 10px 10px;
+  @media screen and (min-height: 600px) and (min-width: 300px) {
+    font-size: 20px;
+    border-radius: 15px;
+    padding: 5px 5px;
   }
 
-  @media screen and (max-height: 800px), screen and (max-width: 700px) {
+  @media screen and (min-height: 700px) and (min-width: 400px) {
     font-size: 30px;
-    border-radius: 10px;
+    border-radius: 15px;
+    padding: 5px 5px;
+  }
+
+  @media screen and (min-height: 800px) and (min-width: 700px) {
+    font-size: 40px;
+    border-radius: 15px;
     padding: 5px 10px;
   }
 
-  @media screen and (max-height: 700px), screen and (max-width: 500px) {
-    font-size: 20px;
-    border-radius: 5px;
-    padding: 5px 5px;
-  }
-
-  @media screen and (max-height: 600px), screen and (max-width: 400px) {
-    font-size: 18px;
-    border-radius: 5px;
-    padding: 5px 5px;
+  @media screen and (min-height: 900px) and (min-width: 900px) {
+    font-size: 50px;
+    padding: 15px 20px;
   }
 `
 

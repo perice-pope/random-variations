@@ -10,7 +10,7 @@ import { Flex, Box, Button, TextInput, Label } from './ui'
 import NotesStaff from './NotesStaff'
 import MeasureScreenSize from './MeasureScreenSize'
 
-import { shuffle, getNoteCardColorByNoteName } from '../utils'
+import { shuffle, arrayMove, getNoteCardColorByNoteName } from '../utils'
 
 import theme from '../styles/theme'
 import globalStyles from '../styles/globalStyles'
@@ -46,9 +46,11 @@ const chromaticNotes = TonalRange.chromatic(['C4', 'B4'], true)
 
 const layoutMinWidth = 320
 
+// @ts-ignore
 const ContentContainer = withProps({
   mx: 'auto',
   maxWidth: '960px',
+  height: '100%',
   width: 1,
   px: 4,
   // @ts-ignore
@@ -121,6 +123,17 @@ class App extends React.Component<{}, AppState> {
       return undefined
     }
     return staffNotes[activeNoteCardIndex]
+  }
+
+  private getPianoHeight = () => {
+    const { height } = this.state
+    if (height > 600) {
+      return 200
+    }
+    if (height > 300) {
+      return 130
+    }
+    return 80
   }
 
   private initSynth = () => {
@@ -269,7 +282,17 @@ class App extends React.Component<{}, AppState> {
     )
   }
 
+  private handleCardsReorder = ({ oldIndex, newIndex }) => {
+    this.setState(
+      {
+        noteCards: arrayMove(this.state.noteCards, oldIndex, newIndex),
+      },
+      this.onNoteCardsUpdated,
+    )
+  }
+
   private handleScreenSizeUpdate = ({ height, width }) => {
+    console.log(height, width)
     if (this.notesStaffContainerRef.current) {
       const {
         width: notesStaffWidth,
@@ -299,74 +322,78 @@ class App extends React.Component<{}, AppState> {
             <Flex
               height="100vh"
               width="100vw"
-              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
               css="overflow: hidden;"
+              flexDirection="column"
             >
-              <ContentContainer flex="1">
-                <Flex
-                  py={4}
-                  // height="100%"
-                  flex="1"
-                  justifyContent="center"
-                  alignItems="center"
-                  flexDirection="column"
-                >
-                  <Flex flexDirection="row" mb={3} width={1}>
-                    <Box flex="1">
-                      <Button
-                        title={isPlaying ? 'Stop' : 'Play'}
-                        bg={isPlaying ? 'red' : 'green'}
-                        m={[1, 2]}
-                        onClick={this.togglePlayback}
-                      >
-                        {isPlaying ? 'Stop' : 'Play'}
-                      </Button>
+              <Flex
+                pt={[2, 3, 4]}
+                flex={1}
+                px={[3]}
+                width={1}
+                maxWidth={960}
+                justifyContent="center"
+                alignItems="center"
+                flexDirection="column"
+              >
+                <Flex flexDirection="row" mb={3} width={1}>
+                  <Box flex="1">
+                    <Button
+                      title={isPlaying ? 'Stop' : 'Play'}
+                      bg={isPlaying ? 'red' : 'green'}
+                      m={[1, 2]}
+                      onClick={this.togglePlayback}
+                    >
+                      {isPlaying ? 'Stop' : 'Play'}
+                    </Button>
 
-                      <Button
-                        title="Shuffle note cards"
-                        m={[1, 2]}
-                        onClick={this.handleShuffleClick}
-                      >
-                        Shuffle!
-                      </Button>
-                    </Box>
+                    <Button
+                      title="Shuffle note cards"
+                      m={[1, 2]}
+                      onClick={this.handleShuffleClick}
+                    >
+                      Shuffle!
+                    </Button>
+                  </Box>
 
-                    <Label>
-                      BPM:
-                      <BpmInput
-                        type="number"
-                        step="1"
-                        min="0"
-                        max="400"
-                        value={`${bpm}`}
-                        onChange={this.handleBpmChange}
-                      />
-                    </Label>
-                  </Flex>
+                  <Label>
+                    BPM:
+                    <BpmInput
+                      type="number"
+                      step="1"
+                      min="0"
+                      max="400"
+                      value={`${bpm}`}
+                      onChange={this.handleBpmChange}
+                    />
+                  </Label>
+                </Flex>
 
+                <Flex flex={2} alignItems="center" maxHeight={400}>
                   <NoteCards
                     noteCards={noteCards}
                     activeNoteCard={activeNoteCard}
                     onNoteCardClick={this.handleNoteCardClick}
+                    onCardsReorder={this.handleCardsReorder}
                   />
-
-                  <Box innerRef={this.notesStaffContainerRef} width={1}>
-                    <NotesStaff
-                      notes={this.state.staffNotes}
-                      activeNote={this.getActiveStaffNote()}
-                      width={this.state.notesStaffWidth}
-                      ref={this.notesStaffRef}
-                      containerProps={{
-                        height: 200,
-                      }}
-                    />
-                  </Box>
                 </Flex>
-              </ContentContainer>
 
-              <Box>
+                <Box innerRef={this.notesStaffContainerRef} width={1}>
+                  <NotesStaff
+                    notes={this.state.staffNotes}
+                    activeNote={this.getActiveStaffNote()}
+                    width={this.state.notesStaffWidth}
+                    ref={this.notesStaffRef}
+                    height={160}
+                  />
+                </Box>
+              </Flex>
+
+              <Box mt={[1, 2, 3]}>
                 <PianoKeyboard
                   width={Math.max(layoutMinWidth, this.state.width)}
+                  height={this.getPianoHeight()}
                   activeNotesMidi={
                     activeNoteCard ? [activeNoteCard.midi] : undefined
                   }

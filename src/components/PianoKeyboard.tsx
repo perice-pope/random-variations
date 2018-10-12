@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { css } from 'react-emotion'
+import { css, cx } from 'react-emotion'
 import * as _ from 'lodash'
 import * as ReactPiano from 'react-piano'
 import * as tonal from 'tonal'
@@ -33,7 +33,9 @@ type MidiNoteRange = {
 }
 
 type PianoKeyboardProps = {
+  className?: any
   width: number
+  height: number
   activeNotesMidi?: number[]
   activeNotesColor?: string
   noteRange?: MidiNoteRange
@@ -42,39 +44,62 @@ type PianoKeyboardProps = {
 }
 
 class PianoKeyboard extends React.Component<PianoKeyboardProps> {
+  private onPlayNote = noteMidi => {
+    if (this.props.onPlayNote) {
+      this.props.onPlayNote(noteMidi)
+    }
+  }
+
+  private onStopNote = noteMidi => {
+    if (this.props.onStopNote) {
+      this.props.onStopNote(noteMidi)
+    }
+  }
+
+  private getNoteRange = () => {
+    const { noteRange, width } = this.props
+    console.log(width)
+    if (noteRange) {
+      return noteRange
+    }
+    if (width > 1000) {
+      return pianoNoteRangeWide
+    }
+    if (width > 400) {
+      return pianoNoteRangeMiddle
+    }
+    return pianoNoteRangeNarrow
+  }
+
   public render() {
     const {
+      className,
+      height,
       width,
       activeNotesMidi,
       activeNotesColor,
-      onPlayNote,
-      onStopNote,
-      noteRange,
     } = this.props
 
     return (
       <Box>
         <ReactPiano.Piano
-          noteRange={
-            noteRange
-              ? noteRange
-              : width > 900
-                ? pianoNoteRangeWide
-                : width > 600
-                  ? pianoNoteRangeMiddle
-                  : pianoNoteRangeNarrow
-          }
-          className={`${css`
-            .ReactPiano__Key {
-              transition: background-color 300ms;
-            }
+          noteRange={this.getNoteRange()}
+          className={cx(
+            `${css`
+              height: ${height}px !important;
 
-            .ReactPiano__Key--active {
-              background-color: ${activeNotesColor};
-            }
-          `}`}
-          playNote={onPlayNote}
-          stopNote={onStopNote}
+              .ReactPiano__Key {
+                transition: background-color 300ms;
+              }
+
+              .ReactPiano__Key--active {
+                background-color: ${activeNotesColor};
+              }
+            `}`,
+            className,
+          )}
+          playNote={this.onPlayNote}
+          stopNote={this.onStopNote}
           activeNotes={activeNotesMidi || []}
           width={width}
           keyboardShortcuts={keyboardShortcuts}

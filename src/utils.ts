@@ -1,5 +1,6 @@
 import { darken, lighten } from 'polished'
 import * as tonal from 'tonal'
+import { arrayMove as reactHocArrayMove } from 'react-sortable-hoc'
 
 /**
  * Returns a copy of the array shuffled randomly
@@ -12,6 +13,8 @@ export function shuffle(array: any[]) {
   }
   return a
 }
+
+export const arrayMove = reactHocArrayMove
 
 const NOTE_NAME_TO_COLOR_MAP = {
   A: '#D783FF',

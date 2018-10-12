@@ -21,6 +21,8 @@ export type BoxProps = ss.SizeProps &
   ss.TopProps &
   ss.RightProps &
   ss.BottomProps &
+  ss.FontWeightProps &
+  ss.FontSizeProps &
   ss.ZIndexProps
 
 export const Box = styled('div')<BoxProps>`
@@ -45,5 +47,7 @@ export const Box = styled('div')<BoxProps>`
   ${ss.bottom}
   ${ss.right}
   ${ss.zIndex}
+  ${ss.fontSize}
+  ${ss.fontWeight}
   box-sizing: border-box;
 `

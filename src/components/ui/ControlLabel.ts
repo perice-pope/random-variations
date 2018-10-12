@@ -5,4 +5,5 @@ export const ControlLabel = styled(Text)`
   font-size: 0.7em;
   text-transform: uppercase;
   color: white;
+  user-select: none;
 `

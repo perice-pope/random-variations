@@ -11,6 +11,7 @@ type NotesStaffProps = {
   notes: StaffNoteType[]
   activeNote?: StaffNoteType
   width: number
+  height: number
   containerProps?: BoxProps
 }
 
@@ -38,22 +39,22 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
   }
 
   private renderStaffAndNotes = () => {
-    const { width, activeNote, notes: notesConfig } = this.props
+    const { width, height, activeNote, notes: notesConfig } = this.props
 
     // Configure the rendering context
-    this.renderer.resize(width, 300)
+    this.renderer.resize(width, height)
 
     this.renderContext = this.renderer.getContext()
     this.renderContext.clear()
     this.renderContext
-      .setFont('Arial', 10)
+      .setFont('Arial', 14)
       .setBackgroundFillStyle('white')
       .setFillStyle('black')
       .setStrokeStyle('black')
     this.renderContext.save()
 
     // Create a stave of at position 10, 40 on the canvas.
-    const stave = new Vex.Flow.Stave(10, 40, width)
+    const stave = new Vex.Flow.Stave(10, 0, width)
 
     // Add a clef and time signature.
     stave.addClef('treble')
@@ -114,11 +115,11 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
       this.renderContext
         .beginPath()
         // @ts-ignore
-        .moveTo(x, stave.getBoundingBox().getY())
+        .moveTo(x, stave.getBoundingBox().getY() + 20)
         .lineTo(
           x,
           // @ts-ignore
-          stave.getBoundingBox().getY() + stave.getBoundingBox().getH(),
+          stave.getBoundingBox().getY() + stave.getBoundingBox().getH() - 20,
         )
         .stroke()
 
@@ -129,10 +130,10 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
   }
 
   public render() {
-    const { containerProps } = this.props
+    const { height, containerProps } = this.props
 
     // @ts-ignore
-    return <Box width={1} id="notation" {...containerProps} />
+    return <Box width={1} id="notation" height={height} {...containerProps} />
   }
 }
 
