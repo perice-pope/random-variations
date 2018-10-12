@@ -9,7 +9,7 @@ import * as ReactPiano from 'react-piano'
 import * as tonal from 'tonal'
 import * as TonalRange from 'tonal-range'
 import * as Vex from 'vexflow'
-import { darken, lighten } from 'polished'
+import { darken, lighten, getLuminance } from 'polished'
 
 import { Flex, Box, Button, TextInput, Label } from './ui'
 import NoteCard from './NoteCard'
@@ -336,7 +336,7 @@ class App extends React.Component<{}, AppState> {
     const stave = new Vex.Flow.Stave(10, 40, width)
 
     // Add a clef and time signature.
-    stave.addClef('treble').addTimeSignature('4/4')
+    stave.addClef('treble')
 
     // Connect it to the rendering context and draw!
     stave.setContext(this.renderContext).draw()
@@ -349,18 +349,32 @@ class App extends React.Component<{}, AppState> {
     }))
 
     const notes = noteConfigs.map(nc => new Vex.Flow.StaveNote(nc))
-    if (this.state.isPlaying) {
-      notes[this.state.currentNoteCardPlaying].setStyle({
-        fillStyle: darken(0.1, '#4de779'),
-        strokeStyle: darken(0.1, '#4de779'),
-      })
-    }
+    this.state.noteCards.forEach((noteCard, index) => {
+      const note = notes[index]
 
-    var beams = Vex.Flow.Beam.generateBeams(notes)
-    Vex.Flow.Formatter.FormatAndDraw(this.renderContext, stave, notes)
-    beams.forEach(b => {
-      b.setContext(this.renderContext).draw()
+      const cardColorLuminance = getLuminance(noteCard.color)
+      const noteColor =
+        cardColorLuminance > 0.5 ? darken(0.2, noteCard.color) : noteCard.color
+
+      if (this.state.isPlaying && index === this.state.currentNoteCardPlaying) {
+        note.setStyle({
+          fillStyle: lighten(0.1, noteColor),
+          strokeStyle: lighten(0.1, noteColor),
+        })
+      } else {
+        note.setStyle({
+          fillStyle: darken(0.1, noteColor),
+          strokeStyle: darken(0.1, noteColor),
+        })
+      }
+
+      // Hide the stems
+      note
+        .getStem()
+        .setStyle({ fillStyle: 'transparent', strokeStyle: 'transparent' })
     })
+
+    Vex.Flow.Formatter.FormatAndDraw(this.renderContext, stave, notes)
 
     if (this.state.isPlaying) {
       const notePosition = notes[
