@@ -23,7 +23,7 @@ const NoteCard = styled(BaseButton)<NoteCardProps>`
   border-radius: 15px;
   border: 2px solid #eee;
   background-color: ${({ bgColor, playing }) =>
-    playing ? lighten(0.1, bgColor) : bgColor};
+    playing ? lighten(0.13, bgColor) : bgColor};
   transform: ${({ playing }) => (playing ? 'scale(1.2)' : 'none')};
   align-items: center;
   justify-content: center;
