@@ -1,21 +1,29 @@
 import styled from 'react-emotion'
 import * as recompose from 'recompose'
+import { lighten } from 'polished'
 
 import { BaseButton } from './ui'
 
 type NoteCardProps = {
+  bgColor: string
   playing: boolean
 }
 
-export default recompose.setDisplayName('NoteCard')(styled(BaseButton)<
-  NoteCardProps
->`
+const enhance = recompose.compose(
+  recompose.setDisplayName('NoteCard'),
+  recompose.defaultProps({
+    bgColor: 'white',
+  }),
+)
+
+const NoteCard = styled(BaseButton)<NoteCardProps>`
   transition: all 300ms;
 
   display: inline-flex;
   border-radius: 15px;
   border: 2px solid #eee;
-  background-color: ${({ playing }) => (playing ? '#4de779' : 'white')};
+  background-color: ${({ bgColor, playing }) =>
+    playing ? lighten(0.1, bgColor) : bgColor};
   transform: ${({ playing }) => (playing ? 'scale(1.2)' : 'none')};
   align-items: center;
   justify-content: center;
@@ -45,4 +53,6 @@ export default recompose.setDisplayName('NoteCard')(styled(BaseButton)<
     border-radius: 5px;
     padding: 5px 5px;
   }
-`)
+`
+
+export default enhance(NoteCard) as typeof NoteCard

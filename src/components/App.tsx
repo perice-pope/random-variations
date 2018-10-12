@@ -9,7 +9,7 @@ import * as ReactPiano from 'react-piano'
 import * as tonal from 'tonal'
 import * as TonalRange from 'tonal-range'
 import * as Vex from 'vexflow'
-import { darken } from 'polished'
+import { darken, lighten } from 'polished'
 
 import { Flex, Box, Button, TextInput, Label } from './ui'
 import NoteCard from './NoteCard'
@@ -41,11 +41,33 @@ const BpmInput = withProps({
   px: [2, 3, 3],
 })(TextInput)
 
+const NOTE_NAME_TO_COLOR_MAP = {
+  A: '#D783FF',
+  B: '#0096FF',
+  C: '#8EFA00',
+  D: '#FFFB02',
+  E: '#FFD479',
+  F: '#FF7E79',
+  G: '#FF5097',
+}
+
+const getColorByNoteName = (fullNoteName: string) => {
+  const [letter, accidental] = tonal.Note.tokenize(fullNoteName)
+  const baseColor = NOTE_NAME_TO_COLOR_MAP[letter.toUpperCase()]
+  if (accidental === '#') {
+    return lighten(0.1, baseColor)
+  } else if (accidental === 'b') {
+    return darken(0.1, baseColor)
+  }
+  return baseColor
+}
+
 type NoteCard = {
   id: string
   note: string
   text: string
   midi: number
+  color: string
 }
 
 type AppState = {
@@ -116,6 +138,7 @@ class App extends React.Component<{}, AppState> {
           text: tonal.Note.pc(noteName),
           note: noteName,
           midi: tonal.Note.midi(noteName),
+          color: getColorByNoteName(noteName),
         }),
       ),
       currentNoteCardPlaying: 0,
@@ -431,6 +454,7 @@ class App extends React.Component<{}, AppState> {
                           zIndex={currentNoteCardPlaying === index ? 2 : 1}
                         >
                           <NoteCard
+                            bgColor={noteCard.color}
                             tabIndex={0}
                             onClick={() => this.handleNoteCardClick(noteCard)}
                             width={1}
