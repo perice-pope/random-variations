@@ -501,7 +501,7 @@ class App extends React.Component<{}, AppState> {
                       transition: background-color 300ms;
                     }
                     .ReactPiano__Key--active {
-                      background-color: #4de779;
+                      background-color: ${activeNoteCard.color};
                     }
                   `}`}
                   playNote={midiNumber => {
