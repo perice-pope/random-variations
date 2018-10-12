@@ -341,14 +341,22 @@ class App extends React.Component<{}, AppState> {
     // Connect it to the rendering context and draw!
     stave.setContext(this.renderContext).draw()
 
-    const noteConfigs = this.state.noteCards.map(noteCard => ({
-      keys: [
-        `${tonal.Note.pc(noteCard.note)}/${tonal.Note.oct(noteCard.note)}`,
-      ],
-      duration: '4',
-    }))
+    const notes = this.state.noteCards.map(noteCard => {
+      const [letter, accidental, octave] = tonal.Note.tokenize(noteCard.note)
 
-    const notes = noteConfigs.map(nc => new Vex.Flow.StaveNote(nc))
+      const noteConfig = {
+        keys: [`${letter}${accidental}/${octave}`],
+        duration: '4',
+      }
+
+      const note = new Vex.Flow.StaveNote(noteConfig)
+      if (accidental) {
+        note.addAccidental(0, new Vex.Flow.Accidental(accidental))
+      }
+
+      return note
+    })
+
     this.state.noteCards.forEach((noteCard, index) => {
       const note = notes[index]
 
