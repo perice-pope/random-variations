@@ -1,10 +1,8 @@
 import * as React from 'react'
-import { css } from 'react-emotion'
 import { ThemeProvider } from 'emotion-theming'
 import { withProps } from 'recompose'
 import * as _ from 'lodash'
 import Tone from 'tone'
-import * as ReactPiano from 'react-piano'
 import * as tonal from 'tonal'
 import * as TonalRange from 'tonal-range'
 
@@ -20,6 +18,7 @@ import globalStyles from '../styles/globalStyles'
 import NoteCards from './NoteCards'
 
 import { NoteCardType, StaffNoteType } from '../types'
+import PianoKeyboard from './PianoKeyboard'
 
 globalStyles()
 
@@ -33,36 +32,17 @@ const BpmInput = withProps({
 type AppState = {
   bpm: number
   isPlaying: boolean
+
   noteCards: NoteCardType[]
   staffNotes: StaffNoteType[]
   activeNoteCardIndex: number
+
   height: number
   width: number
   notesStaffWidth: number
 }
 
 const chromaticNotes = TonalRange.chromatic(['C4', 'B4'], true)
-
-const pianoNoteRangeWide = {
-  first: tonal.Note.midi('C3'),
-  last: tonal.Note.midi('B5'),
-}
-
-const pianoNoteRangeMiddle = {
-  first: tonal.Note.midi('G3'),
-  last: tonal.Note.midi('E5'),
-}
-
-const pianoNoteRangeNarrow = {
-  first: tonal.Note.midi('C4'),
-  last: tonal.Note.midi('B4'),
-}
-
-const keyboardShortcuts = ReactPiano.KeyboardShortcuts.create({
-  first: pianoNoteRangeNarrow.first,
-  last: pianoNoteRangeNarrow.last,
-  keyboardConfig: ReactPiano.KeyboardShortcuts.QWERTY_ROW,
-})
 
 const layoutMinWidth = 320
 
@@ -385,38 +365,14 @@ class App extends React.Component<{}, AppState> {
               </ContentContainer>
 
               <Box>
-                <ReactPiano.Piano
-                  noteRange={
-                    this.state.width > 900
-                      ? pianoNoteRangeWide
-                      : this.state.width > 600
-                        ? pianoNoteRangeMiddle
-                        : pianoNoteRangeNarrow
-                  }
-                  className={`${css`
-                    .ReactPiano__Key {
-                      transition: background-color 300ms;
-                    }
-
-                    .ReactPiano__Key--active {
-                      background-color: ${activeNoteCard
-                        ? activeNoteCard.color
-                        : undefined};
-                    }
-                  `}`}
-                  playNote={midiNumber => {
-                    // Play a given note - see notes below
-                    console.log('Piano / play: ', midiNumber)
-                  }}
-                  stopNote={midiNumber => {
-                    // Stop playing a given note - see notes below
-                    console.log('Piano / stop: ', midiNumber)
-                  }}
-                  activeNotes={
+                <PianoKeyboard
+                  width={Math.max(layoutMinWidth, this.state.width)}
+                  activeNotesMidi={
                     activeNoteCard ? [activeNoteCard.midi] : undefined
                   }
-                  width={Math.max(layoutMinWidth, this.state.width)}
-                  keyboardShortcuts={keyboardShortcuts}
+                  activeNotesColor={
+                    activeNoteCard ? activeNoteCard.color : undefined
+                  }
                 />
               </Box>
             </Flex>
