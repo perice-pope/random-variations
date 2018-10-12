@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { Flipper, Flipped } from 'react-flip-toolkit'
-import styled, { css } from 'react-emotion'
+import { css } from 'react-emotion'
 import { ThemeProvider } from 'emotion-theming'
 import { withProps } from 'recompose'
 import * as _ from 'lodash'
@@ -8,11 +7,9 @@ import Tone from 'tone'
 import * as ReactPiano from 'react-piano'
 import * as tonal from 'tonal'
 import * as TonalRange from 'tonal-range'
-import * as Vex from 'vexflow'
-import { darken, lighten, getLuminance } from 'polished'
 
 import { Flex, Box, Button, TextInput, Label } from './ui'
-import NoteCard from './NoteCard'
+import NotesStaff from './NotesStaff'
 import MeasureScreenSize from './MeasureScreenSize'
 
 import { shuffle, getNoteCardColorByNoteName } from '../utils'
@@ -22,15 +19,9 @@ import globalStyles from '../styles/globalStyles'
 
 import NoteCards from './NoteCards'
 
-import { NoteCardType } from '../types'
+import { NoteCardType, StaffNoteType } from '../types'
 
 globalStyles()
-
-const FlipperStyled = styled(Flipper)`
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-`
 
 const BpmInput = withProps({
   p: [2, 2, 2],
@@ -43,10 +34,11 @@ type AppState = {
   bpm: number
   isPlaying: boolean
   noteCards: NoteCardType[]
+  staffNotes: StaffNoteType[]
   activeNoteCardIndex: number
   height: number
   width: number
-  notationRootWidth: number
+  notesStaffWidth: number
 }
 
 const chromaticNotes = TonalRange.chromatic(['C4', 'B4'], true)
@@ -85,9 +77,8 @@ const ContentContainer = withProps({
 class App extends React.Component<{}, AppState> {
   private synth: any
   private scheduledEvents: any[] = []
-  private notationRoot: HTMLElement
-  private renderer: Vex.Flow.Renderer
-  private renderContext: Vex.IRenderContext
+  private notesStaffRef: React.RefObject<NotesStaff>
+  private notesStaffContainerRef: React.RefObject<any>
 
   constructor(props) {
     super(props)
@@ -96,7 +87,7 @@ class App extends React.Component<{}, AppState> {
       // Screen size
       height: 0,
       width: 0,
-      notationRootWidth: 0,
+      notesStaffWidth: 0,
 
       bpm: 120,
       isPlaying: false,
@@ -110,26 +101,46 @@ class App extends React.Component<{}, AppState> {
           color: getNoteCardColorByNoteName(noteName),
         }),
       ),
+      staffNotes: [],
       activeNoteCardIndex: 0,
     }
+
+    this.notesStaffRef = React.createRef()
+    this.notesStaffContainerRef = React.createRef()
   }
 
   componentDidMount() {
-    this.initNotationRenderer()
     this.initSynth()
     this.scheduleNotes()
+    this.updateStaffNotes()
   }
 
   componentWillUnmount() {
     this.cleanUp()
   }
 
-  private initNotationRenderer = () => {
-    this.notationRoot = document.getElementById('notation') as HTMLElement
-    this.renderer = new Vex.Flow.Renderer(
-      this.notationRoot,
-      Vex.Flow.Renderer.Backends.SVG,
+  updateStaffNotes = () => {
+    const { noteCards } = this.state
+    const staffNotes: StaffNoteType[] = noteCards.map(
+      (noteCard, index) =>
+        ({
+          index,
+          note: noteCard.note,
+          midi: noteCard.midi,
+          color: noteCard.color,
+          duration: '4',
+        } as StaffNoteType),
     )
+
+    this.setState({ staffNotes }, this.renderNotation)
+  }
+
+  private getActiveStaffNote = () => {
+    const { isPlaying, staffNotes, activeNoteCardIndex } = this.state
+    if (!isPlaying) {
+      return undefined
+    }
+    return staffNotes[activeNoteCardIndex]
   }
 
   private initSynth = () => {
@@ -167,6 +178,7 @@ class App extends React.Component<{}, AppState> {
   private onNoteCardsUpdated = () => {
     const hasBeenPlaying = this.state.isPlaying
     this.stopPlaying(() => {
+      this.updateStaffNotes()
       if (hasBeenPlaying) {
         setTimeout(this.startPlaying, 200)
       }
@@ -192,7 +204,7 @@ class App extends React.Component<{}, AppState> {
   drawAnimation = time => {
     console.log('drawAnimation', time)
     if (time === '0:0' && this.state.activeNoteCardIndex === 0) {
-      this.renderNotation()
+      this.updateStaffNotes()
       return
     }
 
@@ -202,7 +214,7 @@ class App extends React.Component<{}, AppState> {
           ? (state.activeNoteCardIndex + 1) % 12
           : state.activeNoteCardIndex,
       }),
-      this.renderNotation,
+      this.updateStaffNotes,
     )
   }
 
@@ -230,7 +242,7 @@ class App extends React.Component<{}, AppState> {
       Tone.Master.mute = true
       Tone.Transport.stop()
 
-      this.renderNotation()
+      this.updateStaffNotes()
 
       if (cb) {
         cb()
@@ -278,100 +290,18 @@ class App extends React.Component<{}, AppState> {
   }
 
   private handleScreenSizeUpdate = ({ height, width }) => {
-    const stateUpdate: Partial<AppState> = { height, width }
-    if (this.notationRoot) {
+    if (this.notesStaffContainerRef.current) {
       const {
-        width: notationRootWidth,
-      } = this.notationRoot.getBoundingClientRect()
-      stateUpdate.notationRootWidth = notationRootWidth
+        width: notesStaffWidth,
+      } = this.notesStaffContainerRef.current.getBoundingClientRect()
+      this.setState({ notesStaffWidth })
     }
-    this.setState(stateUpdate as any, this.renderNotation)
+    this.setState({ height, width }, this.renderNotation)
   }
 
   private renderNotation = () => {
-    const width = this.state.notationRootWidth
-
-    // Configure the rendering context
-    this.renderer.resize(width, 300)
-
-    this.renderContext = this.renderer.getContext()
-    this.renderContext.clear()
-    this.renderContext.setFont('Arial', 10).setBackgroundFillStyle('white')
-
-    // Create a stave of at position 10, 40 on the canvas.
-    const stave = new Vex.Flow.Stave(10, 40, width)
-
-    // Add a clef and time signature.
-    stave.addClef('treble')
-
-    // Connect it to the rendering context and draw!
-    stave.setContext(this.renderContext).draw()
-
-    const notes = this.state.noteCards.map(noteCard => {
-      const [letter, accidental, octave] = tonal.Note.tokenize(noteCard.note)
-
-      const noteConfig = {
-        keys: [`${letter}${accidental}/${octave}`],
-        duration: '4',
-      }
-
-      const note = new Vex.Flow.StaveNote(noteConfig)
-      if (accidental) {
-        note.addAccidental(0, new Vex.Flow.Accidental(accidental))
-      }
-
-      return note
-    })
-
-    this.state.noteCards.forEach((noteCard, index) => {
-      const note = notes[index]
-
-      const cardColorLuminance = getLuminance(noteCard.color)
-      const noteColor =
-        cardColorLuminance > 0.5 ? darken(0.2, noteCard.color) : noteCard.color
-
-      if (this.state.isPlaying && index === this.state.activeNoteCardIndex) {
-        note.setStyle({
-          fillStyle: lighten(0.1, noteColor),
-          strokeStyle: lighten(0.1, noteColor),
-        })
-      } else {
-        note.setStyle({
-          fillStyle: darken(0.1, noteColor),
-          strokeStyle: darken(0.1, noteColor),
-        })
-      }
-
-      // Hide the stems
-      note
-        .getStem()
-        .setStyle({ fillStyle: 'transparent', strokeStyle: 'transparent' })
-    })
-
-    Vex.Flow.Formatter.FormatAndDraw(this.renderContext, stave, notes)
-
-    if (this.state.isPlaying) {
-      const notePosition = notes[
-        this.state.activeNoteCardIndex
-      ].getBoundingBox()
-      const x = notePosition.getX() + notePosition.getW() / 2
-
-      this.renderContext.save()
-      this.renderContext.setLineWidth(1)
-      this.renderContext.setStrokeStyle('salmon')
-
-      this.renderContext
-        .beginPath()
-        // @ts-ignore
-        .moveTo(x, stave.getBoundingBox().getY())
-        .lineTo(
-          x,
-          // @ts-ignore
-          stave.getBoundingBox().getY() + stave.getBoundingBox().getH(),
-        )
-        .stroke()
-
-      this.renderContext.restore()
+    if (this.notesStaffRef.current) {
+      this.notesStaffRef.current.draw()
     }
   }
 
@@ -440,7 +370,17 @@ class App extends React.Component<{}, AppState> {
                     onNoteCardClick={this.handleNoteCardClick}
                   />
 
-                  <Box width={1} height="200px" id="notation" />
+                  <Box innerRef={this.notesStaffContainerRef} width={1}>
+                    <NotesStaff
+                      notes={this.state.staffNotes}
+                      activeNote={this.getActiveStaffNote()}
+                      width={this.state.notesStaffWidth}
+                      ref={this.notesStaffRef}
+                      containerProps={{
+                        height: 200,
+                      }}
+                    />
+                  </Box>
                 </Flex>
               </ContentContainer>
 

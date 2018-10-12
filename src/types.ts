@@ -5,3 +5,11 @@ export type NoteCardType = {
   midi: number
   color: string
 }
+
+export type StaffNoteType = {
+  index: number
+  note: string
+  midi: number
+  color: string
+  duration: '4'
+}
