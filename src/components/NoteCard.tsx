@@ -6,7 +6,7 @@ import { BaseButton } from './ui'
 
 type NoteCardProps = {
   bgColor: string
-  playing: boolean
+  active: boolean
 }
 
 const enhance = recompose.compose(
@@ -22,9 +22,9 @@ const NoteCard = styled(BaseButton)<NoteCardProps>`
   display: inline-flex;
   border-radius: 15px;
   border: 2px solid #eee;
-  background-color: ${({ bgColor, playing }) =>
-    playing ? lighten(0.13, bgColor) : bgColor};
-  transform: ${({ playing }) => (playing ? 'scale(1.2)' : 'none')};
+  background-color: ${({ bgColor, active }) =>
+    active ? lighten(0.13, bgColor) : bgColor};
+  transform: ${({ active }) => (active ? 'scale(1.2)' : 'none')};
   align-items: center;
   justify-content: center;
 

@@ -15,18 +15,16 @@ import { Flex, Box, Button, TextInput, Label } from './ui'
 import NoteCard from './NoteCard'
 import MeasureScreenSize from './MeasureScreenSize'
 
+import { shuffle, getNoteCardColorByNoteName } from '../utils'
+
 import theme from '../styles/theme'
 import globalStyles from '../styles/globalStyles'
 
-globalStyles()
+import NoteCards from './NoteCards'
 
-function shuffle(a) {
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a
-}
+import { NoteCardType } from '../types'
+
+globalStyles()
 
 const FlipperStyled = styled(Flipper)`
   width: 100%;
@@ -41,40 +39,11 @@ const BpmInput = withProps({
   px: [2, 3, 3],
 })(TextInput)
 
-const NOTE_NAME_TO_COLOR_MAP = {
-  A: '#D783FF',
-  B: '#0096FF',
-  C: '#8EFA00',
-  D: '#FFFB02',
-  E: '#FFD479',
-  F: '#FF7E79',
-  G: '#FF5097',
-}
-
-const getColorByNoteName = (fullNoteName: string) => {
-  const [letter, accidental] = tonal.Note.tokenize(fullNoteName)
-  const baseColor = NOTE_NAME_TO_COLOR_MAP[letter.toUpperCase()]
-  if (accidental === '#') {
-    return lighten(0.1, baseColor)
-  } else if (accidental === 'b') {
-    return darken(0.1, baseColor)
-  }
-  return baseColor
-}
-
-type NoteCard = {
-  id: string
-  note: string
-  text: string
-  midi: number
-  color: string
-}
-
 type AppState = {
   bpm: number
   isPlaying: boolean
-  noteCards: NoteCard[]
-  currentNoteCardPlaying: number
+  noteCards: NoteCardType[]
+  activeNoteCardIndex: number
   height: number
   width: number
   notationRootWidth: number
@@ -138,10 +107,10 @@ class App extends React.Component<{}, AppState> {
           text: tonal.Note.pc(noteName),
           note: noteName,
           midi: tonal.Note.midi(noteName),
-          color: getColorByNoteName(noteName),
+          color: getNoteCardColorByNoteName(noteName),
         }),
       ),
-      currentNoteCardPlaying: 0,
+      activeNoteCardIndex: 0,
     }
   }
 
@@ -189,10 +158,7 @@ class App extends React.Component<{}, AppState> {
   private handleShuffleClick = () => {
     this.setState(
       state => ({
-        noteCards: [
-          state.noteCards[0],
-          ...shuffle([...state.noteCards.slice(1)]),
-        ],
+        noteCards: [state.noteCards[0], ...shuffle(state.noteCards.slice(1))],
       }),
       this.onNoteCardsUpdated,
     )
@@ -225,16 +191,16 @@ class App extends React.Component<{}, AppState> {
 
   drawAnimation = time => {
     console.log('drawAnimation', time)
-    if (time === '0:0' && this.state.currentNoteCardPlaying === 0) {
+    if (time === '0:0' && this.state.activeNoteCardIndex === 0) {
       this.renderNotation()
       return
     }
 
     this.setState(
       state => ({
-        currentNoteCardPlaying: state.isPlaying
-          ? (state.currentNoteCardPlaying + 1) % 12
-          : state.currentNoteCardPlaying,
+        activeNoteCardIndex: state.isPlaying
+          ? (state.activeNoteCardIndex + 1) % 12
+          : state.activeNoteCardIndex,
       }),
       this.renderNotation,
     )
@@ -260,7 +226,7 @@ class App extends React.Component<{}, AppState> {
   }
 
   stopPlaying = (cb?: () => any) => {
-    this.setState({ isPlaying: false, currentNoteCardPlaying: 0 }, () => {
+    this.setState({ isPlaying: false, activeNoteCardIndex: 0 }, () => {
       Tone.Master.mute = true
       Tone.Transport.stop()
 
@@ -299,7 +265,7 @@ class App extends React.Component<{}, AppState> {
     }
   }
 
-  private handleNoteCardClick = (noteCard: NoteCard) => {
+  private handleNoteCardClick = (noteCard: NoteCardType) => {
     this.setState(
       state => ({
         noteCards: [
@@ -364,7 +330,7 @@ class App extends React.Component<{}, AppState> {
       const noteColor =
         cardColorLuminance > 0.5 ? darken(0.2, noteCard.color) : noteCard.color
 
-      if (this.state.isPlaying && index === this.state.currentNoteCardPlaying) {
+      if (this.state.isPlaying && index === this.state.activeNoteCardIndex) {
         note.setStyle({
           fillStyle: lighten(0.1, noteColor),
           strokeStyle: lighten(0.1, noteColor),
@@ -386,7 +352,7 @@ class App extends React.Component<{}, AppState> {
 
     if (this.state.isPlaying) {
       const notePosition = notes[
-        this.state.currentNoteCardPlaying
+        this.state.activeNoteCardIndex
       ].getBoundingBox()
       const x = notePosition.getX() + notePosition.getW() / 2
 
@@ -410,9 +376,11 @@ class App extends React.Component<{}, AppState> {
   }
 
   public render() {
-    const { bpm, noteCards, isPlaying, currentNoteCardPlaying } = this.state
+    const { bpm, noteCards, isPlaying, activeNoteCardIndex } = this.state
 
-    const activeNoteCard = this.state.noteCards[currentNoteCardPlaying]
+    const activeNoteCard = isPlaying
+      ? noteCards[activeNoteCardIndex]
+      : undefined
 
     return (
       <ThemeProvider theme={theme}>
@@ -466,30 +434,11 @@ class App extends React.Component<{}, AppState> {
                     </Label>
                   </Flex>
 
-                  <FlipperStyled flipKey={noteCards}>
-                    {noteCards.map((noteCard, index) => (
-                      <Flipped key={noteCard.id} flipId={noteCard.id}>
-                        <Box
-                          p={2}
-                          width={1 / 4}
-                          position="relative"
-                          zIndex={currentNoteCardPlaying === index ? 2 : 1}
-                        >
-                          <NoteCard
-                            bgColor={noteCard.color}
-                            tabIndex={0}
-                            onClick={() => this.handleNoteCardClick(noteCard)}
-                            width={1}
-                            playing={
-                              isPlaying && currentNoteCardPlaying === index
-                            }
-                          >
-                            {noteCard.text}
-                          </NoteCard>
-                        </Box>
-                      </Flipped>
-                    ))}
-                  </FlipperStyled>
+                  <NoteCards
+                    noteCards={noteCards}
+                    activeNoteCard={activeNoteCard}
+                    onNoteCardClick={this.handleNoteCardClick}
+                  />
 
                   <Box width={1} height="200px" id="notation" />
                 </Flex>
@@ -508,8 +457,11 @@ class App extends React.Component<{}, AppState> {
                     .ReactPiano__Key {
                       transition: background-color 300ms;
                     }
+
                     .ReactPiano__Key--active {
-                      background-color: ${activeNoteCard.color};
+                      background-color: ${activeNoteCard
+                        ? activeNoteCard.color
+                        : undefined};
                     }
                   `}`}
                   playNote={midiNumber => {
@@ -520,7 +472,9 @@ class App extends React.Component<{}, AppState> {
                     // Stop playing a given note - see notes below
                     console.log('Piano / stop: ', midiNumber)
                   }}
-                  activeNotes={isPlaying ? [activeNoteCard.midi] : undefined}
+                  activeNotes={
+                    activeNoteCard ? [activeNoteCard.midi] : undefined
+                  }
                   width={Math.max(layoutMinWidth, this.state.width)}
                   keyboardShortcuts={keyboardShortcuts}
                 />
