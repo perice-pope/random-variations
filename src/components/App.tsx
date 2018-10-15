@@ -344,6 +344,15 @@ class App extends React.Component<{}, AppState> {
     })
   }
 
+  private handleNoteCardDraggedOut = (noteCard: NoteCardType) => {
+    this.setState(
+      {
+        noteCards: this.state.noteCards.filter(nc => nc !== noteCard),
+      },
+      this.onNoteCardsUpdated,
+    )
+  }
+
   private handleCardsReorder = ({ oldIndex, newIndex }) => {
     this.setState(
       {
@@ -509,17 +518,19 @@ class App extends React.Component<{}, AppState> {
                     activeNoteCard={activeNoteCard}
                     onNoteCardClick={this.handleNoteCardClick}
                     onCardsReorder={this.handleCardsReorder}
+                    onCardDraggedOut={this.handleNoteCardDraggedOut}
                   >
                     {this.state.noteCards.length < 12 ? (
                       <Button
                         onClick={this.openNoteAddingModal}
                         title="Add a note"
-                        bg="white"
+                        bg="rgba(1,1,1,0)"
                         border="dashed 2px #c0c3c7"
                         borderRadius={40}
                         color="#777777"
                         maxHeight={120}
                         alignSelf="center"
+                        opacity={0}
                       >
                         + Add note
                       </Button>

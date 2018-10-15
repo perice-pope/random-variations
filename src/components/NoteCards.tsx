@@ -18,13 +18,6 @@ const FlipperStyled = styled(Flipper)`
   flex-wrap: wrap;
 `
 
-type NoteCardsProps = {
-  noteCards: NoteCardType[]
-  activeNoteCard?: NoteCardType
-  onCardsReorder: (arg: { oldIndex: number; newIndex: number }) => any
-  onNoteCardClick: (noteCard: NoteCardType) => any
-}
-
 const SortableNoteCard = SortableElement(
   ({ id, active, bgColor, shouldFlip, onClick, ...props }) => (
     <Flipped flipId={id} shouldFlip={shouldFlip}>
@@ -50,12 +43,31 @@ const SortableNoteCard = SortableElement(
 )
 
 const SortableNotesContainer = SortableContainer(
-  ({ items, children, activeNoteCard, shouldFlip, onClick }) => {
+  ({
+    items,
+    isDragging,
+    isDraggingOutOfContainer,
+    innerRef,
+    children,
+    activeNoteCard,
+    shouldFlip,
+    onClick,
+  }) => {
+    let backgroundColor = 'transparent'
+    if (isDraggingOutOfContainer) {
+      backgroundColor = '#ffe4e4'
+    } else if (isDragging) {
+      backgroundColor = '#eff8ff'
+    }
     return (
       <div
+        ref={innerRef}
         className={css(`
           height: 100%;
           width: 100%;
+          border-radius: 15px;
+          transition: background-color 0.3s;
+          background-color: ${backgroundColor}
       `)}
       >
         <FlipperStyled flipKey={items}>
@@ -85,27 +97,70 @@ const SortableNotesContainer = SortableContainer(
 
 const DRAG_AND_DROP_TRANSITION_DURATION_MS = 300
 
-class NoteCards extends React.Component<NoteCardsProps> {
-  state = {
-    isSorting: false,
+type NoteCardsProps = {
+  noteCards: NoteCardType[]
+  activeNoteCard?: NoteCardType
+  onCardsReorder: (arg: { oldIndex: number; newIndex: number }) => any
+  onNoteCardClick: (noteCard: NoteCardType) => any
+  onCardDraggedOut: (noteCard: NoteCardType) => any
+}
+
+type NoteCardsState = {
+  noteCardDraggedIndex?: number
+  isDragging: boolean
+  isDraggingOutOfContainer?: boolean
+}
+
+class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
+  containerRef: React.RefObject<React.ReactNode>
+
+  constructor(props: NoteCardsProps) {
+    super(props)
+    this.containerRef = React.createRef()
+    this.state = {
+      noteCardDraggedIndex: undefined,
+      isDragging: false,
+      isDraggingOutOfContainer: false,
+    }
   }
 
   private shouldFlip = () => {
-    return this.state.isSorting === false
+    return this.state.isDragging === false
   }
 
-  handleSortStart = () => {
-    this.setState({ isSorting: true })
+  handleSortStart = ({ index }) => {
+    this.setState({ noteCardDraggedIndex: index, isDragging: true })
   }
 
   handleSortEnd = ({ oldIndex, newIndex }) => {
-    if (this.props.onCardsReorder) {
+    if (
+      this.state.isDraggingOutOfContainer &&
+      typeof this.state.noteCardDraggedIndex !== 'undefined'
+    ) {
+      const noteCardDragged = this.props.noteCards[
+        this.state.noteCardDraggedIndex
+      ]
+      this.props.onCardDraggedOut(noteCardDragged)
+    } else if (this.props.onCardsReorder) {
       this.props.onCardsReorder({ oldIndex, newIndex })
     }
     setTimeout(
-      () => this.setState({ isSorting: false }),
+      () =>
+        this.setState({
+          isDragging: false,
+          isDraggingOutOfContainer: undefined,
+        }),
       DRAG_AND_DROP_TRANSITION_DURATION_MS,
     )
+  }
+
+  handleSortMove = e => {
+    const container = this.containerRef.current as Element
+    if (!container) {
+      return
+    }
+    const movingOver = e.target
+    this.setState({ isDraggingOutOfContainer: !container.contains(movingOver) })
   }
 
   public render() {
@@ -114,11 +169,15 @@ class NoteCards extends React.Component<NoteCardsProps> {
     return (
       <SortableNotesContainer
         // @ts-ignore
+        isDragging={this.state.isDragging}
+        isDraggingOutOfContainer={this.state.isDraggingOutOfContainer}
+        innerRef={this.containerRef}
         shouldFlip={this.shouldFlip}
         transitionDuration={DRAG_AND_DROP_TRANSITION_DURATION_MS}
         activeNoteCard={activeNoteCard}
         items={noteCards}
         onSortEnd={this.handleSortEnd}
+        onSortMove={this.handleSortMove}
         onSortStart={this.handleSortStart}
         onClick={onNoteCardClick}
         axis="xy"
