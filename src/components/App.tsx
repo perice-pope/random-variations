@@ -5,6 +5,7 @@ import * as _ from 'lodash'
 import Tone from 'tone'
 import * as tonal from 'tonal'
 import * as TonalRange from 'tonal-range'
+import { transpose } from 'tonal-distance'
 import Modal from 'react-modal'
 
 import { Flex, Box, Button, TextInput, Label } from './ui'
@@ -38,6 +39,7 @@ type AppState = {
   noteCards: NoteCardType[]
   staffNotes: StaffNoteType[]
   activeNoteCardIndex: number
+  activeStaffNoteIndex: number
 
   height: number
   width: number
@@ -46,6 +48,8 @@ type AppState = {
   noteAddingModalIsOpen: boolean
   noteEditingModalIsOpen: boolean
   noteEditingModalNoteCard?: NoteCardType
+
+  areTriadsEnabled: boolean
 }
 
 const chromaticNotes = TonalRange.chromatic(['C4', 'B4'], true)
@@ -93,7 +97,7 @@ const PickNoteModal: React.SFC<PickNoteModalProps> = (
     <Flex flexWrap="wrap" maxWidth={300}>
       {chromaticNotes.map(noteName => {
         return (
-          <Box width={1 / 4} p={[1, 2, 2]}>
+          <Box key={noteName} width={1 / 4} p={[1, 2, 2]}>
             <Button
               borderRadius={15}
               border={
@@ -102,7 +106,6 @@ const PickNoteModal: React.SFC<PickNoteModalProps> = (
                   : undefined
               }
               width={1}
-              key={noteName}
               bg={getNoteCardColorByNoteName(noteName)}
               onClick={() => props.onSubmit({ noteName })}
             >
@@ -136,19 +139,19 @@ class App extends React.Component<{}, AppState> {
     }
 
     const savedState = window.localStorage.getItem('appState')
-    if (!savedState) {
-      restoredState = {
-        bpm: 120,
-        noteCards: [randomNoteCard],
+    if (savedState) {
+      try {
+        restoredState = JSON.parse(savedState) as Partial<AppState>
+      } catch (error) {
+        console.error(error)
+        window.localStorage.removeItem('appState')
       }
-    } else {
-      restoredState = JSON.parse(savedState) as Partial<AppState>
     }
 
     this.state = {
       bpm: 120,
       noteCards: [randomNoteCard],
-      ...restoredState,
+      areTriadsEnabled: false,
 
       // Screen size
       height: 0,
@@ -158,10 +161,13 @@ class App extends React.Component<{}, AppState> {
       isPlaying: false,
       staffNotes: [],
       activeNoteCardIndex: 0,
+      activeStaffNoteIndex: 0,
 
       noteAddingModalIsOpen: false,
       noteEditingModalIsOpen: false,
       noteEditingModalNoteCard: undefined,
+
+      ...restoredState,
     }
 
     this.notesStaffRef = React.createRef()
@@ -169,37 +175,71 @@ class App extends React.Component<{}, AppState> {
   }
 
   componentDidMount() {
-    this.initSynth()
-    this.scheduleNotes()
-    this.updateStaffNotes()
+    this.init()
   }
 
   componentWillUnmount() {
     this.cleanUp()
   }
 
-  updateStaffNotes = () => {
+  private init = async () => {
+    await this.updateStaffNotes()
+    this.initSynth()
+    this.scheduleNotes()
+  }
+
+  private updateStaffNotes = async () => {
     const { noteCards } = this.state
-    const staffNotes: StaffNoteType[] = noteCards.map(
-      (noteCard, index) =>
-        ({
-          index,
-          note: noteCard.note,
-          midi: noteCard.midi,
+    const staffNotes: StaffNoteType[] = _.flatten(
+      noteCards.map(noteCard => {
+        const result: any[] = []
+
+        let note = noteCard.note
+
+        result.push({
+          note: note,
+          midi: tonal.Note.midi(note),
+          freq: tonal.Note.freq(note),
           color: noteCard.color,
           duration: '4',
-        } as StaffNoteType),
-    )
+        })
 
-    this.setState({ staffNotes }, this.renderNotation)
+        if (this.state.areTriadsEnabled) {
+          note = transpose(note, '3M')
+          result.push({
+            note: note,
+            midi: tonal.Note.midi(note),
+            freq: tonal.Note.freq(note),
+            color: 'black',
+            duration: '4',
+          })
+          note = transpose(note, '3m')
+          result.push({
+            note: note,
+            midi: tonal.Note.midi(note),
+            freq: tonal.Note.freq(note),
+            color: 'black',
+            duration: '4',
+          })
+        }
+        return result
+      }),
+    ).map((v, index) => ({ ...v, index }))
+
+    return new Promise(resolve => {
+      this.setState({ staffNotes }, () => {
+        this.renderNotation()
+        resolve()
+      })
+    })
   }
 
   private getActiveStaffNote = () => {
-    const { isPlaying, staffNotes, activeNoteCardIndex } = this.state
+    const { isPlaying, staffNotes, activeStaffNoteIndex } = this.state
     if (!isPlaying) {
       return undefined
     }
-    return staffNotes[activeNoteCardIndex]
+    return staffNotes[activeStaffNoteIndex]
   }
 
   private getPianoHeight = () => {
@@ -222,7 +262,7 @@ class App extends React.Component<{}, AppState> {
       },
     }).toMaster()
 
-    Tone.Transport.loopEnd = `0:${this.state.noteCards.length}`
+    Tone.Transport.loopEnd = `0:${this.state.staffNotes.length}`
     Tone.Transport.loop = true
 
     Tone.Transport.bpm.value = this.state.bpm
@@ -241,7 +281,7 @@ class App extends React.Component<{}, AppState> {
       state => ({
         noteCards: [state.noteCards[0], ...shuffle(state.noteCards.slice(1))],
       }),
-      this.onNoteCardsUpdated,
+      this.onNotesUpdated,
     )
   }
 
@@ -251,20 +291,18 @@ class App extends React.Component<{}, AppState> {
       JSON.stringify({
         bpm: this.state.bpm,
         noteCards: this.state.noteCards,
+        areTriadsEnabled: this.state.areTriadsEnabled,
       }),
     )
   }
 
-  private onNoteCardsUpdated = () => {
+  private onNotesUpdated = () => {
     const hasBeenPlaying = this.state.isPlaying
 
     this.serializeAndSaveAppStateLocally()
 
-    this.stopPlaying(() => {
-      // Update loop length according to the number of note cards
-      Tone.Transport.loopEnd = `0:${this.state.noteCards.length}`
-
-      this.updateStaffNotes()
+    this.stopPlaying(async () => {
+      await this.updateStaffNotes()
 
       if (hasBeenPlaying) {
         setTimeout(this.startPlaying, 200)
@@ -273,15 +311,13 @@ class App extends React.Component<{}, AppState> {
   }
 
   scheduleNote = (
-    note: string,
+    freq: number,
     time: string = '0:0',
     duration: string = '4n',
   ) => {
-    console.log(`Scheduling note: ${note} ${time}`)
-
     return Tone.Transport.schedule(contextTime => {
       if (this.synth) {
-        this.synth.triggerAttackRelease(note, duration, contextTime)
+        this.synth.triggerAttackRelease(freq, duration, contextTime)
       }
 
       Tone.Draw.schedule(() => this.drawAnimation(time), contextTime)
@@ -290,28 +326,36 @@ class App extends React.Component<{}, AppState> {
 
   drawAnimation = time => {
     console.log('drawAnimation', time, Tone.Transport.progress)
-    if (time === '0:0' && this.state.activeNoteCardIndex === 0) {
-      this.updateStaffNotes()
-      return
-    }
 
-    this.setState(
-      state => ({
-        activeNoteCardIndex: state.isPlaying
-          ? (state.activeNoteCardIndex + 1) % this.state.noteCards.length
-          : state.activeNoteCardIndex,
-      }),
-      this.updateStaffNotes,
-    )
+    this.setState(state => {
+      if (time === '0:0' && state.activeStaffNoteIndex === 0) {
+        return null
+      }
+      if (!state.isPlaying) {
+        return null
+      }
+
+      const nextStaffNoteIndex =
+        (state.activeStaffNoteIndex + 1) % this.state.staffNotes.length
+      const nextNoteCardIndex = state.areTriadsEnabled
+        ? Math.floor(nextStaffNoteIndex / 3)
+        : nextStaffNoteIndex
+      return {
+        activeStaffNoteIndex: nextStaffNoteIndex,
+        activeNoteCardIndex: nextNoteCardIndex,
+      }
+    }, this.updateStaffNotes)
   }
 
   scheduleNotes = () => {
     console.log('scheduleNotes is called\n---------\n')
+    // Update loop length according to the number of note cards
+    Tone.Transport.loopEnd = `0:${this.state.staffNotes.length}`
     this.scheduledEvents.forEach(eventId => Tone.Transport.clear(eventId))
 
-    this.state.noteCards.forEach(({ note }, index) => {
+    this.state.staffNotes.forEach(({ freq }, index) => {
       this.scheduledEvents.push(
-        this.scheduleNote(note, `${Math.floor(index / 4)}:${index % 4}`),
+        this.scheduleNote(freq, `${Math.floor(index / 4)}:${index % 4}`),
       )
     })
   }
@@ -319,22 +363,25 @@ class App extends React.Component<{}, AppState> {
   startPlaying = () => {
     this.scheduleNotes()
     this.setState({ isPlaying: true }, () => {
-      Tone.Master.mute = false
+      Tone.Master.volume.rampTo(1, 100)
       Tone.Transport.start()
     })
   }
 
   stopPlaying = (cb?: () => any) => {
-    this.setState({ isPlaying: false, activeNoteCardIndex: 0 }, () => {
-      Tone.Master.mute = true
-      Tone.Transport.stop()
+    this.setState(
+      { isPlaying: false, activeNoteCardIndex: 0, activeStaffNoteIndex: 0 },
+      async () => {
+        Tone.Master.volume.rampTo(0)
+        Tone.Transport.stop()
 
-      this.updateStaffNotes()
+        await this.updateStaffNotes()
 
-      if (cb) {
-        cb()
-      }
-    })
+        if (cb) {
+          cb()
+        }
+      },
+    )
   }
 
   togglePlayback = () => {
@@ -358,9 +405,12 @@ class App extends React.Component<{}, AppState> {
       }
     } finally {
       Tone.Transport.bpm.value = bpmValue
-      this.setState({
-        bpm: bpmValue,
-      }, this.serializeAndSaveAppStateLocally)
+      this.setState(
+        {
+          bpm: bpmValue,
+        },
+        this.serializeAndSaveAppStateLocally,
+      )
     }
   }
 
@@ -376,7 +426,7 @@ class App extends React.Component<{}, AppState> {
       {
         noteCards: this.state.noteCards.filter(nc => nc !== noteCard),
       },
-      this.onNoteCardsUpdated,
+      this.onNotesUpdated,
     )
   }
 
@@ -385,7 +435,7 @@ class App extends React.Component<{}, AppState> {
       {
         noteCards: arrayMove(this.state.noteCards, oldIndex, newIndex),
       },
-      this.onNoteCardsUpdated,
+      this.onNotesUpdated,
     )
   }
 
@@ -445,7 +495,7 @@ class App extends React.Component<{}, AppState> {
         noteEditingModalIsOpen: false,
         noteEditingModalNoteCard: undefined,
       },
-      this.onNoteCardsUpdated,
+      this.onNotesUpdated,
     )
   }
 
@@ -466,15 +516,32 @@ class App extends React.Component<{}, AppState> {
         noteCards: newNoteCards,
         noteAddingModalIsOpen: false,
       },
-      this.onNoteCardsUpdated,
+      this.onNotesUpdated,
+    )
+  }
+
+  private toggleTriads = () => {
+    this.setState(
+      state => ({ areTriadsEnabled: !state.areTriadsEnabled }),
+      this.onNotesUpdated,
     )
   }
 
   public render() {
-    const { bpm, noteCards, isPlaying, activeNoteCardIndex } = this.state
+    const {
+      bpm,
+      noteCards,
+      staffNotes,
+      isPlaying,
+      activeNoteCardIndex,
+      activeStaffNoteIndex,
+    } = this.state
 
     const activeNoteCard = isPlaying
       ? noteCards[activeNoteCardIndex]
+      : undefined
+    const activeStaffNote = isPlaying
+      ? staffNotes[activeStaffNoteIndex]
       : undefined
 
     return (
@@ -519,7 +586,7 @@ class App extends React.Component<{}, AppState> {
                     </Button>
                   </Box>
 
-                  <Label for="bpm" fontSize={[2, 3, 3]}>
+                  <Label htmlFor="bpm" fontSize={[2, 3, 3]}>
                     BPM:
                   </Label>
                   <BpmInput
@@ -552,15 +619,36 @@ class App extends React.Component<{}, AppState> {
                         onClick={this.openNoteAddingModal}
                         title="Add a note"
                         bg="rgba(1,1,1,0)"
-                        border="dashed 2px #c0c3c7"
+                        border="dashed 1px #c0c3c7"
                         borderRadius={40}
                         color="#777777"
                         maxHeight={120}
                         alignSelf="center"
                       >
-                        + Add note
+                        + Note
                       </Button>
                     ) : null}
+                    <Button
+                      onClick={this.toggleTriads}
+                      title={
+                        this.state.areTriadsEnabled
+                          ? 'Remove triads'
+                          : 'Add triads'
+                      }
+                      bg="rgba(1,1,1,0)"
+                      m={1}
+                      border={`dashed 1px ${
+                        this.state.areTriadsEnabled ? '#8989ff' : '#c0c3c7'
+                      }`}
+                      borderRadius={40}
+                      color={
+                        this.state.areTriadsEnabled ? '#8989ff' : '#c0c3c7'
+                      }
+                      maxHeight={120}
+                      alignSelf="center"
+                    >
+                      {this.state.areTriadsEnabled ? '- Triads' : '+ Triads'}
+                    </Button>
                   </NoteCards>
                 </Flex>
 
@@ -580,7 +668,7 @@ class App extends React.Component<{}, AppState> {
                   width={Math.max(layoutMinWidth, this.state.width)}
                   height={this.getPianoHeight()}
                   activeNotesMidi={
-                    activeNoteCard ? [activeNoteCard.midi] : undefined
+                    activeStaffNote ? [activeStaffNote.midi] : undefined
                   }
                   activeNotesColor={
                     activeNoteCard ? activeNoteCard.color : undefined
