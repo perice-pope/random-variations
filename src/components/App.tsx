@@ -124,6 +124,8 @@ class App extends React.Component<{}, AppState> {
   constructor(props) {
     super(props)
 
+    let restoredState: Partial<AppState> = {}
+
     const noteName = _.sample(chromaticNotes)
     const randomNoteCard = {
       id: '0',
@@ -133,15 +135,27 @@ class App extends React.Component<{}, AppState> {
       color: getNoteCardColorByNoteName(noteName),
     }
 
+    const savedState = window.localStorage.getItem('appState')
+    if (!savedState) {
+      restoredState = {
+        bpm: 120,
+        noteCards: [randomNoteCard],
+      }
+    } else {
+      restoredState = JSON.parse(savedState) as Partial<AppState>
+    }
+
     this.state = {
+      bpm: 120,
+      noteCards: [randomNoteCard],
+      ...restoredState,
+
       // Screen size
       height: 0,
       width: 0,
       notesStaffWidth: 0,
 
-      bpm: 120,
       isPlaying: false,
-      noteCards: [randomNoteCard],
       staffNotes: [],
       activeNoteCardIndex: 0,
 
@@ -231,8 +245,21 @@ class App extends React.Component<{}, AppState> {
     )
   }
 
+  private serializeAndSaveAppStateLocally = () => {
+    window.localStorage.setItem(
+      'appState',
+      JSON.stringify({
+        bpm: this.state.bpm,
+        noteCards: this.state.noteCards,
+      }),
+    )
+  }
+
   private onNoteCardsUpdated = () => {
     const hasBeenPlaying = this.state.isPlaying
+
+    this.serializeAndSaveAppStateLocally()
+
     this.stopPlaying(() => {
       // Update loop length according to the number of note cards
       Tone.Transport.loopEnd = `0:${this.state.noteCards.length}`
@@ -333,7 +360,7 @@ class App extends React.Component<{}, AppState> {
       Tone.Transport.bpm.value = bpmValue
       this.setState({
         bpm: bpmValue,
-      })
+      }, this.serializeAndSaveAppStateLocally)
     }
   }
 
