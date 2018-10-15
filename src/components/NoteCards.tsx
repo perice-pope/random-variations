@@ -50,7 +50,7 @@ const SortableNoteCard = SortableElement(
 )
 
 const SortableNotesContainer = SortableContainer(
-  ({ items, activeNoteCard, shouldFlip, onClick }) => {
+  ({ items, children, activeNoteCard, shouldFlip, onClick }) => {
     return (
       <div
         className={css(`
@@ -76,6 +76,7 @@ const SortableNotesContainer = SortableContainer(
               {noteCard.text}
             </SortableNoteCard>
           ))}
+          {children}
         </FlipperStyled>
       </div>
     )
@@ -108,7 +109,7 @@ class NoteCards extends React.Component<NoteCardsProps> {
   }
 
   public render() {
-    const { onNoteCardClick, noteCards, activeNoteCard } = this.props
+    const { children, onNoteCardClick, noteCards, activeNoteCard } = this.props
 
     return (
       <SortableNotesContainer
@@ -121,6 +122,7 @@ class NoteCards extends React.Component<NoteCardsProps> {
         onSortStart={this.handleSortStart}
         onClick={onNoteCardClick}
         axis="xy"
+        children={children}
       />
     )
   }

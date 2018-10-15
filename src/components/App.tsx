@@ -43,8 +43,9 @@ type AppState = {
   width: number
   notesStaffWidth: number
 
-  noteEditingModaIsOpen: boolean
-  noteEditingModaNoteCard?: NoteCardType
+  noteAddingModalIsOpen: boolean
+  noteEditingModalIsOpen: boolean
+  noteEditingModalNoteCard?: NoteCardType
 }
 
 const chromaticNotes = TonalRange.chromatic(['C4', 'B4'], true)
@@ -72,15 +73,15 @@ const customStyles = {
   },
 }
 
-type ChangeNoteModalProps = {
+type PickNoteModalProps = {
   isOpen: boolean
   onClose: () => any
   onSubmit: (args: { noteName: string }) => any
-  noteCard?: NoteCardType
+  selectedNoteName?: string
 }
 
-const ChangeNoteModal: React.SFC<ChangeNoteModalProps> = (
-  props: ChangeNoteModalProps,
+const PickNoteModal: React.SFC<PickNoteModalProps> = (
+  props: PickNoteModalProps,
 ) => (
   <Modal
     isOpen={props.isOpen}
@@ -96,7 +97,7 @@ const ChangeNoteModal: React.SFC<ChangeNoteModalProps> = (
             <Button
               borderRadius={15}
               border={
-                props.noteCard && noteName === props.noteCard.note
+                props.selectedNoteName && noteName === props.selectedNoteName
                   ? '4px solid red'
                   : undefined
               }
@@ -123,15 +124,14 @@ class App extends React.Component<{}, AppState> {
   constructor(props) {
     super(props)
 
-    const randomNoteCards = _.sampleSize(chromaticNotes, 12).map(
-      (noteName: string, index) => ({
-        id: `${index}`,
-        text: tonal.Note.pc(noteName),
-        note: noteName,
-        midi: tonal.Note.midi(noteName),
-        color: getNoteCardColorByNoteName(noteName),
-      }),
-    )
+    const noteName = _.sample(chromaticNotes)
+    const randomNoteCard = {
+      id: '0',
+      text: tonal.Note.pc(noteName),
+      note: noteName,
+      midi: tonal.Note.midi(noteName),
+      color: getNoteCardColorByNoteName(noteName),
+    }
 
     this.state = {
       // Screen size
@@ -141,13 +141,13 @@ class App extends React.Component<{}, AppState> {
 
       bpm: 120,
       isPlaying: false,
-      // 12 random note cards
-      noteCards: randomNoteCards,
+      noteCards: [randomNoteCard],
       staffNotes: [],
       activeNoteCardIndex: 0,
 
-      noteEditingModaIsOpen: false,
-      noteEditingModaNoteCard: undefined,
+      noteAddingModalIsOpen: false,
+      noteEditingModalIsOpen: false,
+      noteEditingModalNoteCard: undefined,
     }
 
     this.notesStaffRef = React.createRef()
@@ -208,7 +208,7 @@ class App extends React.Component<{}, AppState> {
       },
     }).toMaster()
 
-    Tone.Transport.loopEnd = '3m'
+    Tone.Transport.loopEnd = `0:${this.state.noteCards.length}`
     Tone.Transport.loop = true
 
     Tone.Transport.bpm.value = this.state.bpm
@@ -234,7 +234,11 @@ class App extends React.Component<{}, AppState> {
   private onNoteCardsUpdated = () => {
     const hasBeenPlaying = this.state.isPlaying
     this.stopPlaying(() => {
+      // Update loop length according to the number of note cards
+      Tone.Transport.loopEnd = `0:${this.state.noteCards.length}`
+
       this.updateStaffNotes()
+
       if (hasBeenPlaying) {
         setTimeout(this.startPlaying, 200)
       }
@@ -258,7 +262,7 @@ class App extends React.Component<{}, AppState> {
   }
 
   drawAnimation = time => {
-    console.log('drawAnimation', time)
+    console.log('drawAnimation', time, Tone.Transport.progress)
     if (time === '0:0' && this.state.activeNoteCardIndex === 0) {
       this.updateStaffNotes()
       return
@@ -267,7 +271,7 @@ class App extends React.Component<{}, AppState> {
     this.setState(
       state => ({
         activeNoteCardIndex: state.isPlaying
-          ? (state.activeNoteCardIndex + 1) % 12
+          ? (state.activeNoteCardIndex + 1) % this.state.noteCards.length
           : state.activeNoteCardIndex,
       }),
       this.updateStaffNotes,
@@ -335,8 +339,8 @@ class App extends React.Component<{}, AppState> {
 
   private handleNoteCardClick = (noteCard: NoteCardType) => {
     this.setState({
-      noteEditingModaIsOpen: true,
-      noteEditingModaNoteCard: noteCard,
+      noteEditingModalIsOpen: true,
+      noteEditingModalNoteCard: noteCard,
     })
   }
 
@@ -367,14 +371,26 @@ class App extends React.Component<{}, AppState> {
 
   private closeNoteEditingModal = () => {
     this.setState({
-      noteEditingModaIsOpen: false,
-      noteEditingModaNoteCard: undefined,
+      noteEditingModalIsOpen: false,
+      noteEditingModalNoteCard: undefined,
+    })
+  }
+
+  private closeNoteAddingModal = () => {
+    this.setState({
+      noteAddingModalIsOpen: false,
+    })
+  }
+
+  private openNoteAddingModal = () => {
+    this.setState({
+      noteAddingModalIsOpen: true,
     })
   }
 
   private handleNoteClickInNoteCardEditingModal = ({ noteName }) => {
     const newNoteCards = this.state.noteCards.map(noteCard => {
-      if (noteCard !== this.state.noteEditingModaNoteCard) {
+      if (noteCard !== this.state.noteEditingModalNoteCard) {
         return noteCard
       }
 
@@ -390,8 +406,29 @@ class App extends React.Component<{}, AppState> {
     this.setState(
       {
         noteCards: newNoteCards,
-        noteEditingModaIsOpen: false,
-        noteEditingModaNoteCard: undefined,
+        noteEditingModalIsOpen: false,
+        noteEditingModalNoteCard: undefined,
+      },
+      this.onNoteCardsUpdated,
+    )
+  }
+
+  private handleNoteClickInNoteCardAddingModal = ({ noteName }) => {
+    const newNoteCards = [
+      ...this.state.noteCards,
+      {
+        id: `${this.state.noteCards.length}`,
+        text: tonal.Note.pc(noteName),
+        note: noteName,
+        midi: tonal.Note.midi(noteName),
+        color: getNoteCardColorByNoteName(noteName),
+      },
+    ]
+
+    this.setState(
+      {
+        noteCards: newNoteCards,
+        noteAddingModalIsOpen: false,
       },
       this.onNoteCardsUpdated,
     )
@@ -472,7 +509,22 @@ class App extends React.Component<{}, AppState> {
                     activeNoteCard={activeNoteCard}
                     onNoteCardClick={this.handleNoteCardClick}
                     onCardsReorder={this.handleCardsReorder}
-                  />
+                  >
+                    {this.state.noteCards.length < 12 ? (
+                      <Button
+                        onClick={this.openNoteAddingModal}
+                        title="Add a note"
+                        bg="white"
+                        border="dashed 2px #c0c3c7"
+                        borderRadius={40}
+                        color="#777777"
+                        maxHeight={120}
+                        alignSelf="center"
+                      >
+                        + Add note
+                      </Button>
+                    ) : null}
+                  </NoteCards>
                 </Flex>
 
                 <Box innerRef={this.notesStaffContainerRef} width={1}>
@@ -499,9 +551,19 @@ class App extends React.Component<{}, AppState> {
                 />
               </Box>
 
-              <ChangeNoteModal
-                isOpen={this.state.noteEditingModaIsOpen}
-                noteCard={this.state.noteEditingModaNoteCard}
+              <PickNoteModal
+                isOpen={this.state.noteAddingModalIsOpen}
+                onClose={this.closeNoteAddingModal}
+                onSubmit={this.handleNoteClickInNoteCardAddingModal}
+              />
+
+              <PickNoteModal
+                isOpen={this.state.noteEditingModalIsOpen}
+                selectedNoteName={
+                  this.state.noteEditingModalNoteCard
+                    ? this.state.noteEditingModalNoteCard.note
+                    : undefined
+                }
                 onClose={this.closeNoteEditingModal}
                 onSubmit={this.handleNoteClickInNoteCardEditingModal}
               />

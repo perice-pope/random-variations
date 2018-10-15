@@ -26,13 +26,14 @@ const NoteCard = styled(Box)<NoteCardProps>`
     transform: scale(1.1);
   }
 
-  border: 2px solid #eee;
+  border: none;
   background-color: ${({ bgColor, active }) =>
     active ? lighten(0.13, bgColor) : bgColor};
   transform: ${({ active }) => (active ? 'scale(1.2)' : 'none')};
   align-items: center;
   justify-content: center;
 
+  max-height: 160px;
   padding: 3px 3px;
   border-radius: 15px;
   font-size: 18px;
