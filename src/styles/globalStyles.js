@@ -59,4 +59,8 @@ export default () => injectGlobal`
     -webkit-appearance: none;
     margin: 0;
   }
+
+  .ReactModal__Overlay {
+    z-index: 100;
+  }
 `

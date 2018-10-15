@@ -5,6 +5,7 @@ import * as _ from 'lodash'
 import Tone from 'tone'
 import * as tonal from 'tonal'
 import * as TonalRange from 'tonal-range'
+import Modal from 'react-modal'
 
 import { Flex, Box, Button, TextInput, Label } from './ui'
 import NotesStaff from './NotesStaff'
@@ -20,6 +21,7 @@ import NoteCards from './NoteCards'
 import { NoteCardType, StaffNoteType } from '../types'
 import PianoKeyboard from './PianoKeyboard'
 
+Modal.setAppElement('#root')
 globalStyles()
 
 const BpmInput = withProps({
@@ -40,6 +42,9 @@ type AppState = {
   height: number
   width: number
   notesStaffWidth: number
+
+  noteEditingModaIsOpen: boolean
+  noteEditingModaNoteCard?: NoteCardType
 }
 
 const chromaticNotes = TonalRange.chromatic(['C4', 'B4'], true)
@@ -56,6 +61,17 @@ const ContentContainer = withProps({
   // @ts-ignore
 })(Box)
 
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+  },
+}
+
 class App extends React.Component<{}, AppState> {
   private synth: any
   private scheduledEvents: any[] = []
@@ -64,6 +80,16 @@ class App extends React.Component<{}, AppState> {
 
   constructor(props) {
     super(props)
+
+    const randomNoteCards = _.sampleSize(chromaticNotes, 12).map(
+      (noteName: string, index) => ({
+        id: `${index}`,
+        text: tonal.Note.pc(noteName),
+        note: noteName,
+        midi: tonal.Note.midi(noteName),
+        color: getNoteCardColorByNoteName(noteName),
+      }),
+    )
 
     this.state = {
       // Screen size
@@ -74,17 +100,12 @@ class App extends React.Component<{}, AppState> {
       bpm: 120,
       isPlaying: false,
       // 12 random note cards
-      noteCards: _.sampleSize(chromaticNotes, 12).map(
-        (noteName: string, index) => ({
-          id: `${index}`,
-          text: tonal.Note.pc(noteName),
-          note: noteName,
-          midi: tonal.Note.midi(noteName),
-          color: getNoteCardColorByNoteName(noteName),
-        }),
-      ),
+      noteCards: randomNoteCards,
       staffNotes: [],
       activeNoteCardIndex: 0,
+
+      noteEditingModaIsOpen: false,
+      noteEditingModaNoteCard: undefined,
     }
 
     this.notesStaffRef = React.createRef()
@@ -271,15 +292,10 @@ class App extends React.Component<{}, AppState> {
   }
 
   private handleNoteCardClick = (noteCard: NoteCardType) => {
-    this.setState(
-      state => ({
-        noteCards: [
-          noteCard,
-          ...this.state.noteCards.filter(nc => nc.id !== noteCard.id),
-        ],
-      }),
-      this.onNoteCardsUpdated,
-    )
+    this.setState({
+      noteEditingModaIsOpen: true,
+      noteEditingModaNoteCard: noteCard,
+    })
   }
 
   private handleCardsReorder = ({ oldIndex, newIndex }) => {
@@ -292,7 +308,6 @@ class App extends React.Component<{}, AppState> {
   }
 
   private handleScreenSizeUpdate = ({ height, width }) => {
-    console.log(height, width)
     if (this.notesStaffContainerRef.current) {
       const {
         width: notesStaffWidth,
@@ -306,6 +321,38 @@ class App extends React.Component<{}, AppState> {
     if (this.notesStaffRef.current) {
       this.notesStaffRef.current.draw()
     }
+  }
+
+  private closeNoteEditingModal = () => {
+    this.setState({
+      noteEditingModaIsOpen: false,
+      noteEditingModaNoteCard: undefined,
+    })
+  }
+
+  private handleNoteClickInNoteCardEditingModal = noteName => {
+    const newNoteCards = this.state.noteCards.map(noteCard => {
+      if (noteCard !== this.state.noteEditingModaNoteCard) {
+        return noteCard
+      }
+
+      return {
+        ...noteCard,
+        text: tonal.Note.pc(noteName),
+        note: noteName,
+        midi: tonal.Note.midi(noteName),
+        color: getNoteCardColorByNoteName(noteName),
+      }
+    })
+
+    this.setState(
+      {
+        noteCards: newNoteCards,
+        noteEditingModaIsOpen: false,
+        noteEditingModaNoteCard: undefined,
+      },
+      this.onNoteCardsUpdated,
+    )
   }
 
   public render() {
@@ -370,7 +417,13 @@ class App extends React.Component<{}, AppState> {
                   </Label>
                 </Flex>
 
-                <Flex flex={2} alignItems="center" maxHeight={400}>
+                <Flex
+                  flex={2}
+                  alignItems="center"
+                  maxHeight={400}
+                  width={1}
+                  maxWidth={700}
+                >
                   <NoteCards
                     noteCards={noteCards}
                     activeNoteCard={activeNoteCard}
@@ -402,6 +455,40 @@ class App extends React.Component<{}, AppState> {
                   }
                 />
               </Box>
+
+              <Modal
+                isOpen={this.state.noteEditingModaIsOpen}
+                onRequestClose={this.closeNoteEditingModal}
+                style={customStyles}
+                contentLabel="Edit card"
+              >
+                <h2>Pick a note</h2>
+                <Flex flexWrap="wrap">
+                  {chromaticNotes.map(noteName => {
+                    return (
+                      <Box width={1 / 4} p={[1, 2, 2]}>
+                        <Button
+                          borderRadius={15}
+                          border={
+                            this.state.noteEditingModaNoteCard &&
+                            noteName === this.state.noteEditingModaNoteCard.note
+                              ? '4px solid red'
+                              : undefined
+                          }
+                          width={1}
+                          key={noteName}
+                          bg={getNoteCardColorByNoteName(noteName)}
+                          onClick={() =>
+                            this.handleNoteClickInNoteCardEditingModal(noteName)
+                          }
+                        >
+                          {tonal.Note.pc(noteName)}
+                        </Button>
+                      </Box>
+                    )
+                  })}
+                </Flex>
+              </Modal>
             </Flex>
           </MeasureScreenSize>
         </>

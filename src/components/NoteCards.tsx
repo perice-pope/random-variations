@@ -26,17 +26,23 @@ type NoteCardsProps = {
 }
 
 const SortableNoteCard = SortableElement(
-  ({ id, active, bgColor, shouldFlip, ...props }) => (
+  ({ id, active, bgColor, shouldFlip, onClick, ...props }) => (
     <Flipped flipId={id} shouldFlip={shouldFlip}>
       <div
         className={css(`
           width: 25%;
           position: relative;
-          z-index: ${({ active }) => (active ? 2 : 1)};
+          z-index: ${active ? 2 : 1};
         `)}
       >
         <Flex p={[1, 2, 2]} height="100%">
-          <NoteCard flex={1} active={active} bgColor={bgColor} {...props} />
+          <NoteCard
+            flex={1}
+            active={active}
+            bgColor={bgColor}
+            onClick={onClick}
+            {...props}
+          />
         </Flex>
       </div>
     </Flipped>
@@ -44,7 +50,7 @@ const SortableNoteCard = SortableElement(
 )
 
 const SortableNotesContainer = SortableContainer(
-  ({ items, activeNoteCard, shouldFlip }) => {
+  ({ items, activeNoteCard, shouldFlip, onClick }) => {
     return (
       <div
         className={css(`
@@ -65,6 +71,7 @@ const SortableNotesContainer = SortableContainer(
               tabIndex={0}
               width={1}
               active={activeNoteCard === noteCard}
+              onClick={() => onClick(noteCard)}
             >
               {noteCard.text}
             </SortableNoteCard>
@@ -101,12 +108,7 @@ class NoteCards extends React.Component<NoteCardsProps> {
   }
 
   public render() {
-    const {
-      // @ts-ignore
-      onNoteCardClick,
-      noteCards,
-      activeNoteCard,
-    } = this.props
+    const { onNoteCardClick, noteCards, activeNoteCard } = this.props
 
     return (
       <SortableNotesContainer
@@ -117,6 +119,7 @@ class NoteCards extends React.Component<NoteCardsProps> {
         items={noteCards}
         onSortEnd={this.handleSortEnd}
         onSortStart={this.handleSortStart}
+        onClick={onNoteCardClick}
         axis="xy"
       />
     )

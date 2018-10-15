@@ -36,6 +36,7 @@ const NoteCard = styled(Box)<NoteCardProps>`
   padding: 3px 3px;
   border-radius: 15px;
   font-size: 18px;
+  font-weight: bold;
   user-select: none;
 
   @media screen and (min-height: 600px) and (min-width: 300px) {

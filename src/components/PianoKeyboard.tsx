@@ -58,7 +58,7 @@ class PianoKeyboard extends React.Component<PianoKeyboardProps> {
 
   private getNoteRange = () => {
     const { noteRange, width } = this.props
-    console.log(width)
+
     if (noteRange) {
       return noteRange
     }
