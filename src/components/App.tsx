@@ -384,7 +384,7 @@ class App extends React.Component<{}, AppState> {
                 alignItems="center"
                 flexDirection="column"
               >
-                <Flex flexDirection="row" mb={3} width={1}>
+                <Flex alignItems="center" flexDirection="row" mb={3} width={1}>
                   <Box flex="1">
                     <Button
                       title={isPlaying ? 'Stop' : 'Play'}
@@ -404,17 +404,16 @@ class App extends React.Component<{}, AppState> {
                     </Button>
                   </Box>
 
-                  <Label>
-                    BPM:
-                    <BpmInput
-                      type="number"
-                      step="1"
-                      min="0"
-                      max="400"
-                      value={`${bpm}`}
-                      onChange={this.handleBpmChange}
-                    />
-                  </Label>
+                  <Label for="bpm" fontSize={[2, 3, 3]}>BPM:</Label>
+                  <BpmInput
+                    id="bpm"
+                    type="number"
+                    step="1"
+                    min="0"
+                    max="400"
+                    value={`${bpm}`}
+                    onChange={this.handleBpmChange}
+                  />
                 </Flex>
 
                 <Flex
