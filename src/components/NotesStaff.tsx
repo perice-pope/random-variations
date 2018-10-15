@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as _ from 'lodash'
 import * as tonal from 'tonal'
 import * as Vex from 'vexflow'
-import { darken, lighten, getLuminance } from 'polished'
+import { darken, getLuminance } from 'polished'
 
 import { Box, BoxProps } from './ui'
 import { StaffNoteType } from '../types'
@@ -81,17 +81,10 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
           ? darken(0.2, noteConfig.color)
           : noteConfig.color
 
-      if (noteConfig === activeNote) {
-        note.setStyle({
-          fillStyle: lighten(0.1, noteColor),
-          strokeStyle: lighten(0.1, noteColor),
-        })
-      } else {
-        note.setStyle({
-          fillStyle: noteColor,
-          strokeStyle: noteColor,
-        })
-      }
+      note.setStyle({
+        fillStyle: noteColor,
+        strokeStyle: noteColor,
+      })
 
       // Hide the stems
       note
