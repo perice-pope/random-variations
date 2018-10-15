@@ -26,7 +26,7 @@ const NoteCard = styled(Box)<NoteCardProps>`
     transform: scale(1.1);
   }
 
-  border: none;
+  box-shadow: ${({ active }) => (active ? '0px 0px 0px 3px #f00' : 'none')};
   background-color: ${({ bgColor, active }) =>
     active ? lighten(0.13, bgColor) : bgColor};
   transform: ${({ active }) => (active ? 'scale(1.2)' : 'none')};

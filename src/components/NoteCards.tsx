@@ -177,7 +177,6 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
         transitionDuration={DRAG_AND_DROP_TRANSITION_DURATION_MS}
         activeNoteCard={activeNoteCard}
         items={noteCards}
-        lockToContainerEdges={true}
         onSortEnd={this.handleSortEnd}
         onSortMove={this.handleSortMove}
         onSortStart={this.handleSortStart}
