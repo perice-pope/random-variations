@@ -72,6 +72,48 @@ const customStyles = {
   },
 }
 
+type ChangeNoteModalProps = {
+  isOpen: boolean
+  onClose: () => any
+  onSubmit: (args: { noteName: string }) => any
+  noteCard?: NoteCardType
+}
+
+const ChangeNoteModal: React.SFC<ChangeNoteModalProps> = (
+  props: ChangeNoteModalProps,
+) => (
+  <Modal
+    isOpen={props.isOpen}
+    onRequestClose={props.onClose}
+    style={customStyles}
+    contentLabel="Edit card"
+  >
+    <h2>Pick a note</h2>
+    <Flex flexWrap="wrap">
+      {chromaticNotes.map(noteName => {
+        return (
+          <Box width={1 / 4} p={[1, 2, 2]}>
+            <Button
+              borderRadius={15}
+              border={
+                props.noteCard && noteName === props.noteCard.note
+                  ? '4px solid red'
+                  : undefined
+              }
+              width={1}
+              key={noteName}
+              bg={getNoteCardColorByNoteName(noteName)}
+              onClick={() => props.onSubmit({ noteName })}
+            >
+              {tonal.Note.pc(noteName)}
+            </Button>
+          </Box>
+        )
+      })}
+    </Flex>
+  </Modal>
+)
+
 class App extends React.Component<{}, AppState> {
   private synth: any
   private scheduledEvents: any[] = []
@@ -330,7 +372,7 @@ class App extends React.Component<{}, AppState> {
     })
   }
 
-  private handleNoteClickInNoteCardEditingModal = noteName => {
+  private handleNoteClickInNoteCardEditingModal = ({ noteName }) => {
     const newNoteCards = this.state.noteCards.map(noteCard => {
       if (noteCard !== this.state.noteEditingModaNoteCard) {
         return noteCard
@@ -404,7 +446,9 @@ class App extends React.Component<{}, AppState> {
                     </Button>
                   </Box>
 
-                  <Label for="bpm" fontSize={[2, 3, 3]}>BPM:</Label>
+                  <Label for="bpm" fontSize={[2, 3, 3]}>
+                    BPM:
+                  </Label>
                   <BpmInput
                     id="bpm"
                     type="number"
@@ -455,39 +499,12 @@ class App extends React.Component<{}, AppState> {
                 />
               </Box>
 
-              <Modal
+              <ChangeNoteModal
                 isOpen={this.state.noteEditingModaIsOpen}
-                onRequestClose={this.closeNoteEditingModal}
-                style={customStyles}
-                contentLabel="Edit card"
-              >
-                <h2>Pick a note</h2>
-                <Flex flexWrap="wrap">
-                  {chromaticNotes.map(noteName => {
-                    return (
-                      <Box width={1 / 4} p={[1, 2, 2]}>
-                        <Button
-                          borderRadius={15}
-                          border={
-                            this.state.noteEditingModaNoteCard &&
-                            noteName === this.state.noteEditingModaNoteCard.note
-                              ? '4px solid red'
-                              : undefined
-                          }
-                          width={1}
-                          key={noteName}
-                          bg={getNoteCardColorByNoteName(noteName)}
-                          onClick={() =>
-                            this.handleNoteClickInNoteCardEditingModal(noteName)
-                          }
-                        >
-                          {tonal.Note.pc(noteName)}
-                        </Button>
-                      </Box>
-                    )
-                  })}
-                </Flex>
-              </Modal>
+                noteCard={this.state.noteEditingModaNoteCard}
+                onClose={this.closeNoteEditingModal}
+                onSubmit={this.handleNoteClickInNoteCardEditingModal}
+              />
             </Flex>
           </MeasureScreenSize>
         </>
