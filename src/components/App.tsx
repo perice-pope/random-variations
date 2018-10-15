@@ -90,7 +90,7 @@ const PickNoteModal: React.SFC<PickNoteModalProps> = (
     contentLabel="Edit card"
   >
     <h2>Pick a note</h2>
-    <Flex flexWrap="wrap">
+    <Flex flexWrap="wrap" maxWidth={300}>
       {chromaticNotes.map(noteName => {
         return (
           <Box width={1 / 4} p={[1, 2, 2]}>
@@ -530,7 +530,6 @@ class App extends React.Component<{}, AppState> {
                         color="#777777"
                         maxHeight={120}
                         alignSelf="center"
-                        opacity={0}
                       >
                         + Add note
                       </Button>
