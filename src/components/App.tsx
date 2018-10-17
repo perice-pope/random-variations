@@ -6,7 +6,6 @@ import Tone from 'tone'
 import * as tonal from 'tonal'
 import * as TonalRange from 'tonal-range'
 import { transpose } from 'tonal-distance'
-import Modal from 'react-modal'
 
 import { Flex, Box, Button, TextInput, Label } from './ui'
 import NotesStaff from './NotesStaff'
@@ -20,9 +19,9 @@ import globalStyles from '../styles/globalStyles'
 import NoteCards from './NoteCards'
 
 import { NoteCardType, StaffNoteType } from '../types'
+import PickNoteModal from './PickNoteModal'
 import PianoKeyboard from './PianoKeyboard'
 
-Modal.setAppElement('#root')
 globalStyles()
 
 const BpmInput = withProps({
@@ -65,58 +64,6 @@ const ContentContainer = withProps({
   px: 4,
   // @ts-ignore
 })(Box)
-
-const customStyles = {
-  content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-  },
-}
-
-type PickNoteModalProps = {
-  isOpen: boolean
-  onClose: () => any
-  onSubmit: (args: { noteName: string }) => any
-  selectedNoteName?: string
-}
-
-const PickNoteModal: React.SFC<PickNoteModalProps> = (
-  props: PickNoteModalProps,
-) => (
-  <Modal
-    isOpen={props.isOpen}
-    onRequestClose={props.onClose}
-    style={customStyles}
-    contentLabel="Edit card"
-  >
-    <h2>Pick a note</h2>
-    <Flex flexWrap="wrap" maxWidth={300}>
-      {chromaticNotes.map(noteName => {
-        return (
-          <Box key={noteName} width={1 / 4} p={[1, 2, 2]}>
-            <Button
-              borderRadius={15}
-              border={
-                props.selectedNoteName && noteName === props.selectedNoteName
-                  ? '4px solid red'
-                  : undefined
-              }
-              width={1}
-              bg={getNoteCardColorByNoteName(noteName)}
-              onClick={() => props.onSubmit({ noteName })}
-            >
-              {tonal.Note.pc(noteName)}
-            </Button>
-          </Box>
-        )
-      })}
-    </Flex>
-  </Modal>
-)
 
 class App extends React.Component<{}, AppState> {
   private synth: any
