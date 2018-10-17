@@ -4,6 +4,7 @@ import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import AddIcon from '@material-ui/icons/Add'
 import Button, { ButtonProps } from '@material-ui/core/Button'
+import Tooltip from '@material-ui/core/Tooltip'
 
 type AddEntityButtonProps = {
   onAddSingleNoteClick: () => any
@@ -63,18 +64,20 @@ export default class AddEntityButton extends React.Component<
           <MenuItem onClick={this.handleSingleNoteClick}>Single note</MenuItem>
           <MenuItem onClick={this.handleArpeggioClick}>Triad</MenuItem>
         </Menu>
-        <Button
-          buttonRef={this.buttonRef}
-          title="Add a note, sequence or a modifier"
-          variant="fab"
-          color="primary"
-          aria-label="Add"
-          aria-owns={this.state.isMenuOpen ? 'add-entity-menu' : undefined}
-          onClick={this.openMenu}
-          {...this.props.buttonProps}
-        >
-          <AddIcon />
-        </Button>
+        <Tooltip title="Add a note, sequence or a modifier">
+          <Button
+            buttonRef={this.buttonRef}
+            title="Add a note, sequence or a modifier"
+            variant="fab"
+            color="primary"
+            aria-label="Add"
+            aria-owns={this.state.isMenuOpen ? 'add-entity-menu' : undefined}
+            onClick={this.openMenu}
+            {...this.props.buttonProps}
+          >
+            <AddIcon />
+          </Button>
+        </Tooltip>
       </>
     )
   }
