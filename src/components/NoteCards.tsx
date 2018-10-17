@@ -142,7 +142,7 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
         this.state.noteCardDraggedIndex
       ]
       this.props.onCardDraggedOut(noteCardDragged)
-    } else if (this.props.onCardsReorder) {
+    } else if (this.props.onCardsReorder && oldIndex !== newIndex) {
       this.props.onCardsReorder({ oldIndex, newIndex })
     }
     setTimeout(
