@@ -7,6 +7,12 @@ import * as tonal from 'tonal'
 import * as TonalRange from 'tonal-range'
 import { transpose } from 'tonal-distance'
 
+import AppBar from '@material-ui/core/AppBar'
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
+import IconButton from '@material-ui/core/IconButton'
+import MenuIcon from '@material-ui/icons/Menu'
+
 import { Flex, Box, Button, TextInput, Label } from './ui'
 import NotesStaff from './NotesStaff'
 import MeasureScreenSize from './MeasureScreenSize'
@@ -515,8 +521,18 @@ class App extends React.Component<{}, AppState> {
               css="overflow: hidden;"
               flexDirection="column"
             >
+              <AppBar position="static">
+                <Toolbar variant="dense">
+                  <IconButton color="inherit" aria-label="Menu">
+                    <MenuIcon />
+                  </IconButton>
+                  <Typography variant="h6" color="inherit">
+                    Random Variations
+                  </Typography>
+                </Toolbar>
+              </AppBar>
               <Flex
-                pt={[2, 3, 4]}
+                pt={[3, 3, 4]}
                 flex={1}
                 px={[3]}
                 width={1}
