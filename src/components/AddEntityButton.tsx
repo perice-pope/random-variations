@@ -62,12 +62,15 @@ export default class AddEntityButton extends React.Component<
           onClose={this.closeMenu}
         >
           <MenuItem onClick={this.handleSingleNoteClick}>Single note</MenuItem>
-          <MenuItem onClick={this.handleArpeggioClick}>Triad</MenuItem>
+          <MenuItem onClick={this.handleArpeggioClick}>Arpeggio</MenuItem>
         </Menu>
-        <Tooltip title="Add a note, sequence or a modifier">
+
+        <Tooltip
+          title="Add a note, sequence or a modifier"
+          disableFocusListener={true}
+        >
           <Button
             buttonRef={this.buttonRef}
-            title="Add a note, sequence or a modifier"
             variant="fab"
             color="primary"
             aria-label="Add"

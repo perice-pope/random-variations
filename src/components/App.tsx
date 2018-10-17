@@ -20,6 +20,8 @@ import ArrowsIcon from '@material-ui/icons/Cached'
 import TextField from '@material-ui/core/TextField'
 import InputAdornment from '@material-ui/core/InputAdornment'
 
+import Chip from '@material-ui/core/Chip'
+
 import { Flex, Box, Button } from './ui'
 import NotesStaff from './NotesStaff'
 import MeasureScreenSize from './MeasureScreenSize'
@@ -31,8 +33,15 @@ import globalStyles from '../styles/globalStyles'
 
 import NoteCards from './NoteCards'
 
-import { NoteCardType, StaffNoteType } from '../types'
+import {
+  NoteCardType,
+  StaffNoteType,
+  ArpeggioModifier,
+  ArpeggioType,
+  ArpeggioDirection,
+} from '../types'
 import PickNoteModal from './PickNoteModal'
+import ArpeggioModifierModal from './ArpeggioModifierModal'
 import PianoKeyboard from './PianoKeyboard'
 
 import AddEntityButton from './AddEntityButton'
@@ -48,15 +57,19 @@ type AppState = {
   activeNoteCardIndex: number
   activeStaffNoteIndex: number
 
+  modifiers: {
+    arpeggio: ArpeggioModifier
+  }
+
   height: number
   width: number
   notesStaffWidth: number
 
+  arpeggioAddingModalIsOpen: boolean
+
   noteAddingModalIsOpen: boolean
   noteEditingModalIsOpen: boolean
   noteEditingModalNoteCard?: NoteCardType
-
-  areTriadsEnabled: boolean
 }
 
 const chromaticNotes = TonalRange.chromatic(['C4', 'B4'], true)
@@ -106,7 +119,6 @@ class App extends React.Component<{}, AppState> {
     this.state = {
       bpm: 120,
       noteCards: [randomNoteCard],
-      areTriadsEnabled: false,
 
       // Screen size
       height: 0,
@@ -118,6 +130,13 @@ class App extends React.Component<{}, AppState> {
       activeNoteCardIndex: 0,
       activeStaffNoteIndex: 0,
 
+      modifiers: {
+        arpeggio: {
+          enabled: false,
+        },
+      },
+
+      arpeggioAddingModalIsOpen: false,
       noteAddingModalIsOpen: false,
       noteEditingModalIsOpen: false,
       noteEditingModalNoteCard: undefined,
@@ -159,8 +178,15 @@ class App extends React.Component<{}, AppState> {
           duration: '4',
         })
 
-        if (this.state.areTriadsEnabled) {
-          note = transpose(note, '3M')
+        const direction =
+          this.state.modifiers.arpeggio.direction === 'up' ? '' : '-'
+        if (this.state.modifiers.arpeggio.enabled) {
+          note = transpose(
+            note,
+            this.state.modifiers.arpeggio.type === 'major triad'
+              ? `${direction}3M`
+              : `${direction}3m`,
+          )
           result.push({
             note: note,
             midi: tonal.Note.midi(note),
@@ -168,7 +194,12 @@ class App extends React.Component<{}, AppState> {
             color: 'black',
             duration: '4',
           })
-          note = transpose(note, '3m')
+          note = transpose(
+            note,
+            this.state.modifiers.arpeggio.type === 'major triad'
+              ? `${direction}3m`
+              : `${direction}3M`,
+          )
           result.push({
             note: note,
             midi: tonal.Note.midi(note),
@@ -246,7 +277,7 @@ class App extends React.Component<{}, AppState> {
       JSON.stringify({
         bpm: this.state.bpm,
         noteCards: this.state.noteCards,
-        areTriadsEnabled: this.state.areTriadsEnabled,
+        modifiers: this.state.modifiers,
       }),
     )
   }
@@ -294,7 +325,7 @@ class App extends React.Component<{}, AppState> {
 
       const nextStaffNoteIndex =
         (state.activeStaffNoteIndex + 1) % this.state.staffNotes.length
-      const nextNoteCardIndex = state.areTriadsEnabled
+      const nextNoteCardIndex = state.modifiers.arpeggio.enabled
         ? Math.floor(nextStaffNoteIndex / 3)
         : nextStaffNoteIndex
       return {
@@ -447,6 +478,18 @@ class App extends React.Component<{}, AppState> {
     })
   }
 
+  private openArpeggioAddingModal = () => {
+    this.setState({
+      arpeggioAddingModalIsOpen: true,
+    })
+  }
+
+  private closeArpeggioAddingModal = () => {
+    this.setState({
+      arpeggioAddingModalIsOpen: false,
+    })
+  }
+
   private handleNoteClickInNoteCardEditingModal = ({ noteName }) => {
     const newNoteCards = this.state.noteCards.map(noteCard => {
       if (noteCard !== this.state.noteEditingModalNoteCard) {
@@ -472,6 +515,45 @@ class App extends React.Component<{}, AppState> {
     )
   }
 
+  private handleArpeggioModifierModalConfirm = ({
+    type,
+    direction,
+  }: {
+    type: ArpeggioType
+    direction: ArpeggioDirection
+  }) => {
+    this.setState(
+      {
+        modifiers: {
+          ...this.state.modifiers,
+          arpeggio: {
+            enabled: true,
+            type,
+            direction,
+          },
+        },
+      },
+      this.updateStaffNotes,
+    )
+    this.closeArpeggioAddingModal()
+    this.serializeAndSaveAppStateLocally()
+  }
+
+  private handleRemoveArpeggioClick = () => {
+    this.setState(
+      {
+        modifiers: {
+          ...this.state.modifiers,
+          arpeggio: {
+            enabled: false,
+          },
+        },
+      },
+      this.updateStaffNotes,
+    )
+    this.serializeAndSaveAppStateLocally()
+  }
+
   private handleNoteClickInNoteCardAddingModal = ({ noteName }) => {
     const newNoteCards = [
       ...this.state.noteCards,
@@ -489,13 +571,6 @@ class App extends React.Component<{}, AppState> {
         noteCards: newNoteCards,
         noteAddingModalIsOpen: false,
       },
-      this.onNotesUpdated,
-    )
-  }
-
-  private toggleTriads = () => {
-    this.setState(
-      state => ({ areTriadsEnabled: !state.areTriadsEnabled }),
       this.onNotesUpdated,
     )
   }
@@ -598,6 +673,7 @@ class App extends React.Component<{}, AppState> {
                 <Flex
                   flex={2}
                   alignItems="center"
+                  flexDirection="column"
                   maxHeight={400}
                   width={1}
                   maxWidth={700}
@@ -619,7 +695,7 @@ class App extends React.Component<{}, AppState> {
                       >
                         <AddEntityButton
                           onAddSingleNoteClick={this.openNoteAddingModal}
-                          onAddArpeggioClick={this.toggleTriads}
+                          onAddArpeggioClick={this.openArpeggioAddingModal}
                           buttonProps={{
                             disabled: isPlaying,
                           }}
@@ -627,6 +703,17 @@ class App extends React.Component<{}, AppState> {
                       </Flex>
                     ) : null}
                   </NoteCards>
+
+                  {this.state.modifiers.arpeggio.enabled && (
+                    <Chip
+                      color="secondary"
+                      label={`${this.state.modifiers.arpeggio.type} / ${
+                        this.state.modifiers.arpeggio.direction
+                      }`}
+                      onClick={this.openArpeggioAddingModal}
+                      onDelete={this.handleRemoveArpeggioClick}
+                    />
+                  )}
                 </Flex>
 
                 <Box innerRef={this.notesStaffContainerRef} width={1}>
@@ -652,6 +739,14 @@ class App extends React.Component<{}, AppState> {
                   }
                 />
               </Box>
+
+              <ArpeggioModifierModal
+                isOpen={this.state.arpeggioAddingModalIsOpen}
+                onClose={this.closeArpeggioAddingModal}
+                onSubmit={this.handleArpeggioModifierModalConfirm}
+                defaultDirection={this.state.modifiers.arpeggio.direction}
+                defaultType={this.state.modifiers.arpeggio.type}
+              />
 
               <PickNoteModal
                 isOpen={this.state.noteAddingModalIsOpen}

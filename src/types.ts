@@ -14,3 +14,12 @@ export type StaffNoteType = {
   color: string
   duration: '4'
 }
+
+export type ArpeggioType = 'major triad' | 'minor triad'
+export type ArpeggioDirection = 'up' | 'down' | 'up down' | 'down up'
+
+export type ArpeggioModifier = {
+  enabled: boolean
+  type?: ArpeggioType
+  direction?: ArpeggioDirection
+}
