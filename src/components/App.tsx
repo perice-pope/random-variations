@@ -379,14 +379,20 @@ class App extends React.Component<{}, AppState> {
     }
   }
 
-  private handleNoteCardClick = (noteCard: NoteCardType) => {
+  private handleEditCardClick = (noteCard: NoteCardType) => {
     this.setState({
       noteEditingModalIsOpen: true,
       noteEditingModalNoteCard: noteCard,
     })
   }
 
-  private handleNoteCardDraggedOut = (noteCard: NoteCardType) => {
+  private handleDeleteCardClick = (noteCard: NoteCardType) =>
+    this.deleteNoteCard(noteCard)
+
+  private handleNoteCardDraggedOut = (noteCard: NoteCardType) =>
+    this.deleteNoteCard(noteCard)
+
+  private deleteNoteCard = (noteCard: NoteCardType) => {
     this.setState(
       {
         noteCards: this.state.noteCards.filter(nc => nc !== noteCard),
@@ -585,7 +591,8 @@ class App extends React.Component<{}, AppState> {
                   <NoteCards
                     noteCards={noteCards}
                     activeNoteCard={activeNoteCard}
-                    onNoteCardClick={this.handleNoteCardClick}
+                    onEditClick={this.handleEditCardClick}
+                    onDeleteClick={this.handleDeleteCardClick}
                     onCardsReorder={this.handleCardsReorder}
                     onCardDraggedOut={this.handleNoteCardDraggedOut}
                   >

@@ -5,6 +5,9 @@ import styled, { css } from 'react-emotion'
 import * as _ from 'lodash'
 import { SortableContainer, SortableElement } from 'react-sortable-hoc'
 
+import Menu from '@material-ui/core/Menu'
+import MenuItem from '@material-ui/core/MenuItem'
+
 import { Flex } from './ui'
 import NoteCard from './NoteCard'
 
@@ -18,28 +21,101 @@ const FlipperStyled = styled(Flipper)`
   flex-wrap: wrap;
 `
 
+type NoteCardWrapperProps = {
+  [x: string]: any //TODO
+}
+
+type Position = {
+  left: number
+  top: number
+}
+
+type NoteCardWrapperState = {
+  menuPosition: Position
+  menuOpen: boolean
+}
+
 const SortableNoteCard = SortableElement(
-  ({ id, active, bgColor, shouldFlip, onClick, ...props }) => (
-    <Flipped flipId={id} shouldFlip={shouldFlip}>
-      <div
-        className={css(`
+  class NoteCardWrapper extends React.Component<
+    NoteCardWrapperProps,
+    NoteCardWrapperState
+  > {
+    state = {
+      menuOpen: false,
+      menuPosition: { left: 0, top: 0 },
+    }
+
+    noteCardRef = React.createRef<HTMLElement>()
+
+    private openMenu = (menuPosition: Position) => {
+      this.setState({ menuOpen: true, menuPosition })
+    }
+
+    private closeMenu = () => {
+      this.setState({ menuOpen: false })
+    }
+
+    private handleCardClick = event => {
+      // @ts-ignore
+      this.openMenu({ left: event.clientX, top: event.clientY })
+    }
+
+    private handleEditClick = () => {
+      this.closeMenu()
+      if (this.props.onEditClick) {
+        this.props.onEditClick()
+      }
+    }
+
+    private handleDeleteClick = () => {
+      this.closeMenu()
+      if (this.props.onDeleteClick) {
+        this.props.onDeleteClick()
+      }
+    }
+
+    render() {
+      const { id, active, bgColor, shouldFlip, onClick, ...props } = this.props
+      const menuId = `note-card-menu-${id}`
+      return (
+        <Flipped flipId={id} shouldFlip={shouldFlip}>
+          <div
+            className={css(`
           width: 25%;
           position: relative;
           z-index: ${active ? 2 : 1};
         `)}
-      >
-        <Flex p={[1, 2, 2]} height="100%">
-          <NoteCard
-            flex={1}
-            active={active}
-            bgColor={bgColor}
-            onClick={onClick}
-            {...props}
-          />
-        </Flex>
-      </div>
-    </Flipped>
-  ),
+          >
+            <Flex p={[1, 2, 2]} height="100%">
+              <Menu
+                id={menuId}
+                // anchorEl={this.noteCardRef.current}
+                anchorReference="anchorPosition"
+                anchorPosition={this.state.menuPosition}
+                open={this.state.menuOpen}
+                onClose={this.closeMenu}
+              >
+                <MenuItem autoFocus onClick={this.handleEditClick}>
+                  Edit
+                </MenuItem>
+                <MenuItem onClick={this.handleDeleteClick}>Remove</MenuItem>
+              </Menu>
+              <NoteCard
+                innerRef={this.noteCardRef}
+                flex={1}
+                active={active}
+                bgColor={bgColor}
+                onClick={this.handleCardClick}
+                aria-owns={this.state.menuOpen ? menuId : undefined}
+                aria-haspopup="true"
+                {...props}
+              />
+            </Flex>
+          </div>
+        </Flipped>
+      )
+    }
+  },
 )
 
 const SortableNotesContainer = SortableContainer(
@@ -51,7 +127,8 @@ const SortableNotesContainer = SortableContainer(
     children,
     activeNoteCard,
     shouldFlip,
-    onClick,
+    onEditClick,
+    onDeleteClick,
   }) => {
     let backgroundColor = 'transparent'
     if (isDraggingOutOfContainer) {
@@ -84,7 +161,8 @@ const SortableNotesContainer = SortableContainer(
               tabIndex={0}
               width={1}
               active={activeNoteCard === noteCard}
-              onClick={() => onClick(noteCard)}
+              onEditClick={() => onEditClick(noteCard)}
+              onDeleteClick={() => onDeleteClick(noteCard)}
             >
               {noteCard.text}
             </SortableNoteCard>
@@ -102,7 +180,8 @@ type NoteCardsProps = {
   noteCards: NoteCardType[]
   activeNoteCard?: NoteCardType
   onCardsReorder: (arg: { oldIndex: number; newIndex: number }) => any
-  onNoteCardClick: (noteCard: NoteCardType) => any
+  onEditClick: (noteCard: NoteCardType) => any
+  onDeleteClick: (noteCard: NoteCardType) => any
   onCardDraggedOut: (noteCard: NoteCardType) => any
 }
 
@@ -165,7 +244,13 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
   }
 
   public render() {
-    const { children, onNoteCardClick, noteCards, activeNoteCard } = this.props
+    const {
+      children,
+      onEditClick,
+      onDeleteClick,
+      noteCards,
+      activeNoteCard,
+    } = this.props
 
     return (
       <SortableNotesContainer
@@ -180,7 +265,8 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
         onSortEnd={this.handleSortEnd}
         onSortMove={this.handleSortMove}
         onSortStart={this.handleSortStart}
-        onClick={onNoteCardClick}
+        onEditClick={onEditClick}
+        onDeleteClick={onDeleteClick}
         axis="xy"
         children={children}
       />
