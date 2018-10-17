@@ -297,6 +297,7 @@ class App extends React.Component<{}, AppState> {
   }
 
   private onNotesUpdated = () => {
+    console.log('onNotesUpdated')
     const hasBeenPlaying = this.state.isPlaying
 
     this.serializeAndSaveAppStateLocally()
@@ -315,6 +316,7 @@ class App extends React.Component<{}, AppState> {
     time: string = '0:0',
     duration: string = '4n',
   ) => {
+    console.log('sheduleNote', freq, time, duration)
     return Tone.Transport.schedule(contextTime => {
       if (this.synth) {
         this.synth.triggerAttackRelease(freq, duration, contextTime)
@@ -361,6 +363,7 @@ class App extends React.Component<{}, AppState> {
   }
 
   startPlaying = () => {
+    console.log('startPlaying')
     this.scheduleNotes()
     this.setState({ isPlaying: true }, () => {
       Tone.Master.volume.rampTo(1, 100)
@@ -369,6 +372,14 @@ class App extends React.Component<{}, AppState> {
   }
 
   stopPlaying = (cb?: () => any) => {
+    console.log('stopPlaying')
+    if (!this.state.isPlaying) {
+      if (cb) {
+        cb()
+      }
+      return
+    }
+
     this.setState(
       { isPlaying: false, activeNoteCardIndex: 0, activeStaffNoteIndex: 0 },
       async () => {
@@ -385,6 +396,7 @@ class App extends React.Component<{}, AppState> {
   }
 
   togglePlayback = () => {
+    console.log('togglePlayback')
     if (this.state.isPlaying) {
       this.stopPlaying()
     } else {
