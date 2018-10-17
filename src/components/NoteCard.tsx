@@ -1,8 +1,10 @@
+import * as React from 'react'
 import styled from 'react-emotion'
 import * as recompose from 'recompose'
 import { lighten } from 'polished'
 
-import { Box } from './ui'
+import ButtonBase from '@material-ui/core/ButtonBase'
+import { Paper, PaperProps } from './ui'
 
 type NoteCardProps = {
   bgColor: string
@@ -16,7 +18,17 @@ const enhance = recompose.compose(
   }),
 )
 
-const NoteCard = styled(Box)<NoteCardProps>`
+const BoxWithTouchRipple: React.SFC<PaperProps & { children?: any }> = ({
+  children,
+  ...props
+}) => (
+  // @ts-ignore
+  <ButtonBase {...props} component={Paper}>
+    {children}
+  </ButtonBase>
+)
+
+const NoteCard = styled(BoxWithTouchRipple)<NoteCardProps>`
   transition: all 300ms;
 
   display: inline-flex;
@@ -26,7 +38,6 @@ const NoteCard = styled(Box)<NoteCardProps>`
     transform: scale(1.1);
   }
 
-  box-shadow: ${({ active }) => (active ? '0px 0px 0px 3px #f00' : 'none')};
   background-color: ${({ bgColor, active }) =>
     active ? lighten(0.13, bgColor) : bgColor};
   transform: ${({ active }) => (active ? 'scale(1.2)' : 'none')};

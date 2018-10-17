@@ -1,5 +1,4 @@
 import * as React from 'react'
-// @ts-ignore
 import { Flipper, Flipped } from 'react-flip-toolkit'
 import styled, { css } from 'react-emotion'
 import * as _ from 'lodash'
@@ -19,6 +18,8 @@ const FlipperStyled = styled(Flipper)`
   height: 100%;
   display: flex;
   flex-wrap: wrap;
+  align-content: center;
+  align-items: center;
 `
 
 type NoteCardWrapperProps = {
@@ -45,8 +46,6 @@ const SortableNoteCard = SortableElement(
       menuPosition: { left: 0, top: 0 },
     }
 
-    noteCardRef = React.createRef<HTMLElement>()
-
     private openMenu = (menuPosition: Position) => {
       this.setState({ menuOpen: true, menuPosition })
     }
@@ -56,7 +55,6 @@ const SortableNoteCard = SortableElement(
     }
 
     private handleCardClick = event => {
-      // @ts-ignore
       this.openMenu({ left: event.clientX, top: event.clientY })
     }
 
@@ -86,10 +84,9 @@ const SortableNoteCard = SortableElement(
           z-index: ${active ? 2 : 1};
         `)}
           >
-            <Flex p={[1, 2, 2]} height="100%">
+            <Flex p={[1, 2, 2]}>
               <Menu
                 id={menuId}
-                // anchorEl={this.noteCardRef.current}
                 anchorReference="anchorPosition"
                 anchorPosition={this.state.menuPosition}
                 open={this.state.menuOpen}
@@ -101,7 +98,6 @@ const SortableNoteCard = SortableElement(
                 <MenuItem onClick={this.handleDeleteClick}>Remove</MenuItem>
               </Menu>
               <NoteCard
-                innerRef={this.noteCardRef}
                 flex={1}
                 active={active}
                 bgColor={bgColor}
@@ -158,7 +154,7 @@ const SortableNotesContainer = SortableContainer(
               index={index}
               // @ts-ignore
               bgColor={noteCard.color}
-              tabIndex={0}
+              tabIndex={-1}
               width={1}
               active={activeNoteCard === noteCard}
               onEditClick={() => onEditClick(noteCard)}

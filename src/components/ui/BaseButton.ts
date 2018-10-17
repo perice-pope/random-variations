@@ -2,16 +2,21 @@ import styled from 'react-emotion'
 import * as ss from './styleSystem'
 import * as recompose from 'recompose'
 import isPropValid from '@emotion/is-prop-valid'
+import {
+  default as MuiButtonBase,
+  ButtonBaseProps as MuiButtonBaseProps,
+} from '@material-ui/core/ButtonBase'
 
 import { BoxProps } from './Box'
 
-export type BaseButtonProps = BoxProps &
+export type BaseButtonProps = MuiButtonBaseProps &
+  BoxProps &
   ss.JustifyContentProps & {
     outline?: string
     variant?: string
   }
 
-const StyledButton = styled('button', {
+const StyledBaseButton = styled(MuiButtonBase, {
   shouldForwardProp: isPropValid,
 })<BaseButtonProps>`
   ${ss.color}
@@ -34,20 +39,10 @@ const StyledButton = styled('button', {
   ${ss.display}
   ${ss.alignItems}
   ${ss.justifyContent}
-  outline: ${({ outline }) => outline};
   cursor: pointer;
   user-select: none;
 `
 
-const enhance = recompose.compose(
-  recompose.setDisplayName('BaseButton'),
-  recompose.defaultProps<BaseButtonProps>({
-    border: 'none',
-    p: '1rem 2rem',
-    fontSize: 3,
-    fontWeight: 'bold',
-    borderRadius: '0.25rem',
-  }),
-)
+const enhance = recompose.compose(recompose.setDisplayName('BaseButton'))
 
-export const BaseButton = enhance(StyledButton) as typeof StyledButton
+export const BaseButton = enhance(StyledBaseButton) as typeof StyledBaseButton

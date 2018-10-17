@@ -1,19 +1,26 @@
 import * as React from 'react'
 import { ThemeProvider } from 'emotion-theming'
+import { css } from 'react-emotion'
 import { withProps } from 'recompose'
 import * as _ from 'lodash'
 import Tone from 'tone'
 import * as tonal from 'tonal'
 import * as TonalRange from 'tonal-range'
 import { transpose } from 'tonal-distance'
+import uuid from 'uuid/v4'
 
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import IconButton from '@material-ui/core/IconButton'
 import MenuIcon from '@material-ui/icons/Menu'
+import PlayIcon from '@material-ui/icons/PlayArrow'
+import StopIcon from '@material-ui/icons/Stop'
+import ArrowsIcon from '@material-ui/icons/Cached'
+import TextField from '@material-ui/core/TextField'
+import InputAdornment from '@material-ui/core/InputAdornment'
 
-import { Flex, Box, Button, TextInput, Label } from './ui'
+import { Flex, Box, Button } from './ui'
 import NotesStaff from './NotesStaff'
 import MeasureScreenSize from './MeasureScreenSize'
 
@@ -28,14 +35,9 @@ import { NoteCardType, StaffNoteType } from '../types'
 import PickNoteModal from './PickNoteModal'
 import PianoKeyboard from './PianoKeyboard'
 
-globalStyles()
+import AddEntityButton from './AddEntityButton'
 
-const BpmInput = withProps({
-  p: [2, 2, 2],
-  fontSize: [2, 3, 3],
-  mx: [2, 2, 2],
-  px: [2, 3, 3],
-})(TextInput)
+globalStyles()
 
 type AppState = {
   bpm: number
@@ -84,7 +86,7 @@ class App extends React.Component<{}, AppState> {
 
     const noteName = _.sample(chromaticNotes)
     const randomNoteCard = {
-      id: '0',
+      id: uuid(),
       text: tonal.Note.pc(noteName),
       note: noteName,
       midi: tonal.Note.midi(noteName),
@@ -474,7 +476,7 @@ class App extends React.Component<{}, AppState> {
     const newNoteCards = [
       ...this.state.noteCards,
       {
-        id: `${this.state.noteCards.length}`,
+        id: uuid(),
         text: tonal.Note.pc(noteName),
         note: noteName,
         midi: tonal.Note.midi(noteName),
@@ -551,28 +553,40 @@ class App extends React.Component<{}, AppState> {
                   <Box flex="1">
                     <Button
                       title={isPlaying ? 'Stop' : 'Play'}
-                      bg={isPlaying ? 'red' : 'green'}
+                      bg={isPlaying ? 'red' : '#00c200'}
                       m={[1, 2]}
                       onClick={this.togglePlayback}
                     >
+                      {isPlaying ? (
+                        <StopIcon className={css({ marginRight: '0.5rem' })} />
+                      ) : (
+                        <PlayIcon className={css({ marginRight: '0.5rem' })} />
+                      )}
                       {isPlaying ? 'Stop' : 'Play'}
                     </Button>
 
                     <Button
+                      variant="contained"
                       title="Shuffle note cards"
                       m={[1, 2]}
                       onClick={this.handleShuffleClick}
                     >
+                      <ArrowsIcon className={css({ marginRight: '0.5rem' })} />
                       Shuffle!
                     </Button>
                   </Box>
 
-                  <Label htmlFor="bpm" fontSize={[2, 3, 3]}>
-                    BPM:
-                  </Label>
-                  <BpmInput
+                  <TextField
+                    className={css({ maxWidth: '100px' })}
+                    label="Tempo"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">BPM</InputAdornment>
+                      ),
+                    }}
                     id="bpm"
                     type="number"
+                    // @ts-ignore
                     step="1"
                     min="0"
                     max="400"
@@ -597,40 +611,21 @@ class App extends React.Component<{}, AppState> {
                     onCardDraggedOut={this.handleNoteCardDraggedOut}
                   >
                     {this.state.noteCards.length < 12 ? (
-                      <Button
-                        onClick={this.openNoteAddingModal}
-                        title="Add a note"
-                        bg="rgba(1,1,1,0)"
-                        border="dashed 1px #c0c3c7"
-                        borderRadius={40}
-                        color="#777777"
-                        maxHeight={120}
-                        alignSelf="center"
+                      <Flex
+                        p={3}
+                        width={1 / 4}
+                        alignItems="center"
+                        justifyContent="center"
                       >
-                        + Note
-                      </Button>
+                        <AddEntityButton
+                          onAddSingleNoteClick={this.openNoteAddingModal}
+                          onAddArpeggioClick={this.toggleTriads}
+                          buttonProps={{
+                            disabled: isPlaying,
+                          }}
+                        />
+                      </Flex>
                     ) : null}
-                    <Button
-                      onClick={this.toggleTriads}
-                      title={
-                        this.state.areTriadsEnabled
-                          ? 'Remove triads'
-                          : 'Add triads'
-                      }
-                      bg="rgba(1,1,1,0)"
-                      m={1}
-                      border={`dashed 1px ${
-                        this.state.areTriadsEnabled ? '#8989ff' : '#c0c3c7'
-                      }`}
-                      borderRadius={40}
-                      color={
-                        this.state.areTriadsEnabled ? '#8989ff' : '#c0c3c7'
-                      }
-                      maxHeight={120}
-                      alignSelf="center"
-                    >
-                      {this.state.areTriadsEnabled ? '- Triads' : '+ Triads'}
-                    </Button>
                   </NoteCards>
                 </Flex>
 
@@ -638,9 +633,9 @@ class App extends React.Component<{}, AppState> {
                   <NotesStaff
                     notes={this.state.staffNotes}
                     activeNote={this.getActiveStaffNote()}
-                    width={this.state.notesStaffWidth}
                     ref={this.notesStaffRef}
                     height={160}
+                    width={this.state.notesStaffWidth}
                   />
                 </Box>
               </Flex>
