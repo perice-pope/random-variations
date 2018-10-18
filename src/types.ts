@@ -29,7 +29,7 @@ export type StaffNoteType = {
   color: string
 }
 
-export type ArpeggioType = 'M' | 'm' | 'maj7' | 'm7'
+export type ArpeggioType = 'M' | 'm' | 'maj7' | 'm7' | 'M69#11'
 export type ArpeggioDirection = 'up' | 'down' | 'up down' | 'down up'
 
 export type ArpeggioModifier = {

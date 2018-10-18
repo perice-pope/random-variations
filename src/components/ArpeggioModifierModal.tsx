@@ -49,6 +49,7 @@ const ArpeggioOptions: ArpeggioOption[] = [
   { title: 'm (Minor triad)', value: 'm' },
   { title: 'M7 (Major 7th)', value: 'maj7' },
   { title: 'm7 (Minor 7th)', value: 'm7' },
+  { title: 'M69#11', value: 'M69#11' },
 ]
 
 type DirectionOption = {
