@@ -668,6 +668,7 @@ class App extends React.Component<{}, AppState> {
                   <Flex
                     flex={2}
                     alignItems="center"
+                    justifyContent="center"
                     flexDirection="column"
                     maxHeight={400}
                     width={1}
@@ -686,6 +687,9 @@ class App extends React.Component<{}, AppState> {
                       flexDirection="row-reverse"
                       alignItems="center"
                       width={1}
+                      px={[1, 2, 2]}
+                      mt={[4, 2, 3]}
+                      mb={[2, 2, 3]}
                     >
                       <AddEntityButton
                         onAddSingleNoteClick={this.openNoteAddingModal}
@@ -695,7 +699,7 @@ class App extends React.Component<{}, AppState> {
                         buttonProps={{
                           disabled: isPlaying,
                           className: css({
-                            marginRight: '1rem',
+                            marginLeft: '1rem',
                           }),
                         }}
                       />

@@ -136,8 +136,6 @@ const SortableNotesContainer = SortableContainer(
       <div
         ref={innerRef}
         className={css(`
-          padding: 10px 20px;
-          height: 100%;
           width: 100%;
           border-radius: 15px;
           transition: background-color 0.3s;
