@@ -8,6 +8,7 @@ import {
   NoteCardType,
   StaffNoteType,
   ArpeggioModifier,
+  ChromaticApproachesModifier,
 } from './types'
 
 type PartialStaffNote = {
@@ -17,11 +18,89 @@ type PartialStaffNote = {
   isMainNote?: boolean
 }
 
-export const generateArpeggioNotes = (
-  // Full note name, e.g. "C4"
-  baseNote: string,
+export const addApproachNotes = (
+  notes: Partial<PartialStaffNote>[],
+  approach: ChromaticApproachesModifier,
+): PartialStaffNote[] => {
+  const baseNoteIndex = notes.findIndex(n => n.isMainNote === true)
+  if (baseNoteIndex < 0) {
+    throw new Error(
+      '"notes" must have exactly one note with "note.isMainNote ==== true"',
+    )
+  }
+  const baseNote = notes[baseNoteIndex].noteName
+
+  let approachNotes: Partial<PartialStaffNote>[] = []
+
+  const approachType =
+    approach.type === 'random' ? _.sample(['above', 'below']) : approach.type
+  const intervalUp = tonal.Interval.fromSemitones(1)
+  const intervalDown = `-${intervalUp}`
+
+  if (approachType === 'above') {
+    approachNotes = [
+      {
+        noteName: transpose(baseNote, intervalUp),
+      },
+    ]
+  } else if (approachType === 'below') {
+    approachNotes = [
+      {
+        noteName: transpose(baseNote, intervalDown),
+      },
+    ]
+  } else if (approachType === 'up down') {
+    approachNotes = [
+      {
+        noteName: transpose(baseNote, intervalUp),
+      },
+      {
+        noteName: transpose(baseNote, intervalDown),
+      },
+    ]
+  } else if (approachType === 'down up') {
+    approachNotes = [
+      {
+        noteName: transpose(baseNote, intervalDown),
+      },
+      {
+        noteName: transpose(baseNote, intervalUp),
+      },
+    ]
+  }
+
+  const approachNotesColor = '#1B34AC'
+  approachNotes = approachNotes.map(
+    note =>
+      ({
+        ...note,
+        isMainNote: false,
+        color: approachNotesColor,
+      } as PartialStaffNote),
+  )
+
+  const notesWithApproachNotes = [...notes] as PartialStaffNote[]
+  notesWithApproachNotes.splice(
+    baseNoteIndex,
+    0,
+    ...(approachNotes as PartialStaffNote[]),
+  )
+
+  return notesWithApproachNotes
+}
+
+export const addArpeggioNotes = (
+  notes: Partial<PartialStaffNote>[],
   arpeggio: ArpeggioModifier,
 ): PartialStaffNote[] => {
+  const baseNoteIndex = notes.findIndex(n => n.isMainNote === true)
+  if (baseNoteIndex < 0) {
+    throw new Error(
+      '"notes" must have exactly one note with "note.isMainNote ==== true"',
+    )
+  }
+  const baseNote = notes[baseNoteIndex].noteName
+
   const chordName = arpeggio.type
 
   const chordIntervals = Chord.intervals(chordName)
@@ -75,7 +154,7 @@ export const generateArpeggioNotes = (
     const isMainNote = mainNoteIndex === index
 
     const mainColor = 'black'
-    const upColor = '#0D4508'
+    const upColor = '#10520A'
     const downColor = '#801415'
 
     let color = mainColor
@@ -104,7 +183,14 @@ export const generateArpeggioNotes = (
     }
   })
 
-  return notesWithArpeggio
+  const notesWithBaseReplacedWithArpeggio = [...notes] as PartialStaffNote[]
+  notesWithBaseReplacedWithArpeggio.splice(
+    baseNoteIndex,
+    1,
+    ...notesWithArpeggio,
+  )
+
+  return notesWithBaseReplacedWithArpeggio
 }
 
 /**
@@ -131,12 +217,17 @@ export const generateStaffNotes = (
     noteCardStaffNotes = [baseStaffNote]
 
     if (modifiers.arpeggio.enabled) {
-      const arpeggioNotes = generateArpeggioNotes(
-        baseStaffNote.noteName,
+      noteCardStaffNotes = addArpeggioNotes(
+        noteCardStaffNotes,
         modifiers.arpeggio,
       )
+    }
 
-      noteCardStaffNotes = arpeggioNotes
+    if (modifiers.chromaticApproaches.enabled) {
+      noteCardStaffNotes = addApproachNotes(
+        noteCardStaffNotes,
+        modifiers.chromaticApproaches,
+      )
     }
 
     noteCardStaffNotes.forEach(note => {

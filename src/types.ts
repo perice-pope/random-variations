@@ -34,10 +34,23 @@ export type ArpeggioDirection = 'up' | 'down' | 'up down' | 'down up'
 
 export type ArpeggioModifier = {
   enabled: boolean
-  type?: ArpeggioType
-  direction?: ArpeggioDirection
+  type: ArpeggioType
+  direction: ArpeggioDirection
+}
+
+export type ChromaticApproachesType =
+  | 'above'
+  | 'below'
+  | 'up down'
+  | 'down up'
+  | 'random'
+
+export type ChromaticApproachesModifier = {
+  enabled: boolean
+  type: ChromaticApproachesType
 }
 
 export type NoteModifiers = {
   arpeggio: ArpeggioModifier
+  chromaticApproaches: ChromaticApproachesModifier
 }

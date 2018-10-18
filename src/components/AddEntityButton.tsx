@@ -9,9 +9,11 @@ import Tooltip from '@material-ui/core/Tooltip'
 type AddEntityButtonProps = {
   onAddSingleNoteClick: () => any
   onAddArpeggioClick: () => any
+  onAddChromaticApproachesClick: () => any
   buttonProps?: ButtonProps
   disableSingleNote?: boolean
   disableChords?: boolean
+  disableChromaticApproaches?: boolean
 }
 
 type AddEntityButtonState = {
@@ -54,10 +56,22 @@ export default class AddEntityButton extends React.Component<
     }
   }
 
-  render() {
-    const { disableChords, disableSingleNote } = this.props
+  private handleChromaticApproachesClick = () => {
+    this.closeMenu()
+    if (this.props.onAddChromaticApproachesClick) {
+      this.props.onAddChromaticApproachesClick()
+    }
+  }
 
-    const allOptionsAreDisabled = disableSingleNote && disableChords
+  render() {
+    const {
+      disableChords,
+      disableSingleNote,
+      disableChromaticApproaches,
+    } = this.props
+
+    const allOptionsAreDisabled =
+      disableSingleNote && disableChords && disableChromaticApproaches
     const buttonProps = this.props.buttonProps || {}
 
     return (
@@ -73,6 +87,11 @@ export default class AddEntityButton extends React.Component<
           )}
           {!disableChords && (
             <MenuItem onClick={this.handleArpeggioClick}>Chord</MenuItem>
+          )}
+          {!disableChromaticApproaches && (
+            <MenuItem onClick={this.handleChromaticApproachesClick}>
+              Chromatic approach
+            </MenuItem>
           )}
         </Menu>
 

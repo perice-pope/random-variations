@@ -44,9 +44,11 @@ import {
   ArpeggioType,
   ArpeggioDirection,
   NoteModifiers,
+  ChromaticApproachesType,
 } from '../types'
 import PickNoteModal from './PickNoteModal'
 import ArpeggioModifierModal from './ArpeggioModifierModal'
+import ChromaticApproachesModifierModal from './ChromaticApproachesModifierModal'
 import PianoKeyboard from './PianoKeyboard'
 
 import AddEntityButton from './AddEntityButton'
@@ -71,7 +73,8 @@ type AppState = {
   width: number
   notesStaffWidth: number
 
-  arpeggioAddingModalIsOpen: boolean
+  chromaticApproachesModalIsOpen: boolean
+  chordsModalIsOpen: boolean
 
   noteAddingModalIsOpen: boolean
   noteEditingModalIsOpen: boolean
@@ -134,33 +137,41 @@ class App extends React.Component<{}, AppState> {
       }
     }
 
-    this.state = {
-      bpm: 120,
-      noteCards: [randomNoteCard],
+    this.state = _.merge(
+      {
+        bpm: 120,
+        noteCards: [randomNoteCard],
 
-      // Screen size
-      height: 0,
-      width: 0,
-      notesStaffWidth: 0,
+        // Screen size
+        height: 0,
+        width: 0,
+        notesStaffWidth: 0,
 
-      isPlaying: false,
-      staffNotes: [],
-      activeNoteCardIndex: 0,
-      activeStaffNoteIndex: 0,
+        isPlaying: false,
+        staffNotes: [],
+        activeNoteCardIndex: 0,
+        activeStaffNoteIndex: 0,
 
-      modifiers: {
-        arpeggio: {
-          enabled: false,
+        modifiers: {
+          arpeggio: {
+            enabled: true,
+            direction: 'up',
+            type: 'M',
+          },
+          chromaticApproaches: {
+            enabled: false,
+            type: 'down',
+          },
         },
+
+        chromaticApproachesModalIsOpen: false,
+        chordsModalIsOpen: false,
+        noteAddingModalIsOpen: false,
+        noteEditingModalIsOpen: false,
+        noteEditingModalNoteCard: undefined,
       },
-
-      arpeggioAddingModalIsOpen: false,
-      noteAddingModalIsOpen: false,
-      noteEditingModalIsOpen: false,
-      noteEditingModalNoteCard: undefined,
-
-      ...restoredState,
-    }
+      restoredState,
+    )
 
     this.notesStaffRef = React.createRef()
     this.notesStaffContainerRef = React.createRef()
@@ -454,13 +465,25 @@ class App extends React.Component<{}, AppState> {
 
   private openArpeggioAddingModal = () => {
     this.setState({
-      arpeggioAddingModalIsOpen: true,
+      chordsModalIsOpen: true,
     })
   }
 
   private closeArpeggioAddingModal = () => {
     this.setState({
-      arpeggioAddingModalIsOpen: false,
+      chordsModalIsOpen: false,
+    })
+  }
+
+  private openChromaticApproachesModal = () => {
+    this.setState({
+      chromaticApproachesModalIsOpen: true,
+    })
+  }
+
+  private closeChromaticApproachesModal = () => {
+    this.setState({
+      chromaticApproachesModalIsOpen: false,
     })
   }
 
@@ -513,12 +536,50 @@ class App extends React.Component<{}, AppState> {
     this.closeArpeggioAddingModal()
   }
 
+  handleChromaticApproachModifierModalConfirm = ({
+    type,
+  }: {
+    type: ChromaticApproachesType
+  }) => {
+    this.setState(
+      {
+        modifiers: {
+          ...this.state.modifiers,
+          chromaticApproaches: {
+            enabled: true,
+            type,
+          },
+        },
+      },
+      this.onNotesUpdated,
+    )
+
+    this.closeChromaticApproachesModal()
+  }
+
   private handleRemoveArpeggioClick = () => {
     this.setState(
       {
         modifiers: {
           ...this.state.modifiers,
           arpeggio: {
+            ...this.state.modifiers.arpeggio,
+            enabled: false,
+          },
+        },
+      },
+      this.updateStaffNotes,
+    )
+    this.serializeAndSaveAppStateLocally()
+  }
+
+  private handleRemoveChromaticApproachesClick = () => {
+    this.setState(
+      {
+        modifiers: {
+          ...this.state.modifiers,
+          chromaticApproaches: {
+            ...this.state.modifiers.chromaticApproaches,
             enabled: false,
           },
         },
@@ -691,8 +752,14 @@ class App extends React.Component<{}, AppState> {
                       <AddEntityButton
                         onAddSingleNoteClick={this.openNoteAddingModal}
                         onAddArpeggioClick={this.openArpeggioAddingModal}
+                        onAddChromaticApproachesClick={
+                          this.openChromaticApproachesModal
+                        }
                         disableSingleNote={this.state.noteCards.length >= 12}
                         disableChords={this.state.modifiers.arpeggio.enabled}
+                        disableChromaticApproaches={
+                          this.state.modifiers.chromaticApproaches.enabled
+                        }
                         buttonProps={{
                           disabled: isPlaying,
                           className: css({
@@ -710,6 +777,22 @@ class App extends React.Component<{}, AppState> {
                             } / ${this.state.modifiers.arpeggio.direction}`}
                             onClick={this.openArpeggioAddingModal}
                             onDelete={this.handleRemoveArpeggioClick}
+                            classes={{
+                              root: css({ marginRight: '0.5rem' }),
+                            }}
+                          />
+                        )}
+                        {this.state.modifiers.chromaticApproaches.enabled && (
+                          <Chip
+                            color="primary"
+                            label={`Approach / ${
+                              this.state.modifiers.chromaticApproaches.type
+                            }`}
+                            onClick={this.openChromaticApproachesModal}
+                            onDelete={this.handleRemoveChromaticApproachesClick}
+                            classes={{
+                              root: css({ marginRight: '0.5rem' }),
+                            }}
                           />
                         )}
                       </Flex>
@@ -741,11 +824,18 @@ class App extends React.Component<{}, AppState> {
                 </Box>
 
                 <ArpeggioModifierModal
-                  isOpen={this.state.arpeggioAddingModalIsOpen}
+                  isOpen={this.state.chordsModalIsOpen}
                   onClose={this.closeArpeggioAddingModal}
                   onSubmit={this.handleArpeggioModifierModalConfirm}
                   defaultDirection={this.state.modifiers.arpeggio.direction}
                   defaultType={this.state.modifiers.arpeggio.type}
+                />
+
+                <ChromaticApproachesModifierModal
+                  isOpen={this.state.chromaticApproachesModalIsOpen}
+                  onClose={this.closeChromaticApproachesModal}
+                  onSubmit={this.handleChromaticApproachModifierModalConfirm}
+                  defaultType={this.state.modifiers.chromaticApproaches.type}
                 />
 
                 <PickNoteModal
