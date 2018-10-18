@@ -9,6 +9,7 @@ import * as TonalRange from 'tonal-range'
 import { transpose } from 'tonal-distance'
 import uuid from 'uuid/v4'
 
+import CssBaseline from '@material-ui/core/CssBaseline'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
@@ -595,6 +596,8 @@ class App extends React.Component<{}, AppState> {
     return (
       <ThemeProvider theme={theme}>
         <>
+          <CssBaseline />
+
           <MeasureScreenSize onUpdate={this.handleScreenSizeUpdate} fireOnMount>
             <Flex
               height="100vh"

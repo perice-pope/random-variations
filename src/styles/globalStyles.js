@@ -34,10 +34,6 @@ export default () => injectGlobal`
     font-style: normal;
   }
 
-  html {
-    background-color: ${theme.colors.nearBlack};
-  }
-
   * {
     font-family: "Futura", sans-serif;
     font-display: swap;
@@ -47,20 +43,5 @@ export default () => injectGlobal`
     width: 100%;
     height: 100%;
     box-sizing: border-box;
-  }
-
-  .bpm-text-input {
-    -moz-appearance:textfield;
-  }
-
-  /* Webkit browsers like Safari and Chrome */
-  .bpm-text-input::-webkit-inner-spin-button,
-  .bpm-text-input::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-
-  .ReactModal__Overlay {
-    z-index: 100;
   }
 `
