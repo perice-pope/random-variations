@@ -59,10 +59,10 @@ type DirectionOption = {
 }
 
 const DirectionOptions: DirectionOption[] = [
-  { title: 'Up', value: 'up', icon: <ArrowTopRight /> },
-  { title: 'Down', value: 'down', icon: <ArrowBottomRight /> },
+  { title: 'Ascending', value: 'up', icon: <ArrowTopRight /> },
+  { title: 'Descending', value: 'down', icon: <ArrowBottomRight /> },
   {
-    title: 'Up and down',
+    title: 'Ascending and descending',
     value: 'up down',
     icon: (
       <>
@@ -72,7 +72,7 @@ const DirectionOptions: DirectionOption[] = [
     ),
   },
   {
-    title: 'Down and up',
+    title: 'Descending and ascending',
     value: 'down up',
     icon: (
       <>
