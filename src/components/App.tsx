@@ -680,35 +680,39 @@ class App extends React.Component<{}, AppState> {
                       onDeleteClick={this.handleDeleteCardClick}
                       onCardsReorder={this.handleCardsReorder}
                       onCardDraggedOut={this.handleNoteCardDraggedOut}
-                    >
-                      {this.state.noteCards.length < 12 ? (
-                        <Flex
-                          p={3}
-                          width={1 / 4}
-                          alignItems="center"
-                          justifyContent="center"
-                        >
-                          <AddEntityButton
-                            onAddSingleNoteClick={this.openNoteAddingModal}
-                            onAddArpeggioClick={this.openArpeggioAddingModal}
-                            buttonProps={{
-                              disabled: isPlaying,
-                            }}
-                          />
-                        </Flex>
-                      ) : null}
-                    </NoteCards>
+                    />
 
-                    {this.state.modifiers.arpeggio.enabled && (
-                      <Chip
-                        color="secondary"
-                        label={`Chords: ${
-                          this.state.modifiers.arpeggio.type
-                        } / ${this.state.modifiers.arpeggio.direction}`}
-                        onClick={this.openArpeggioAddingModal}
-                        onDelete={this.handleRemoveArpeggioClick}
+                    <Flex
+                      flexDirection="row-reverse"
+                      alignItems="center"
+                      width={1}
+                    >
+                      <AddEntityButton
+                        onAddSingleNoteClick={this.openNoteAddingModal}
+                        onAddArpeggioClick={this.openArpeggioAddingModal}
+                        disableSingleNote={this.state.noteCards.length >= 12}
+                        disableChords={this.state.modifiers.arpeggio.enabled}
+                        buttonProps={{
+                          disabled: isPlaying,
+                          className: css({
+                            marginRight: '1rem',
+                          }),
+                        }}
                       />
-                    )}
+
+                      <Flex flex-direction="row" flex={1} alignItems="center">
+                        {this.state.modifiers.arpeggio.enabled && (
+                          <Chip
+                            color="primary"
+                            label={`Chords: ${
+                              this.state.modifiers.arpeggio.type
+                            } / ${this.state.modifiers.arpeggio.direction}`}
+                            onClick={this.openArpeggioAddingModal}
+                            onDelete={this.handleRemoveArpeggioClick}
+                          />
+                        )}
+                      </Flex>
+                    </Flex>
                   </Flex>
 
                   <Box innerRef={this.notesStaffContainerRef} width={1}>

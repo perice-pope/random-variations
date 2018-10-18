@@ -10,6 +10,8 @@ type AddEntityButtonProps = {
   onAddSingleNoteClick: () => any
   onAddArpeggioClick: () => any
   buttonProps?: ButtonProps
+  disableSingleNote?: boolean
+  disableChords?: boolean
 }
 
 type AddEntityButtonState = {
@@ -53,6 +55,11 @@ export default class AddEntityButton extends React.Component<
   }
 
   render() {
+    const { disableChords, disableSingleNote } = this.props
+
+    const allOptionsAreDisabled = disableSingleNote && disableChords
+    const buttonProps = this.props.buttonProps || {}
+
     return (
       <>
         <Menu
@@ -61,8 +68,12 @@ export default class AddEntityButton extends React.Component<
           open={this.state.isMenuOpen}
           onClose={this.closeMenu}
         >
-          <MenuItem onClick={this.handleSingleNoteClick}>Note</MenuItem>
-          <MenuItem onClick={this.handleArpeggioClick}>Chord</MenuItem>
+          {!disableSingleNote && (
+            <MenuItem onClick={this.handleSingleNoteClick}>Note</MenuItem>
+          )}
+          {!disableChords && (
+            <MenuItem onClick={this.handleArpeggioClick}>Chord</MenuItem>
+          )}
         </Menu>
 
         <Tooltip
@@ -76,7 +87,8 @@ export default class AddEntityButton extends React.Component<
             aria-label="Add"
             aria-owns={this.state.isMenuOpen ? 'add-entity-menu' : undefined}
             onClick={this.openMenu}
-            {...this.props.buttonProps}
+            {...buttonProps}
+            disabled={buttonProps.disabled || allOptionsAreDisabled}
           >
             <AddIcon />
           </Button>
