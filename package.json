@@ -26,6 +26,7 @@
     "recompose": "^0.30.0",
     "styled-system": "^3.1.6",
     "tonal": "^2.0.0",
+    "tonal-chord": "^2.0.0",
     "tonal-distance": "^2.0.0",
     "tonal-range": "^2.0.0",
     "tone": "^0.12.80",

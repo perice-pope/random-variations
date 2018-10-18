@@ -72,7 +72,7 @@ export default class AddEntityButton extends React.Component<
           <Button
             buttonRef={this.buttonRef}
             variant="fab"
-            color="primary"
+            color="secondary"
             aria-label="Add"
             aria-owns={this.state.isMenuOpen ? 'add-entity-menu' : undefined}
             onClick={this.openMenu}

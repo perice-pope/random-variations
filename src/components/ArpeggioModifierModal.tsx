@@ -45,8 +45,10 @@ type ArpeggioOption = {
 }
 
 const ArpeggioOptions: ArpeggioOption[] = [
-  { title: 'Major triad', value: 'major triad' },
-  { title: 'Minor triad', value: 'minor triad' },
+  { title: 'M (Major triad)', value: 'M' },
+  { title: 'm (Minor triad)', value: 'm' },
+  { title: 'M7 (Major 7th)', value: 'maj7' },
+  { title: 'm7 (Minor 7th)', value: 'm7' },
 ]
 
 type DirectionOption = {
@@ -86,7 +88,7 @@ class ArpeggioModifierModal extends React.Component<
   ArpeggioModifierModalState
 > {
   static defaultProps: Partial<ArpeggioModifierModalProps> = {
-    defaultType: 'major triad',
+    defaultType: 'm',
     defaultDirection: 'up',
   }
 

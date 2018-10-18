@@ -63,7 +63,9 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
     stave.setContext(this.renderContext).draw()
 
     const notes = notesConfig.map(noteConfig => {
-      const [letter, accidental, octave] = tonal.Note.tokenize(noteConfig.note)
+      const [letter, accidental, octave] = tonal.Note.tokenize(
+        noteConfig.noteName,
+      )
 
       const vexFlowNoteConfig = {
         keys: [`${letter}${accidental}/${octave}`],
