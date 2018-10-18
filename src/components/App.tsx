@@ -9,6 +9,10 @@ import * as TonalRange from 'tonal-range'
 import { transpose } from 'tonal-distance'
 import uuid from 'uuid/v4'
 
+import JssProvider from 'react-jss/lib/JssProvider'
+import { create } from 'jss'
+import { createGenerateClassName, jssPreset } from '@material-ui/core/styles'
+
 import CssBaseline from '@material-ui/core/CssBaseline'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
@@ -87,6 +91,12 @@ const ContentContainer = withProps({
   // @ts-ignore
 })(Box)
 
+const generateClassName = createGenerateClassName()
+const jss = create({
+  ...jssPreset(),
+  // We define a custom insertion point that JSS will look for injecting the styles in the DOM.
+  insertionPoint: document.getElementById('jss-insertion-point') as HTMLElement,
+})
 class App extends React.Component<{}, AppState> {
   private synth: any
   private scheduledEvents: any[] = []
@@ -595,181 +605,197 @@ class App extends React.Component<{}, AppState> {
 
     return (
       <ThemeProvider theme={theme}>
-        <>
-          <CssBaseline />
+        <JssProvider jss={jss} generateClassName={generateClassName}>
+          <>
+            <CssBaseline />
 
-          <MeasureScreenSize onUpdate={this.handleScreenSizeUpdate} fireOnMount>
-            <Flex
-              height="100vh"
-              width="100vw"
-              alignItems="center"
-              justifyContent="center"
-              css="overflow: hidden;"
-              flexDirection="column"
+            <MeasureScreenSize
+              onUpdate={this.handleScreenSizeUpdate}
+              fireOnMount
             >
-              <AppBar position="static">
-                <Toolbar variant="dense">
-                  <IconButton color="inherit" aria-label="Menu">
-                    <MenuIcon />
-                  </IconButton>
-                  <Typography variant="h6" color="inherit">
-                    Random Variations
-                  </Typography>
-                </Toolbar>
-              </AppBar>
               <Flex
-                pt={[3, 3, 4]}
-                flex={1}
-                px={[3]}
-                width={1}
-                maxWidth={960}
-                justifyContent="center"
+                height="100vh"
+                width="100vw"
                 alignItems="center"
+                justifyContent="center"
+                css="overflow: hidden;"
                 flexDirection="column"
               >
-                <Flex alignItems="center" flexDirection="row" mb={3} width={1}>
-                  <Box flex="1">
-                    <Button
-                      title={isPlaying ? 'Stop' : 'Play'}
-                      bg={isPlaying ? 'red' : '#00c200'}
-                      m={[1, 2]}
-                      onClick={this.togglePlayback}
-                    >
-                      {isPlaying ? (
-                        <StopIcon className={css({ marginRight: '0.5rem' })} />
-                      ) : (
-                        <PlayIcon className={css({ marginRight: '0.5rem' })} />
-                      )}
-                      {isPlaying ? 'Stop' : 'Play'}
-                    </Button>
-
-                    <Button
-                      variant="contained"
-                      title="Shuffle note cards"
-                      m={[1, 2]}
-                      onClick={this.handleShuffleClick}
-                    >
-                      <ArrowsIcon className={css({ marginRight: '0.5rem' })} />
-                      Shuffle!
-                    </Button>
-                  </Box>
-
-                  <TextField
-                    className={css({ maxWidth: '100px' })}
-                    label="Tempo"
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">BPM</InputAdornment>
-                      ),
-                    }}
-                    id="bpm"
-                    type="number"
-                    // @ts-ignore
-                    step="1"
-                    min="0"
-                    max="400"
-                    value={`${bpm}`}
-                    onChange={this.handleBpmChange}
-                  />
-                </Flex>
-
+                <AppBar position="static">
+                  <Toolbar variant="dense">
+                    <IconButton color="inherit" aria-label="Menu">
+                      <MenuIcon />
+                    </IconButton>
+                    <Typography variant="h6" color="inherit">
+                      Random Variations
+                    </Typography>
+                  </Toolbar>
+                </AppBar>
                 <Flex
-                  flex={2}
+                  pt={[3, 3, 4]}
+                  flex={1}
+                  px={[3]}
+                  width={1}
+                  maxWidth={960}
+                  justifyContent="center"
                   alignItems="center"
                   flexDirection="column"
-                  maxHeight={400}
-                  width={1}
-                  maxWidth={700}
                 >
-                  <NoteCards
-                    noteCards={noteCards}
-                    activeNoteCard={activeNoteCard}
-                    onEditClick={this.handleEditCardClick}
-                    onDeleteClick={this.handleDeleteCardClick}
-                    onCardsReorder={this.handleCardsReorder}
-                    onCardDraggedOut={this.handleNoteCardDraggedOut}
+                  <Flex
+                    alignItems="center"
+                    flexDirection="row"
+                    mb={3}
+                    width={1}
                   >
-                    {this.state.noteCards.length < 12 ? (
-                      <Flex
-                        p={3}
-                        width={1 / 4}
-                        alignItems="center"
-                        justifyContent="center"
+                    <Box flex="1">
+                      <Button
+                        title={isPlaying ? 'Stop' : 'Play'}
+                        bg={isPlaying ? 'red' : '#00c200'}
+                        m={[1, 2]}
+                        onClick={this.togglePlayback}
                       >
-                        <AddEntityButton
-                          onAddSingleNoteClick={this.openNoteAddingModal}
-                          onAddArpeggioClick={this.openArpeggioAddingModal}
-                          buttonProps={{
-                            disabled: isPlaying,
-                          }}
-                        />
-                      </Flex>
-                    ) : null}
-                  </NoteCards>
+                        {isPlaying ? (
+                          <StopIcon
+                            className={css({ marginRight: '0.5rem' })}
+                          />
+                        ) : (
+                          <PlayIcon
+                            className={css({ marginRight: '0.5rem' })}
+                          />
+                        )}
+                        {isPlaying ? 'Stop' : 'Play'}
+                      </Button>
 
-                  {this.state.modifiers.arpeggio.enabled && (
-                    <Chip
-                      color="secondary"
-                      label={`${this.state.modifiers.arpeggio.type} / ${
-                        this.state.modifiers.arpeggio.direction
-                      }`}
-                      onClick={this.openArpeggioAddingModal}
-                      onDelete={this.handleRemoveArpeggioClick}
+                      <Button
+                        variant="contained"
+                        title="Shuffle note cards"
+                        m={[1, 2]}
+                        onClick={this.handleShuffleClick}
+                      >
+                        <ArrowsIcon
+                          className={css({ marginRight: '0.5rem' })}
+                        />
+                        Shuffle!
+                      </Button>
+                    </Box>
+
+                    <TextField
+                      className={css({ maxWidth: '100px' })}
+                      label="Tempo"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">BPM</InputAdornment>
+                        ),
+                      }}
+                      id="bpm"
+                      type="number"
+                      // @ts-ignore
+                      step="1"
+                      min="0"
+                      max="400"
+                      value={`${bpm}`}
+                      onChange={this.handleBpmChange}
                     />
-                  )}
+                  </Flex>
+
+                  <Flex
+                    flex={2}
+                    alignItems="center"
+                    flexDirection="column"
+                    maxHeight={400}
+                    width={1}
+                    maxWidth={700}
+                  >
+                    <NoteCards
+                      noteCards={noteCards}
+                      activeNoteCard={activeNoteCard}
+                      onEditClick={this.handleEditCardClick}
+                      onDeleteClick={this.handleDeleteCardClick}
+                      onCardsReorder={this.handleCardsReorder}
+                      onCardDraggedOut={this.handleNoteCardDraggedOut}
+                    >
+                      {this.state.noteCards.length < 12 ? (
+                        <Flex
+                          p={3}
+                          width={1 / 4}
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          <AddEntityButton
+                            onAddSingleNoteClick={this.openNoteAddingModal}
+                            onAddArpeggioClick={this.openArpeggioAddingModal}
+                            buttonProps={{
+                              disabled: isPlaying,
+                            }}
+                          />
+                        </Flex>
+                      ) : null}
+                    </NoteCards>
+
+                    {this.state.modifiers.arpeggio.enabled && (
+                      <Chip
+                        color="secondary"
+                        label={`${this.state.modifiers.arpeggio.type} / ${
+                          this.state.modifiers.arpeggio.direction
+                        }`}
+                        onClick={this.openArpeggioAddingModal}
+                        onDelete={this.handleRemoveArpeggioClick}
+                      />
+                    )}
+                  </Flex>
+
+                  <Box innerRef={this.notesStaffContainerRef} width={1}>
+                    <NotesStaff
+                      notes={this.state.staffNotes}
+                      activeNote={this.getActiveStaffNote()}
+                      ref={this.notesStaffRef}
+                      height={160}
+                      width={this.state.notesStaffWidth}
+                    />
+                  </Box>
                 </Flex>
 
-                <Box innerRef={this.notesStaffContainerRef} width={1}>
-                  <NotesStaff
-                    notes={this.state.staffNotes}
-                    activeNote={this.getActiveStaffNote()}
-                    ref={this.notesStaffRef}
-                    height={160}
-                    width={this.state.notesStaffWidth}
+                <Box mt={[1, 2, 3]}>
+                  <PianoKeyboard
+                    width={Math.max(layoutMinWidth, this.state.width)}
+                    height={this.getPianoHeight()}
+                    activeNotesMidi={
+                      activeStaffNote ? [activeStaffNote.midi] : undefined
+                    }
+                    activeNotesColor={
+                      activeNoteCard ? activeNoteCard.color : undefined
+                    }
                   />
                 </Box>
-              </Flex>
 
-              <Box mt={[1, 2, 3]}>
-                <PianoKeyboard
-                  width={Math.max(layoutMinWidth, this.state.width)}
-                  height={this.getPianoHeight()}
-                  activeNotesMidi={
-                    activeStaffNote ? [activeStaffNote.midi] : undefined
-                  }
-                  activeNotesColor={
-                    activeNoteCard ? activeNoteCard.color : undefined
-                  }
+                <ArpeggioModifierModal
+                  isOpen={this.state.arpeggioAddingModalIsOpen}
+                  onClose={this.closeArpeggioAddingModal}
+                  onSubmit={this.handleArpeggioModifierModalConfirm}
+                  defaultDirection={this.state.modifiers.arpeggio.direction}
+                  defaultType={this.state.modifiers.arpeggio.type}
                 />
-              </Box>
 
-              <ArpeggioModifierModal
-                isOpen={this.state.arpeggioAddingModalIsOpen}
-                onClose={this.closeArpeggioAddingModal}
-                onSubmit={this.handleArpeggioModifierModalConfirm}
-                defaultDirection={this.state.modifiers.arpeggio.direction}
-                defaultType={this.state.modifiers.arpeggio.type}
-              />
+                <PickNoteModal
+                  isOpen={this.state.noteAddingModalIsOpen}
+                  onClose={this.closeNoteAddingModal}
+                  onSubmit={this.handleNoteClickInNoteCardAddingModal}
+                />
 
-              <PickNoteModal
-                isOpen={this.state.noteAddingModalIsOpen}
-                onClose={this.closeNoteAddingModal}
-                onSubmit={this.handleNoteClickInNoteCardAddingModal}
-              />
-
-              <PickNoteModal
-                isOpen={this.state.noteEditingModalIsOpen}
-                selectedNoteName={
-                  this.state.noteEditingModalNoteCard
-                    ? this.state.noteEditingModalNoteCard.note
-                    : undefined
-                }
-                onClose={this.closeNoteEditingModal}
-                onSubmit={this.handleNoteClickInNoteCardEditingModal}
-              />
-            </Flex>
-          </MeasureScreenSize>
-        </>
+                <PickNoteModal
+                  isOpen={this.state.noteEditingModalIsOpen}
+                  selectedNoteName={
+                    this.state.noteEditingModalNoteCard
+                      ? this.state.noteEditingModalNoteCard.note
+                      : undefined
+                  }
+                  onClose={this.closeNoteEditingModal}
+                  onSubmit={this.handleNoteClickInNoteCardEditingModal}
+                />
+              </Flex>
+            </MeasureScreenSize>
+          </>
+        </JssProvider>
       </ThemeProvider>
     )
   }
