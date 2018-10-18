@@ -702,9 +702,9 @@ class App extends React.Component<{}, AppState> {
                     {this.state.modifiers.arpeggio.enabled && (
                       <Chip
                         color="secondary"
-                        label={`${this.state.modifiers.arpeggio.type} / ${
-                          this.state.modifiers.arpeggio.direction
-                        }`}
+                        label={`Chords: ${
+                          this.state.modifiers.arpeggio.type
+                        } / ${this.state.modifiers.arpeggio.direction}`}
                         onClick={this.openArpeggioAddingModal}
                         onDelete={this.handleRemoveArpeggioClick}
                       />

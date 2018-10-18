@@ -4,20 +4,20 @@ import { css } from 'react-emotion'
 
 import { default as MuButton } from '@material-ui/core/Button'
 
+import List from '@material-ui/core/List'
+import ListItem from '@material-ui/core/ListItem'
+import ListSubheader from '@material-ui/core/ListSubheader'
+import ListItemText from '@material-ui/core/ListItemText'
+import ListItemIcon from '@material-ui/core/ListItemIcon'
+
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
-import ListSubheader from '@material-ui/core/ListSubheader'
-import ListItemText from '@material-ui/core/ListItemText'
-
-import DownIcon from '@material-ui/icons/ArrowDownward'
-import UpIcon from '@material-ui/icons/ArrowUpward'
+import ArrowBottomRight from 'mdi-material-ui/ArrowBottomRight'
+import ArrowTopRight from 'mdi-material-ui/ArrowTopRight'
 
 import { ArpeggioType, ArpeggioDirection } from 'src/types'
 
@@ -58,15 +58,15 @@ type DirectionOption = {
 }
 
 const DirectionOptions: DirectionOption[] = [
-  { title: 'Up', value: 'up', icon: <UpIcon /> },
-  { title: 'Down', value: 'down', icon: <DownIcon /> },
+  { title: 'Up', value: 'up', icon: <ArrowTopRight /> },
+  { title: 'Down', value: 'down', icon: <ArrowBottomRight /> },
   {
     title: 'Up and down',
     value: 'up down',
     icon: (
       <>
-        <UpIcon />
-        <DownIcon />
+        <ArrowTopRight />
+        <ArrowBottomRight />
       </>
     ),
   },
@@ -75,8 +75,8 @@ const DirectionOptions: DirectionOption[] = [
     value: 'down up',
     icon: (
       <>
-        <DownIcon />
-        <UpIcon />
+        <ArrowBottomRight />
+        <ArrowTopRight />
       </>
     ),
   },
@@ -125,17 +125,17 @@ class ArpeggioModifierModal extends React.Component<
         onClose={this.handleSubmit}
         aria-labelledby="arpeggio-modifier-dialog"
       >
-        <DialogTitle id="arpeggio-modifier-dialog">Add arpeggios</DialogTitle>
+        <DialogTitle id="arpeggio-modifier-dialog">Chords</DialogTitle>
 
         <DialogContent>
           <List
             dense={true}
-            subheader={<ListSubheader>Chord type</ListSubheader>}
             className={css({
               maxHeight: '300px',
               overflow: 'auto',
             })}
           >
+            <ListSubheader>Chord type</ListSubheader>
             {ArpeggioOptions.map(({ title, value }) => (
               <ListItem
                 selected={value === this.state.type}

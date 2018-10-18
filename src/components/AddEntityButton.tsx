@@ -61,8 +61,8 @@ export default class AddEntityButton extends React.Component<
           open={this.state.isMenuOpen}
           onClose={this.closeMenu}
         >
-          <MenuItem onClick={this.handleSingleNoteClick}>Single note</MenuItem>
-          <MenuItem onClick={this.handleArpeggioClick}>Arpeggio</MenuItem>
+          <MenuItem onClick={this.handleSingleNoteClick}>Note</MenuItem>
+          <MenuItem onClick={this.handleArpeggioClick}>Chord</MenuItem>
         </Menu>
 
         <Tooltip
