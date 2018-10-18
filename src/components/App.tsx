@@ -507,10 +507,7 @@ class App extends React.Component<{}, AppState> {
           },
         },
       },
-      () => {
-        this.updateStaffNotes()
-        this.serializeAndSaveAppStateLocally()
-      },
+      this.onNotesUpdated,
     )
 
     this.closeArpeggioAddingModal()
