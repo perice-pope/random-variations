@@ -21,6 +21,7 @@ import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import IconButton from '@material-ui/core/IconButton'
 import MenuIcon from '@material-ui/icons/Menu'
+import SettingsIcon from '@material-ui/icons/Settings'
 import PlayIcon from '@material-ui/icons/PlayArrow'
 import StopIcon from '@material-ui/icons/Stop'
 import ArrowsIcon from '@material-ui/icons/Cached'
@@ -53,13 +54,14 @@ import ArpeggioModifierModal from './ArpeggioModifierModal'
 import ChromaticApproachesModifierModal from './ChromaticApproachesModifierModal'
 import PianoKeyboard from './PianoKeyboard'
 
+import SettingsModal from './SettingsModal'
 import AddEntityButton from './AddEntityButton'
 import { generateStaffNotes } from '../musicUtils'
-import AudioFontsConfig from '../audioFontsConfig'
+import AudioFontsConfig, { AudioFontId } from '../audioFontsConfig'
 
 globalStyles()
 
-const AudioFontsConfigByName = _.keyBy(AudioFontsConfig, 'name')
+const AudioFontsConfigById = _.keyBy(AudioFontsConfig, 'id')
 
 console.log('All supported audio fonts: ', _.map(AudioFontsConfig, 'title'))
 console.log('All supported chord names: ', Chord.names())
@@ -68,9 +70,9 @@ type AppState = {
   bpm: number
   isPlaying: boolean
 
-  audioFontId: string
-  hasLoadedAudioFontMap: { [audioFontId: string]: boolean }
-  isLoadingAudioFontMap: { [audioFontId: string]: boolean }
+  audioFontId: AudioFontId
+  hasLoadedAudioFontMap: { [audioFontId in AudioFontId]: boolean }
+  isLoadingAudioFontMap: { [audioFontId in AudioFontId]: boolean }
 
   noteCards: NoteCardType[]
   staffNotes: StaffNoteType[]
@@ -83,6 +85,7 @@ type AppState = {
   width: number
   notesStaffWidth: number
 
+  settingsModalIsOpen: boolean
   chromaticApproachesModalIsOpen: boolean
   chordsModalIsOpen: boolean
 
@@ -186,6 +189,8 @@ class App extends React.Component<{}, AppState> {
         noteAddingModalIsOpen: false,
         noteEditingModalIsOpen: false,
         noteEditingModalNoteCard: undefined,
+
+        settingsModalIsOpen: false,
       },
       restoredState,
     )
@@ -250,8 +255,11 @@ class App extends React.Component<{}, AppState> {
     return 80
   }
 
-  private setAndLoadAudioFont = (audioFontId: string) => {
-    this.setState({ audioFontId }, () => this.loadAudioFont(audioFontId))
+  private setAndLoadAudioFont = (audioFontId: AudioFontId) => {
+    this.setState({ audioFontId }, () => {
+      this.loadAudioFont(audioFontId)
+      this.serializeAndSaveAppStateLocally()
+    })
   }
 
   private loadAudioFont = audioFontId => {
@@ -259,7 +267,8 @@ class App extends React.Component<{}, AppState> {
       return
     }
 
-    const audioFont = AudioFontsConfigByName[audioFontId]
+    const audioFont = AudioFontsConfigById[audioFontId]
+    console.log(audioFontId)
     if (!audioFont) {
       console.error('Could not find audio font with name ', audioFontId)
       this.setState({ audioFontId: AudioFontsConfig[0].id })
@@ -278,13 +287,14 @@ class App extends React.Component<{}, AppState> {
         },
       },
       () => {
+        // See https://surikov.github.io/webaudiofont/
         this.audioFontPlayer.loader.startLoad(
           Tone.context,
           audioFont.url,
-          audioFont.id,
+          audioFont.globalVarName,
         )
         this.audioFontPlayer.loader.waitLoad(() => {
-          this.audioFontCache[audioFont.id] = window[audioFont.id]
+          this.audioFontCache[audioFont.id] = window[audioFont.globalVarName]
           this.setState({
             isLoadingAudioFontMap: {
               ...this.state.isLoadingAudioFontMap,
@@ -340,6 +350,7 @@ class App extends React.Component<{}, AppState> {
       'appState',
       JSON.stringify({
         bpm: this.state.bpm,
+        audioFontId: this.state.audioFontId,
         noteCards: this.state.noteCards,
         modifiers: this.state.modifiers,
       }),
@@ -369,7 +380,6 @@ class App extends React.Component<{}, AppState> {
     // Duration in seconds
     duration: number,
   ) => {
-    console.log('sheduleNote', midiNotes, time, duration)
     return Tone.Transport.schedule(contextTime => {
       if (
         this.audioFontPlayer &&
@@ -392,8 +402,6 @@ class App extends React.Component<{}, AppState> {
   }
 
   drawAnimation = time => {
-    console.log('drawAnimation', time, Tone.Transport.progress)
-
     this.setState(state => {
       if (time === '0:0' && state.activeStaffNoteIndex === 0) {
         return null
@@ -417,14 +425,13 @@ class App extends React.Component<{}, AppState> {
   }
 
   scheduleNotes = () => {
-    console.log('scheduleNotes is called\n---------\n')
     // Update loop length according to the number of note cards
     Tone.Transport.loopEnd = `0:${this.state.staffNotes.length}`
     this.scheduledEvents.forEach(eventId => Tone.Transport.clear(eventId))
 
     this.state.staffNotes.forEach(({ midi }, index) => {
       const time = `${Math.floor(index / 4)}:${index % 4}`
-      const duration = this.state.bpm ? 60.0 / this.state.bpm : 0.5
+      const duration = this.state.bpm ? 1.05 * (60.0 / this.state.bpm) : 0.5
       this.scheduledEvents.push(this.scheduleNote([midi], time, duration))
     })
   }
@@ -538,6 +545,14 @@ class App extends React.Component<{}, AppState> {
     if (this.notesStaffRef.current) {
       this.notesStaffRef.current.draw()
     }
+  }
+
+  private openSettingsModal = () => {
+    this.setState({ settingsModalIsOpen: true })
+  }
+
+  private closeSettingsModal = () => {
+    this.setState({ settingsModalIsOpen: false })
   }
 
   private closeNoteEditingModal = () => {
@@ -707,12 +722,6 @@ class App extends React.Component<{}, AppState> {
     )
   }
 
-  private toggleSound = () => {
-    this.setAndLoadAudioFont(_.sample(
-      _.map(AudioFontsConfig, 'name'),
-    ) as string)
-  }
-
   public render() {
     const {
       bpm,
@@ -750,16 +759,23 @@ class App extends React.Component<{}, AppState> {
               >
                 <AppBar position="static">
                   <Toolbar variant="dense">
-                    <IconButton
-                      color="inherit"
-                      aria-label="Menu"
-                      onClick={this.toggleSound}
-                    >
+                    <IconButton color="inherit" aria-label="Menu">
                       <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" color="inherit">
+                    <Typography
+                      variant="h6"
+                      color="inherit"
+                      className={css({ flexGrow: 1 })}
+                    >
                       Random Variations
                     </Typography>
+
+                    <IconButton
+                      color="inherit"
+                      onClick={this.openSettingsModal}
+                    >
+                      <SettingsIcon />
+                    </IconButton>
                   </Toolbar>
                 </AppBar>
                 <Flex
@@ -928,6 +944,16 @@ class App extends React.Component<{}, AppState> {
                     }
                   />
                 </Box>
+
+                <SettingsModal
+                  isOpen={this.state.settingsModalIsOpen}
+                  onClose={this.closeSettingsModal}
+                  defaultValues={{
+                    audioFontId: this.state.audioFontId,
+                  }}
+                  onSubmit={this.closeSettingsModal}
+                  onAudioFontChanged={this.setAndLoadAudioFont}
+                />
 
                 <ArpeggioModifierModal
                   isOpen={this.state.chordsModalIsOpen}
