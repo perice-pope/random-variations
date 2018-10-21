@@ -10148,6 +10148,11 @@ wcwidth@^1.0.0:
   dependencies:
     defaults "^1.0.3"
 
+webaudiofont@^2.5.26:
+  version "2.5.26"
+  resolved "https://registry.yarnpkg.com/webaudiofont/-/webaudiofont-2.5.26.tgz#f3c5b4724431d87253a04535f2382e2fcdbc9d8c"
+  integrity sha512-xaurI0cLKeqELhEYTGaKb9SZgvygbNe0+VkkrayON+GcpcaI+Gxn8HQ6QUPb+J/6Y10ljBzZvkmAOxwQrqPtYA==
+
 webidl-conversions@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-3.0.1.tgz#24534275e2a7bc6be7bc86611cc16ae0a5654871"

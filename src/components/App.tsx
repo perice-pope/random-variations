@@ -9,6 +9,8 @@ import * as TonalRange from 'tonal-range'
 import * as Chord from 'tonal-chord'
 import uuid from 'uuid/v4'
 
+import WebAudioFontPlayer from 'webaudiofont'
+
 import JssProvider from 'react-jss/lib/JssProvider'
 import { create } from 'jss'
 import { createGenerateClassName, jssPreset } from '@material-ui/core/styles'
@@ -52,15 +54,23 @@ import ChromaticApproachesModifierModal from './ChromaticApproachesModifierModal
 import PianoKeyboard from './PianoKeyboard'
 
 import AddEntityButton from './AddEntityButton'
-import { generateStaffNotes } from 'src/musicUtils'
+import { generateStaffNotes } from '../musicUtils'
+import AudioFontsConfig from '../audioFontsConfig'
 
 globalStyles()
 
+const AudioFontsConfigByName = _.keyBy(AudioFontsConfig, 'name')
+
+console.log('All supported audio fonts: ', _.map(AudioFontsConfig, 'title'))
 console.log('All supported chord names: ', Chord.names())
 
 type AppState = {
   bpm: number
   isPlaying: boolean
+
+  audioFontId: string
+  hasLoadedAudioFontMap: { [audioFontId: string]: boolean }
+  isLoadingAudioFontMap: { [audioFontId: string]: boolean }
 
   noteCards: NoteCardType[]
   staffNotes: StaffNoteType[]
@@ -111,6 +121,9 @@ class App extends React.Component<{}, AppState> {
   private notesStaffRef: React.RefObject<NotesStaff>
   private notesStaffContainerRef: React.RefObject<any>
 
+  private audioFontCache: { [audioFontId: string]: any } = {}
+  private audioFontPlayer?: any
+
   constructor(props) {
     super(props)
 
@@ -139,6 +152,10 @@ class App extends React.Component<{}, AppState> {
 
     this.state = _.merge(
       {
+        hasLoadedAudioFontMap: {},
+        isLoadingAudioFontMap: {},
+        audioFontId: AudioFontsConfig[1].id,
+
         bpm: 120,
         noteCards: [randomNoteCard],
 
@@ -185,6 +202,17 @@ class App extends React.Component<{}, AppState> {
     this.cleanUp()
   }
 
+  private getLoadedAudioFont = (audioFontId: string) => {
+    return this.audioFontCache[audioFontId]
+  }
+
+  private hasLoadedAudioFont = (audioFontId: string) => {
+    return (
+      this.state.hasLoadedAudioFontMap[audioFontId] === true &&
+      this.getLoadedAudioFont(audioFontId) != null
+    )
+  }
+
   private init = async () => {
     await this.updateStaffNotes()
     this.initSynth()
@@ -222,6 +250,56 @@ class App extends React.Component<{}, AppState> {
     return 80
   }
 
+  private setAndLoadAudioFont = (audioFontId: string) => {
+    this.setState({ audioFontId }, () => this.loadAudioFont(audioFontId))
+  }
+
+  private loadAudioFont = audioFontId => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const audioFont = AudioFontsConfigByName[audioFontId]
+    if (!audioFont) {
+      console.error('Could not find audio font with name ', audioFontId)
+      this.setState({ audioFontId: AudioFontsConfig[0].id })
+      return
+    }
+
+    if (this.hasLoadedAudioFont(audioFontId)) {
+      return
+    }
+
+    this.setState(
+      {
+        isLoadingAudioFontMap: {
+          ...this.state.isLoadingAudioFontMap,
+          [audioFont.id]: true,
+        },
+      },
+      () => {
+        this.audioFontPlayer.loader.startLoad(
+          Tone.context,
+          audioFont.url,
+          audioFont.id,
+        )
+        this.audioFontPlayer.loader.waitLoad(() => {
+          this.audioFontCache[audioFont.id] = window[audioFont.id]
+          this.setState({
+            isLoadingAudioFontMap: {
+              ...this.state.isLoadingAudioFontMap,
+              [audioFont.id]: false,
+            },
+            hasLoadedAudioFontMap: {
+              ...this.state.hasLoadedAudioFontMap,
+              [audioFont.id]: true,
+            },
+          })
+        })
+      },
+    )
+  }
+
   private initSynth = () => {
     this.cleanUp()
 
@@ -235,6 +313,9 @@ class App extends React.Component<{}, AppState> {
     Tone.Transport.loop = true
 
     Tone.Transport.bpm.value = this.state.bpm
+
+    this.audioFontPlayer = new WebAudioFontPlayer()
+    this.loadAudioFont(this.state.audioFontId)
   }
 
   private cleanUp = () => {
@@ -281,14 +362,29 @@ class App extends React.Component<{}, AppState> {
   }
 
   scheduleNote = (
-    freq: number,
+    // Notes to play (could be a list for playing intervals and chords)
+    midiNotes: number[],
+    // Transport time when to schedule the notes
     time: string = '0:0',
-    duration: string = '4n',
+    // Duration in seconds
+    duration: number,
   ) => {
-    console.log('sheduleNote', freq, time, duration)
+    console.log('sheduleNote', midiNotes, time, duration)
     return Tone.Transport.schedule(contextTime => {
-      if (this.synth) {
-        this.synth.triggerAttackRelease(freq, duration, contextTime)
+      if (
+        this.audioFontPlayer &&
+        this.hasLoadedAudioFont(this.state.audioFontId)
+      ) {
+        this.audioFontPlayer.queueChord(
+          Tone.context,
+          Tone.context.destination,
+          this.getLoadedAudioFont(this.state.audioFontId),
+          contextTime,
+          midiNotes,
+          duration,
+          // Volume
+          1.0,
+        )
       }
 
       Tone.Draw.schedule(() => this.drawAnimation(time), contextTime)
@@ -326,10 +422,10 @@ class App extends React.Component<{}, AppState> {
     Tone.Transport.loopEnd = `0:${this.state.staffNotes.length}`
     this.scheduledEvents.forEach(eventId => Tone.Transport.clear(eventId))
 
-    this.state.staffNotes.forEach(({ freq }, index) => {
-      this.scheduledEvents.push(
-        this.scheduleNote(freq, `${Math.floor(index / 4)}:${index % 4}`),
-      )
+    this.state.staffNotes.forEach(({ midi }, index) => {
+      const time = `${Math.floor(index / 4)}:${index % 4}`
+      const duration = this.state.bpm ? 60.0 / this.state.bpm : 0.5
+      this.scheduledEvents.push(this.scheduleNote([midi], time, duration))
     })
   }
 
@@ -611,6 +707,12 @@ class App extends React.Component<{}, AppState> {
     )
   }
 
+  private toggleSound = () => {
+    this.setAndLoadAudioFont(_.sample(
+      _.map(AudioFontsConfig, 'name'),
+    ) as string)
+  }
+
   public render() {
     const {
       bpm,
@@ -648,7 +750,11 @@ class App extends React.Component<{}, AppState> {
               >
                 <AppBar position="static">
                   <Toolbar variant="dense">
-                    <IconButton color="inherit" aria-label="Menu">
+                    <IconButton
+                      color="inherit"
+                      aria-label="Menu"
+                      onClick={this.toggleSound}
+                    >
                       <MenuIcon />
                     </IconButton>
                     <Typography variant="h6" color="inherit">

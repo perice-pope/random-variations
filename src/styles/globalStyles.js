@@ -1,5 +1,6 @@
 import { injectGlobal } from 'emotion'
 import theme from './theme'
+
 import futuraMediumWoff2 from '../assets/fonts/FuturaStd-Medium.woff2'
 import futuraMediumWoff from '../assets/fonts/FuturaStd-Medium.woff'
 import futuraBoldWoff2 from '../assets/fonts/FuturaStd-Bold.woff2'

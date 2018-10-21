@@ -32,7 +32,8 @@
     "tonal-range": "^2.0.0",
     "tone": "^0.12.80",
     "uuid": "^3.3.2",
-    "vexflow": "^1.2.87"
+    "vexflow": "^1.2.87",
+    "webaudiofont": "^2.5.26"
   },
   "scripts": {
     "start": "react-scripts-ts start",
