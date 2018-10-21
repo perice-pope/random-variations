@@ -936,6 +936,23 @@ class App extends React.Component<{}, AppState> {
                   <PianoKeyboard
                     width={Math.max(layoutMinWidth, this.state.width)}
                     height={this.getPianoHeight()}
+                    onPlayNote={midiNote => {
+                      if (
+                        this.audioFontPlayer &&
+                        this.hasLoadedAudioFont(this.state.audioFontId)
+                      ) {
+                        this.audioFontPlayer.queueChord(
+                          Tone.context,
+                          Tone.context.destination,
+                          this.getLoadedAudioFont(this.state.audioFontId),
+                          0,
+                          [midiNote],
+                          0.5,
+                          // Volume
+                          1.0,
+                        )
+                      }
+                    }}
                     activeNotesMidi={
                       activeStaffNote ? [activeStaffNote.midi] : undefined
                     }
