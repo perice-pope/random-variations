@@ -230,7 +230,10 @@ class App extends React.Component<{}, AppState> {
   private loadAndSetAudioFont = async (audioFontId: AudioFontId) => {
     this.setState({ isLoadingAudioFont: true })
     await audioEngine.setAudioFont(audioFontId)
-    this.setState({ isLoadingAudioFont: false })
+    this.setState(
+      { audioFontId, isLoadingAudioFont: false },
+      this.serializeAndSaveAppStateLocally,
+    )
   }
 
   private updateStaffNotes = async () => {
