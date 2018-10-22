@@ -1,6 +1,7 @@
 import Tone from 'tone'
 import WebAudioFontPlayer from 'webaudiofont'
 import * as _ from 'lodash'
+import UnmuteButton from 'unmute'
 
 import { PlayableLoop, PlayableNote, PlayableLoopTick } from 'src/types'
 import audioFontsConfig, { AudioFontId, AudioFont } from 'src/audioFontsConfig'
@@ -31,10 +32,12 @@ export default class AudioEngine {
   private isPlayingLoop: boolean = false
 
   constructor() {
+    // Needed to enable the webaudio in Safari and on iOS devices
+    UnmuteButton({ tone: Tone })
+
     Tone.Transport.loopEnd = `0:${this.loop.ticks.length}`
     Tone.Transport.loop = true
     Tone.Transport.bpm.value = this.bpm
-
     this.audioFontPlayer = new WebAudioFontPlayer()
   }
 
@@ -71,13 +74,20 @@ export default class AudioEngine {
       )
 
       // TODO: add error handling
-      this.audioFontPlayer.loader.waitLoad(() => {
+      const waitLoad = () => {
+        if (typeof window[audioFont.globalVarName] === 'undefined') {
+          setTimeout(waitLoad, 1000)
+          return
+        }
+
         this.audioFontCache[audioFont.id] = window[audioFont.globalVarName]
         this.isLoadingAudioFontMap[audioFontId] = false
         this.hasLoadedAudioFontMap[audioFontId] = true
 
         resolve()
-      })
+      }
+
+      waitLoad()
     })
 
     return audioFontLoadingPromise
@@ -94,6 +104,7 @@ export default class AudioEngine {
   }
 
   public playLoop = () => {
+    this.rescheduleLoopNotes()
     Tone.Master.volume.rampTo(1, 100)
     this.isPlayingLoop = true
     Tone.Transport.start()
@@ -139,6 +150,7 @@ export default class AudioEngine {
 
   public setLoop = (loop: PlayableLoop) => {
     this.loop = loop
+    console.log('this.loop', loop)
     Tone.Transport.loopEnd = `0:${loop.ticks.length}`
     this.rescheduleLoopNotes()
   }
@@ -151,7 +163,9 @@ export default class AudioEngine {
     this.removeScheduledEvents()
 
     console.log('rescheduleLoopNotes', this.loop.ticks.length)
+    console.log(Tone.context.state)
     this.loop.ticks.forEach((tick, index) => {
+      console.log('calling schedule')
       const time = `0:${index}`
       // Duration in seconds, based on the current BPM
       const duration = 60.0 / this.bpm
@@ -171,9 +185,14 @@ export default class AudioEngine {
       return
     }
 
+    console.log('scheduleTick / outside', time)
+    console.log(Tone.context.state)
+
     const midiNotes = tick.notes.map(note => note.midi)
 
     return Tone.Transport.schedule(contextTime => {
+      console.log('scheduleTick / inside', contextTime)
+      console.log(Tone.context.state)
       this.audioFontPlayer.queueChord(
         Tone.context,
         Tone.context.destination,

@@ -22,27 +22,27 @@ const audioFontsConfig: AudioFontConfig[] = ([
   {
     id: 'grand_piano_1',
     title: 'Grand Piano',
-    name: '0000_Chaos_sf2_file',
+    name: '0000_SoundBlasterOld_sf2',
   },
   {
     id: 'electric_piano_1',
     title: 'Electric Piano',
-    name: '0040_JCLive_sf2_file',
+    name: '0050_SoundBlasterOld_sf2',
   },
   {
     id: 'acoustic_guitar_1',
     title: 'Acoustic Guitar (steel)',
-    name: '0250_Aspirin_sf2_file',
+    name: '0250_SoundBlasterOld_sf2',
   },
   {
     id: 'trumpet_soft_1',
     title: 'Trumpet',
-    name: '0560_Aspirin_sf2_file',
+    name: '0560_SoundBlasterOld_sf2',
   },
   {
     id: 'sax_soprano_1',
     title: 'Soprano Sax',
-    name: '0640_Aspirin_sf2_file',
+    name: '0640_SoundBlasterOld_sf2',
   },
   // TODO: add more sounds here
 ] as ({ id: AudioFontId; title: string; name: string })[]).map(afc => ({

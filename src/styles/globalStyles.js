@@ -11,6 +11,11 @@ import futuraHeavyWoff from '../assets/fonts/FuturaStd-Heavy.woff'
 import 'react-piano/dist/styles.css'
 
 export default () => injectGlobal`
+  #unmute-button {
+    display: none;
+    top: 70px !important;
+  }
+
   @font-face {
     font-family: 'Futura';
     src: url(${futuraMediumWoff2}) format('woff2'),
