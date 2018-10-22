@@ -1,10 +1,32 @@
-export type NoteCardType = {
+export interface PlayableNote {
+  midi: number
+}
+
+export interface PlayableLoopTick {
+  // If empty, it represents a break
+  notes: PlayableNote[]
+  meta: {
+    // ID of the note card from which this tick was generated
+    noteCardId: string
+  }
+}
+
+/**
+ * Collection of playable notes or breaks, organized
+ * along the tempo-agnostic "ticks" axis
+ * (e.g. the same PlayableLoop can be played at various tempos)
+ *
+ * Ticks come at equal intervals.
+ */
+export interface PlayableLoop {
+  ticks: PlayableLoopTick[]
+}
+
+export interface NoteCardType extends PlayableNote {
   id: string
 
   // Full note name, e.g. "C#4"
   noteName: string
-  freq: number
-  midi: number
 
   // Text to show on the card, e.g. "C#"
   text: string
@@ -12,7 +34,7 @@ export type NoteCardType = {
   color: string
 }
 
-export type StaffNoteType = {
+export interface StaffNoteType extends PlayableNote {
   index: number
   // A reference back to note card which "generated" this staff note
   noteCardId: string

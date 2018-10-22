@@ -1,3 +1,5 @@
+export type AudioFont = any
+
 export type AudioFontId =
   | 'grand_piano_1'
   | 'electric_piano_1'
@@ -16,7 +18,7 @@ export type AudioFontConfig = {
   globalVarName: string
 }
 
-const AUDIO_FONTS_CONFIG: AudioFontConfig[] = ([
+const audioFontsConfig: AudioFontConfig[] = ([
   {
     id: 'grand_piano_1',
     title: 'Grand Piano',
@@ -50,4 +52,4 @@ const AUDIO_FONTS_CONFIG: AudioFontConfig[] = ([
   globalVarName: `_tone_${afc.name}`,
 }))
 
-export default AUDIO_FONTS_CONFIG
+export default audioFontsConfig

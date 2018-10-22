@@ -28,7 +28,9 @@ const BoxWithTouchRipple: React.SFC<PaperProps & { children?: any }> = ({
   </ButtonBase>
 )
 
-const NoteCard = styled(BoxWithTouchRipple)<NoteCardProps>`
+const NoteCard = styled(BoxWithTouchRipple, {
+  shouldForwardProp: prop => prop !== 'active' && prop !== 'bgColor',
+})<NoteCardProps>`
   transition: all 300ms;
 
   display: inline-flex;

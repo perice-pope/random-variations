@@ -3,13 +3,10 @@ import { ThemeProvider } from 'emotion-theming'
 import { css } from 'react-emotion'
 import { withProps } from 'recompose'
 import * as _ from 'lodash'
-import Tone from 'tone'
 import * as tonal from 'tonal'
 import * as TonalRange from 'tonal-range'
 import * as Chord from 'tonal-chord'
 import uuid from 'uuid/v4'
-
-import WebAudioFontPlayer from 'webaudiofont'
 
 import JssProvider from 'react-jss/lib/JssProvider'
 import { create } from 'jss'
@@ -48,6 +45,8 @@ import {
   ArpeggioDirection,
   NoteModifiers,
   ChromaticApproachesType,
+  PlayableLoopTick,
+  PlayableLoop,
 } from '../types'
 import PickNoteModal from './PickNoteModal'
 import ArpeggioModifierModal from './ArpeggioModifierModal'
@@ -58,21 +57,21 @@ import SettingsModal from './SettingsModal'
 import AddEntityButton from './AddEntityButton'
 import { generateStaffNotes } from '../musicUtils'
 import AudioFontsConfig, { AudioFontId } from '../audioFontsConfig'
+import AudioEngine, { AnimationCallback } from './services/audioEngine'
 
 globalStyles()
-
-const AudioFontsConfigById = _.keyBy(AudioFontsConfig, 'id')
 
 console.log('All supported audio fonts: ', _.map(AudioFontsConfig, 'title'))
 console.log('All supported chord names: ', Chord.names())
 
 type AppState = {
+  isInitialized: boolean
+  isLoadingAudioFont: boolean
+
   bpm: number
   isPlaying: boolean
 
   audioFontId: AudioFontId
-  hasLoadedAudioFontMap: { [audioFontId in AudioFontId]: boolean }
-  isLoadingAudioFontMap: { [audioFontId in AudioFontId]: boolean }
 
   noteCards: NoteCardType[]
   staffNotes: StaffNoteType[]
@@ -118,14 +117,11 @@ const jss = create({
   insertionPoint: document.getElementById('jss-insertion-point') as HTMLElement,
 })
 
+const audioEngine = new AudioEngine()
+
 class App extends React.Component<{}, AppState> {
-  private synth: any
-  private scheduledEvents: any[] = []
   private notesStaffRef: React.RefObject<NotesStaff>
   private notesStaffContainerRef: React.RefObject<any>
-
-  private audioFontCache: { [audioFontId: string]: any } = {}
-  private audioFontPlayer?: any
 
   constructor(props) {
     super(props)
@@ -155,8 +151,8 @@ class App extends React.Component<{}, AppState> {
 
     this.state = _.merge(
       {
-        hasLoadedAudioFontMap: {},
-        isLoadingAudioFontMap: {},
+        isInitialized: false,
+        isLoadingAudioFont: false,
         audioFontId: AudioFontsConfig[1].id,
 
         bpm: 120,
@@ -203,25 +199,24 @@ class App extends React.Component<{}, AppState> {
     this.init()
   }
 
-  componentWillUnmount() {
-    this.cleanUp()
-  }
-
-  private getLoadedAudioFont = (audioFontId: string) => {
-    return this.audioFontCache[audioFontId]
-  }
-
-  private hasLoadedAudioFont = (audioFontId: string) => {
-    return (
-      this.state.hasLoadedAudioFontMap[audioFontId] === true &&
-      this.getLoadedAudioFont(audioFontId) != null
-    )
-  }
-
   private init = async () => {
     await this.updateStaffNotes()
-    this.initSynth()
-    this.scheduleNotes()
+    await this.initAudioEngine()
+    await this.onNotesUpdated()
+
+    this.setState({ isInitialized: true })
+  }
+
+  private initAudioEngine = async () => {
+    audioEngine.setBpm(this.state.bpm)
+    audioEngine.setAnimationCallback(this.drawAnimation)
+    await this.loadAndSetAudioFont(this.state.audioFontId)
+  }
+
+  private loadAndSetAudioFont = async (audioFontId: AudioFontId) => {
+    this.setState({ isLoadingAudioFont: true })
+    await audioEngine.setAudioFont(audioFontId)
+    this.setState({ isLoadingAudioFont: false })
   }
 
   private updateStaffNotes = async () => {
@@ -255,87 +250,6 @@ class App extends React.Component<{}, AppState> {
     return 80
   }
 
-  private setAndLoadAudioFont = (audioFontId: AudioFontId) => {
-    this.setState({ audioFontId }, () => {
-      this.loadAudioFont(audioFontId)
-      this.serializeAndSaveAppStateLocally()
-    })
-  }
-
-  private loadAudioFont = audioFontId => {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    const audioFont = AudioFontsConfigById[audioFontId]
-    console.log(audioFontId)
-    if (!audioFont) {
-      console.error('Could not find audio font with name ', audioFontId)
-      this.setState({ audioFontId: AudioFontsConfig[0].id })
-      return
-    }
-
-    if (this.hasLoadedAudioFont(audioFontId)) {
-      return
-    }
-
-    this.setState(
-      {
-        isLoadingAudioFontMap: {
-          ...this.state.isLoadingAudioFontMap,
-          [audioFont.id]: true,
-        },
-      },
-      () => {
-        // See https://surikov.github.io/webaudiofont/
-        this.audioFontPlayer.loader.startLoad(
-          Tone.context,
-          audioFont.url,
-          audioFont.globalVarName,
-        )
-        this.audioFontPlayer.loader.waitLoad(() => {
-          this.audioFontCache[audioFont.id] = window[audioFont.globalVarName]
-          this.setState({
-            isLoadingAudioFontMap: {
-              ...this.state.isLoadingAudioFontMap,
-              [audioFont.id]: false,
-            },
-            hasLoadedAudioFontMap: {
-              ...this.state.hasLoadedAudioFontMap,
-              [audioFont.id]: true,
-            },
-          })
-        })
-      },
-    )
-  }
-
-  private initSynth = () => {
-    this.cleanUp()
-
-    this.synth = new Tone.PolySynth(10, Tone.Synth, {
-      oscillator: {
-        partials: [0, 2, 3, 4],
-      },
-    }).toMaster()
-
-    Tone.Transport.loopEnd = `0:${this.state.staffNotes.length}`
-    Tone.Transport.loop = true
-
-    Tone.Transport.bpm.value = this.state.bpm
-
-    this.audioFontPlayer = new WebAudioFontPlayer()
-    this.loadAudioFont(this.state.audioFontId)
-  }
-
-  private cleanUp = () => {
-    if (this.synth) {
-      this.synth.disconnect(Tone.Master)
-      this.synth.dispose()
-      this.synth = null
-    }
-  }
-
   private handleShuffleClick = () => {
     this.setState(
       state => ({
@@ -357,65 +271,36 @@ class App extends React.Component<{}, AppState> {
     )
   }
 
-  private onNotesUpdated = () => {
+  private onNotesUpdated = async () => {
     console.log('onNotesUpdated')
-    const hasBeenPlaying = this.state.isPlaying
+    await this.updateStaffNotes()
+
+    const { staffNotes } = this.state
+    const loopTicks: PlayableLoopTick[] = staffNotes.map(staffNote => ({
+      notes: [{ midi: staffNote.midi }],
+      meta: {
+        noteCardId: staffNote.noteCardId,
+      },
+    }))
+
+    const loop: PlayableLoop = { ticks: loopTicks }
+    audioEngine.setLoop(loop)
 
     this.serializeAndSaveAppStateLocally()
-
-    this.stopPlaying(async () => {
-      await this.updateStaffNotes()
-
-      if (hasBeenPlaying) {
-        setTimeout(this.startPlaying, 200)
-      }
-    })
   }
 
-  scheduleNote = (
-    // Notes to play (could be a list for playing intervals and chords)
-    midiNotes: number[],
-    // Transport time when to schedule the notes
-    time: string = '0:0',
-    // Duration in seconds
-    duration: number,
-  ) => {
-    return Tone.Transport.schedule(contextTime => {
-      if (
-        this.audioFontPlayer &&
-        this.hasLoadedAudioFont(this.state.audioFontId)
-      ) {
-        this.audioFontPlayer.queueChord(
-          Tone.context,
-          Tone.context.destination,
-          this.getLoadedAudioFont(this.state.audioFontId),
-          contextTime,
-          midiNotes,
-          duration,
-          // Volume
-          1.0,
-        )
-      }
-
-      Tone.Draw.schedule(() => this.drawAnimation(time), contextTime)
-    }, Tone.Time(time))
-  }
-
-  drawAnimation = time => {
+  private drawAnimation: AnimationCallback = ({ tick, tickIndex, loop }) => {
+    console.log('drawAnimation', tickIndex, loop)
     this.setState(state => {
-      if (time === '0:0' && state.activeStaffNoteIndex === 0) {
-        return null
-      }
       if (!state.isPlaying) {
         return null
       }
 
-      const nextStaffNoteIndex =
-        (state.activeStaffNoteIndex + 1) % this.state.staffNotes.length
+      const nextStaffNoteIndex = tickIndex
+      // (state.activeStaffNoteIndex + 1) % this.state.staffNotes.length
       const nextStaffNote = this.state.staffNotes[nextStaffNoteIndex]
-      const nextNoteCardId = nextStaffNote.noteCardId
       const nextNoteCardIndex = this.state.noteCards.findIndex(
-        nc => nc.id === nextNoteCardId,
+        nc => nc.id === nextStaffNote.noteCardId,
       )
       return {
         activeStaffNoteIndex: nextStaffNoteIndex,
@@ -424,41 +309,20 @@ class App extends React.Component<{}, AppState> {
     }, this.updateStaffNotes)
   }
 
-  scheduleNotes = () => {
-    // Update loop length according to the number of note cards
-    Tone.Transport.loopEnd = `0:${this.state.staffNotes.length}`
-    this.scheduledEvents.forEach(eventId => Tone.Transport.clear(eventId))
-
-    this.state.staffNotes.forEach(({ midi }, index) => {
-      const time = `${Math.floor(index / 4)}:${index % 4}`
-      const duration = this.state.bpm ? 1.05 * (60.0 / this.state.bpm) : 0.5
-      this.scheduledEvents.push(this.scheduleNote([midi], time, duration))
-    })
-  }
-
-  startPlaying = () => {
+  private startPlaying = () => {
     console.log('startPlaying')
-    this.scheduleNotes()
     this.setState({ isPlaying: true }, () => {
-      Tone.Master.volume.rampTo(1, 100)
-      Tone.Transport.start()
+      audioEngine.playLoop()
     })
   }
 
-  stopPlaying = (cb?: () => any) => {
+  private stopPlaying = (cb?: () => any) => {
     console.log('stopPlaying')
-    if (!this.state.isPlaying) {
-      if (cb) {
-        cb()
-      }
-      return
-    }
 
     this.setState(
       { isPlaying: false, activeNoteCardIndex: 0, activeStaffNoteIndex: 0 },
       async () => {
-        Tone.Master.volume.rampTo(0)
-        Tone.Transport.stop()
+        audioEngine.stopLoop()
 
         await this.updateStaffNotes()
 
@@ -469,7 +333,7 @@ class App extends React.Component<{}, AppState> {
     )
   }
 
-  togglePlayback = () => {
+  private togglePlayback = () => {
     console.log('togglePlayback')
     if (this.state.isPlaying) {
       this.stopPlaying()
@@ -478,7 +342,7 @@ class App extends React.Component<{}, AppState> {
     }
   }
 
-  handleBpmChange = e => {
+  private handleBpmChange = e => {
     let bpmValue = this.state.bpm
     try {
       if (!e.target.value) {
@@ -490,7 +354,8 @@ class App extends React.Component<{}, AppState> {
         }
       }
     } finally {
-      Tone.Transport.bpm.value = bpmValue
+      audioEngine.setBpm(bpmValue)
+
       this.setState(
         {
           bpm: bpmValue,
@@ -498,6 +363,10 @@ class App extends React.Component<{}, AppState> {
         this.serializeAndSaveAppStateLocally,
       )
     }
+  }
+
+  private handleAudioFontChanged = (audioFontId: AudioFontId) => {
+    this.loadAndSetAudioFont(audioFontId)
   }
 
   private handleEditCardClick = (noteCard: NoteCardType) => {
@@ -679,9 +548,8 @@ class App extends React.Component<{}, AppState> {
           },
         },
       },
-      this.updateStaffNotes,
+      this.onNotesUpdated,
     )
-    this.serializeAndSaveAppStateLocally()
   }
 
   private handleRemoveChromaticApproachesClick = () => {
@@ -695,9 +563,8 @@ class App extends React.Component<{}, AppState> {
           },
         },
       },
-      this.updateStaffNotes,
+      this.onNotesUpdated,
     )
-    this.serializeAndSaveAppStateLocally()
   }
 
   private handleNoteClickInNoteCardAddingModal = ({ noteName }) => {
@@ -936,23 +803,6 @@ class App extends React.Component<{}, AppState> {
                   <PianoKeyboard
                     width={Math.max(layoutMinWidth, this.state.width)}
                     height={this.getPianoHeight()}
-                    onPlayNote={midiNote => {
-                      if (
-                        this.audioFontPlayer &&
-                        this.hasLoadedAudioFont(this.state.audioFontId)
-                      ) {
-                        this.audioFontPlayer.queueChord(
-                          Tone.context,
-                          Tone.context.destination,
-                          this.getLoadedAudioFont(this.state.audioFontId),
-                          0,
-                          [midiNote],
-                          0.5,
-                          // Volume
-                          1.0,
-                        )
-                      }
-                    }}
                     activeNotesMidi={
                       activeStaffNote ? [activeStaffNote.midi] : undefined
                     }
@@ -969,7 +819,7 @@ class App extends React.Component<{}, AppState> {
                     audioFontId: this.state.audioFontId,
                   }}
                   onSubmit={this.closeSettingsModal}
-                  onAudioFontChanged={this.setAndLoadAudioFont}
+                  onAudioFontChanged={this.handleAudioFontChanged}
                 />
 
                 <ArpeggioModifierModal
