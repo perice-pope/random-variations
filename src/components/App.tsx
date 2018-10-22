@@ -160,7 +160,7 @@ class App extends React.Component<{}, AppState> {
       {
         isInitialized: false,
         isLoadingAudioFont: false,
-        audioFontId: AudioFontsConfig[1].id,
+        audioFontId: AudioFontsConfig[0].id,
 
         bpm: 120,
         rests: 1,
@@ -511,6 +511,7 @@ class App extends React.Component<{}, AppState> {
 
       return {
         ...noteCard,
+        noteName,
         text: tonal.Note.pc(noteName),
         note: noteName,
         midi: tonal.Note.midi(noteName),
