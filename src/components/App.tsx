@@ -440,7 +440,7 @@ class App extends React.Component<{}, AppState> {
 
   private renderNotation = () => {
     if (this.notesStaffRef.current) {
-      this.notesStaffRef.current.draw()
+      this.notesStaffRef.current.redraw()
     }
   }
 
@@ -832,6 +832,7 @@ class App extends React.Component<{}, AppState> {
 
                   <Box innerRef={this.notesStaffContainerRef} width={1}>
                     <NotesStaff
+                      id="notation"
                       ticks={this.state.staffTicks}
                       activeTickIndex={
                         isPlaying ? activeStaffTickIndex : undefined

@@ -4,10 +4,12 @@ import * as tonal from 'tonal'
 import * as Vex from 'vexflow'
 import { darken, getLuminance } from 'polished'
 
+import MeasureScreenSize from './MeasureScreenSize'
 import { Box, BoxProps } from './ui'
 import { StaffTick } from '../types'
 
 type NotesStaffProps = {
+  id: string
   ticks: StaffTick[]
   activeTickIndex?: number
   width: number
@@ -16,30 +18,37 @@ type NotesStaffProps = {
 }
 
 class NotesStaff extends React.Component<NotesStaffProps, {}> {
-  private notationRoot: HTMLElement
+  private root: HTMLElement
   private renderer: Vex.Flow.Renderer
   private renderContext: Vex.IRenderContext
 
+  private notesPerTick: Vex.Flow.StaveNote[][] = []
+  private stave?: Vex.Flow.Stave
+
   componentDidMount() {
-    this.initNotationRenderer()
+    this.initRenderer()
   }
 
-  private initNotationRenderer = () => {
-    this.notationRoot = document.getElementById('notation') as HTMLElement
+  componentDidUpdate(prevProps) {
+    if (prevProps.ticks !== this.props.ticks) {
+      this.drawStaffAndNotes()
+    }
+    if (prevProps.activeTickIndex !== this.props.activeTickIndex) {
+      this.drawActiveNoteLine()
+    }
+  }
+
+  private initRenderer = () => {
+    this.root = document.getElementById(this.props.id) as HTMLElement
     this.renderer = new Vex.Flow.Renderer(
-      this.notationRoot,
+      this.root,
       Vex.Flow.Renderer.Backends.SVG,
     )
+    this.redraw()
   }
 
-  public getNotationRoot = () => this.notationRoot
-
-  public draw = () => {
-    this.renderStaffAndNotes()
-  }
-
-  private renderStaffAndNotes = () => {
-    const { width, height, activeTickIndex, ticks } = this.props
+  public redraw = () => {
+    const { width, height } = this.props
 
     // Configure the rendering context
     this.renderer.resize(width, height)
@@ -53,14 +62,33 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
       .setStrokeStyle('black')
     this.renderContext.save()
 
+    this.drawStaveAndClef()
+    this.drawStaffAndNotes()
+    this.drawActiveNoteLine()
+  }
+
+  private drawStaveAndClef = () => {
+    const { width } = this.props
+
     // Create a stave of at position 10, 40 on the canvas.
     const stave = new Vex.Flow.Stave(10, 0, width)
+    this.stave = stave
 
     // Add a clef and time signature.
     stave.addClef('treble')
 
     // Connect it to the rendering context and draw!
     stave.setContext(this.renderContext).draw()
+  }
+
+  private drawStaffAndNotes = () => {
+    console.log('drawStaffAndNotes')
+    const { ticks } = this.props
+    const { stave } = this
+
+    if (!stave) {
+      return
+    }
 
     const notesPerTick = ticks.map(tick => {
       const tickNotes = tick.notes.map(noteConfig => {
@@ -106,6 +134,21 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
       _.flatten(notesPerTick),
     )
 
+    this.notesPerTick = notesPerTick
+
+    this.renderContext.restore()
+  }
+
+  drawActiveNoteLine = () => {
+    if (!this.stave) {
+      return
+    }
+
+    this.renderContext.save()
+    const { activeTickIndex } = this.props
+    const { ticks } = this.props
+    const { stave, notesPerTick } = this
+
     if (
       activeTickIndex != null &&
       activeTickIndex >= 0 &&
@@ -126,7 +169,7 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
         this.renderContext
           .beginPath()
           // @ts-ignore
-          .moveTo(noteHeadX, stave.getBoundingBox().getY() + 20)
+          .moveTo(noteHeadX, this.stave.getBoundingBox().getY() + 20)
           .lineTo(
             noteHeadX,
             // @ts-ignore
@@ -139,15 +182,19 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
         activeNote.draw()
       }
     }
-
-    this.renderContext.restore()
   }
 
   public render() {
-    const { height, containerProps } = this.props
+    const { id, height, containerProps } = this.props
 
-    // @ts-ignore
-    return <Box width={1} id="notation" height={height} {...containerProps} />
+    const content = (
+      // @ts-ignore
+      <Box width={1} id={id} height={height} {...containerProps} />
+    )
+
+    return (
+      <MeasureScreenSize onUpdate={this.redraw}>{content}</MeasureScreenSize>
+    )
   }
 }
 
