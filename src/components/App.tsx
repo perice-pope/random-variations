@@ -76,6 +76,7 @@ type AppState = {
 
   noteCards: NoteCardType[]
   staffTicks: StaffTick[]
+  staffTicksPerCard: { [noteCardId: string]: StaffTick[] }
   activeNoteCardIndex: number
   activeStaffTickIndex: number
 
@@ -167,6 +168,7 @@ class App extends React.Component<{}, AppState> {
 
         isPlaying: false,
         staffTicks: [],
+        staffTicksPerCard: {},
         activeNoteCardIndex: 0,
         activeStaffTickIndex: 0,
 
@@ -228,9 +230,10 @@ class App extends React.Component<{}, AppState> {
   private updateStaffNotes = async () => {
     const { noteCards, modifiers, rests } = this.state
     const staffTicks = generateStaffTicks({ noteCards, modifiers, rests })
+    const staffTicksPerCard = _.groupBy(staffTicks, 'noteCardId')
 
     return new Promise(resolve => {
-      this.setState({ staffTicks }, () => {
+      this.setState({ staffTicks, staffTicksPerCard }, () => {
         resolve()
       })
     })
@@ -620,6 +623,7 @@ class App extends React.Component<{}, AppState> {
       rests,
       noteCards,
       staffTicks,
+      staffTicksPerCard,
       isPlaying,
       activeNoteCardIndex,
       activeStaffTickIndex,
@@ -630,6 +634,10 @@ class App extends React.Component<{}, AppState> {
       : undefined
     const activeStaffTick = isPlaying
       ? staffTicks[activeStaffTickIndex]
+      : undefined
+
+    const activeNoteCardTicks = activeNoteCard
+      ? staffTicksPerCard[activeNoteCard.id]
       : undefined
 
     return (
@@ -846,12 +854,21 @@ class App extends React.Component<{}, AppState> {
                   <PianoKeyboard
                     width={Math.max(layoutMinWidth, this.state.width)}
                     height={this.getPianoHeight()}
-                    activeNotesMidi={
+                    secondaryNotesMidi={
+                      activeNoteCardTicks
+                        ? _.flatten(
+                            activeNoteCardTicks.map(t =>
+                              t.notes.map(n => n.midi),
+                            ),
+                          )
+                        : undefined
+                    }
+                    primaryNotesMidi={
                       activeStaffTick
                         ? activeStaffTick.notes.map(n => n.midi)
                         : undefined
                     }
-                    activeNotesColor={
+                    notesColor={
                       activeNoteCard ? activeNoteCard.color : undefined
                     }
                   />

@@ -188,7 +188,6 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
     const { stave, renderContext } = this
 
     if (!stave) {
-      console.log('fish')
       return
     }
 
@@ -266,11 +265,7 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
           activeNote.getNoteHeadBeginX() +
           (activeNote.getNoteHeadEndX() - activeNote.getNoteHeadBeginX()) / 2
 
-        const activeLineXOld = this.activeLineEl.getBoundingClientRect().left
         const activeLineXNew = noteHeadX
-        const xDiff = activeLineXNew - activeLineXOld
-
-        console.log(xDiff)
 
         // @ts-ignore
         this.activeLineEl.style = `transform: translateX(${activeLineXNew}px);`
