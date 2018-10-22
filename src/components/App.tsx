@@ -227,7 +227,6 @@ class App extends React.Component<{}, AppState> {
 
     return new Promise(resolve => {
       this.setState({ staffTicks }, () => {
-        this.renderNotation()
         resolve()
       })
     })
@@ -428,20 +427,14 @@ class App extends React.Component<{}, AppState> {
     )
   }
 
-  private handleScreenSizeUpdate = ({ height, width }) => {
+  private handleScreenSizeUpdate = ({ width, height }) => {
     if (this.notesStaffContainerRef.current) {
       const {
         width: notesStaffWidth,
       } = this.notesStaffContainerRef.current.getBoundingClientRect()
       this.setState({ notesStaffWidth })
     }
-    this.setState({ height, width }, this.renderNotation)
-  }
-
-  private renderNotation = () => {
-    if (this.notesStaffRef.current) {
-      this.notesStaffRef.current.redraw()
-    }
+    this.setState({ width, height })
   }
 
   private openSettingsModal = () => {
@@ -741,7 +734,7 @@ class App extends React.Component<{}, AppState> {
                     />
 
                     <TextField
-                      className={css({ marginLeft: '10px', maxWidth: '50px' })}
+                      className={css({ marginLeft: '15px', maxWidth: '50px' })}
                       label="Rests"
                       id="rests"
                       type="number"

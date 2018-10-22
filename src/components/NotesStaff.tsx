@@ -4,7 +4,6 @@ import * as tonal from 'tonal'
 import * as Vex from 'vexflow'
 import { darken, getLuminance } from 'polished'
 
-import MeasureScreenSize from './MeasureScreenSize'
 import { Box, BoxProps } from './ui'
 import { StaffTick } from '../types'
 
@@ -30,11 +29,17 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.ticks !== this.props.ticks) {
-      this.drawStaffAndNotes()
-    }
-    if (prevProps.activeTickIndex !== this.props.activeTickIndex) {
+    if (prevProps.ticks.length !== this.props.ticks.length) {
+      this.redraw()
+    } else if (prevProps.ticks !== this.props.ticks) {
+      this.drawNotes()
+    } else if (prevProps.activeTickIndex !== this.props.activeTickIndex) {
       this.drawActiveNoteLine()
+    } else if (
+      prevProps.width !== this.props.width ||
+      prevProps.height !== this.props.height
+    ) {
+      this.redraw()
     }
   }
 
@@ -48,6 +53,7 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
   }
 
   public redraw = () => {
+    console.log('redraw')
     const { width, height } = this.props
 
     // Configure the rendering context
@@ -63,11 +69,12 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
     this.renderContext.save()
 
     this.drawStaveAndClef()
-    this.drawStaffAndNotes()
+    this.drawNotes()
     this.drawActiveNoteLine()
   }
 
   private drawStaveAndClef = () => {
+    console.log('drawStaveAndClef')
     const { width } = this.props
 
     // Create a stave of at position 10, 40 on the canvas.
@@ -81,14 +88,19 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
     stave.setContext(this.renderContext).draw()
   }
 
-  private drawStaffAndNotes = () => {
-    console.log('drawStaffAndNotes')
+  private drawNotes = () => {
+    console.log('drawNotes')
     const { ticks } = this.props
-    const { stave } = this
+    const { stave, renderContext } = this
 
     if (!stave) {
+      console.log('fish')
       return
     }
+
+    // Clear the old notes
+    // @ts-ignore
+    renderContext.svg.querySelectorAll('.vf-stavenote').forEach(n => n.remove())
 
     const notesPerTick = ticks.map(tick => {
       const tickNotes = tick.notes.map(noteConfig => {
@@ -133,13 +145,12 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
       stave,
       _.flatten(notesPerTick),
     )
-
     this.notesPerTick = notesPerTick
-
     this.renderContext.restore()
   }
 
   drawActiveNoteLine = () => {
+    console.log('drawActiveNoteLine')
     if (!this.stave) {
       return
     }
@@ -187,13 +198,9 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
   public render() {
     const { id, height, containerProps } = this.props
 
-    const content = (
+    return (
       // @ts-ignore
       <Box width={1} id={id} height={height} {...containerProps} />
-    )
-
-    return (
-      <MeasureScreenSize onUpdate={this.redraw}>{content}</MeasureScreenSize>
     )
   }
 }
