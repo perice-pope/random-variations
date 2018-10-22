@@ -201,6 +201,10 @@ class App extends React.Component<{}, AppState> {
     this.init()
   }
 
+  componentWillUnmount() {
+    audioEngine.cleanUp()
+  }
+
   private init = async () => {
     await this.updateStaffNotes()
     await this.initAudioEngine()
@@ -825,6 +829,7 @@ class App extends React.Component<{}, AppState> {
 
                   <Box innerRef={this.notesStaffContainerRef} width={1}>
                     <NotesStaff
+                      isPlaying={isPlaying}
                       id="notation"
                       ticks={this.state.staffTicks}
                       activeTickIndex={

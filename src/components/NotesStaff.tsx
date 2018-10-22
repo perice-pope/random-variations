@@ -2,14 +2,25 @@ import * as React from 'react'
 import * as _ from 'lodash'
 import * as tonal from 'tonal'
 import * as Vex from 'vexflow'
+import { css } from 'react-emotion'
 import { darken, getLuminance } from 'polished'
 
 import { Box, BoxProps } from './ui'
 import { StaffTick } from '../types'
 
+const activeNoteClasses = {
+  base: css({
+    transition: '0.2s transform, 0.5s opacity',
+  }),
+  hidden: css({
+    opacity: 0,
+  }),
+}
+
 type NotesStaffProps = {
   id: string
   ticks: StaffTick[]
+  isPlaying: boolean
   activeTickIndex?: number
   width: number
   height: number
@@ -23,23 +34,42 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
 
   private notesPerTick: Vex.Flow.StaveNote[][] = []
   private stave?: Vex.Flow.Stave
+  private activeLineEl?: SVGElement
 
   componentDidMount() {
     this.initRenderer()
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.ticks.length !== this.props.ticks.length) {
-      this.redraw()
-    } else if (prevProps.ticks !== this.props.ticks) {
-      this.drawNotes()
-    } else if (prevProps.activeTickIndex !== this.props.activeTickIndex) {
-      this.drawActiveNoteLine()
-    } else if (
+    if (
       prevProps.width !== this.props.width ||
       prevProps.height !== this.props.height
     ) {
       this.redraw()
+      return
+    }
+
+    if (prevProps.ticks.length !== this.props.ticks.length) {
+      this.redraw()
+      return
+    }
+
+    if (prevProps.ticks !== this.props.ticks) {
+      this.drawNotes()
+    }
+    if (
+      prevProps.activeTickIndex !== this.props.activeTickIndex &&
+      this.props.activeTickIndex != null
+    ) {
+      this.updateActiveNoteLine()
+    }
+
+    if (prevProps.isPlaying !== this.props.isPlaying) {
+      if (this.props.isPlaying === false) {
+        this.hideActiveNoteLine()
+      } else {
+        this.showActiveNoteLine()
+      }
     }
   }
 
@@ -69,8 +99,72 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
     this.renderContext.save()
 
     this.drawStaveAndClef()
-    this.drawNotes()
     this.drawActiveNoteLine()
+
+    this.drawNotes()
+    this.updateActiveNoteLine()
+  }
+
+  private drawActiveNoteLine = () => {
+    const { stave } = this
+    if (!stave) {
+      return
+    }
+
+    if (this.activeLineEl) {
+      this.activeLineEl.remove()
+      this.activeLineEl = undefined
+    }
+
+    this.renderContext.save()
+    this.renderContext.setLineWidth(2)
+    this.renderContext.setStrokeStyle('salmon')
+
+    // @ts-ignore
+    this.activeLineEl = this.renderContext.openGroup() as SVGElement
+
+    this.renderContext
+      .beginPath()
+      // @ts-ignore
+      .moveTo(0, this.stave.getBoundingBox().getY() + 20)
+      .lineTo(
+        0,
+        // @ts-ignore
+        stave.getBoundingBox().getY() +
+          // @ts-ignore
+          stave.getBoundingBox().getH() -
+          20,
+      )
+      .stroke()
+
+    this.activeLineEl.classList.add(
+      'vf-active-line',
+      activeNoteClasses.base,
+      activeNoteClasses.hidden,
+    )
+
+    // @ts-ignore
+    this.renderContext.closeGroup()
+  }
+
+  private hideActiveNoteLine = () => {
+    if (this.activeLineEl) {
+      this.activeLineEl.classList.add(activeNoteClasses.hidden)
+
+      // Reset the transition transform
+      setTimeout(() => {
+        if (this.activeLineEl) {
+          // @ts-ignore
+          this.activeLineEl.style = ''
+        }
+      }, 400)
+    }
+  }
+
+  private showActiveNoteLine = () => {
+    if (this.activeLineEl) {
+      this.activeLineEl.classList.remove(activeNoteClasses.hidden)
+    }
   }
 
   private drawStaveAndClef = () => {
@@ -149,16 +243,15 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
     this.renderContext.restore()
   }
 
-  drawActiveNoteLine = () => {
+  updateActiveNoteLine = () => {
     console.log('drawActiveNoteLine')
-    if (!this.stave) {
+    if (!this.stave || !this.activeLineEl) {
       return
     }
 
-    this.renderContext.save()
     const { activeTickIndex } = this.props
     const { ticks } = this.props
-    const { stave, notesPerTick } = this
+    const { notesPerTick } = this
 
     if (
       activeTickIndex != null &&
@@ -173,22 +266,14 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
           activeNote.getNoteHeadBeginX() +
           (activeNote.getNoteHeadEndX() - activeNote.getNoteHeadBeginX()) / 2
 
-        this.renderContext.save()
-        this.renderContext.setLineWidth(1)
-        this.renderContext.setStrokeStyle('salmon')
+        const activeLineXOld = this.activeLineEl.getBoundingClientRect().left
+        const activeLineXNew = noteHeadX
+        const xDiff = activeLineXNew - activeLineXOld
 
-        this.renderContext
-          .beginPath()
-          // @ts-ignore
-          .moveTo(noteHeadX, this.stave.getBoundingBox().getY() + 20)
-          .lineTo(
-            noteHeadX,
-            // @ts-ignore
-            stave.getBoundingBox().getY() + stave.getBoundingBox().getH() - 20,
-          )
-          .stroke()
+        console.log(xDiff)
 
-        this.renderContext.restore()
+        // @ts-ignore
+        this.activeLineEl.style = `transform: translateX(${activeLineXNew}px);`
 
         activeNote.draw()
       }

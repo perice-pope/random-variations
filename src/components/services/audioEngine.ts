@@ -38,6 +38,10 @@ export default class AudioEngine {
     this.audioFontPlayer = new WebAudioFontPlayer()
   }
 
+  public cleanUp = () => {
+    this.removeScheduledEvents()
+  }
+
   public hasLoadedAudioFont = (audioFontId: AudioFontId) => {
     return this.hasLoadedAudioFontMap[audioFontId] === true
   }
@@ -139,9 +143,14 @@ export default class AudioEngine {
     this.rescheduleLoopNotes()
   }
 
-  private rescheduleLoopNotes = () => {
+  private removeScheduledEvents = () => {
     this.scheduledEvents.forEach(eventId => Tone.Transport.clear(eventId))
+  }
 
+  private rescheduleLoopNotes = () => {
+    this.removeScheduledEvents()
+
+    console.log('rescheduleLoopNotes', this.loop.ticks.length)
     this.loop.ticks.forEach((tick, index) => {
       const time = `0:${index}`
       // Duration in seconds, based on the current BPM
