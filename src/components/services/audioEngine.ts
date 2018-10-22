@@ -105,7 +105,11 @@ export default class AudioEngine {
     }, rampTimeMs)
   }
 
-  public playNote = (note: PlayableNote, duration: number = 10000000) => {
+  public playNote = (
+    note: PlayableNote,
+    when: 0,
+    duration: number = 10000000,
+  ) => {
     if (!this.audioFontPlayer || !this.hasLoadedAudioFont(this.audioFontId)) {
       return
     }
@@ -114,7 +118,7 @@ export default class AudioEngine {
       Tone.context,
       Tone.context.destination,
       this.audioFontCache[this.audioFontId],
-      0,
+      when,
       note.midi,
       duration,
       // Volume

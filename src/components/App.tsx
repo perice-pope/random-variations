@@ -365,8 +365,9 @@ class App extends React.Component<{}, AppState> {
     }
   }
 
-  private handleAudioFontChanged = (audioFontId: AudioFontId) => {
-    this.loadAndSetAudioFont(audioFontId)
+  private handleAudioFontChanged = async (audioFontId: AudioFontId) => {
+    await this.loadAndSetAudioFont(audioFontId)
+    audioEngine.playNote({ midi: tonal.Note.midi('C4') }, 0, 0.5)
   }
 
   private handleEditCardClick = (noteCard: NoteCardType) => {
