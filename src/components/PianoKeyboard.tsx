@@ -7,6 +7,8 @@ import * as tonal from 'tonal'
 import { lighten, darken, getLuminance } from 'polished'
 
 import { Box } from './ui'
+import { withAudioEngine } from './withAudioEngine'
+import AudioEngine from './services/audioEngine'
 
 const pianoNoteRangeWide: MidiNoteRange = {
   first: tonal.Note.midi('C3'),
@@ -35,6 +37,7 @@ type MidiNoteRange = {
 }
 
 type PianoKeyboardProps = {
+  audioEngine: AudioEngine
   className?: any
   width: number
   height: number
@@ -56,6 +59,7 @@ class PianoKeyboard extends React.Component<
 > {
   midiToKeyRefMap: { [midi: string]: HTMLElement } = {}
   midiToKeyLabelRefMap: { [midi: string]: HTMLElement } = {}
+  playingNoteEnvelopes: { [midi: string]: any } = {}
 
   state = {
     notesColor: 'salmon',
@@ -148,12 +152,19 @@ class PianoKeyboard extends React.Component<
   }
 
   private onPlayNote = noteMidi => {
+    this.playingNoteEnvelopes[noteMidi] = this.props.audioEngine.playNote({
+      midi: noteMidi,
+    })
     if (this.props.onPlayNote) {
       this.props.onPlayNote(noteMidi)
     }
   }
 
   private onStopNote = noteMidi => {
+    if (this.playingNoteEnvelopes[noteMidi]) {
+      this.props.audioEngine.stopNote(this.playingNoteEnvelopes[noteMidi])
+      delete this.playingNoteEnvelopes[noteMidi]
+    }
     if (this.props.onStopNote) {
       this.props.onStopNote(noteMidi)
     }
@@ -287,4 +298,4 @@ class PianoKeyboard extends React.Component<
   }
 }
 
-export default PianoKeyboard
+export default withAudioEngine(PianoKeyboard)

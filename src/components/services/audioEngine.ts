@@ -110,7 +110,7 @@ export default class AudioEngine {
 
   public playNote = (
     note: PlayableNote,
-    when: 0,
+    when: number = 0,
     duration: number = 10000000,
   ) => {
     if (!this.audioFontPlayer || !this.hasLoadedAudioFont(this.audioFontId)) {

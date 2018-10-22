@@ -78,7 +78,7 @@ class ChromaticApproachesModifierModal extends React.Component<
         aria-labelledby="chromatic-approach-modifier-dialog"
       >
         <DialogTitle id="chromatic-approach-modifier-dialog">
-          Chromatic approach
+          Enclosure
         </DialogTitle>
 
         <DialogContent>
