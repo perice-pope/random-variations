@@ -2,13 +2,15 @@ import * as tonal from 'tonal'
 import * as Chord from 'tonal-chord'
 import { transpose } from 'tonal-distance'
 import * as _ from 'lodash'
+import uuid from 'uuid/v4'
 
 import {
   NoteModifiers,
-  NoteCardType,
-  StaffNoteType,
+  StaffNote,
   ArpeggioModifier,
   ChromaticApproachesModifier,
+  StaffTick,
+  NoteCardType,
 } from './types'
 
 type PartialStaffNote = {
@@ -199,14 +201,20 @@ export const addArpeggioNotes = (
  * @param noteCards - note cards of the session from which staff notes should be generated
  * @param modifiers - session modifiers such as chromatic approach, etc
  */
-export const generateStaffNotes = (
-  noteCards: NoteCardType[],
-  modifiers: NoteModifiers,
-) => {
-  const result: Partial<StaffNoteType>[] = []
+export const generateStaffTicks = ({
+  noteCards,
+  modifiers,
+  rests,
+}: {
+  noteCards: NoteCardType[]
+  modifiers: NoteModifiers
+  // Number of rests to add after each note card
+  rests: number
+}): StaffTick[] => {
+  const ticksPerCard: StaffTick[][] = []
 
   noteCards.forEach(noteCard => {
-    let noteCardStaffNotes: Partial<StaffNoteType>[] = []
+    let notesForCard: Partial<StaffNote>[] = []
 
     const baseStaffNote = {
       noteName: noteCard.noteName,
@@ -214,39 +222,50 @@ export const generateStaffNotes = (
       isMainNote: true,
     }
 
-    noteCardStaffNotes = [baseStaffNote]
+    notesForCard = [baseStaffNote]
 
     if (modifiers.arpeggio.enabled) {
-      noteCardStaffNotes = addArpeggioNotes(
-        noteCardStaffNotes,
-        modifiers.arpeggio,
-      )
+      notesForCard = addArpeggioNotes(notesForCard, modifiers.arpeggio)
     }
 
     if (modifiers.chromaticApproaches.enabled) {
-      noteCardStaffNotes = addApproachNotes(
-        noteCardStaffNotes,
+      notesForCard = addApproachNotes(
+        notesForCard,
         modifiers.chromaticApproaches,
       )
     }
 
-    noteCardStaffNotes.forEach(note => {
-      result.push({
-        ...note,
+    const notesForCardFull: StaffNote[] = notesForCard.map(
+      note =>
+        ({
+          ...note,
+          id: uuid(),
+          noteCardId: noteCard.id,
+          midi: tonal.Note.midi(note.noteName),
+          color: note.isMainNote ? noteCard.color : note.color,
+        } as StaffNote),
+    )
+
+    let ticksForCard: StaffTick[] = notesForCardFull.map(note => ({
+      id: uuid(),
+      noteCardId: noteCard.id,
+      notes: [note],
+    }))
+
+    // Add rests if needed
+    if (rests) {
+      const breakTicksForCard = new Array(rests).fill(null).map(() => ({
+        id: uuid(),
         noteCardId: noteCard.id,
-        color: note.isMainNote ? noteCard.color : note.color,
-      })
-    })
+        // Empty array means it's a break
+        notes: [],
+      }))
+      ticksForCard = [...ticksForCard, ...breakTicksForCard]
+    }
+
+    ticksPerCard.push(ticksForCard)
   })
 
-  // Fill the remaining missing repeating fields of the staff notes...
-  result.forEach((nc, index) => {
-    nc.duration = '4'
-    nc.index = index
-    nc.isMainNote = nc.isMainNote || false
-    nc.freq = tonal.Note.freq(nc.noteName)
-    nc.midi = tonal.Note.midi(nc.noteName)
-  })
-
-  return result as StaffNoteType[]
+  const allTicks = _.flatten(ticksPerCard)
+  return allTicks
 }

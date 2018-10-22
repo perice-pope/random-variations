@@ -8,6 +8,7 @@ export interface PlayableLoopTick {
   meta: {
     // ID of the note card from which this tick was generated
     noteCardId: string
+    staffTickIndex: number
   }
 }
 
@@ -22,32 +23,27 @@ export interface PlayableLoop {
   ticks: PlayableLoopTick[]
 }
 
-export interface NoteCardType extends PlayableNote {
+export interface StaffNote extends PlayableNote {
   id: string
-
   // Full note name, e.g. "C#4"
   noteName: string
-
-  // Text to show on the card, e.g. "C#"
-  text: string
-
+  isMainNote: boolean
   color: string
 }
 
-export interface StaffNoteType extends PlayableNote {
-  index: number
-  // A reference back to note card which "generated" this staff note
+export interface StaffTick {
+  id: string
   noteCardId: string
-  // "true" for exactly one (the base) note from the same "note card" notes bucket
-  isMainNote: boolean
 
+  notes: StaffNote[]
+}
+
+export interface NoteCardType extends PlayableNote {
+  id: string
   // Full note name, e.g. "C#4"
   noteName: string
-
-  duration: '4'
-  freq: number
-  midi: number
-
+  // Text to show on the card, e.g. "C#"
+  text: string
   color: string
 }
 

@@ -5,11 +5,11 @@ import * as Vex from 'vexflow'
 import { darken, getLuminance } from 'polished'
 
 import { Box, BoxProps } from './ui'
-import { StaffNoteType } from '../types'
+import { StaffTick } from '../types'
 
 type NotesStaffProps = {
-  notes: StaffNoteType[]
-  activeNote?: StaffNoteType
+  ticks: StaffTick[]
+  activeTickIndex?: number
   width: number
   height: number
   containerProps?: BoxProps
@@ -39,7 +39,7 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
   }
 
   private renderStaffAndNotes = () => {
-    const { width, height, activeNote, notes: notesConfig } = this.props
+    const { width, height, activeTickIndex, ticks } = this.props
 
     // Configure the rendering context
     this.renderer.resize(width, height)
@@ -62,63 +62,82 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
     // Connect it to the rendering context and draw!
     stave.setContext(this.renderContext).draw()
 
-    const notes = notesConfig.map(noteConfig => {
-      const [letter, accidental, octave] = tonal.Note.tokenize(
-        noteConfig.noteName,
-      )
+    const notesPerTick = ticks.map(tick => {
+      const tickNotes = tick.notes.map(noteConfig => {
+        const [letter, accidental, octave] = tonal.Note.tokenize(
+          noteConfig.noteName,
+        )
 
-      const vexFlowNoteConfig = {
-        keys: [`${letter}${accidental}/${octave}`],
-        duration: noteConfig.duration,
-      }
+        const vexFlowNoteConfig = {
+          keys: [`${letter}${accidental}/${octave}`],
+          duration: '4',
+        }
 
-      const note = new Vex.Flow.StaveNote(vexFlowNoteConfig)
-      if (accidental) {
-        note.addAccidental(0, new Vex.Flow.Accidental(accidental))
-      }
+        const note = new Vex.Flow.StaveNote(vexFlowNoteConfig)
+        if (accidental) {
+          note.addAccidental(0, new Vex.Flow.Accidental(accidental))
+        }
 
-      const cardColorLuminance = getLuminance(noteConfig.color)
-      const noteColor =
-        cardColorLuminance > 0.6
-          ? darken(0.2, noteConfig.color)
-          : noteConfig.color
+        const cardColorLuminance = getLuminance(noteConfig.color)
+        const noteColor =
+          cardColorLuminance > 0.6
+            ? darken(0.2, noteConfig.color)
+            : noteConfig.color
 
-      note.setStyle({
-        fillStyle: noteColor,
-        strokeStyle: noteColor,
+        note.setStyle({
+          fillStyle: noteColor,
+          strokeStyle: noteColor,
+        })
+
+        // Hide the stems
+        note
+          .getStem()
+          .setStyle({ fillStyle: 'transparent', strokeStyle: 'transparent' })
+
+        return note
       })
 
-      // Hide the stems
-      note
-        .getStem()
-        .setStyle({ fillStyle: 'transparent', strokeStyle: 'transparent' })
-
-      return note
+      return tickNotes
     })
 
-    Vex.Flow.Formatter.FormatAndDraw(this.renderContext, stave, notes)
+    Vex.Flow.Formatter.FormatAndDraw(
+      this.renderContext,
+      stave,
+      _.flatten(notesPerTick),
+    )
 
-    const activeNoteIndex = notesConfig.findIndex(n => n === activeNote)
-    if (activeNoteIndex !== -1) {
-      const notePosition = notes[activeNoteIndex].getBoundingBox()
-      const x = notePosition.getX() + notePosition.getW() / 2
+    if (
+      activeTickIndex != null &&
+      activeTickIndex >= 0 &&
+      activeTickIndex < ticks.length
+    ) {
+      const notesPerActiveTick = notesPerTick[activeTickIndex]
+      const activeNote = notesPerActiveTick[0]
 
-      this.renderContext.save()
-      this.renderContext.setLineWidth(1)
-      this.renderContext.setStrokeStyle('salmon')
+      if (activeNote) {
+        const noteHeadX =
+          activeNote.getNoteHeadBeginX() +
+          (activeNote.getNoteHeadEndX() - activeNote.getNoteHeadBeginX()) / 2
 
-      this.renderContext
-        .beginPath()
-        // @ts-ignore
-        .moveTo(x, stave.getBoundingBox().getY() + 20)
-        .lineTo(
-          x,
+        this.renderContext.save()
+        this.renderContext.setLineWidth(1)
+        this.renderContext.setStrokeStyle('salmon')
+
+        this.renderContext
+          .beginPath()
           // @ts-ignore
-          stave.getBoundingBox().getY() + stave.getBoundingBox().getH() - 20,
-        )
-        .stroke()
+          .moveTo(noteHeadX, stave.getBoundingBox().getY() + 20)
+          .lineTo(
+            noteHeadX,
+            // @ts-ignore
+            stave.getBoundingBox().getY() + stave.getBoundingBox().getH() - 20,
+          )
+          .stroke()
 
-      this.renderContext.restore()
+        this.renderContext.restore()
+
+        activeNote.draw()
+      }
     }
 
     this.renderContext.restore()

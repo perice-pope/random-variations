@@ -40,7 +40,7 @@ import NoteCards from './NoteCards'
 
 import {
   NoteCardType,
-  StaffNoteType,
+  StaffTick,
   ArpeggioType,
   ArpeggioDirection,
   NoteModifiers,
@@ -55,7 +55,7 @@ import PianoKeyboard from './PianoKeyboard'
 
 import SettingsModal from './SettingsModal'
 import AddEntityButton from './AddEntityButton'
-import { generateStaffNotes } from '../musicUtils'
+import { generateStaffTicks } from '../musicUtils'
 import AudioFontsConfig, { AudioFontId } from '../audioFontsConfig'
 import AudioEngine, { AnimationCallback } from './services/audioEngine'
 
@@ -69,14 +69,15 @@ type AppState = {
   isLoadingAudioFont: boolean
 
   bpm: number
+  rests: number
   isPlaying: boolean
 
   audioFontId: AudioFontId
 
   noteCards: NoteCardType[]
-  staffNotes: StaffNoteType[]
+  staffTicks: StaffTick[]
   activeNoteCardIndex: number
-  activeStaffNoteIndex: number
+  activeStaffTickIndex: number
 
   modifiers: NoteModifiers
 
@@ -156,6 +157,7 @@ class App extends React.Component<{}, AppState> {
         audioFontId: AudioFontsConfig[1].id,
 
         bpm: 120,
+        rests: 1,
         noteCards: [randomNoteCard],
 
         // Screen size
@@ -164,9 +166,9 @@ class App extends React.Component<{}, AppState> {
         notesStaffWidth: 0,
 
         isPlaying: false,
-        staffNotes: [],
+        staffTicks: [],
         activeNoteCardIndex: 0,
-        activeStaffNoteIndex: 0,
+        activeStaffTickIndex: 0,
 
         modifiers: {
           arpeggio: {
@@ -220,23 +222,15 @@ class App extends React.Component<{}, AppState> {
   }
 
   private updateStaffNotes = async () => {
-    const { noteCards, modifiers } = this.state
-    const staffNotes = generateStaffNotes(noteCards, modifiers)
+    const { noteCards, modifiers, rests } = this.state
+    const staffTicks = generateStaffTicks({ noteCards, modifiers, rests })
 
     return new Promise(resolve => {
-      this.setState({ staffNotes }, () => {
+      this.setState({ staffTicks }, () => {
         this.renderNotation()
         resolve()
       })
     })
-  }
-
-  private getActiveStaffNote = () => {
-    const { isPlaying, staffNotes, activeStaffNoteIndex } = this.state
-    if (!isPlaying) {
-      return undefined
-    }
-    return staffNotes[activeStaffNoteIndex]
   }
 
   private getPianoHeight = () => {
@@ -264,6 +258,7 @@ class App extends React.Component<{}, AppState> {
       'appState',
       JSON.stringify({
         bpm: this.state.bpm,
+        rests: this.state.rests,
         audioFontId: this.state.audioFontId,
         noteCards: this.state.noteCards,
         modifiers: this.state.modifiers,
@@ -271,39 +266,50 @@ class App extends React.Component<{}, AppState> {
     )
   }
 
+  private generateLoop = () => {
+    const { staffTicks } = this.state
+
+    // Generate loop
+    const loopTicks: PlayableLoopTick[] = staffTicks.map(
+      (staffTick, index) => ({
+        notes: staffTick.notes,
+        meta: {
+          staffTickIndex: index,
+          noteCardId: staffTick.noteCardId,
+        },
+      }),
+    )
+
+    const loop: PlayableLoop = { ticks: loopTicks }
+    return loop
+  }
+
   private onNotesUpdated = async () => {
     console.log('onNotesUpdated')
     await this.updateStaffNotes()
 
-    const { staffNotes } = this.state
-    const loopTicks: PlayableLoopTick[] = staffNotes.map(staffNote => ({
-      notes: [{ midi: staffNote.midi }],
-      meta: {
-        noteCardId: staffNote.noteCardId,
-      },
-    }))
-
-    const loop: PlayableLoop = { ticks: loopTicks }
+    const loop = this.generateLoop()
     audioEngine.setLoop(loop)
 
     this.serializeAndSaveAppStateLocally()
   }
 
-  private drawAnimation: AnimationCallback = ({ tick, tickIndex, loop }) => {
-    console.log('drawAnimation', tickIndex, loop)
+  private drawAnimation: AnimationCallback = ({ tick }) => {
     this.setState(state => {
       if (!state.isPlaying) {
         return null
       }
 
-      const nextStaffNoteIndex = tickIndex
-      // (state.activeStaffNoteIndex + 1) % this.state.staffNotes.length
-      const nextStaffNote = this.state.staffNotes[nextStaffNoteIndex]
+      console.log('drawAnimation', tick.meta.staffTickIndex)
+      const nextStaffNoteIndex = tick.meta.staffTickIndex
+      // (state.activeStaffTickIndex + 1) % this.state.staffTicks.length
+      const nextStaffNote = this.state.staffTicks[nextStaffNoteIndex]
+      // TODO: optimize this serial search code to a hash lookup
       const nextNoteCardIndex = this.state.noteCards.findIndex(
         nc => nc.id === nextStaffNote.noteCardId,
       )
       return {
-        activeStaffNoteIndex: nextStaffNoteIndex,
+        activeStaffTickIndex: nextStaffNoteIndex,
         activeNoteCardIndex: nextNoteCardIndex,
       }
     }, this.updateStaffNotes)
@@ -320,7 +326,7 @@ class App extends React.Component<{}, AppState> {
     console.log('stopPlaying')
 
     this.setState(
-      { isPlaying: false, activeNoteCardIndex: 0, activeStaffNoteIndex: 0 },
+      { isPlaying: false, activeNoteCardIndex: 0, activeStaffTickIndex: 0 },
       async () => {
         audioEngine.stopLoop()
 
@@ -361,6 +367,27 @@ class App extends React.Component<{}, AppState> {
           bpm: bpmValue,
         },
         this.serializeAndSaveAppStateLocally,
+      )
+    }
+  }
+
+  private handleRestsChange = e => {
+    let restsValue = this.state.rests
+    try {
+      if (!e.target.value) {
+        restsValue = 0
+      } else {
+        restsValue = parseInt(e.target.value, 10)
+        if (isNaN(restsValue)) {
+          restsValue = 0
+        }
+      }
+    } finally {
+      this.setState(
+        {
+          rests: restsValue,
+        },
+        this.onNotesUpdated,
       )
     }
   }
@@ -593,18 +620,19 @@ class App extends React.Component<{}, AppState> {
   public render() {
     const {
       bpm,
+      rests,
       noteCards,
-      staffNotes,
+      staffTicks,
       isPlaying,
       activeNoteCardIndex,
-      activeStaffNoteIndex,
+      activeStaffTickIndex,
     } = this.state
 
     const activeNoteCard = isPlaying
       ? noteCards[activeNoteCardIndex]
       : undefined
-    const activeStaffNote = isPlaying
-      ? staffNotes[activeStaffNoteIndex]
+    const activeStaffTick = isPlaying
+      ? staffTicks[activeStaffTickIndex]
       : undefined
 
     return (
@@ -695,7 +723,7 @@ class App extends React.Component<{}, AppState> {
                     </Box>
 
                     <TextField
-                      className={css({ maxWidth: '100px' })}
+                      className={css({ maxWidth: '80px' })}
                       label="Tempo"
                       InputProps={{
                         endAdornment: (
@@ -710,6 +738,19 @@ class App extends React.Component<{}, AppState> {
                       max="400"
                       value={`${bpm}`}
                       onChange={this.handleBpmChange}
+                    />
+
+                    <TextField
+                      className={css({ marginLeft: '10px', maxWidth: '50px' })}
+                      label="Rests"
+                      id="rests"
+                      type="number"
+                      // @ts-ignore
+                      step="1"
+                      min="0"
+                      max="8"
+                      value={`${rests}`}
+                      onChange={this.handleRestsChange}
                     />
                   </Flex>
 
@@ -791,8 +832,10 @@ class App extends React.Component<{}, AppState> {
 
                   <Box innerRef={this.notesStaffContainerRef} width={1}>
                     <NotesStaff
-                      notes={this.state.staffNotes}
-                      activeNote={this.getActiveStaffNote()}
+                      ticks={this.state.staffTicks}
+                      activeTickIndex={
+                        isPlaying ? activeStaffTickIndex : undefined
+                      }
                       ref={this.notesStaffRef}
                       height={160}
                       width={this.state.notesStaffWidth}
@@ -805,7 +848,9 @@ class App extends React.Component<{}, AppState> {
                     width={Math.max(layoutMinWidth, this.state.width)}
                     height={this.getPianoHeight()}
                     activeNotesMidi={
-                      activeStaffNote ? [activeStaffNote.midi] : undefined
+                      activeStaffTick
+                        ? activeStaffTick.notes.map(n => n.midi)
+                        : undefined
                     }
                     activeNotesColor={
                       activeNoteCard ? activeNoteCard.color : undefined

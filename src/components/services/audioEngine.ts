@@ -9,7 +9,6 @@ const audioFontsConfigById = _.keyBy(audioFontsConfig, 'id')
 
 type AnimationCallbackArg = {
   tick: PlayableLoopTick
-  tickIndex: number
   loop: PlayableLoop
 }
 
@@ -141,13 +140,12 @@ export default class AudioEngine {
   }
 
   private rescheduleLoopNotes = () => {
-    console.log('rescheduleLoopNotes')
     this.scheduledEvents.forEach(eventId => Tone.Transport.clear(eventId))
 
     this.loop.ticks.forEach((tick, index) => {
       const time = `0:${index}`
       // Duration in seconds, based on the current BPM
-      const duration = 1.05 * (60.0 / this.bpm)
+      const duration = 60.0 / this.bpm
       this.scheduledEvents.push(this.scheduleTick(tick, index, time, duration))
     })
   }
@@ -160,7 +158,6 @@ export default class AudioEngine {
     // Duration in seconds
     duration: number,
   ) => {
-    console.log('scheduleTick', tick, tickIndex, time, duration)
     if (!this.audioFontPlayer || !this.hasLoadedAudioFont(this.audioFontId)) {
       return
     }
@@ -184,7 +181,6 @@ export default class AudioEngine {
         if (this.animationCallback) {
           this.animationCallback({
             tick,
-            tickIndex,
             loop: this.loop,
           })
         }
