@@ -150,7 +150,6 @@ export default class AudioEngine {
 
   public setLoop = (loop: PlayableLoop) => {
     this.loop = loop
-    console.log('this.loop', loop)
     Tone.Transport.loopEnd = `0:${loop.ticks.length}`
     this.rescheduleLoopNotes()
   }
@@ -162,10 +161,7 @@ export default class AudioEngine {
   private rescheduleLoopNotes = () => {
     this.removeScheduledEvents()
 
-    console.log('rescheduleLoopNotes', this.loop.ticks.length)
-    console.log(Tone.context.state)
     this.loop.ticks.forEach((tick, index) => {
-      console.log('calling schedule')
       const time = `0:${index}`
       // Duration in seconds, based on the current BPM
       const duration = 60.0 / this.bpm
@@ -185,14 +181,9 @@ export default class AudioEngine {
       return
     }
 
-    console.log('scheduleTick / outside', time)
-    console.log(Tone.context.state)
-
     const midiNotes = tick.notes.map(note => note.midi)
 
     return Tone.Transport.schedule(contextTime => {
-      console.log('scheduleTick / inside', contextTime)
-      console.log(Tone.context.state)
       this.audioFontPlayer.queueChord(
         Tone.context,
         Tone.context.destination,
