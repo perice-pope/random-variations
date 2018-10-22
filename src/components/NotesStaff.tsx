@@ -239,7 +239,6 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
       _.flatten(notesPerTick),
     )
     this.notesPerTick = notesPerTick
-    this.renderContext.restore()
   }
 
   updateActiveNoteLine = () => {
