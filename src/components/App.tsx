@@ -926,7 +926,7 @@ class App extends React.Component<{}, AppState> {
 
                   <PickNoteModal
                     isOpen={this.state.noteEditingModalIsOpen}
-                    selectedNoteName={
+                    noteName={
                       this.state.noteEditingModalNoteCard
                         ? this.state.noteEditingModalNoteCard.noteName
                         : undefined

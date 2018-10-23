@@ -63,6 +63,8 @@ class PianoKeyboard extends React.Component<
     notesColor: 'rgba(0,0,0,0)',
   }
 
+  private boxRef = React.createRef<typeof Box>()
+
   static getDerivedStateFromProps(props) {
     if (props.notesColor) {
       return {
@@ -74,12 +76,13 @@ class PianoKeyboard extends React.Component<
   }
 
   private onPlayNote = noteMidi => {
-    this.playingNoteEnvelopes[noteMidi] = this.props.audioEngine.playNote({
-      midi: noteMidi,
-    })
     if (this.props.onPlayNote) {
       this.props.onPlayNote(noteMidi)
     }
+
+    this.playingNoteEnvelopes[noteMidi] = this.props.audioEngine.playNote({
+      midi: noteMidi,
+    })
   }
 
   private onStopNote = noteMidi => {
@@ -92,8 +95,18 @@ class PianoKeyboard extends React.Component<
     }
   }
 
+  private getWidth = () => {
+    let { width } = this.props
+    if (width == null && this.boxRef.current) {
+      // @ts-ignore
+      width = this.boxRef.current.getBoundingClientRect().width
+    }
+    return width
+  }
+
   private getNoteRange = () => {
-    const { noteRange, width } = this.props
+    const { noteRange } = this.props
+    const width = this.getWidth()
 
     if (noteRange) {
       return noteRange
@@ -157,7 +170,7 @@ class PianoKeyboard extends React.Component<
   }
 
   public render() {
-    const { className, height, width } = this.props
+    const { className, height } = this.props
 
     let naturalColor = this.state.notesColor
 
@@ -174,7 +187,7 @@ class PianoKeyboard extends React.Component<
     const accidentalLabelColor = lighten(0.1, accidentalColor)
 
     return (
-      <Box>
+      <Box innerRef={this.boxRef}>
         <ReactPiano.Piano
           noteRange={this.getNoteRange()}
           className={cx(
@@ -283,7 +296,7 @@ class PianoKeyboard extends React.Component<
           )}
           playNote={this.onPlayNote}
           stopNote={this.onStopNote}
-          width={width}
+          width={this.getWidth()}
           keyboardShortcuts={keyboardShortcuts}
           renderNoteLabel={this.renderNoteLabel}
         />
