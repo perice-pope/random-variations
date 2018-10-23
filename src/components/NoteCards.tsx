@@ -1,13 +1,14 @@
 import * as React from 'react'
 import { Flipper, Flipped } from 'react-flip-toolkit'
 import styled, { css } from 'react-emotion'
+import * as tonal from 'tonal'
 import * as _ from 'lodash'
 import { SortableContainer, SortableElement } from 'react-sortable-hoc'
 
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 
-import { Flex } from './ui'
+import { Flex, Text } from './ui'
 import NoteCard from './NoteCard'
 
 import { NoteCardType } from '../types'
@@ -58,6 +59,13 @@ const SortableNoteCard = SortableElement(
       this.openMenu({ left: event.clientX, top: event.clientY })
     }
 
+    private handleChangeToEnharmonicClick = () => {
+      this.closeMenu()
+      if (this.props.onChangeToEnharmonicClick) {
+        this.props.onChangeToEnharmonicClick()
+      }
+    }
+
     private handleEditClick = () => {
       this.closeMenu()
       if (this.props.onEditClick) {
@@ -73,8 +81,21 @@ const SortableNoteCard = SortableElement(
     }
 
     render() {
-      const { id, active, bgColor, shouldFlip, onClick, ...props } = this.props
+      const {
+        noteCard,
+        id,
+        active,
+        bgColor,
+        shouldFlip,
+        onClick,
+        ...props
+      } = this.props
       const menuId = `note-card-menu-${id}`
+
+      const enharmonicNoteName = tonal.Note.enharmonic(noteCard.noteName)
+      const shouldShowChangeToEnharmonic =
+        enharmonicNoteName !== noteCard.noteName
+
       return (
         <Flipped flipId={id} shouldFlip={shouldFlip}>
           <div
@@ -92,6 +113,17 @@ const SortableNoteCard = SortableElement(
                 open={this.state.menuOpen}
                 onClose={this.closeMenu}
               >
+                {shouldShowChangeToEnharmonic && (
+                  <MenuItem
+                    autoFocus
+                    onClick={this.handleChangeToEnharmonicClick}
+                  >
+                    {'Change to '}
+                    <Text ml={1} fontWeight="bold">
+                      {tonal.Note.pc(enharmonicNoteName)}
+                    </Text>
+                  </MenuItem>
+                )}
                 <MenuItem autoFocus onClick={this.handleEditClick}>
                   Edit
                 </MenuItem>
@@ -123,6 +155,7 @@ const SortableNotesContainer = SortableContainer(
     children,
     activeNoteCard,
     shouldFlip,
+    onChangeToEnharmonicClick,
     onEditClick,
     onDeleteClick,
   }) => {
@@ -132,6 +165,7 @@ const SortableNotesContainer = SortableContainer(
     } else if (isDragging) {
       backgroundColor = '#eff8ff'
     }
+
     return (
       <div
         ref={innerRef}
@@ -145,6 +179,7 @@ const SortableNotesContainer = SortableContainer(
         <FlipperStyled flipKey={items}>
           {items.map((noteCard, index) => (
             <SortableNoteCard
+              noteCard={noteCard}
               // @ts-ignore
               shouldFlip={shouldFlip}
               id={noteCard.id}
@@ -156,6 +191,9 @@ const SortableNotesContainer = SortableContainer(
               width={1}
               active={activeNoteCard === noteCard}
               onEditClick={() => onEditClick(noteCard)}
+              onChangeToEnharmonicClick={() =>
+                onChangeToEnharmonicClick(noteCard)
+              }
               onDeleteClick={() => onDeleteClick(noteCard)}
             >
               {noteCard.text}
@@ -174,6 +212,7 @@ type NoteCardsProps = {
   noteCards: NoteCardType[]
   activeNoteCard?: NoteCardType
   onCardsReorder: (arg: { oldIndex: number; newIndex: number }) => any
+  onChangeToEnharmonicClick: (noteCard: NoteCardType) => any
   onEditClick: (noteCard: NoteCardType) => any
   onDeleteClick: (noteCard: NoteCardType) => any
   onCardDraggedOut: (noteCard: NoteCardType) => any
@@ -242,6 +281,7 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
       children,
       onEditClick,
       onDeleteClick,
+      onChangeToEnharmonicClick,
       noteCards,
       activeNoteCard,
     } = this.props
@@ -261,6 +301,7 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
         onSortStart={this.handleSortStart}
         onEditClick={onEditClick}
         onDeleteClick={onDeleteClick}
+        onChangeToEnharmonicClick={onChangeToEnharmonicClick}
         axis="xy"
         children={children}
       />

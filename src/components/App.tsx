@@ -418,6 +418,13 @@ class App extends React.Component<{}, AppState> {
     })
   }
 
+  private handleChangeNoteCardToEnharmonicClick = (noteCard: NoteCardType) => {
+    this.updateNoteCard({
+      noteCardId: noteCard.id,
+      noteName: tonal.Note.enharmonic(noteCard.noteName),
+    })
+  }
+
   private handleDeleteCardClick = (noteCard: NoteCardType) =>
     this.deleteNoteCard(noteCard)
 
@@ -506,9 +513,9 @@ class App extends React.Component<{}, AppState> {
     })
   }
 
-  private handleNoteClickInNoteCardEditingModal = ({ noteName }) => {
+  private updateNoteCard = ({ noteCardId, noteName }) => {
     const newNoteCards = this.state.noteCards.map(noteCard => {
-      if (noteCard !== this.state.noteEditingModalNoteCard) {
+      if (noteCard.id !== noteCardId) {
         return noteCard
       }
 
@@ -526,11 +533,25 @@ class App extends React.Component<{}, AppState> {
       {
         noteCards: newNoteCards,
         noteCardsById: _.keyBy(newNoteCards, 'id'),
-        noteEditingModalIsOpen: false,
-        noteEditingModalNoteCard: undefined,
       },
       this.onNotesUpdated,
     )
+  }
+
+  private handleNoteClickInNoteCardEditingModal = ({ noteName }) => {
+    if (!this.state.noteEditingModalNoteCard) {
+      return
+    }
+
+    this.updateNoteCard({
+      noteCardId: this.state.noteEditingModalNoteCard.id,
+      noteName,
+    })
+
+    this.setState({
+      noteEditingModalIsOpen: false,
+      noteEditingModalNoteCard: undefined,
+    })
   }
 
   private handleArpeggioModifierModalConfirm = ({
@@ -788,6 +809,9 @@ class App extends React.Component<{}, AppState> {
                       <NoteCards
                         noteCards={noteCards}
                         activeNoteCard={activeNoteCard}
+                        onChangeToEnharmonicClick={
+                          this.handleChangeNoteCardToEnharmonicClick
+                        }
                         onEditClick={this.handleEditCardClick}
                         onDeleteClick={this.handleDeleteCardClick}
                         onCardsReorder={this.handleCardsReorder}
