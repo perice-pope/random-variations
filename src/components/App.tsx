@@ -924,16 +924,18 @@ class App extends React.Component<{}, AppState> {
                     onSubmit={this.handleNoteClickInNoteCardAddingModal}
                   />
 
-                  <PickNoteModal
-                    isOpen={this.state.noteEditingModalIsOpen}
-                    noteName={
-                      this.state.noteEditingModalNoteCard
-                        ? this.state.noteEditingModalNoteCard.noteName
-                        : undefined
-                    }
-                    onClose={this.closeNoteEditingModal}
-                    onSubmit={this.handleNoteClickInNoteCardEditingModal}
-                  />
+                  {this.state.noteEditingModalIsOpen && (
+                    <PickNoteModal
+                      isOpen
+                      noteName={
+                        this.state.noteEditingModalNoteCard
+                          ? this.state.noteEditingModalNoteCard.noteName
+                          : undefined
+                      }
+                      onClose={this.closeNoteEditingModal}
+                      onSubmit={this.handleNoteClickInNoteCardEditingModal}
+                    />
+                  )}
                 </Flex>
               </MeasureScreenSize>
             </>
