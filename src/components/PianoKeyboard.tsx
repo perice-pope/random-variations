@@ -202,25 +202,43 @@ class PianoKeyboard extends React.Component<
                 position: absolute;
                 bottom: 0;
                 top: 0;
+
+                -webkit-tap-highlight-color: rgba(0,0,0,0);
+                -webkit-tap-highlight-color: transparent;
                 
                 .vf-note-label {
                   opacity: 0;
                 }
 
                 &:hover {
+                  border: none;
+
+                  &.ReactPiano__Key--natural {
+                    background: #f6f5f3;
+                    border: 1px solid #888;
+                  }
+
+                  &.ReactPiano__Key--accidental {
+                    background: #555;
+                    border: 1px solid #fff;
+                  }
+
                   .vf-key-overlay {
                     background-color: ${rgba('salmon', 0.1)};
                   }
                 }
 
                 &.ReactPiano__Key--active {
+                  border: none;
 
                   &.ReactPiano__Key--natural {
-                    background-color: #f6f5f3;
+                    background: #f6f5f3;
+                    border: 1px solid #888;
                   }
 
                   &.ReactPiano__Key--accidental {
-                    background-color: #555;
+                    background: #555;
+                    border: 1px solid #fff;
                   }
 
                   .vf-key-overlay {
