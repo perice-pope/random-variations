@@ -78,6 +78,7 @@ type AppState = {
   audioFontId: AudioFontId
   enharmonicFlatsMap: EnharmonicFlatsMap
 
+  noteCardWithMouseOver?: NoteCardType
   noteCards: NoteCardType[]
   noteCardsById: { [noteCardId: string]: NoteCardType }
   staffTicks: StaffTick[]
@@ -419,6 +420,14 @@ class App extends React.Component<{}, AppState> {
     audioEngine.playNote({ midi: tonal.Note.midi('C4') }, 0, 0.5)
   }
 
+  private handleMouseOverNoteCard = (noteCard: NoteCardType) => {
+    this.setState({ noteCardWithMouseOver: noteCard })
+  }
+
+  private handleMouseLeaveNoteCard = () => {
+    this.setState({ noteCardWithMouseOver: undefined })
+  }
+
   private handleEditCardClick = (noteCard: NoteCardType) => {
     this.setState({
       noteEditingModalIsOpen: true,
@@ -678,6 +687,7 @@ class App extends React.Component<{}, AppState> {
       isPlaying,
       activeNoteCardIndex,
       activeStaffTickIndex,
+      noteCardWithMouseOver,
     } = this.state
 
     const activeNoteCard = isPlaying
@@ -691,6 +701,9 @@ class App extends React.Component<{}, AppState> {
       ? staffTicksPerCard[activeNoteCard.id]
       : undefined
 
+    const noteCardWithMouseOverTicks = noteCardWithMouseOver
+      ? staffTicksPerCard[noteCardWithMouseOver.id]
+      : undefined
     return (
       <ThemeProvider theme={theme}>
         <AudioEngineContext.Provider value={audioEngine}>
@@ -829,6 +842,8 @@ class App extends React.Component<{}, AppState> {
                         onChangeToEnharmonicClick={
                           this.handleChangeNoteCardToEnharmonicClick
                         }
+                        onMouseOver={this.handleMouseOverNoteCard}
+                        onMouseLeave={this.handleMouseLeaveNoteCard}
                         onEditClick={this.handleEditCardClick}
                         onDeleteClick={this.handleDeleteCardClick}
                         onCardsReorder={this.handleCardsReorder}
@@ -921,15 +936,27 @@ class App extends React.Component<{}, AppState> {
                                 t.notes.map(n => n.midi),
                               ),
                             )
-                          : undefined
+                          : noteCardWithMouseOverTicks
+                            ? _.flatten(
+                                noteCardWithMouseOverTicks.map(t =>
+                                  t.notes.map(n => n.midi),
+                                ),
+                              )
+                            : undefined
                       }
                       primaryNotesMidi={
                         activeStaffTick
                           ? activeStaffTick.notes.map(n => n.midi)
-                          : undefined
+                          : noteCardWithMouseOver
+                            ? [noteCardWithMouseOver.midi]
+                            : undefined
                       }
                       notesColor={
-                        activeNoteCard ? activeNoteCard.color : undefined
+                        activeNoteCard
+                          ? activeNoteCard.color
+                          : noteCardWithMouseOver
+                            ? noteCardWithMouseOver.color
+                            : undefined
                       }
                     />
                   </Box>

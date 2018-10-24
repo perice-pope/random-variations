@@ -133,7 +133,6 @@ const SortableNoteCard = SortableElement(
                 flex={1}
                 active={active}
                 bg={bgColor}
-                hoverBg={bgColor}
                 onClick={this.handleCardClick}
                 aria-owns={this.state.menuOpen ? menuId : undefined}
                 aria-haspopup="true"
@@ -159,6 +158,8 @@ const SortableNotesContainer = SortableContainer(
     onChangeToEnharmonicClick,
     onEditClick,
     onDeleteClick,
+    onMouseOver,
+    onMouseLeave,
   }) => {
     let backgroundColor = 'transparent'
     if (isDraggingOutOfContainer) {
@@ -196,6 +197,16 @@ const SortableNotesContainer = SortableContainer(
                 onChangeToEnharmonicClick(noteCard)
               }
               onDeleteClick={() => onDeleteClick(noteCard)}
+              onMouseOver={() => {
+                if (onMouseOver) {
+                  onMouseOver(noteCard)
+                }
+              }}
+              onMouseLeave={() => {
+                if (onMouseLeave) {
+                  onMouseLeave(noteCard)
+                }
+              }}
             >
               {noteCard.text}
             </SortableNoteCard>
@@ -212,6 +223,9 @@ const DRAG_AND_DROP_TRANSITION_DURATION_MS = 300
 type NoteCardsProps = {
   noteCards: NoteCardType[]
   activeNoteCard?: NoteCardType
+  buttonProps?: any
+  onMouseOver?: (noteCard: NoteCardType) => any
+  onMouseLeave?: (noteCard: NoteCardType) => any
   onCardsReorder: (arg: { oldIndex: number; newIndex: number }) => any
   onChangeToEnharmonicClick: (noteCard: NoteCardType) => any
   onEditClick: (noteCard: NoteCardType) => any
@@ -285,6 +299,8 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
       onChangeToEnharmonicClick,
       noteCards,
       activeNoteCard,
+      onMouseOver,
+      onMouseLeave,
     } = this.props
 
     return (
@@ -297,6 +313,8 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
         transitionDuration={DRAG_AND_DROP_TRANSITION_DURATION_MS}
         activeNoteCard={activeNoteCard}
         items={noteCards}
+        onMouseOver={onMouseOver}
+        onMouseLeave={onMouseLeave}
         onSortEnd={this.handleSortEnd}
         onSortMove={this.handleSortMove}
         onSortStart={this.handleSortStart}
