@@ -15,6 +15,9 @@ type AnimationCallbackArg = {
 
 export type AnimationCallback = (arg: AnimationCallbackArg) => any
 
+// Needed to enable the webaudio in Safari and on iOS devices
+UnmuteButton({ tone: Tone })
+
 export default class AudioEngine {
   private loop: PlayableLoop = { ticks: [] }
   private bpm: number = 120
@@ -32,9 +35,6 @@ export default class AudioEngine {
   private isPlayingLoop: boolean = false
 
   constructor() {
-    // Needed to enable the webaudio in Safari and on iOS devices
-    UnmuteButton({ tone: Tone })
-
     Tone.Transport.loopEnd = `0:${this.loop.ticks.length}`
     Tone.Transport.loop = true
     Tone.Transport.bpm.value = this.bpm
