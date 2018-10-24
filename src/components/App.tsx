@@ -47,6 +47,8 @@ import {
   ChromaticApproachesType,
   PlayableLoopTick,
   PlayableLoop,
+  EnharmonicFlatsMap,
+  ChromaticNoteSharps,
 } from '../types'
 import PickNoteModal from './PickNoteModal'
 import ArpeggioModifierModal from './ArpeggioModifierModal'
@@ -74,6 +76,7 @@ type AppState = {
   isPlaying: boolean
 
   audioFontId: AudioFontId
+  enharmonicFlatsMap: EnharmonicFlatsMap
 
   noteCards: NoteCardType[]
   noteCardsById: { [noteCardId: string]: NoteCardType }
@@ -166,6 +169,10 @@ class App extends React.Component<{}, AppState> {
         rests: 1,
         noteCards,
         noteCardsById,
+        enharmonicFlatsMap: {
+          'C#': true,
+          'D#': true,
+        },
 
         // Screen size
         height: 0,
@@ -275,6 +282,7 @@ class App extends React.Component<{}, AppState> {
         bpm: this.state.bpm,
         rests: this.state.rests,
         audioFontId: this.state.audioFontId,
+        enharmonicFlatsMap: this.state.enharmonicFlatsMap,
         noteCards: this.state.noteCards,
         modifiers: this.state.modifiers,
       }),
@@ -629,6 +637,15 @@ class App extends React.Component<{}, AppState> {
     )
   }
 
+  private handleEnharmonicMapToggle = (pitchName: ChromaticNoteSharps) => {
+    this.setState({
+      enharmonicFlatsMap: {
+        ...this.state.enharmonicFlatsMap,
+        [pitchName]: !Boolean(this.state.enharmonicFlatsMap[pitchName]),
+      },
+    })
+  }
+
   private handleNoteClickInNoteCardAddingModal = ({ noteName }) => {
     const newNoteCards = [
       ...this.state.noteCards,
@@ -946,6 +963,8 @@ class App extends React.Component<{}, AppState> {
                     isOpen={this.state.noteAddingModalIsOpen}
                     onClose={this.closeNoteAddingModal}
                     onSubmit={this.handleNoteClickInNoteCardAddingModal}
+                    enharmonicFlatsMap={this.state.enharmonicFlatsMap}
+                    onEnharmonicFlatsMapToggle={this.handleEnharmonicMapToggle}
                   />
 
                   {this.state.noteEditingModalIsOpen && (
@@ -958,6 +977,10 @@ class App extends React.Component<{}, AppState> {
                       }
                       onClose={this.closeNoteEditingModal}
                       onSubmit={this.handleNoteClickInNoteCardEditingModal}
+                      enharmonicFlatsMap={this.state.enharmonicFlatsMap}
+                      onEnharmonicFlatsMapToggle={
+                        this.handleEnharmonicMapToggle
+                      }
                     />
                   )}
                 </Flex>

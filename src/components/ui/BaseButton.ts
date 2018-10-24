@@ -8,16 +8,21 @@ import {
 } from '@material-ui/core/ButtonBase'
 
 import { BoxProps } from './Box'
+import { getLuminance, lighten, darken } from 'polished'
 
 export type BaseButtonProps = MuiButtonBaseProps &
   BoxProps &
   ss.JustifyContentProps & {
     outline?: string
     variant?: string
+    hoverColor?: string
+    hoverBg?: string
+    fontColor?: string
   }
 
 const StyledBaseButton = styled(MuiButtonBase, {
-  shouldForwardProp: isPropValid,
+  shouldForwardProp: prop =>
+    isPropValid || prop === 'variant' || prop === 'component',
 })<BaseButtonProps>`
   ${ss.color}
   ${ss.width}
@@ -41,8 +46,51 @@ const StyledBaseButton = styled(MuiButtonBase, {
   ${ss.justifyContent}
   cursor: pointer;
   user-select: none;
+
+  ${ss.style({
+    cssProperty: 'color',
+    prop: 'fontColor',
+    key: 'colors',
+  })};
+
+  transition: background-color 200ms;
+
+  &:hover,
+  &:focus {
+    ${ss.style({
+      cssProperty: 'color',
+      prop: 'hoverColor',
+      key: 'colors',
+    })};
+    ${ss.style({
+      cssProperty: 'background-color',
+      prop: 'hoverBg',
+      key: 'colors',
+    })};
+  }
 `
 
-const enhance = recompose.compose(recompose.setDisplayName('BaseButton'))
+const enhance = recompose.compose(
+  recompose.setDisplayName('BaseButton'),
+  recompose.mapProps((props: BaseButtonProps) => {
+    const newProps: BaseButtonProps = {}
+
+    if (props.bg && !props.hoverBg) {
+      newProps.hoverBg =
+        getLuminance(props.bg as string) < 0.3
+          ? lighten(0.1, props.bg as string)
+          : darken(0.1, props.bg as string)
+    }
+
+    if (!props.fontColor && props.bg) {
+      newProps.fontColor =
+        getLuminance(props.bg as string) < 0.4 ? 'white' : 'black'
+    }
+    return {
+      ...props,
+      ...newProps,
+    }
+  }),
+)
 
 export const BaseButton = enhance(StyledBaseButton) as typeof StyledBaseButton

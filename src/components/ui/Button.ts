@@ -62,7 +62,7 @@ const ButtonStyled = styled(MuiButton, {
       key: 'colors',
     })};
     ${ss.style({
-      cssProperty: 'backgroundColor',
+      cssProperty: 'background-color',
       prop: 'hoverBg',
       key: 'colors',
     })};

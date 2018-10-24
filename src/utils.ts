@@ -1,4 +1,4 @@
-import { darken, lighten } from 'polished'
+import { mix } from 'polished'
 import * as tonal from 'tonal'
 import { arrayMove as reactHocArrayMove } from 'react-sortable-hoc'
 
@@ -16,7 +16,7 @@ export function shuffle(array: any[]) {
 
 export const arrayMove = reactHocArrayMove
 
-const NOTE_NAME_TO_COLOR_MAP = {
+const NoteNameToColorMap = {
   A: '#D783FF',
   B: '#0096FF',
   C: '#8EFA00',
@@ -26,16 +26,41 @@ const NOTE_NAME_TO_COLOR_MAP = {
   G: '#FF5097',
 }
 
+const baseNotes = Object.keys(NoteNameToColorMap)
+
+const getNextNoteLetter = (letter: string) => {
+  if (letter === 'G') {
+    return 'A'
+  }
+  return String.fromCharCode(letter.charCodeAt(0) + 1)
+}
+
+const getPrevNoteLetter = (letter: string) => {
+  if (letter === 'A') {
+    return 'G'
+  }
+  return String.fromCharCode(letter.charCodeAt(0) - 1)
+}
+
+baseNotes.forEach(baseNote => {
+  const nextLetter = getNextNoteLetter(baseNote)
+  const prevLetter = getPrevNoteLetter(baseNote)
+  NoteNameToColorMap[`${baseNote}#`] = mix(
+    0.6,
+    NoteNameToColorMap[baseNote],
+    NoteNameToColorMap[nextLetter],
+  )
+  NoteNameToColorMap[`${baseNote}b`] = mix(
+    0.6,
+    NoteNameToColorMap[baseNote],
+    NoteNameToColorMap[prevLetter],
+  )
+})
+
 /**
  * @param fullNoteName Full note name, e.g. "C#4"
  */
 export const getNoteCardColorByNoteName = (fullNoteName: string) => {
-  const [letter, accidental] = tonal.Note.tokenize(fullNoteName)
-  const baseColor = NOTE_NAME_TO_COLOR_MAP[letter.toUpperCase()]
-  if (accidental === '#') {
-    return lighten(0.1, baseColor)
-  } else if (accidental === 'b') {
-    return darken(0.1, baseColor)
-  }
-  return baseColor
+  const pitchName = tonal.Note.pc(fullNoteName)
+  return NoteNameToColorMap[pitchName]
 }

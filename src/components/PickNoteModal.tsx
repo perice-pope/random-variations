@@ -14,22 +14,31 @@ import withMobileDialog, {
   InjectedProps,
 } from '@material-ui/core/withMobileDialog'
 
-import { Flex, Box, Button } from './ui'
+import { Flex, Box, BaseButton, Paper } from './ui'
 
 import { getNoteCardColorByNoteName } from '../utils'
+import { EnharmonicFlatsMap, ChromaticNoteSharps } from 'src/types'
+import { css } from 'emotion'
+import { lighten } from 'polished'
+import { withAudioEngine } from './withAudioEngine'
+import AudioEngine from './services/audioEngine'
 
 const chromaticNotes = TonalRange.chromatic(['C4', 'B4'], true)
 
 type PickNoteModalProps = {
+  audioEngine: AudioEngine
   isOpen: boolean
+  enharmonicFlatsMap: EnharmonicFlatsMap
   onClose: () => any
   onSubmit: (args: { noteName: string }) => any
+  onEnharmonicFlatsMapToggle?: (notePitch: ChromaticNoteSharps) => any
   noteName?: string
 }
 
 type PickNoteModalState = {
   noteName?: string
-  notePitchClass?: string
+  notePitchName?: string
+  enharmonicFlatsMap: EnharmonicFlatsMap
 }
 
 // @ts-ignore
@@ -41,7 +50,8 @@ class PickNoteModal extends React.Component<
     super(props)
     this.state = {
       noteName: props.noteName,
-      notePitchClass: tonal.Note.pc(props.noteName),
+      notePitchName: tonal.Note.pc(props.noteNameWithSharp),
+      enharmonicFlatsMap: this.props.enharmonicFlatsMap,
     }
   }
 
@@ -51,8 +61,39 @@ class PickNoteModal extends React.Component<
     }
   }
 
-  onNoteSelected = noteName => {
-    this.setState({ noteName, notePitchClass: tonal.Note.pc(noteName) })
+  onNoteSelected = (noteName: string) => {
+    const noteEnharmonicName = tonal.Note.enharmonic(noteName)
+
+    if (noteName !== noteEnharmonicName && this.state.noteName === noteName) {
+      // This is a second click on a card with "enharmonic-capable" note...
+      // this.props.onEnharmonicChange(noteNameWithSharp)
+      const noteNameWithSharp = noteName.includes('#')
+        ? noteName
+        : noteEnharmonicName
+      const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)
+
+      this.setState({
+        noteName: noteEnharmonicName,
+        notePitchName: tonal.Note.pc(noteEnharmonicName),
+        enharmonicFlatsMap: {
+          ...this.state.enharmonicFlatsMap,
+          [notePitchWithSharp]: !Boolean(
+            this.state.enharmonicFlatsMap[notePitchWithSharp],
+          ),
+        },
+      })
+
+      if (this.props.onEnharmonicFlatsMapToggle) {
+        this.props.onEnharmonicFlatsMapToggle(notePitchWithSharp)
+      }
+
+      return
+    }
+
+    this.setState({
+      noteName: noteName,
+      notePitchName: tonal.Note.pc(noteName),
+    })
   }
 
   render() {
@@ -64,35 +105,71 @@ class PickNoteModal extends React.Component<
         aria-labelledby="pick-note-dialog"
       >
         <DialogTitle id="pick-note-dialog">Pick a note</DialogTitle>
-        <DialogContent>
-          <Flex flexDirection="column" alignItems="center">
+        <DialogContent
+          className={css({ display: 'flex', alignItems: 'center' })}
+        >
+          <Flex flexDirection="column" alignItems="center" width={1} flex={1}>
             <Flex flexWrap="wrap" flex={1}>
-              {chromaticNotes.map(noteName => {
+              {chromaticNotes.map(noteNameWithSharp => {
+                const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)
+
+                const shouldUseFlat =
+                  this.state.enharmonicFlatsMap[notePitchWithSharp] === true
+
+                const noteName = shouldUseFlat
+                  ? tonal.Note.enharmonic(noteNameWithSharp)
+                  : noteNameWithSharp
+
+                const notePitch = tonal.Note.pc(noteName)
+
+                const isSelected = notePitch === this.state.notePitchName
+                const bgColor = getNoteCardColorByNoteName(noteName)
+
                 return (
-                  <Box key={noteName} width={1 / 4} p={[1, 2, 2]}>
-                    <Button
+                  <Box key={noteNameWithSharp} width={1 / 4} p={[1, 2, 2]}>
+                    <BaseButton
+                      // @ts-ignore
+                      component={Paper}
+                      fontWeight="bold"
+                      fontSize={[2, 3, 3]}
+                      p={[2, 2, 3]}
                       borderRadius={15}
-                      border={
-                        tonal.Note.pc(noteName) === this.state.notePitchClass
-                          ? '4px solid red'
-                          : '4px solid transparent'
-                      }
+                      className={css({
+                        transition: '0.3s transform, background',
+                        transform: isSelected ? 'scale(1.2)' : 'none',
+                      })}
                       width={1}
-                      bg={getNoteCardColorByNoteName(noteName)}
-                      onClick={() => this.onNoteSelected(noteName)}
+                      bg={isSelected ? lighten(0.05, bgColor) : bgColor}
+                      onClick={() => {
+                        this.onNoteSelected(noteName)
+                        this.props.audioEngine.playNote(
+                          {
+                            midi: tonal.Note.midi(noteName),
+                          },
+                          0,
+                          1.0,
+                        )
+                      }}
                     >
-                      {tonal.Note.pc(noteName)}
-                    </Button>
+                      {notePitch}
+                    </BaseButton>
                   </Box>
                 )
               })}
             </Flex>
 
-            <Box mt={[3, 3, 3]} width={1}>
+            <Box mt={4} width={1}>
               <PianoKeyboard
                 height={100}
                 onPlayNote={midiNote => {
-                  this.onNoteSelected(tonal.Note.fromMidi(midiNote, true))
+                  const noteNameWithSharp = tonal.Note.fromMidi(midiNote, true)
+                  const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)
+                  const noteName = this.state.enharmonicFlatsMap[
+                    notePitchWithSharp
+                  ]
+                    ? tonal.Note.enharmonic(noteNameWithSharp)
+                    : noteNameWithSharp
+                  this.onNoteSelected(noteName)
                 }}
                 primaryNotesMidi={
                   this.state.noteName
@@ -126,4 +203,6 @@ class PickNoteModal extends React.Component<
   }
 }
 
-export default withMobileDialog<PickNoteModalProps>()(PickNoteModal)
+export default withAudioEngine(
+  withMobileDialog<PickNoteModalProps>()(PickNoteModal),
+)

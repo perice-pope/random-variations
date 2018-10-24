@@ -113,6 +113,9 @@ const SortableNoteCard = SortableElement(
                 open={this.state.menuOpen}
                 onClose={this.closeMenu}
               >
+                <MenuItem autoFocus onClick={this.handleEditClick}>
+                  Edit
+                </MenuItem>
                 {shouldShowChangeToEnharmonic && (
                   <MenuItem
                     autoFocus
@@ -124,9 +127,6 @@ const SortableNoteCard = SortableElement(
                     </Text>
                   </MenuItem>
                 )}
-                <MenuItem autoFocus onClick={this.handleEditClick}>
-                  Edit
-                </MenuItem>
                 <MenuItem onClick={this.handleDeleteClick}>Remove</MenuItem>
               </Menu>
               <NoteCard

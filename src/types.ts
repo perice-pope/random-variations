@@ -2,6 +2,10 @@ export interface PlayableNote {
   midi: number
 }
 
+export type ChromaticNoteSharps = 'A#' | 'C#' | 'D#' | 'F#' | 'G#'
+
+export type EnharmonicFlatsMap = { [key in ChromaticNoteSharps]: boolean }
+
 export interface PlayableLoopTick {
   // If empty, it represents a break
   notes: PlayableNote[]
