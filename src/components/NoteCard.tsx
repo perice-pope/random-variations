@@ -1,46 +1,53 @@
 import * as React from 'react'
 import styled from 'react-emotion'
 import * as recompose from 'recompose'
-import { lighten } from 'polished'
 
-import ButtonBase from '@material-ui/core/ButtonBase'
-import { Paper, PaperProps } from './ui'
+// import ButtonBase from '@material-ui/core/ButtonBase'
+import { BaseButton, Paper, PaperProps, BaseButtonProps } from './ui'
+import { lighten, saturate } from 'polished'
 
 type NoteCardProps = {
-  bgColor: string
   active: boolean
-}
+} & BaseButtonProps
 
 const enhance = recompose.compose(
   recompose.setDisplayName('NoteCard'),
   recompose.defaultProps({
-    bgColor: 'white',
+    bg: 'white',
   }),
 )
+
+type NoteCardButtonProps = {
+  active: boolean
+} & BaseButtonProps
+
+const NoteCardButton = styled(BaseButton)<NoteCardButtonProps>`
+  transition: all 200ms;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  transform: ${({ active }) => (active ? 'scale(1.2)' : 'none')};
+
+  background-color: ${({ active, bg }) =>
+    active ? saturate(0.2, lighten(0.07, bg as string)) : bg};
+`
 
 const BoxWithTouchRipple: React.SFC<PaperProps & { children?: any }> = ({
   children,
   ...props
 }) => (
   // @ts-ignore
-  <ButtonBase {...props} component={Paper}>
+  <NoteCardButton {...props} component={Paper}>
     {children}
-  </ButtonBase>
+  </NoteCardButton>
 )
 
 const NoteCard = styled(BoxWithTouchRipple)<NoteCardProps>`
-  transition: all 300ms;
-
   display: inline-flex;
   cursor: pointer;
 
-  &:hover {
-    transform: scale(1.1);
-  }
-
-  background-color: ${({ bgColor, active }) =>
-    active ? lighten(0.13, bgColor) : bgColor};
-  transform: ${({ active }) => (active ? 'scale(1.2)' : 'none')};
   align-items: center;
   justify-content: center;
 

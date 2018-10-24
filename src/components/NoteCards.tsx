@@ -132,7 +132,8 @@ const SortableNoteCard = SortableElement(
               <NoteCard
                 flex={1}
                 active={active}
-                bgColor={bgColor}
+                bg={bgColor}
+                hoverBg={bgColor}
                 onClick={this.handleCardClick}
                 aria-owns={this.state.menuOpen ? menuId : undefined}
                 aria-haspopup="true"

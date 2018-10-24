@@ -18,6 +18,7 @@ export type BaseButtonProps = MuiButtonBaseProps &
     hoverColor?: string
     hoverBg?: string
     fontColor?: string
+    transform?: string
   }
 
 const StyledBaseButton = styled(MuiButtonBase, {
@@ -53,8 +54,6 @@ const StyledBaseButton = styled(MuiButtonBase, {
     key: 'colors',
   })};
 
-  transition: background-color 200ms;
-
   &:hover,
   &:focus {
     ${ss.style({
@@ -79,7 +78,7 @@ const enhance = recompose.compose(
       newProps.hoverBg =
         getLuminance(props.bg as string) < 0.3
           ? lighten(0.1, props.bg as string)
-          : darken(0.1, props.bg as string)
+          : darken(0.05, props.bg as string)
     }
 
     if (!props.fontColor && props.bg) {

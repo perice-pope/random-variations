@@ -14,7 +14,7 @@ import withMobileDialog, {
   InjectedProps,
 } from '@material-ui/core/withMobileDialog'
 
-import { Flex, Box, BaseButton, Paper } from './ui'
+import { Flex, Box, BaseButton, Paper, BaseButtonProps } from './ui'
 
 import { getNoteCardColorByNoteName } from '../utils'
 import { EnharmonicFlatsMap, ChromaticNoteSharps } from 'src/types'
@@ -22,6 +22,7 @@ import { css } from 'emotion'
 import { lighten } from 'polished'
 import { withAudioEngine } from './withAudioEngine'
 import AudioEngine from './services/audioEngine'
+import styled from 'react-emotion'
 
 const chromaticNotes = TonalRange.chromatic(['C4', 'B4'], true)
 
@@ -41,6 +42,20 @@ type PickNoteModalState = {
   enharmonicFlatsMap: EnharmonicFlatsMap
 }
 
+type NoteButtonProps = {
+  active: boolean
+} & BaseButtonProps
+
+const NoteButton = styled(BaseButton)<NoteButtonProps>`
+  transition: all 200ms;
+  transform: ${({ active }) => (active ? 'scale(1.2)' : 'none')};
+
+  background-color: ${({ active, bg }) =>
+    active ? lighten(0.1, bg as string) : bg};
+
+  ${({ active, bg }) => (active ? lighten(0.1, bg as string) : bg)};
+`
+
 // @ts-ignore
 class PickNoteModal extends React.Component<
   PickNoteModalProps & InjectedProps,
@@ -50,7 +65,7 @@ class PickNoteModal extends React.Component<
     super(props)
     this.state = {
       noteName: props.noteName,
-      notePitchName: tonal.Note.pc(props.noteNameWithSharp),
+      notePitchName: tonal.Note.pc(props.noteName),
       enharmonicFlatsMap: this.props.enharmonicFlatsMap,
     }
   }
@@ -127,19 +142,17 @@ class PickNoteModal extends React.Component<
 
                 return (
                   <Box key={noteNameWithSharp} width={1 / 4} p={[1, 2, 2]}>
-                    <BaseButton
+                    <NoteButton
                       // @ts-ignore
                       component={Paper}
+                      active={isSelected}
                       fontWeight="bold"
                       fontSize={[2, 3, 3]}
                       p={[2, 2, 3]}
+                      bg={bgColor}
+                      hoverBg={isSelected ? bgColor : undefined}
                       borderRadius={15}
-                      className={css({
-                        transition: '0.3s transform, background',
-                        transform: isSelected ? 'scale(1.2)' : 'none',
-                      })}
                       width={1}
-                      bg={isSelected ? lighten(0.05, bgColor) : bgColor}
                       onClick={() => {
                         this.onNoteSelected(noteName)
                         this.props.audioEngine.playNote(
@@ -152,7 +165,7 @@ class PickNoteModal extends React.Component<
                       }}
                     >
                       {notePitch}
-                    </BaseButton>
+                    </NoteButton>
                   </Box>
                 )
               })}

@@ -66,6 +66,7 @@ const ButtonStyled = styled(MuiButton, {
       prop: 'hoverBg',
       key: 'colors',
     })};
+  }
 `
 
 export const Button = recompose.compose(
