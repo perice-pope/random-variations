@@ -5,11 +5,14 @@ import * as TonalRange from 'tonal-range'
 
 import PianoKeyboard from './PianoKeyboard'
 
-import { default as MuButton } from '@material-ui/core/Button'
+import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogTitle from '@material-ui/core/DialogTitle'
+import PlusIcon from '@material-ui/icons/Add'
+import MinusIcon from '@material-ui/icons/Remove'
 import withMobileDialog, {
   InjectedProps,
 } from '@material-ui/core/withMobileDialog'
@@ -24,8 +27,6 @@ import { withAudioEngine } from './withAudioEngine'
 import AudioEngine from '../services/audioEngine'
 import styled from 'react-emotion'
 
-const chromaticNotes = TonalRange.chromatic(['C4', 'B4'], true)
-
 type PickNoteModalProps = {
   audioEngine: AudioEngine
   isOpen: boolean
@@ -39,7 +40,10 @@ type PickNoteModalProps = {
 type PickNoteModalState = {
   noteName?: string
   notePitchName?: string
+  octave?: number
   enharmonicFlatsMap: EnharmonicFlatsMap
+
+  noteNameMouseOver?: string
 }
 
 type NoteButtonProps = {
@@ -65,9 +69,33 @@ class PickNoteModal extends React.Component<
     super(props)
     this.state = {
       noteName: props.noteName,
-      notePitchName: tonal.Note.pc(props.noteName),
+      octave: props.noteName ? tonal.Note.oct(props.noteName) : 4,
+      notePitchName: props.noteName ? tonal.Note.pc(props.noteName) : undefined,
       enharmonicFlatsMap: this.props.enharmonicFlatsMap,
     }
+  }
+
+  getNoteRange = noteName => {
+    const octave = noteName ? tonal.Note.oct(noteName) : 4
+    const firstNote = octave === 1 ? `C${octave}` : `A${octave - 1}`
+    const lastNote = octave === 6 ? `B${octave}` : `D${octave + 1}`
+    const noteRange = {
+      first: tonal.Note.midi(firstNote),
+      last: tonal.Note.midi(lastNote),
+    }
+    return noteRange
+  }
+
+  setNoteNameMouseOver = noteName => {
+    this.setState({ noteNameMouseOver: noteName })
+  }
+
+  handleIncreaseOctave = () => {
+    this.setOctave(this.state.octave != null ? this.state.octave + 1 : 1)
+  }
+
+  handleDecreaseOctave = () => {
+    this.setOctave(this.state.octave != null ? this.state.octave - 1 : 6)
   }
 
   submit = () => {
@@ -76,7 +104,52 @@ class PickNoteModal extends React.Component<
     }
   }
 
-  onNoteSelected = (noteName: string) => {
+  private handleOctaveChange = e => {
+    let octaveValue = this.state.octave
+    try {
+      if (!e.target.value) {
+        octaveValue = undefined
+      } else {
+        octaveValue = parseInt(e.target.value, 10)
+        if (isNaN(octaveValue)) {
+          octaveValue = undefined
+        } else if (octaveValue < 1) {
+          octaveValue = 1
+        } else if (octaveValue > 6) {
+          octaveValue = 6
+        }
+      }
+    } finally {
+      console.log('TCL: octaveValue', octaveValue)
+      this.setOctave(octaveValue)
+    }
+  }
+
+  private setOctave = octave => {
+    const octaveValue =
+      octave != null ? Math.max(1, Math.min(octave, 6)) : undefined
+
+    if (octaveValue != null && this.state.noteName != null) {
+      const newNoteName = `${tonal.Note.pc(this.state.noteName)}${octaveValue}`
+      this.onNoteSelected(newNoteName)
+    } else {
+      this.setState({
+        octave: octaveValue,
+      })
+    }
+  }
+
+  onNoteSelected = (noteName?: string) => {
+    if (!noteName) {
+      this.setState({
+        noteName: undefined,
+        notePitchName: undefined,
+        octave: undefined,
+      })
+      return
+    }
+
+    console.log('TCL: onNoteSelected -> noteName', noteName)
     const noteEnharmonicName = tonal.Note.enharmonic(noteName)
 
     if (noteName !== noteEnharmonicName && this.state.noteName === noteName) {
@@ -89,6 +162,7 @@ class PickNoteModal extends React.Component<
 
       this.setState({
         noteName: noteEnharmonicName,
+        octave: tonal.Note.oct(noteEnharmonicName),
         notePitchName: tonal.Note.pc(noteEnharmonicName),
         enharmonicFlatsMap: {
           ...this.state.enharmonicFlatsMap,
@@ -102,16 +176,39 @@ class PickNoteModal extends React.Component<
         this.props.onEnharmonicFlatsMapToggle(notePitchWithSharp)
       }
 
+      this.props.audioEngine.playNote(
+        {
+          midi: tonal.Note.midi(noteName),
+        },
+        0,
+        1.0,
+      )
+
       return
     }
 
+    this.props.audioEngine.playNote(
+      {
+        midi: tonal.Note.midi(noteName),
+      },
+      0,
+      1.0,
+    )
+
     this.setState({
       noteName: noteName,
+      octave: tonal.Note.oct(noteName),
       notePitchName: tonal.Note.pc(noteName),
     })
   }
 
   render() {
+    const octaveOrDefault = this.state.octave || 4
+    const noteNames = TonalRange.chromatic(
+      [`C${octaveOrDefault}`, `B${octaveOrDefault}`],
+      true,
+    )
+
     return (
       <Dialog
         fullScreen={this.props.fullScreen}
@@ -125,7 +222,7 @@ class PickNoteModal extends React.Component<
         >
           <Flex flexDirection="column" alignItems="center" width={1} flex={1}>
             <Flex flexWrap="wrap" flex={1}>
-              {chromaticNotes.map(noteNameWithSharp => {
+              {noteNames.map(noteNameWithSharp => {
                 const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)
 
                 const shouldUseFlat =
@@ -150,18 +247,13 @@ class PickNoteModal extends React.Component<
                       fontSize={[2, 3, 3]}
                       p={[2, 2, 3]}
                       bg={bgColor}
+                      onMouseOver={() => this.setNoteNameMouseOver(noteName)}
+                      onMouseLeave={() => this.setNoteNameMouseOver(undefined)}
                       hoverBg={isSelected ? bgColor : undefined}
                       borderRadius={15}
                       width={1}
                       onClick={() => {
                         this.onNoteSelected(noteName)
-                        this.props.audioEngine.playNote(
-                          {
-                            midi: tonal.Note.midi(noteName),
-                          },
-                          0,
-                          1.0,
-                        )
                       }}
                     >
                       {notePitch}
@@ -171,9 +263,52 @@ class PickNoteModal extends React.Component<
               })}
             </Flex>
 
+            <Flex alignItems="center">
+              <Button
+                variant="fab"
+                color="default"
+                onClick={this.handleDecreaseOctave}
+                disabled={this.state.octave == null || this.state.octave === 1}
+              >
+                <MinusIcon />
+              </Button>
+              <TextField
+                className={css({
+                  maxWidth: '80px',
+                  marginTop: '1rem',
+                  marginLeft: '1rem',
+                  marginRight: '1rem',
+                })}
+                InputLabelProps={{
+                  className: css({ fontSize: '1.2rem' }),
+                }}
+                InputProps={{
+                  className: css({ fontSize: '2rem' }),
+                }}
+                label="Octave"
+                id="bpm"
+                type="number"
+                // @ts-ignore
+                step="1"
+                min="1"
+                max="6"
+                value={`${this.state.octave}`}
+                onChange={this.handleOctaveChange}
+              />
+              <Button
+                variant="fab"
+                color="default"
+                onClick={this.handleIncreaseOctave}
+                disabled={this.state.octave == null || this.state.octave === 6}
+              >
+                <PlusIcon />
+              </Button>
+            </Flex>
+
             <Box mt={4} width={1}>
               <PianoKeyboard
                 height={100}
+                noteRange={this.getNoteRange(this.state.noteName)}
                 onPlayNote={midiNote => {
                   const noteNameWithSharp = tonal.Note.fromMidi(midiNote, true)
                   const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)
@@ -189,9 +324,17 @@ class PickNoteModal extends React.Component<
                     ? [tonal.Note.midi(this.state.noteName)]
                     : undefined
                 }
+                secondaryNotesMidi={
+                  this.state.noteNameMouseOver
+                    ? [tonal.Note.midi(this.state.noteNameMouseOver)]
+                    : undefined
+                }
                 notesColor={
-                  this.state.noteName
-                    ? getNoteCardColorByNoteName(this.state.noteName)
+                  this.state.noteName || this.state.noteNameMouseOver
+                    ? getNoteCardColorByNoteName(
+                        // @ts-ignore
+                        this.state.noteName || this.state.noteNameMouseOver,
+                      )
                     : undefined
                 }
               />
@@ -199,17 +342,17 @@ class PickNoteModal extends React.Component<
           </Flex>
         </DialogContent>
         <DialogActions>
-          <MuButton onClick={this.props.onClose} color="secondary">
+          <Button onClick={this.props.onClose} color="secondary">
             Cancel
-          </MuButton>
-          <MuButton
-            disabled={!this.state.noteName}
+          </Button>
+          <Button
+            disabled={!this.state.noteName || !this.state.octave}
             onClick={this.submit}
             color="primary"
             autoFocus
           >
             OK
-          </MuButton>
+          </Button>
         </DialogActions>
       </Dialog>
     )
