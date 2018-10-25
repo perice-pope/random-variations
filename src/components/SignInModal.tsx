@@ -35,17 +35,18 @@ class SignInModal extends React.Component<SignInModalProps & InjectedProps> {
     return (
       <Dialog
         open={this.props.isOpen}
+        fullScreen={this.props.fullScreen}
         onClose={this.props.onClose}
         aria-labelledby="sign-in-dialog"
       >
         <DialogTitle id="sign-in-dialog">Sign in</DialogTitle>
         <DialogContent>
           <Typography>
-            Please sign in or create a free account to use all our features:
+            Please sign in or create a free account to be able to:
             <ul>
-              <li>Saving your sessions</li>
-              <li>Sharing sessions with others</li>
-              <li>MIDI export</li>
+              <li>save your sessions</li>
+              <li>share sessions with others</li>
+              <li>export sessions as MIDI</li>
               <li>...and more!</li>
             </ul>
           </Typography>

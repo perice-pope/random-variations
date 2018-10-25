@@ -6,7 +6,6 @@ import {
   default as MuiButton,
   ButtonProps as MuiButtonProps,
 } from '@material-ui/core/Button'
-import theme from '../../styles/theme'
 import { BoxProps } from './Box'
 import { getLuminance, lighten, darken } from 'polished'
 
@@ -73,9 +72,6 @@ export const Button = recompose.compose(
   recompose.setDisplayName('Button'),
   recompose.defaultProps({
     variant: 'contained',
-    bg: theme.colors.lightGray,
-    p: [2, 2, 3],
-    fontSize: [2, 3, 3],
   }),
   recompose.mapProps((props: ButtonProps) => {
     const newProps: ButtonProps = {}

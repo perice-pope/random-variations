@@ -24,13 +24,14 @@ import PlayIcon from '@material-ui/icons/PlayArrow'
 import StopIcon from '@material-ui/icons/Stop'
 import ListIcon from '@material-ui/icons/List'
 import ShareIcon from '@material-ui/icons/Share'
+import SaveIcon from '@material-ui/icons/Save'
 import ArrowsIcon from '@material-ui/icons/Cached'
 import TextField from '@material-ui/core/TextField'
 import InputAdornment from '@material-ui/core/InputAdornment'
 
 import Chip from '@material-ui/core/Chip'
 
-import { Flex, Box, Button } from './ui'
+import { Flex, Box, Button, Text } from './ui'
 import NotesStaff from './NotesStaff'
 import MeasureScreenSize from './MeasureScreenSize'
 
@@ -67,7 +68,7 @@ import AudioEngine, { AnimationCallback } from '../services/audioEngine'
 import { AudioEngineContext } from './withAudioEngine'
 import firebase, { FirebaseContext, base } from 'src/services/firebase'
 import SignInModal from './SignInModal'
-import { CircularProgress } from '@material-ui/core'
+import { CircularProgress, Avatar } from '@material-ui/core'
 
 globalStyles()
 
@@ -75,6 +76,7 @@ console.log('All supported audio fonts: ', _.map(AudioFontsConfig, 'title'))
 console.log('All supported chord names: ', Chord.names())
 
 type SessionNoteCard = {
+  id: string
   noteName: string
 }
 
@@ -82,8 +84,8 @@ type SessionNoteCard = {
  * Persisted sharable session
  */
 type Session = {
-  key?: string
-  author: string
+  key: string
+  author?: string
   name: string
 
   createdAt: string
@@ -157,15 +159,19 @@ const createDefaultSession = () => {
     },
     noteCards: [
       {
+        id: uuid(),
         noteName: 'C4',
       },
       {
+        id: uuid(),
         noteName: 'G4',
       },
       {
+        id: uuid(),
         noteName: 'F4',
       },
       {
+        id: uuid(),
         noteName: 'D4',
       },
     ],
@@ -202,7 +208,7 @@ const audioEngine = new AudioEngine()
 
 const unpackSessionState = (session: Session) => {
   const noteCards = (session.noteCards || []).map(nc => ({
-    id: uuid(),
+    id: nc.id || uuid(),
     noteName: nc.noteName,
     text: tonal.Note.pc(nc.noteName),
     midi: tonal.Note.midi(nc.noteName),
@@ -230,69 +236,53 @@ class App extends React.Component<{}, AppState> {
   constructor(props) {
     super(props)
 
-    let restoredState: Partial<AppState> = {}
+    this.state = _.merge({
+      isInitialized: false,
+      isLoadingAudioFont: false,
+      audioFontId: AudioFontsConfig[0].id,
 
-    const savedState = window.localStorage.getItem('appState')
-    if (savedState) {
-      try {
-        restoredState = JSON.parse(savedState) as Partial<AppState>
-        console.log('restoredState = ', restoredState)
-      } catch (error) {
-        console.error(error)
-        window.localStorage.removeItem('appState')
-      }
-    }
+      sessionsById: {},
 
-    this.state = _.merge(
-      {
-        isInitialized: false,
-        isLoadingAudioFont: false,
-        audioFontId: AudioFontsConfig[0].id,
+      bpm: 120,
+      rests: 1,
+      noteCards: [],
+      noteCardsById: {},
+      enharmonicFlatsMap: {},
 
-        sessionsById: {},
+      // Screen size
+      height: 0,
+      width: 0,
+      notesStaffWidth: 0,
 
-        bpm: 120,
-        rests: 1,
-        noteCards: [],
-        noteCardsById: {},
-        enharmonicFlatsMap: {},
+      isPlaying: false,
+      staffTicks: [],
+      staffTicksPerCard: {},
+      activeNoteCardIndex: 0,
+      activeStaffTickIndex: 0,
 
-        // Screen size
-        height: 0,
-        width: 0,
-        notesStaffWidth: 0,
-
-        isPlaying: false,
-        staffTicks: [],
-        staffTicksPerCard: {},
-        activeNoteCardIndex: 0,
-        activeStaffTickIndex: 0,
-
-        modifiers: {
-          arpeggio: {
-            enabled: true,
-            direction: 'up',
-            type: 'M',
-          },
-          chromaticApproaches: {
-            enabled: false,
-            type: 'above',
-          },
+      modifiers: {
+        arpeggio: {
+          enabled: true,
+          direction: 'up',
+          type: 'M',
         },
-
-        signInModalIsOpen: false,
-        isSignedIn: false,
-
-        chromaticApproachesModalIsOpen: false,
-        chordsModalIsOpen: false,
-        noteAddingModalIsOpen: false,
-        noteEditingModalIsOpen: false,
-        noteEditingModalNoteCard: undefined,
-
-        settingsModalIsOpen: false,
+        chromaticApproaches: {
+          enabled: false,
+          type: 'above',
+        },
       },
-      restoredState,
-    )
+
+      signInModalIsOpen: false,
+      isSignedIn: false,
+
+      chromaticApproachesModalIsOpen: false,
+      chordsModalIsOpen: false,
+      noteAddingModalIsOpen: false,
+      noteEditingModalIsOpen: false,
+      noteEditingModalNoteCard: undefined,
+
+      settingsModalIsOpen: false,
+    })
 
     this.notesStaffRef = React.createRef()
     this.notesStaffContainerRef = React.createRef()
@@ -315,21 +305,31 @@ class App extends React.Component<{}, AppState> {
 
   private onAuthStateChanged = (user: firebase.User | null) => {
     console.log('onAuthStateChanged: ', user, user && user.isAnonymous)
-    this.setState({
-      isSignedIn: !!user && !user.isAnonymous,
-      currentUser: user || undefined,
-    })
+    this.setState(
+      {
+        isSignedIn: !!user,
+        currentUser: user || undefined,
+      },
+      async () => {
+        await this.fetchAndRestoreSessions()
+      },
+    )
+
     if (user && this.state.signInModalIsOpen) {
       this.closeSignInModal()
     }
   }
 
-  private restoreSavedSessions = (sessions: Session[]) => {
+  private restoreSavedSessions = (
+    sessions: Session[],
+    activeSessionId: string,
+  ) => {
+    console.log('restoreSavedSessions: ', sessions)
     this.setState(
       {
         sessionsById: _.keyBy(sessions, 'key'),
       },
-      () => this.loadSession(sessions[0].key as string),
+      () => this.loadSession(activeSessionId),
     )
   }
 
@@ -373,45 +373,94 @@ class App extends React.Component<{}, AppState> {
       })
     }
 
-    this.restoreSavedSessions(sessions)
+    this.restoreSavedSessions(sessions, sessions[0].key)
+  }
 
-    // this.unregisterSessionsObserver = await base.listenTo(
-    //   `users/${user.uid}/sessions`,
-    //   {
-    //     context: this,
-    //     asArray: true,
-    //     then: this.onUserSessionsFetched,
-    //   },
-    // )
+  private restoreLocalState = () => {
+    console.log('restoreLocalState')
+    let restoredState: Partial<AppState> = {}
+
+    const savedState = window.localStorage.getItem('appState')
+    if (savedState) {
+      try {
+        restoredState = JSON.parse(savedState) as Partial<AppState>
+        console.log('restoredState = ', restoredState)
+      } catch (error) {
+        console.error(error)
+        window.localStorage.removeItem('appState')
+      }
+    }
+
+    if (restoredState) {
+      this.setState({
+        enharmonicFlatsMap: restoredState.enharmonicFlatsMap
+          ? restoredState.enharmonicFlatsMap
+          : this.state.enharmonicFlatsMap,
+      })
+    }
+  }
+
+  private getActiveSession = () => {
+    const { sessionsById, activeSessionId } = this.state
+    if (!sessionsById || !activeSessionId) {
+      return null
+    }
+    return sessionsById[activeSessionId]
+  }
+
+  private loadDefaultSession = () => {
+    const defaultSessionId = uuid()
+    this.setState(
+      {
+        sessionsById: {
+          [defaultSessionId]: {
+            ...defaultSession,
+            key: defaultSessionId,
+          } as Session,
+        },
+      },
+      () => {
+        this.loadSession(defaultSessionId)
+      },
+    )
   }
 
   private init = async () => {
+    this.restoreLocalState()
+
     await new Promise(resolve => {
       const unregisterInitAuthObserver = firebase
         .auth()
         .onAuthStateChanged(user => {
-          this.onAuthStateChanged(user)
-          unregisterInitAuthObserver()
+          this.setState(
+            {
+              isSignedIn: !!user,
+              currentUser: user || undefined,
+            },
+            () => {
+              unregisterInitAuthObserver()
 
-          this.unregisterAuthObserver = firebase
-            .auth()
-            .onAuthStateChanged(this.onAuthStateChanged)
+              if (user) {
+                this.fetchAndRestoreSessions()
+              } else {
+                this.loadDefaultSession()
+              }
 
-          resolve()
+              resolve()
+            },
+          )
         })
     })
-
-    if (!firebase.auth().currentUser) {
-      await firebase.auth().signInAnonymously()
-    }
-
-    await this.fetchAndRestoreSessions()
 
     await this.updateStaffNotes()
     await this.initAudioEngine()
     await this.onNotesUpdated()
 
-    this.setState({ isInitialized: true })
+    this.setState({ isInitialized: true }, () => {
+      this.unregisterAuthObserver = firebase
+        .auth()
+        .onAuthStateChanged(this.onAuthStateChanged)
+    })
   }
 
   private initAudioEngine = async () => {
@@ -463,8 +512,6 @@ class App extends React.Component<{}, AppState> {
     window.localStorage.setItem(
       'appState',
       JSON.stringify({
-        sessionsById: this.state.sessionsById,
-        activeSessionId: this.state.activeSessionId,
         audioFontId: this.state.audioFontId,
         enharmonicFlatsMap: this.state.enharmonicFlatsMap,
       }),
@@ -473,10 +520,10 @@ class App extends React.Component<{}, AppState> {
 
   private saveActiveSession = () => {
     const user = firebase.auth().currentUser
-    if (!user || !this.state.activeSessionId) {
+    const session = this.getActiveSession()
+    if (!user || !session) {
       return
     }
-    const session = this.state.sessionsById[this.state.activeSessionId]
     base.update(`users/${user.uid}/sessions/${session.key}`, { data: session })
   }
 
@@ -568,13 +615,14 @@ class App extends React.Component<{}, AppState> {
   }
 
   private updateActiveSession = data => {
-    if (!this.state.activeSessionId) {
+    const session = this.getActiveSession()
+    if (!session) {
       return
     }
 
-    const session = this.state.sessionsById[this.state.activeSessionId]
     const noteCards = (data.noteCards || session.noteCards || []).map(nc => ({
       noteName: nc.noteName,
+      id: nc.id,
     }))
 
     const updatedSession = {
@@ -587,7 +635,7 @@ class App extends React.Component<{}, AppState> {
       {
         sessionsById: {
           ...this.state.sessionsById,
-          [this.state.activeSessionId]: updatedSession,
+          [session.key]: updatedSession,
         },
         ...unpackSessionState(updatedSession),
       },
@@ -869,6 +917,7 @@ class App extends React.Component<{}, AppState> {
       ...this.state.noteCards,
       {
         noteName,
+        id: uuid(),
       },
     ]
 
@@ -888,11 +937,9 @@ class App extends React.Component<{}, AppState> {
       activeNoteCardIndex,
       activeStaffTickIndex,
       noteCardWithMouseOver,
-      activeSessionId,
-      sessionsById,
     } = this.state
 
-    const activeSession = activeSessionId ? sessionsById[activeSessionId] : null
+    const activeSession = this.getActiveSession()
 
     const activeNoteCard = isPlaying
       ? noteCards[activeNoteCardIndex]
@@ -909,24 +956,35 @@ class App extends React.Component<{}, AppState> {
       ? staffTicksPerCard[noteCardWithMouseOver.id]
       : undefined
 
+    const currentUser = firebase.auth().currentUser
+
     return (
       <>
         <AppBar position="static">
           <Toolbar variant="dense">
-            <IconButton color="inherit" onClick={this.openSettingsModal}>
-              <SettingsIcon />
-            </IconButton>
+            {activeSession &&
+              isSignedIn && (
+                <MuiButton
+                  color="inherit"
+                  variant="flat"
+                  onClick={!isSignedIn ? this.openSignInModal : undefined}
+                >
+                  <ListIcon />
+                  <Hidden xsDown>My sessions</Hidden>
+                </MuiButton>
+              )}
 
-            {activeSession && (
+            {!isSignedIn && (
               <MuiButton
-                color="inherit"
-                variant="flat"
+                color="secondary"
+                variant="raised"
                 onClick={!isSignedIn ? this.openSignInModal : undefined}
               >
-                <ListIcon />
-                <Hidden xsDown>My sessions</Hidden>
+                <SaveIcon />
+                <Hidden xsDown>Save</Hidden>
               </MuiButton>
             )}
+
             {activeSession && (
               <MuiButton
                 color="inherit"
@@ -951,9 +1009,28 @@ class App extends React.Component<{}, AppState> {
               </MuiButton>
             ) : (
               <MuiButton color="inherit" onClick={this.signOut} variant="flat">
-                Log out
+                <Avatar
+                  className={css({
+                    height: 30,
+                    width: 30,
+                  })}
+                  src={
+                    currentUser && currentUser.photoURL
+                      ? currentUser.photoURL
+                      : undefined
+                  }
+                >
+                  {currentUser && currentUser.displayName
+                    ? currentUser.displayName
+                    : null}
+                </Avatar>
+                <Text ml={2}>Log out</Text>
               </MuiButton>
             )}
+
+            <IconButton color="inherit" onClick={this.openSettingsModal}>
+              <SettingsIcon />
+            </IconButton>
           </Toolbar>
         </AppBar>
 
@@ -967,8 +1044,15 @@ class App extends React.Component<{}, AppState> {
           alignItems="center"
           flexDirection="column"
         >
-          <Flex alignItems="center" flexDirection="row" mb={3} width={1}>
-            <Box flex="1">
+          <Flex
+            alignItems="center"
+            flexDirection="row"
+            mb={3}
+            width={1}
+            flexWrap="wrap"
+            justifyContent="center"
+          >
+            <Box flex="1" className={css({ whiteSpace: 'nowrap' })} mb={1}>
               <Button
                 title={isPlaying ? 'Stop' : 'Play'}
                 bg={isPlaying ? 'red' : '#00c200'}
@@ -980,7 +1064,7 @@ class App extends React.Component<{}, AppState> {
                 ) : (
                   <PlayIcon className={css({ marginRight: '0.5rem' })} />
                 )}
-                {isPlaying ? 'Stop' : 'Play'}
+                <Hidden xsDown>{isPlaying ? 'Stop' : 'Play'}</Hidden>
               </Button>
 
               <Button
@@ -990,43 +1074,45 @@ class App extends React.Component<{}, AppState> {
                 onClick={this.handleShuffleClick}
               >
                 <ArrowsIcon className={css({ marginRight: '0.5rem' })} />
-                Shuffle!
+                <Hidden xsDown>Shuffle</Hidden>
               </Button>
             </Box>
 
-            <TextField
-              className={css({ maxWidth: '80px' })}
-              label="Tempo"
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">BPM</InputAdornment>
-                ),
-              }}
-              id="bpm"
-              type="number"
-              // @ts-ignore
-              step="1"
-              min="0"
-              max="400"
-              value={`${bpm}`}
-              onChange={this.handleBpmChange}
-            />
+            <Box mb={1}>
+              <TextField
+                className={css({ maxWidth: '80px' })}
+                label="Tempo"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">BPM</InputAdornment>
+                  ),
+                }}
+                id="bpm"
+                type="number"
+                // @ts-ignore
+                step="1"
+                min="0"
+                max="400"
+                value={`${bpm}`}
+                onChange={this.handleBpmChange}
+              />
 
-            <TextField
-              className={css({
-                marginLeft: '15px',
-                maxWidth: '50px',
-              })}
-              label="Rests"
-              id="rests"
-              type="number"
-              // @ts-ignore
-              step="1"
-              min="0"
-              max="8"
-              value={`${rests}`}
-              onChange={this.handleRestsChange}
-            />
+              <TextField
+                className={css({
+                  marginLeft: '15px',
+                  maxWidth: '50px',
+                })}
+                label="Rests"
+                id="rests"
+                type="number"
+                // @ts-ignore
+                step="1"
+                min="0"
+                max="8"
+                value={`${rests}`}
+                onChange={this.handleRestsChange}
+              />
+            </Box>
           </Flex>
 
           <Flex
