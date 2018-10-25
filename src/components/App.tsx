@@ -4,7 +4,6 @@ import { css } from 'react-emotion'
 import { withProps } from 'recompose'
 import * as _ from 'lodash'
 import * as tonal from 'tonal'
-import * as TonalRange from 'tonal-range'
 import * as Chord from 'tonal-chord'
 import uuid from 'uuid/v4'
 
@@ -63,13 +62,35 @@ import { generateStaffTicks } from '../musicUtils'
 import AudioFontsConfig, { AudioFontId } from '../audioFontsConfig'
 import AudioEngine, { AnimationCallback } from '../services/audioEngine'
 import { AudioEngineContext } from './withAudioEngine'
-import firebase, { FirebaseContext } from 'src/services/firebase'
+import firebase, { FirebaseContext, base } from 'src/services/firebase'
 import SignInModal from './SignInModal'
+import { CircularProgress } from '@material-ui/core'
 
 globalStyles()
 
 console.log('All supported audio fonts: ', _.map(AudioFontsConfig, 'title'))
 console.log('All supported chord names: ', Chord.names())
+
+type SessionNoteCard = {
+  noteName: string
+}
+
+/**
+ * Persisted sharable session
+ */
+type Session = {
+  key?: string
+  author: string
+  name: string
+
+  createdAt: string
+  updatedAt: string
+
+  bpm: number
+  rests: number
+  noteCards: SessionNoteCard[]
+  modifiers: NoteModifiers
+}
 
 type AppState = {
   isSignedIn: boolean
@@ -77,6 +98,9 @@ type AppState = {
 
   isInitialized: boolean
   isLoadingAudioFont: boolean
+
+  sessionsById: { [sessionId: string]: Session }
+  activeSessionId?: string
 
   bpm: number
   rests: number
@@ -109,7 +133,45 @@ type AppState = {
   noteEditingModalNoteCard?: NoteCardType
 }
 
-const chromaticNotes = TonalRange.chromatic(['C4', 'B4'], true)
+const createDefaultSession = () => {
+  const defaultSession: Partial<Session> = {
+    name: 'default',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+
+    bpm: 120,
+    rests: 1,
+    modifiers: {
+      arpeggio: {
+        enabled: true,
+        direction: 'up',
+        type: 'M',
+      },
+      chromaticApproaches: {
+        enabled: false,
+        type: 'above',
+      },
+    },
+    noteCards: [
+      {
+        noteName: 'C4',
+      },
+      {
+        noteName: 'G4',
+      },
+      {
+        noteName: 'F4',
+      },
+      {
+        noteName: 'D4',
+      },
+    ],
+  }
+
+  return defaultSession
+}
+
+const defaultSession = createDefaultSession()
 
 const layoutMinWidth = 320
 
@@ -135,25 +197,37 @@ const jss = create({
 
 const audioEngine = new AudioEngine()
 
+const unpackSessionState = (session: Session) => {
+  const noteCards = (session.noteCards || []).map(nc => ({
+    id: uuid(),
+    noteName: nc.noteName,
+    text: tonal.Note.pc(nc.noteName),
+    midi: tonal.Note.midi(nc.noteName),
+    freq: tonal.Note.freq(nc.noteName),
+    color: getNoteCardColorByNoteName(nc.noteName),
+  }))
+
+  const noteCardsById = _.keyBy(noteCards, 'id')
+
+  return {
+    noteCards,
+    noteCardsById,
+    bpm: session.bpm,
+    rests: session.rests,
+    modifiers: session.modifiers,
+  }
+}
+
 class App extends React.Component<{}, AppState> {
   private notesStaffRef: React.RefObject<NotesStaff>
   private notesStaffContainerRef: React.RefObject<any>
   private unregisterAuthObserver: firebase.Unsubscribe
+  private unregisterSessionsObserver: firebase.Unsubscribe
 
   constructor(props) {
     super(props)
 
     let restoredState: Partial<AppState> = {}
-
-    const noteName = _.sample(chromaticNotes)
-    const randomNoteCard = {
-      noteName,
-      id: uuid(),
-      text: tonal.Note.pc(noteName),
-      midi: tonal.Note.midi(noteName),
-      freq: tonal.Note.freq(noteName),
-      color: getNoteCardColorByNoteName(noteName),
-    }
 
     const savedState = window.localStorage.getItem('appState')
     if (savedState) {
@@ -166,23 +240,19 @@ class App extends React.Component<{}, AppState> {
       }
     }
 
-    const noteCards = restoredState.noteCards || [randomNoteCard]
-    const noteCardsById = _.keyBy(noteCards, 'id')
-
     this.state = _.merge(
       {
         isInitialized: false,
         isLoadingAudioFont: false,
         audioFontId: AudioFontsConfig[0].id,
 
+        sessionsById: {},
+
         bpm: 120,
         rests: 1,
-        noteCards,
-        noteCardsById,
-        enharmonicFlatsMap: {
-          'C#': true,
-          'D#': true,
-        },
+        noteCards: [],
+        noteCardsById: {},
+        enharmonicFlatsMap: {},
 
         // Screen size
         height: 0,
@@ -203,7 +273,7 @@ class App extends React.Component<{}, AppState> {
           },
           chromaticApproaches: {
             enabled: false,
-            type: 'down',
+            type: 'above',
           },
         },
 
@@ -235,13 +305,104 @@ class App extends React.Component<{}, AppState> {
     if (this.unregisterAuthObserver) {
       this.unregisterAuthObserver()
     }
+    if (this.unregisterSessionsObserver) {
+      base.removeBinding(this.unregisterSessionsObserver)
+    }
+  }
+
+  private onAuthStateChanged = (user: firebase.User | null) => {
+    console.log('onAuthStateChanged: ', user, user && user.isAnonymous)
+    this.setState({
+      isSignedIn: !!user && !user.isAnonymous,
+      currentUser: user || undefined,
+    })
+    if (user && this.state.signInModalIsOpen) {
+      this.closeSignInModal()
+    }
+  }
+
+  private restoreSavedSessions = (sessions: Session[]) => {
+    this.setState(
+      {
+        sessionsById: _.keyBy(sessions, 'key'),
+      },
+      () => this.loadSession(sessions[0].key as string),
+    )
+  }
+
+  private loadSession = (sessionId: string) => {
+    const session = this.state.sessionsById[sessionId]
+    console.log('loadSession -> restoreSession: ', sessionId, session)
+    if (!session) {
+      console.error('loadSession -> no session: ', sessionId)
+      return
+    }
+
+    this.setState(
+      {
+        activeSessionId: sessionId,
+        ...unpackSessionState(session),
+      },
+      this.onNotesUpdated,
+    )
+  }
+
+  private fetchAndRestoreSessions = async () => {
+    const user = firebase.auth().currentUser
+    if (!user) {
+      return
+    }
+
+    let sessions = await base.fetch(`users/${user.uid}/sessions`, {
+      asArray: true,
+    })
+
+    if (!sessions || sessions.length === 0) {
+      await base.push(`users/${user.uid}/sessions`, {
+        data: {
+          ...defaultSession,
+          author: user.uid,
+        } as Session,
+      })
+
+      sessions = await base.fetch(`users/${user.uid}/sessions`, {
+        asArray: true,
+      })
+    }
+
+    this.restoreSavedSessions(sessions)
+
+    // this.unregisterSessionsObserver = await base.listenTo(
+    //   `users/${user.uid}/sessions`,
+    //   {
+    //     context: this,
+    //     asArray: true,
+    //     then: this.onUserSessionsFetched,
+    //   },
+    // )
   }
 
   private init = async () => {
-    this.unregisterAuthObserver = firebase.auth().onAuthStateChanged(user => {
-      this.setState({ isSignedIn: !!user, currentUser: user || undefined })
-      this.closeSignInModal()
+    await new Promise(resolve => {
+      const unregisterInitAuthObserver = firebase
+        .auth()
+        .onAuthStateChanged(user => {
+          this.onAuthStateChanged(user)
+          unregisterInitAuthObserver()
+
+          this.unregisterAuthObserver = firebase
+            .auth()
+            .onAuthStateChanged(this.onAuthStateChanged)
+
+          resolve()
+        })
     })
+
+    if (!firebase.auth().currentUser) {
+      await firebase.auth().signInAnonymously()
+    }
+
+    await this.fetchAndRestoreSessions()
 
     await this.updateStaffNotes()
     await this.initAudioEngine()
@@ -259,14 +420,12 @@ class App extends React.Component<{}, AppState> {
   private loadAndSetAudioFont = async (audioFontId: AudioFontId) => {
     this.setState({ isLoadingAudioFont: true })
     await audioEngine.setAudioFont(audioFontId)
-    this.setState(
-      { audioFontId, isLoadingAudioFont: false },
-      this.serializeAndSaveAppStateLocally,
-    )
+    this.setState({ audioFontId, isLoadingAudioFont: false }, this.saveAppState)
   }
 
   private updateStaffNotes = async () => {
     const { noteCards, modifiers, rests } = this.state
+
     const staffTicks = generateStaffTicks({ noteCards, modifiers, rests })
     const staffTicksPerCard = _.groupBy(staffTicks, 'noteCardId')
 
@@ -289,26 +448,39 @@ class App extends React.Component<{}, AppState> {
   }
 
   private handleShuffleClick = () => {
-    this.setState(
-      state => ({
-        noteCards: [state.noteCards[0], ...shuffle(state.noteCards.slice(1))],
-      }),
-      this.onNotesUpdated,
-    )
+    this.updateActiveSession({
+      noteCards: [
+        this.state.noteCards[0],
+        ...shuffle(this.state.noteCards.slice(1)),
+      ],
+    })
   }
 
-  private serializeAndSaveAppStateLocally = () => {
+  private saveLocalAppState = () => {
     window.localStorage.setItem(
       'appState',
       JSON.stringify({
-        bpm: this.state.bpm,
-        rests: this.state.rests,
+        sessionsById: this.state.sessionsById,
+        activeSessionId: this.state.activeSessionId,
         audioFontId: this.state.audioFontId,
         enharmonicFlatsMap: this.state.enharmonicFlatsMap,
-        noteCards: this.state.noteCards,
-        modifiers: this.state.modifiers,
       }),
     )
+  }
+
+  private saveActiveSession = () => {
+    const user = firebase.auth().currentUser
+    if (!user || !this.state.activeSessionId) {
+      return
+    }
+    const session = this.state.sessionsById[this.state.activeSessionId]
+    base.update(`users/${user.uid}/sessions/${session.key}`, { data: session })
+  }
+
+  private saveAppState = () => {
+    console.log('saveAppState')
+    this.saveLocalAppState()
+    this.saveActiveSession()
   }
 
   private generateLoop = () => {
@@ -336,7 +508,7 @@ class App extends React.Component<{}, AppState> {
     const loop = this.generateLoop()
     audioEngine.setLoop(loop)
 
-    this.serializeAndSaveAppStateLocally()
+    this.saveAppState()
   }
 
   private drawAnimation: AnimationCallback = ({ tick }) => {
@@ -392,6 +564,37 @@ class App extends React.Component<{}, AppState> {
     }
   }
 
+  private updateActiveSession = data => {
+    if (!this.state.activeSessionId) {
+      return
+    }
+
+    const session = this.state.sessionsById[this.state.activeSessionId]
+    const noteCards = (data.noteCards || session.noteCards || []).map(nc => ({
+      noteName: nc.noteName,
+    }))
+
+    const updatedSession = {
+      ...session,
+      ...data,
+      noteCards,
+    }
+
+    this.setState(
+      {
+        sessionsById: {
+          ...this.state.sessionsById,
+          [this.state.activeSessionId]: updatedSession,
+        },
+        ...unpackSessionState(updatedSession),
+      },
+      () => {
+        this.onNotesUpdated()
+        this.saveAppState()
+      },
+    )
+  }
+
   private handleBpmChange = e => {
     let bpmValue = this.state.bpm
     try {
@@ -405,13 +608,7 @@ class App extends React.Component<{}, AppState> {
       }
     } finally {
       audioEngine.setBpm(bpmValue)
-
-      this.setState(
-        {
-          bpm: bpmValue,
-        },
-        this.serializeAndSaveAppStateLocally,
-      )
+      this.updateActiveSession({ bpm: bpmValue })
     }
   }
 
@@ -427,12 +624,7 @@ class App extends React.Component<{}, AppState> {
         }
       }
     } finally {
-      this.setState(
-        {
-          rests: restsValue,
-        },
-        this.onNotesUpdated,
-      )
+      this.updateActiveSession({ rests: restsValue })
     }
   }
 
@@ -471,23 +663,16 @@ class App extends React.Component<{}, AppState> {
 
   private deleteNoteCard = (noteCard: NoteCardType) => {
     const newNoteCards = this.state.noteCards.filter(nc => nc !== noteCard)
-    this.setState(
-      {
-        noteCards: newNoteCards,
-        noteCardsById: _.keyBy(newNoteCards, 'id'),
-      },
-      this.onNotesUpdated,
-    )
+    this.updateActiveSession({
+      noteCards: newNoteCards,
+    })
   }
 
   private handleCardsReorder = ({ oldIndex, newIndex }) => {
     const newNoteCards = arrayMove(this.state.noteCards, oldIndex, newIndex)
-    this.setState(
-      {
-        noteCards: newNoteCards,
-      },
-      this.onNotesUpdated,
-    )
+    this.updateActiveSession({
+      noteCards: newNoteCards,
+    })
   }
 
   private handleScreenSizeUpdate = ({ width, height }) => {
@@ -611,19 +796,16 @@ class App extends React.Component<{}, AppState> {
     type: ArpeggioType
     direction: ArpeggioDirection
   }) => {
-    this.setState(
-      {
-        modifiers: {
-          ...this.state.modifiers,
-          arpeggio: {
-            enabled: true,
-            type,
-            direction,
-          },
+    this.updateActiveSession({
+      modifiers: {
+        ...this.state.modifiers,
+        arpeggio: {
+          enabled: true,
+          type,
+          direction,
         },
       },
-      this.onNotesUpdated,
-    )
+    })
 
     this.closeArpeggioAddingModal()
   }
@@ -633,50 +815,41 @@ class App extends React.Component<{}, AppState> {
   }: {
     type: ChromaticApproachesType
   }) => {
-    this.setState(
-      {
-        modifiers: {
-          ...this.state.modifiers,
-          chromaticApproaches: {
-            enabled: true,
-            type,
-          },
+    this.updateActiveSession({
+      modifiers: {
+        ...this.state.modifiers,
+        chromaticApproaches: {
+          enabled: true,
+          type,
         },
       },
-      this.onNotesUpdated,
-    )
+    })
 
     this.closeChromaticApproachesModal()
   }
 
   private handleRemoveArpeggioClick = () => {
-    this.setState(
-      {
-        modifiers: {
-          ...this.state.modifiers,
-          arpeggio: {
-            ...this.state.modifiers.arpeggio,
-            enabled: false,
-          },
+    this.updateActiveSession({
+      modifiers: {
+        ...this.state.modifiers,
+        arpeggio: {
+          ...this.state.modifiers.arpeggio,
+          enabled: false,
         },
       },
-      this.onNotesUpdated,
-    )
+    })
   }
 
   private handleRemoveChromaticApproachesClick = () => {
-    this.setState(
-      {
-        modifiers: {
-          ...this.state.modifiers,
-          chromaticApproaches: {
-            ...this.state.modifiers.chromaticApproaches,
-            enabled: false,
-          },
+    this.updateActiveSession({
+      modifiers: {
+        ...this.state.modifiers,
+        chromaticApproaches: {
+          ...this.state.modifiers.chromaticApproaches,
+          enabled: false,
         },
       },
-      this.onNotesUpdated,
-    )
+    })
   }
 
   private handleEnharmonicMapToggle = (pitchName: ChromaticNoteSharps) => {
@@ -693,24 +866,14 @@ class App extends React.Component<{}, AppState> {
       ...this.state.noteCards,
       {
         noteName,
-        id: uuid(),
-        text: tonal.Note.pc(noteName),
-        midi: tonal.Note.midi(noteName),
-        freq: tonal.Note.freq(noteName),
-        color: getNoteCardColorByNoteName(noteName),
       },
     ]
 
-    this.setState(
-      {
-        noteCards: newNoteCards,
-        noteAddingModalIsOpen: false,
-      },
-      this.onNotesUpdated,
-    )
+    this.updateActiveSession({ noteCards: newNoteCards })
+    this.closeNoteAddingModal()
   }
 
-  public render() {
+  private renderApp = () => {
     const {
       bpm,
       rests,
@@ -737,6 +900,300 @@ class App extends React.Component<{}, AppState> {
     const noteCardWithMouseOverTicks = noteCardWithMouseOver
       ? staffTicksPerCard[noteCardWithMouseOver.id]
       : undefined
+
+    return (
+      <>
+        <AppBar position="static">
+          <Toolbar variant="dense">
+            <IconButton color="inherit" aria-label="Menu">
+              <MenuIcon />
+            </IconButton>
+            <Typography
+              variant="h6"
+              color="inherit"
+              className={css({ flexGrow: 1 })}
+            >
+              Random Variations
+            </Typography>
+
+            {!this.state.isSignedIn ? (
+              <MuiButton color="inherit" onClick={this.openSignInModal}>
+                Sign in
+              </MuiButton>
+            ) : (
+              <MuiButton color="inherit" onClick={this.signOut}>
+                Sign out
+              </MuiButton>
+            )}
+
+            <IconButton color="inherit" onClick={this.openSettingsModal}>
+              <SettingsIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        <Flex
+          pt={[3, 3, 4]}
+          flex={1}
+          px={[3]}
+          width={1}
+          maxWidth={960}
+          justifyContent="center"
+          alignItems="center"
+          flexDirection="column"
+        >
+          <Flex alignItems="center" flexDirection="row" mb={3} width={1}>
+            <Box flex="1">
+              <Button
+                title={isPlaying ? 'Stop' : 'Play'}
+                bg={isPlaying ? 'red' : '#00c200'}
+                m={[1, 2]}
+                onClick={this.togglePlayback}
+              >
+                {isPlaying ? (
+                  <StopIcon className={css({ marginRight: '0.5rem' })} />
+                ) : (
+                  <PlayIcon className={css({ marginRight: '0.5rem' })} />
+                )}
+                {isPlaying ? 'Stop' : 'Play'}
+              </Button>
+
+              <Button
+                variant="contained"
+                title="Shuffle note cards"
+                m={[1, 2]}
+                onClick={this.handleShuffleClick}
+              >
+                <ArrowsIcon className={css({ marginRight: '0.5rem' })} />
+                Shuffle!
+              </Button>
+            </Box>
+
+            <TextField
+              className={css({ maxWidth: '80px' })}
+              label="Tempo"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">BPM</InputAdornment>
+                ),
+              }}
+              id="bpm"
+              type="number"
+              // @ts-ignore
+              step="1"
+              min="0"
+              max="400"
+              value={`${bpm}`}
+              onChange={this.handleBpmChange}
+            />
+
+            <TextField
+              className={css({
+                marginLeft: '15px',
+                maxWidth: '50px',
+              })}
+              label="Rests"
+              id="rests"
+              type="number"
+              // @ts-ignore
+              step="1"
+              min="0"
+              max="8"
+              value={`${rests}`}
+              onChange={this.handleRestsChange}
+            />
+          </Flex>
+
+          <Flex
+            flex={2}
+            alignItems="center"
+            justifyContent="center"
+            flexDirection="column"
+            maxHeight={400}
+            width={1}
+            maxWidth={700}
+          >
+            <NoteCards
+              noteCards={noteCards}
+              activeNoteCard={activeNoteCard}
+              onChangeToEnharmonicClick={
+                this.handleChangeNoteCardToEnharmonicClick
+              }
+              onMouseOver={this.handleMouseOverNoteCard}
+              onMouseLeave={this.handleMouseLeaveNoteCard}
+              onEditClick={this.handleEditCardClick}
+              onDeleteClick={this.handleDeleteCardClick}
+              onCardsReorder={this.handleCardsReorder}
+              onCardDraggedOut={this.handleNoteCardDraggedOut}
+            />
+
+            <Flex
+              flexDirection="row-reverse"
+              alignItems="center"
+              width={1}
+              px={[1, 2, 2]}
+              mt={[4, 2, 3]}
+              mb={[2, 2, 3]}
+            >
+              <AddEntityButton
+                onAddSingleNoteClick={this.openNoteAddingModal}
+                onAddArpeggioClick={this.openArpeggioAddingModal}
+                onAddChromaticApproachesClick={
+                  this.openChromaticApproachesModal
+                }
+                disableSingleNote={this.state.noteCards.length >= 12}
+                disableChords={this.state.modifiers.arpeggio.enabled}
+                disableChromaticApproaches={
+                  this.state.modifiers.chromaticApproaches.enabled
+                }
+                buttonProps={{
+                  disabled: isPlaying,
+                  className: css({
+                    marginLeft: '1rem',
+                  }),
+                }}
+              />
+
+              <Flex flex-direction="row" flex={1} alignItems="center">
+                {this.state.modifiers.arpeggio.enabled && (
+                  <Chip
+                    color="primary"
+                    label={`Chords: ${this.state.modifiers.arpeggio.type} / ${
+                      this.state.modifiers.arpeggio.direction
+                    }`}
+                    onClick={this.openArpeggioAddingModal}
+                    onDelete={this.handleRemoveArpeggioClick}
+                    classes={{
+                      root: css({ marginRight: '0.5rem' }),
+                    }}
+                  />
+                )}
+                {this.state.modifiers.chromaticApproaches.enabled && (
+                  <Chip
+                    color="primary"
+                    label={`Enclosure / ${
+                      this.state.modifiers.chromaticApproaches.type
+                    }`}
+                    onClick={this.openChromaticApproachesModal}
+                    onDelete={this.handleRemoveChromaticApproachesClick}
+                    classes={{
+                      root: css({ marginRight: '0.5rem' }),
+                    }}
+                  />
+                )}
+              </Flex>
+            </Flex>
+          </Flex>
+
+          <MeasureScreenSize onUpdate={this.handleScreenSizeUpdate} fireOnMount>
+            <Box innerRef={this.notesStaffContainerRef} width={1}>
+              <NotesStaff
+                isPlaying={isPlaying}
+                id="notation"
+                ticks={this.state.staffTicks}
+                activeTickIndex={isPlaying ? activeStaffTickIndex : undefined}
+                ref={this.notesStaffRef}
+                height={160}
+                width={this.state.notesStaffWidth}
+              />
+            </Box>
+          </MeasureScreenSize>
+        </Flex>
+
+        <Box mt={[1, 2, 3]}>
+          <PianoKeyboard
+            width={Math.max(layoutMinWidth, this.state.width)}
+            height={this.getPianoHeight()}
+            secondaryNotesMidi={
+              activeNoteCardTicks
+                ? _.flatten(
+                    activeNoteCardTicks.map(t => t.notes.map(n => n.midi)),
+                  )
+                : noteCardWithMouseOverTicks
+                  ? _.flatten(
+                      noteCardWithMouseOverTicks.map(t =>
+                        t.notes.map(n => n.midi),
+                      ),
+                    )
+                  : undefined
+            }
+            primaryNotesMidi={
+              activeStaffTick
+                ? activeStaffTick.notes.map(n => n.midi)
+                : noteCardWithMouseOver
+                  ? [noteCardWithMouseOver.midi]
+                  : undefined
+            }
+            notesColor={
+              activeNoteCard
+                ? activeNoteCard.color
+                : noteCardWithMouseOver
+                  ? noteCardWithMouseOver.color
+                  : undefined
+            }
+          />
+        </Box>
+
+        <SignInModal
+          isOpen={this.state.signInModalIsOpen}
+          onClose={this.closeSignInModal}
+        />
+
+        <SettingsModal
+          isOpen={this.state.settingsModalIsOpen}
+          onClose={this.closeSettingsModal}
+          defaultValues={{
+            audioFontId: this.state.audioFontId,
+          }}
+          onSubmit={this.closeSettingsModal}
+          onAudioFontChanged={this.handleAudioFontChanged}
+        />
+
+        <ArpeggioModifierModal
+          isOpen={this.state.chordsModalIsOpen}
+          onClose={this.closeArpeggioAddingModal}
+          onSubmit={this.handleArpeggioModifierModalConfirm}
+          defaultDirection={this.state.modifiers.arpeggio.direction}
+          defaultType={this.state.modifiers.arpeggio.type}
+        />
+
+        <ChromaticApproachesModifierModal
+          isOpen={this.state.chromaticApproachesModalIsOpen}
+          onClose={this.closeChromaticApproachesModal}
+          onSubmit={this.handleChromaticApproachModifierModalConfirm}
+          defaultType={this.state.modifiers.chromaticApproaches.type}
+        />
+
+        <PickNoteModal
+          isOpen={this.state.noteAddingModalIsOpen}
+          onClose={this.closeNoteAddingModal}
+          onSubmit={this.handleNoteClickInNoteCardAddingModal}
+          enharmonicFlatsMap={this.state.enharmonicFlatsMap}
+          onEnharmonicFlatsMapToggle={this.handleEnharmonicMapToggle}
+        />
+
+        {this.state.noteEditingModalIsOpen && (
+          <PickNoteModal
+            isOpen
+            noteName={
+              this.state.noteEditingModalNoteCard
+                ? this.state.noteEditingModalNoteCard.noteName
+                : undefined
+            }
+            onClose={this.closeNoteEditingModal}
+            onSubmit={this.handleNoteClickInNoteCardEditingModal}
+            enharmonicFlatsMap={this.state.enharmonicFlatsMap}
+            onEnharmonicFlatsMapToggle={this.handleEnharmonicMapToggle}
+          />
+        )}
+      </>
+    )
+  }
+
+  private renderLoader = () => {
+    return <CircularProgress size={50} />
+  }
+
+  public render() {
     return (
       <ThemeProvider theme={theme}>
         <AudioEngineContext.Provider value={audioEngine}>
@@ -745,342 +1202,18 @@ class App extends React.Component<{}, AppState> {
               <>
                 <CssBaseline />
 
-                <MeasureScreenSize
-                  onUpdate={this.handleScreenSizeUpdate}
-                  fireOnMount
+                <Flex
+                  height="100vh"
+                  width="100vw"
+                  alignItems="center"
+                  justifyContent="center"
+                  css="overflow: hidden;"
+                  flexDirection="column"
                 >
-                  <Flex
-                    height="100vh"
-                    width="100vw"
-                    alignItems="center"
-                    justifyContent="center"
-                    css="overflow: hidden;"
-                    flexDirection="column"
-                  >
-                    <AppBar position="static">
-                      <Toolbar variant="dense">
-                        <IconButton color="inherit" aria-label="Menu">
-                          <MenuIcon />
-                        </IconButton>
-                        <Typography
-                          variant="h6"
-                          color="inherit"
-                          className={css({ flexGrow: 1 })}
-                        >
-                          Random Variations
-                        </Typography>
-
-                        {!this.state.isSignedIn ? (
-                          <MuiButton
-                            color="inherit"
-                            onClick={this.openSignInModal}
-                          >
-                            Sign in
-                          </MuiButton>
-                        ) : (
-                          <MuiButton color="inherit" onClick={this.signOut}>
-                            Sign out
-                          </MuiButton>
-                        )}
-
-                        <IconButton
-                          color="inherit"
-                          onClick={this.openSettingsModal}
-                        >
-                          <SettingsIcon />
-                        </IconButton>
-                      </Toolbar>
-                    </AppBar>
-                    <Flex
-                      pt={[3, 3, 4]}
-                      flex={1}
-                      px={[3]}
-                      width={1}
-                      maxWidth={960}
-                      justifyContent="center"
-                      alignItems="center"
-                      flexDirection="column"
-                    >
-                      <Flex
-                        alignItems="center"
-                        flexDirection="row"
-                        mb={3}
-                        width={1}
-                      >
-                        <Box flex="1">
-                          <Button
-                            title={isPlaying ? 'Stop' : 'Play'}
-                            bg={isPlaying ? 'red' : '#00c200'}
-                            m={[1, 2]}
-                            onClick={this.togglePlayback}
-                          >
-                            {isPlaying ? (
-                              <StopIcon
-                                className={css({ marginRight: '0.5rem' })}
-                              />
-                            ) : (
-                              <PlayIcon
-                                className={css({ marginRight: '0.5rem' })}
-                              />
-                            )}
-                            {isPlaying ? 'Stop' : 'Play'}
-                          </Button>
-
-                          <Button
-                            variant="contained"
-                            title="Shuffle note cards"
-                            m={[1, 2]}
-                            onClick={this.handleShuffleClick}
-                          >
-                            <ArrowsIcon
-                              className={css({ marginRight: '0.5rem' })}
-                            />
-                            Shuffle!
-                          </Button>
-                        </Box>
-
-                        <TextField
-                          className={css({ maxWidth: '80px' })}
-                          label="Tempo"
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                BPM
-                              </InputAdornment>
-                            ),
-                          }}
-                          id="bpm"
-                          type="number"
-                          // @ts-ignore
-                          step="1"
-                          min="0"
-                          max="400"
-                          value={`${bpm}`}
-                          onChange={this.handleBpmChange}
-                        />
-
-                        <TextField
-                          className={css({
-                            marginLeft: '15px',
-                            maxWidth: '50px',
-                          })}
-                          label="Rests"
-                          id="rests"
-                          type="number"
-                          // @ts-ignore
-                          step="1"
-                          min="0"
-                          max="8"
-                          value={`${rests}`}
-                          onChange={this.handleRestsChange}
-                        />
-                      </Flex>
-
-                      <Flex
-                        flex={2}
-                        alignItems="center"
-                        justifyContent="center"
-                        flexDirection="column"
-                        maxHeight={400}
-                        width={1}
-                        maxWidth={700}
-                      >
-                        <NoteCards
-                          noteCards={noteCards}
-                          activeNoteCard={activeNoteCard}
-                          onChangeToEnharmonicClick={
-                            this.handleChangeNoteCardToEnharmonicClick
-                          }
-                          onMouseOver={this.handleMouseOverNoteCard}
-                          onMouseLeave={this.handleMouseLeaveNoteCard}
-                          onEditClick={this.handleEditCardClick}
-                          onDeleteClick={this.handleDeleteCardClick}
-                          onCardsReorder={this.handleCardsReorder}
-                          onCardDraggedOut={this.handleNoteCardDraggedOut}
-                        />
-
-                        <Flex
-                          flexDirection="row-reverse"
-                          alignItems="center"
-                          width={1}
-                          px={[1, 2, 2]}
-                          mt={[4, 2, 3]}
-                          mb={[2, 2, 3]}
-                        >
-                          <AddEntityButton
-                            onAddSingleNoteClick={this.openNoteAddingModal}
-                            onAddArpeggioClick={this.openArpeggioAddingModal}
-                            onAddChromaticApproachesClick={
-                              this.openChromaticApproachesModal
-                            }
-                            disableSingleNote={
-                              this.state.noteCards.length >= 12
-                            }
-                            disableChords={
-                              this.state.modifiers.arpeggio.enabled
-                            }
-                            disableChromaticApproaches={
-                              this.state.modifiers.chromaticApproaches.enabled
-                            }
-                            buttonProps={{
-                              disabled: isPlaying,
-                              className: css({
-                                marginLeft: '1rem',
-                              }),
-                            }}
-                          />
-
-                          <Flex
-                            flex-direction="row"
-                            flex={1}
-                            alignItems="center"
-                          >
-                            {this.state.modifiers.arpeggio.enabled && (
-                              <Chip
-                                color="primary"
-                                label={`Chords: ${
-                                  this.state.modifiers.arpeggio.type
-                                } / ${this.state.modifiers.arpeggio.direction}`}
-                                onClick={this.openArpeggioAddingModal}
-                                onDelete={this.handleRemoveArpeggioClick}
-                                classes={{
-                                  root: css({ marginRight: '0.5rem' }),
-                                }}
-                              />
-                            )}
-                            {this.state.modifiers.chromaticApproaches
-                              .enabled && (
-                              <Chip
-                                color="primary"
-                                label={`Enclosure / ${
-                                  this.state.modifiers.chromaticApproaches.type
-                                }`}
-                                onClick={this.openChromaticApproachesModal}
-                                onDelete={
-                                  this.handleRemoveChromaticApproachesClick
-                                }
-                                classes={{
-                                  root: css({ marginRight: '0.5rem' }),
-                                }}
-                              />
-                            )}
-                          </Flex>
-                        </Flex>
-                      </Flex>
-
-                      <Box innerRef={this.notesStaffContainerRef} width={1}>
-                        <NotesStaff
-                          isPlaying={isPlaying}
-                          id="notation"
-                          ticks={this.state.staffTicks}
-                          activeTickIndex={
-                            isPlaying ? activeStaffTickIndex : undefined
-                          }
-                          ref={this.notesStaffRef}
-                          height={160}
-                          width={this.state.notesStaffWidth}
-                        />
-                      </Box>
-                    </Flex>
-
-                    <Box mt={[1, 2, 3]}>
-                      <PianoKeyboard
-                        width={Math.max(layoutMinWidth, this.state.width)}
-                        height={this.getPianoHeight()}
-                        secondaryNotesMidi={
-                          activeNoteCardTicks
-                            ? _.flatten(
-                                activeNoteCardTicks.map(t =>
-                                  t.notes.map(n => n.midi),
-                                ),
-                              )
-                            : noteCardWithMouseOverTicks
-                              ? _.flatten(
-                                  noteCardWithMouseOverTicks.map(t =>
-                                    t.notes.map(n => n.midi),
-                                  ),
-                                )
-                              : undefined
-                        }
-                        primaryNotesMidi={
-                          activeStaffTick
-                            ? activeStaffTick.notes.map(n => n.midi)
-                            : noteCardWithMouseOver
-                              ? [noteCardWithMouseOver.midi]
-                              : undefined
-                        }
-                        notesColor={
-                          activeNoteCard
-                            ? activeNoteCard.color
-                            : noteCardWithMouseOver
-                              ? noteCardWithMouseOver.color
-                              : undefined
-                        }
-                      />
-                    </Box>
-
-                    <SignInModal
-                      isOpen={this.state.signInModalIsOpen}
-                      onClose={this.closeSignInModal}
-                    />
-
-                    <SettingsModal
-                      isOpen={this.state.settingsModalIsOpen}
-                      onClose={this.closeSettingsModal}
-                      defaultValues={{
-                        audioFontId: this.state.audioFontId,
-                      }}
-                      onSubmit={this.closeSettingsModal}
-                      onAudioFontChanged={this.handleAudioFontChanged}
-                    />
-
-                    <ArpeggioModifierModal
-                      isOpen={this.state.chordsModalIsOpen}
-                      onClose={this.closeArpeggioAddingModal}
-                      onSubmit={this.handleArpeggioModifierModalConfirm}
-                      defaultDirection={this.state.modifiers.arpeggio.direction}
-                      defaultType={this.state.modifiers.arpeggio.type}
-                    />
-
-                    <ChromaticApproachesModifierModal
-                      isOpen={this.state.chromaticApproachesModalIsOpen}
-                      onClose={this.closeChromaticApproachesModal}
-                      onSubmit={
-                        this.handleChromaticApproachModifierModalConfirm
-                      }
-                      defaultType={
-                        this.state.modifiers.chromaticApproaches.type
-                      }
-                    />
-
-                    <PickNoteModal
-                      isOpen={this.state.noteAddingModalIsOpen}
-                      onClose={this.closeNoteAddingModal}
-                      onSubmit={this.handleNoteClickInNoteCardAddingModal}
-                      enharmonicFlatsMap={this.state.enharmonicFlatsMap}
-                      onEnharmonicFlatsMapToggle={
-                        this.handleEnharmonicMapToggle
-                      }
-                    />
-
-                    {this.state.noteEditingModalIsOpen && (
-                      <PickNoteModal
-                        isOpen
-                        noteName={
-                          this.state.noteEditingModalNoteCard
-                            ? this.state.noteEditingModalNoteCard.noteName
-                            : undefined
-                        }
-                        onClose={this.closeNoteEditingModal}
-                        onSubmit={this.handleNoteClickInNoteCardEditingModal}
-                        enharmonicFlatsMap={this.state.enharmonicFlatsMap}
-                        onEnharmonicFlatsMapToggle={
-                          this.handleEnharmonicMapToggle
-                        }
-                      />
-                    )}
-                  </Flex>
-                </MeasureScreenSize>
+                  {this.state.isInitialized
+                    ? this.renderApp()
+                    : this.renderLoader()}
+                </Flex>
               </>
             </JssProvider>
           </FirebaseContext.Provider>

@@ -17,6 +17,7 @@
     "lodash": "^4.17.11",
     "mdi-material-ui": "^5.5.0",
     "polished": "^2.2.0",
+    "re-base": "^4.0.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-emotion": "^9.2.12",

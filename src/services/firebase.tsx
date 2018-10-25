@@ -1,4 +1,5 @@
 import * as React from 'react'
+import Rebase from 're-base'
 import * as firebase from 'firebase'
 
 // Initialize Firebase
@@ -11,6 +12,8 @@ const config = {
   messagingSenderId: '905007255924',
 }
 firebase.initializeApp(config)
+
+export const base = Rebase.createClass(firebase.database())
 
 export const FirebaseContext = React.createContext(firebase)
 

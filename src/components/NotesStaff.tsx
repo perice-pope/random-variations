@@ -82,8 +82,8 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
     this.redraw()
   }
 
-  public redraw = () => {
-    console.log('redraw')
+  private redraw = () => {
+    console.log('NotesStaff -> redraw')
     const { width, height } = this.props
 
     // Configure the rendering context
@@ -106,6 +106,7 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
   }
 
   private drawActiveNoteLine = () => {
+    console.log('NotesStaff -> drawActiveNoteLine')
     const { stave } = this
     if (!stave) {
       return
@@ -137,11 +138,11 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
       )
       .stroke()
 
-    this.activeLineEl.classList.add(
-      'vf-active-line',
-      activeNoteClasses.base,
-      activeNoteClasses.hidden,
-    )
+    this.activeLineEl.classList.add('vf-active-line', activeNoteClasses.base)
+
+    if (!this.props.isPlaying) {
+      this.activeLineEl.classList.add(activeNoteClasses.hidden)
+    }
 
     // @ts-ignore
     this.renderContext.closeGroup()
@@ -168,7 +169,7 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
   }
 
   private drawStaveAndClef = () => {
-    console.log('drawStaveAndClef')
+    console.log('NotesStaff -> drawStaveAndClef')
     const { width } = this.props
 
     // Create a stave of at position 10, 40 on the canvas.
@@ -183,7 +184,7 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
   }
 
   private drawNotes = () => {
-    console.log('drawNotes')
+    console.log('NotesStaff -> drawNotes')
     const { ticks } = this.props
     const { stave, renderContext } = this
 
@@ -242,9 +243,12 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
   }
 
   updateActiveNoteLine = () => {
-    console.log('drawActiveNoteLine')
-    if (!this.stave || !this.activeLineEl) {
+    if (!this.stave) {
       return
+    }
+
+    if (!this.activeLineEl) {
+      this.drawActiveNoteLine()
     }
 
     const { activeTickIndex } = this.props
