@@ -21,7 +21,7 @@ import { EnharmonicFlatsMap, ChromaticNoteSharps } from 'src/types'
 import { css } from 'emotion'
 import { lighten } from 'polished'
 import { withAudioEngine } from './withAudioEngine'
-import AudioEngine from './services/audioEngine'
+import AudioEngine from '../services/audioEngine'
 import styled from 'react-emotion'
 
 const chromaticNotes = TonalRange.chromatic(['C4', 'B4'], true)

@@ -8,7 +8,7 @@ import { lighten, darken, getLuminance, opacify, rgb, rgba } from 'polished'
 
 import { Box } from './ui'
 import { withAudioEngine } from './withAudioEngine'
-import AudioEngine from './services/audioEngine'
+import AudioEngine from '../services/audioEngine'
 
 const pianoNoteRangeWide: MidiNoteRange = {
   first: tonal.Note.midi('C3'),

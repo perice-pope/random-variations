@@ -6,6 +6,10 @@ export type ChromaticNoteSharps = 'A#' | 'C#' | 'D#' | 'F#' | 'G#'
 
 export type EnharmonicFlatsMap = { [key in ChromaticNoteSharps]: boolean }
 
+export type User = {
+  displayName: string | null
+}
+
 export interface PlayableLoopTick {
   // If empty, it represents a break
   notes: PlayableNote[]
