@@ -13,6 +13,7 @@ import withMobileDialog, {
 } from '@material-ui/core/withMobileDialog'
 
 import { withFirebase } from 'src/services/firebase'
+import { Typography } from '@material-ui/core'
 
 type SignInModalProps = {
   firebase: any
@@ -39,6 +40,15 @@ class SignInModal extends React.Component<SignInModalProps & InjectedProps> {
       >
         <DialogTitle id="sign-in-dialog">Sign in</DialogTitle>
         <DialogContent>
+          <Typography>
+            Please sign in or create a free account to use all our features:
+            <ul>
+              <li>Saving your sessions</li>
+              <li>Sharing sessions with others</li>
+              <li>MIDI export</li>
+              <li>...and more!</li>
+            </ul>
+          </Typography>
           <StyledFirebaseAuth
             uiConfig={uiConfig}
             firebaseAuth={this.props.firebase.auth()}

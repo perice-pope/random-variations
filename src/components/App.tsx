@@ -17,10 +17,13 @@ import Toolbar from '@material-ui/core/Toolbar'
 import MuiButton from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import IconButton from '@material-ui/core/IconButton'
-import MenuIcon from '@material-ui/icons/Menu'
+import Hidden from '@material-ui/core/Hidden'
+
 import SettingsIcon from '@material-ui/icons/Settings'
 import PlayIcon from '@material-ui/icons/PlayArrow'
 import StopIcon from '@material-ui/icons/Stop'
+import ListIcon from '@material-ui/icons/List'
+import ShareIcon from '@material-ui/icons/Share'
 import ArrowsIcon from '@material-ui/icons/Cached'
 import TextField from '@material-ui/core/TextField'
 import InputAdornment from '@material-ui/core/InputAdornment'
@@ -875,6 +878,7 @@ class App extends React.Component<{}, AppState> {
 
   private renderApp = () => {
     const {
+      isSignedIn,
       bpm,
       rests,
       noteCards,
@@ -884,7 +888,11 @@ class App extends React.Component<{}, AppState> {
       activeNoteCardIndex,
       activeStaffTickIndex,
       noteCardWithMouseOver,
+      activeSessionId,
+      sessionsById,
     } = this.state
+
+    const activeSession = activeSessionId ? sessionsById[activeSessionId] : null
 
     const activeNoteCard = isPlaying
       ? noteCards[activeNoteCardIndex]
@@ -905,32 +913,50 @@ class App extends React.Component<{}, AppState> {
       <>
         <AppBar position="static">
           <Toolbar variant="dense">
-            <IconButton color="inherit" aria-label="Menu">
-              <MenuIcon />
-            </IconButton>
-            <Typography
-              variant="h6"
-              color="inherit"
-              className={css({ flexGrow: 1 })}
-            >
-              Random Variations
-            </Typography>
-
-            {!this.state.isSignedIn ? (
-              <MuiButton color="inherit" onClick={this.openSignInModal}>
-                Sign in
-              </MuiButton>
-            ) : (
-              <MuiButton color="inherit" onClick={this.signOut}>
-                Sign out
-              </MuiButton>
-            )}
-
             <IconButton color="inherit" onClick={this.openSettingsModal}>
               <SettingsIcon />
             </IconButton>
+
+            {activeSession && (
+              <MuiButton
+                color="inherit"
+                variant="flat"
+                onClick={!isSignedIn ? this.openSignInModal : undefined}
+              >
+                <ListIcon />
+                <Hidden xsDown>My sessions</Hidden>
+              </MuiButton>
+            )}
+            {activeSession && (
+              <MuiButton
+                color="inherit"
+                variant="flat"
+                onClick={!isSignedIn ? this.openSignInModal : undefined}
+              >
+                <ShareIcon />
+                <Hidden xsDown>Share</Hidden>
+              </MuiButton>
+            )}
+
+            <Box className={css({ flexGrow: 1 })} />
+
+            {!isSignedIn ? (
+              <MuiButton
+                // color="primary"
+                color="secondary"
+                onClick={this.openSignInModal}
+                variant="raised"
+              >
+                Sign in
+              </MuiButton>
+            ) : (
+              <MuiButton color="inherit" onClick={this.signOut} variant="flat">
+                Log out
+              </MuiButton>
+            )}
           </Toolbar>
         </AppBar>
+
         <Flex
           pt={[3, 3, 4]}
           flex={1}
@@ -1190,7 +1216,19 @@ class App extends React.Component<{}, AppState> {
   }
 
   private renderLoader = () => {
-    return <CircularProgress size={50} />
+    return (
+      <Flex flexDirection="column" alignItems="center">
+        <Typography variant="h4" color="primary">
+          Random Variations
+        </Typography>
+        <Typography variant="h6" color="secondary">
+          Your music practice app
+        </Typography>
+        <Box mt={3}>
+          <CircularProgress size={50} />
+        </Box>
+      </Flex>
+    )
   }
 
   public render() {
