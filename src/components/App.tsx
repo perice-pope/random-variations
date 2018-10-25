@@ -437,13 +437,13 @@ class App extends React.Component<{}, AppState> {
               isSignedIn: !!user,
               currentUser: user || undefined,
             },
-            () => {
+            async () => {
               unregisterInitAuthObserver()
 
               if (user) {
-                this.fetchAndRestoreSessions()
+                await this.fetchAndRestoreSessions()
               } else {
-                this.loadDefaultSession()
+                await this.loadDefaultSession()
               }
 
               resolve()
