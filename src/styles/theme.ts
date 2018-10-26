@@ -2,8 +2,6 @@ const colors = {
   white: '#FFFFFF',
   lightGray: '#C0C3C7',
   gray: '#909599',
-  primary: 'rgba(213,255,169,1)',
-  secondary: 'rgba(152,255,193,1)',
 }
 
 const theme = {

@@ -42,7 +42,9 @@ type AudioFontOption = {
   value: AudioFontId
 }
 
-const AudioFontOptions: AudioFontOption[] = AudioFontConfig.map(afc => ({
+const AudioFontOptions: AudioFontOption[] = AudioFontConfig.filter(
+  ({ id }) => id !== 'metronome',
+).map(afc => ({
   title: afc.title,
   value: afc.id,
 }))

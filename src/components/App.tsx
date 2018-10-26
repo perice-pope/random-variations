@@ -26,6 +26,8 @@ import ListIcon from '@material-ui/icons/List'
 import ShareIcon from '@material-ui/icons/Share'
 import SaveIcon from '@material-ui/icons/Save'
 import ArrowsIcon from '@material-ui/icons/Cached'
+import TimerIcon from '@material-ui/icons/Timer'
+import MetronomeIcon from 'mdi-material-ui/Metronome'
 import TextField from '@material-ui/core/TextField'
 import InputAdornment from '@material-ui/core/InputAdornment'
 
@@ -93,6 +95,11 @@ type Session = {
 
   bpm: number
   rests: number
+
+  countInCounts: number
+  countInEnabled: boolean
+  metronomeEnabled: boolean
+
   noteCards: SessionNoteCard[]
   modifiers: NoteModifiers
 }
@@ -109,6 +116,9 @@ type AppState = {
 
   bpm: number
   rests: number
+  countInCounts: number
+  countInEnabled: boolean
+  metronomeEnabled: boolean
   isPlaying: boolean
 
   audioFontId: AudioFontId
@@ -146,6 +156,8 @@ const createDefaultSession = () => {
 
     bpm: 120,
     rests: 1,
+    countInCounts: 3,
+    countInEnabled: false,
     modifiers: {
       arpeggio: {
         enabled: true,
@@ -223,6 +235,9 @@ const unpackSessionState = (session: Session) => {
     noteCardsById,
     bpm: session.bpm,
     rests: session.rests,
+    countInCounts: session.countInCounts,
+    countInEnabled: session.countInEnabled,
+    metronomeEnabled: session.metronomeEnabled,
     modifiers: session.modifiers,
   }
 }
@@ -239,7 +254,7 @@ class App extends React.Component<{}, AppState> {
     this.state = _.merge({
       isInitialized: false,
       isLoadingAudioFont: false,
-      audioFontId: AudioFontsConfig[0].id,
+      audioFontId: AudioFontsConfig[1].id,
 
       sessionsById: {},
 
@@ -466,6 +481,11 @@ class App extends React.Component<{}, AppState> {
   private initAudioEngine = async () => {
     audioEngine.setBpm(this.state.bpm)
     audioEngine.setAnimationCallback(this.drawAnimation)
+    audioEngine.setMetronomeEnabled(this.state.metronomeEnabled)
+    audioEngine.setCountIn(
+      this.state.countInEnabled ? this.state.countInCounts : 0,
+    )
+
     await this.loadAndSetAudioFont(this.state.audioFontId)
   }
 
@@ -571,6 +591,10 @@ class App extends React.Component<{}, AppState> {
       // (state.activeStaffTickIndex + 1) % this.state.staffTicks.length
       const nextStaffNote = this.state.staffTicks[nextStaffNoteIndex]
       // TODO: optimize this serial search code to a hash lookup
+      if (!nextStaffNote) {
+        return null
+      }
+
       const nextNoteCardIndex = this.state.noteCards.findIndex(
         nc => nc.id === nextStaffNote.noteCardId,
       )
@@ -614,7 +638,7 @@ class App extends React.Component<{}, AppState> {
     }
   }
 
-  private updateActiveSession = data => {
+  private updateActiveSession = (data, updateNotes = true) => {
     const session = this.getActiveSession()
     if (!session) {
       return
@@ -640,7 +664,9 @@ class App extends React.Component<{}, AppState> {
         ...unpackSessionState(updatedSession),
       },
       () => {
-        this.onNotesUpdated()
+        if (updateNotes) {
+          this.onNotesUpdated()
+        }
         this.saveAppState()
       },
     )
@@ -659,8 +685,53 @@ class App extends React.Component<{}, AppState> {
       }
     } finally {
       audioEngine.setBpm(bpmValue)
-      this.updateActiveSession({ bpm: bpmValue })
+      this.updateActiveSession({ bpm: bpmValue }, false)
     }
+  }
+
+  private handleCountInCountsChange = e => {
+    let value = this.state.countInCounts
+    try {
+      if (!e.target.value) {
+        value = 0
+      } else {
+        value = parseInt(e.target.value, 10)
+        if (isNaN(value)) {
+          value = 0
+        }
+        if (value > 16) {
+          value = 16
+        }
+        if (value < 0) {
+          value = 0
+        }
+      }
+    } finally {
+      audioEngine.setCountIn(this.state.countInEnabled ? value : 0)
+      this.updateActiveSession({ countInCounts: value }, false)
+    }
+  }
+
+  private handleCountInToggle = () => {
+    audioEngine.setCountIn(
+      this.state.countInEnabled ? 0 : this.state.countInCounts,
+    )
+    this.updateActiveSession(
+      {
+        countInEnabled: !Boolean(this.state.countInEnabled),
+      },
+      false,
+    )
+  }
+
+  private handleMetronomeToggle = () => {
+    audioEngine.setMetronomeEnabled(!Boolean(this.state.metronomeEnabled))
+    this.updateActiveSession(
+      {
+        metronomeEnabled: !Boolean(this.state.metronomeEnabled),
+      },
+      false,
+    )
   }
 
   private handleRestsChange = e => {
@@ -930,6 +1001,9 @@ class App extends React.Component<{}, AppState> {
       isSignedIn,
       bpm,
       rests,
+      countInCounts,
+      countInEnabled,
+      metronomeEnabled,
       noteCards,
       staffTicks,
       staffTicksPerCard,
@@ -962,6 +1036,10 @@ class App extends React.Component<{}, AppState> {
       <>
         <AppBar position="static">
           <Toolbar variant="dense">
+            <IconButton color="inherit" onClick={this.openSettingsModal}>
+              <SettingsIcon />
+            </IconButton>
+
             {activeSession &&
               isSignedIn && (
                 <MuiButton
@@ -1027,10 +1105,6 @@ class App extends React.Component<{}, AppState> {
                 <Text ml={2}>Log out</Text>
               </MuiButton>
             )}
-
-            <IconButton color="inherit" onClick={this.openSettingsModal}>
-              <SettingsIcon />
-            </IconButton>
           </Toolbar>
         </AppBar>
 
@@ -1052,17 +1126,23 @@ class App extends React.Component<{}, AppState> {
             flexWrap="wrap"
             justifyContent="center"
           >
-            <Box flex="1" className={css({ whiteSpace: 'nowrap' })} mb={1}>
+            <Box
+              flex="1"
+              className={css({ whiteSpace: 'nowrap' })}
+              mb={1}
+              mr={2}
+            >
               <Button
                 title={isPlaying ? 'Stop' : 'Play'}
                 bg={isPlaying ? 'red' : '#00c200'}
                 m={[1, 2]}
+                className={css({ maxWidth: '100px' })}
                 onClick={this.togglePlayback}
               >
                 {isPlaying ? (
-                  <StopIcon className={css({ marginRight: '0.5rem' })} />
+                  <StopIcon className={css({ margin: '0 0.5rem' })} />
                 ) : (
-                  <PlayIcon className={css({ marginRight: '0.5rem' })} />
+                  <PlayIcon className={css({ margin: '0 0.5rem' })} />
                 )}
                 <Hidden xsDown>{isPlaying ? 'Stop' : 'Play'}</Hidden>
               </Button>
@@ -1073,19 +1153,46 @@ class App extends React.Component<{}, AppState> {
                 m={[1, 2]}
                 onClick={this.handleShuffleClick}
               >
-                <ArrowsIcon className={css({ marginRight: '0.5rem' })} />
-                <Hidden xsDown>Shuffle</Hidden>
+                <ArrowsIcon className={css({ margin: '0 0.5rem' })} />
+                <Hidden smDown>Shuffle</Hidden>
+              </Button>
+
+              <Button
+                color={countInEnabled ? 'primary' : 'default'}
+                title={
+                  countInEnabled
+                    ? 'Turn off counting in'
+                    : 'Turn on counting in'
+                }
+                m={[1, 2]}
+                onClick={this.handleCountInToggle}
+              >
+                <TimerIcon className={css({ margin: '0 0.5rem' })} />
+                <Hidden smDown>Count in</Hidden>
+              </Button>
+
+              <Button
+                color={metronomeEnabled ? 'primary' : 'default'}
+                title={
+                  metronomeEnabled ? 'Turn metronome off' : 'Turn metronome on'
+                }
+                m={[1, 2]}
+                onClick={this.handleMetronomeToggle}
+              >
+                <MetronomeIcon className={css({ margin: '0 0.5rem' })} />
+                <Hidden smDown>Metronome</Hidden>
               </Button>
             </Box>
 
             <Box mb={1}>
               <TextField
-                className={css({ maxWidth: '80px' })}
+                className={css({ maxWidth: '95px' })}
                 label="Tempo"
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">BPM</InputAdornment>
                   ),
+                  className: css({ fontSize: '1.3rem' }),
                 }}
                 id="bpm"
                 type="number"
@@ -1102,6 +1209,9 @@ class App extends React.Component<{}, AppState> {
                   marginLeft: '15px',
                   maxWidth: '50px',
                 })}
+                InputProps={{
+                  className: css({ fontSize: '1.3rem' }),
+                }}
                 label="Rests"
                 id="rests"
                 type="number"
@@ -1111,6 +1221,26 @@ class App extends React.Component<{}, AppState> {
                 max="8"
                 value={`${rests}`}
                 onChange={this.handleRestsChange}
+              />
+
+              <TextField
+                className={css({
+                  marginLeft: '15px',
+                  maxWidth: '65px',
+                })}
+                InputProps={{
+                  className: css({ fontSize: '1.3rem' }),
+                }}
+                label="Count in"
+                id="countInCounts"
+                disabled={!countInEnabled}
+                type="number"
+                // @ts-ignore
+                step="1"
+                min="0"
+                max="16"
+                value={`${countInCounts}`}
+                onChange={this.handleCountInCountsChange}
               />
             </Box>
           </Flex>

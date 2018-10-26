@@ -42,6 +42,7 @@ const ButtonStyled = styled(MuiButton, {
   ${ss.display}
   ${ss.alignItems}
   ${ss.justifyContent}
+
   cursor: pointer;
   user-select: none;
 
