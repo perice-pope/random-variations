@@ -18,6 +18,8 @@ import MuiButton from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import IconButton from '@material-ui/core/IconButton'
 import Hidden from '@material-ui/core/Hidden'
+import Snackbar from '@material-ui/core/Snackbar'
+import CloseIcon from '@material-ui/icons/Close'
 
 import SettingsIcon from '@material-ui/icons/Settings'
 import PlayIcon from '@material-ui/icons/PlayArrow'
@@ -105,6 +107,10 @@ type Session = {
 }
 
 type AppState = {
+  isOnline?: boolean
+  isOfflineNotificationShown: boolean
+  isOnlineNotificationShown: boolean
+
   isSignedIn: boolean
   currentUser?: User
 
@@ -253,6 +259,8 @@ class App extends React.Component<{}, AppState> {
 
     this.state = _.merge({
       isInitialized: false,
+      isOfflineNotificationShown: false,
+      isOnlineNotificationShown: false,
       isLoadingAudioFont: false,
       audioFontId: AudioFontsConfig[1].id,
 
@@ -443,6 +451,26 @@ class App extends React.Component<{}, AppState> {
   private init = async () => {
     this.restoreLocalState()
 
+    // Track the "online/offline" state, see:
+    // https://firebase.google.com/docs/database/web/offline-capabilities#section-connection-state
+    const connectedRef = firebase.database().ref('.info/connected')
+    connectedRef.on('value', snap => {
+      if (snap && snap.val() === true) {
+        if (this.state.isOfflineNotificationShown) {
+          this.setState({ isOnlineNotificationShown: true })
+        }
+        this.setState({ isOnline: true, isOfflineNotificationShown: false })
+        console.log('CONNECTED: YES')
+      } else {
+        this.setState({
+          isOnline: false,
+          isOfflineNotificationShown: true,
+          isOnlineNotificationShown: false,
+        })
+        console.log('CONNECTED: NO')
+      }
+    })
+
     await new Promise(resolve => {
       const unregisterInitAuthObserver = firebase
         .auth()
@@ -455,7 +483,7 @@ class App extends React.Component<{}, AppState> {
             async () => {
               unregisterInitAuthObserver()
 
-              if (user) {
+              if (user && this.state.isOnline !== false) {
                 await this.fetchAndRestoreSessions()
               } else {
                 await this.loadDefaultSession()
@@ -1447,6 +1475,87 @@ class App extends React.Component<{}, AppState> {
     )
   }
 
+  private closeOfflineNotification = () => {
+    this.setState({ isOfflineNotificationShown: false })
+  }
+
+  private closeOnlineNotification = () => {
+    this.setState({ isOnlineNotificationShown: false })
+  }
+
+  private renderOfflineNotification = () => {
+    if (!this.state.isOfflineNotificationShown) {
+      return null
+    }
+
+    return (
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        open={this.state.isOfflineNotificationShown}
+        onClose={this.closeOfflineNotification}
+        ContentProps={{
+          className: css({ backgroundColor: '#FF7E79' }),
+          'aria-describedby': 'offline-notification-message',
+        }}
+        message={
+          <span id="offline-notification-message">
+            You're offline - you won't be able to use your saved sessions and a few other features
+          </span>
+        }
+        action={[
+          <IconButton
+            key="close"
+            aria-label="Close"
+            color="inherit"
+            onClick={this.closeOfflineNotification}
+          >
+            <CloseIcon />
+          </IconButton>,
+        ]}
+      />
+    )
+  }
+
+  private renderOnlineNotification = () => {
+    if (!this.state.isOnlineNotificationShown) {
+      return null
+    }
+
+    return (
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        autoHideDuration={30000}
+        open={this.state.isOnlineNotificationShown}
+        onClose={this.closeOnlineNotification}
+        ContentProps={{
+          className: css({ backgroundColor: '#4BCB7C' }),
+          'aria-describedby': 'online-notification-message',
+        }}
+        message={
+          <span id="online-notification-message">
+            You're back online - please refresh the page to enjoy all features
+          </span>
+        }
+        action={[
+          <IconButton
+            key="close"
+            aria-label="Close"
+            color="inherit"
+            onClick={this.closeOnlineNotification}
+          >
+            <CloseIcon />
+          </IconButton>,
+        ]}
+      />
+    )
+  }
+
   public render() {
     return (
       <ThemeProvider theme={theme}>
@@ -1455,6 +1564,9 @@ class App extends React.Component<{}, AppState> {
             <JssProvider jss={jss} generateClassName={generateClassName}>
               <>
                 <CssBaseline />
+
+                {this.renderOfflineNotification()}
+                {this.renderOnlineNotification()}
 
                 <Flex
                   height="100vh"
