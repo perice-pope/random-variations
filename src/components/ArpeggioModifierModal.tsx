@@ -15,6 +15,7 @@ import withMobileDialog from '@material-ui/core/withMobileDialog'
 import InputLabel from '@material-ui/core/InputLabel'
 import FormControl from '@material-ui/core/FormControl'
 import NativeSelect from '@material-ui/core/NativeSelect'
+import ArrowsIcon from '@material-ui/icons/Cached'
 
 import PatternEditor from './PatternEditor'
 
@@ -25,7 +26,7 @@ import {
   StaffTick,
 } from 'src/types'
 import { ChangeEvent } from 'react'
-import { Input } from '@material-ui/core'
+import { Input, Tooltip } from '@material-ui/core'
 import { css } from 'react-emotion'
 import {
   generateChordPatternFromPreset,
@@ -158,9 +159,9 @@ class ArpeggioModifierModal extends React.Component<
     const baseNote = 'C4'
     const staffTicks: StaffTick[] = this.state.values.pattern.items.map(
       (item, index) => {
-        const note = item.note
-          ? transpose(baseNote, intervals[item.note - 1])
-          : undefined
+        const note = item.muted
+          ? undefined
+          : transpose(baseNote, intervals[item.note - 1])
         return {
           id: `${index}`,
           notes: note
@@ -180,6 +181,18 @@ class ArpeggioModifierModal extends React.Component<
     return staffTicks
   }
 
+  handleRandomizePattern = () => {
+    const chord = chordsByChordType[this.state.values.chordType]
+    const { pattern } = this.state.values
+    const newPattern = {
+      ...pattern,
+      items: pattern.items.map(() => ({
+        note: _.random(1, chord.notesCount),
+      })),
+    }
+    this.handlePatternChange(newPattern)
+  }
+
   render() {
     const chord = chordsByChordType[this.state.values.chordType]
     return (
@@ -192,7 +205,15 @@ class ArpeggioModifierModal extends React.Component<
       >
         <DialogTitle id="arpeggio-modifier-dialog">Chords</DialogTitle>
 
-        <DialogContent>
+        <DialogContent
+          id="arpeggio-modifier-dialog-content"
+          className={css({
+            maxWidth: '600px',
+            margin: '0 auto',
+            width: '100%',
+            marginTop: '2rem',
+          })}
+        >
           <Flex flexDirection="row">
             <FormControl className={css({ flex: 1 })}>
               <InputLabel htmlFor="chord-type">Chord type</InputLabel>
@@ -209,31 +230,56 @@ class ArpeggioModifierModal extends React.Component<
                 ))}
               </NativeSelect>
             </FormControl>
-
-            <FormControl className={css({ flex: 1, marginLeft: '2rem' })}>
-              <InputLabel htmlFor="arp-pattern-preset">Pattern</InputLabel>
-              <NativeSelect
-                value={this.state.values.patternPreset}
-                onChange={this.handlePatternPresetSelected}
-                name="patternPreset"
-                input={<Input id="arp-pattern-preset" />}
-              >
-                {patternPresetOptions.map(({ title, value }) => (
-                  <option key={value} value={value}>
-                    {title}
-                  </option>
-                ))}
-              </NativeSelect>
-            </FormControl>
           </Flex>
 
-          <Flex mt={[1, 2, 4]}>
-            <PatternEditor
-              value={this.state.values.pattern}
-              onChange={this.handlePatternChange}
-              min={1}
-              max={chord.notesCount}
-            />
+          <Flex mt={[1, 2, 4]} flexDirection="column">
+            <Flex flexWrap="wrap" flexDirection="row" mt={4}>
+              <FormControl className={css({ flex: 1, marginRight: '1rem' })}>
+                <InputLabel htmlFor="arp-pattern-preset">Pattern</InputLabel>
+                <NativeSelect
+                  value={this.state.values.patternPreset}
+                  onChange={this.handlePatternPresetSelected}
+                  name="patternPreset"
+                  input={<Input id="arp-pattern-preset" />}
+                >
+                  {patternPresetOptions.map(({ title, value }) => (
+                    <option key={value} value={value}>
+                      {title}
+                    </option>
+                  ))}
+                </NativeSelect>
+              </FormControl>
+
+              <Tooltip title="Randomize pattern" disableFocusListener={true}>
+                <MuButton
+                  color="primary"
+                  className={css({ minWidth: '40px' })}
+                  size="small"
+                  variant="outlined"
+                  aria-label="Randomize pattern"
+                  disabled={this.state.values.pattern.items.length < 1}
+                  onClick={this.handleRandomizePattern}
+                >
+                  <ArrowsIcon
+                    fontSize="small"
+                    className={css({ marginRight: '0.5rem' })}
+                  />{' '}
+                  Randomize
+                </MuButton>
+              </Tooltip>
+            </Flex>
+
+            <Box width={1} mt={3}>
+              <PatternEditor
+                value={this.state.values.pattern}
+                onChange={this.handlePatternChange}
+                min={1}
+                max={chord.notesCount}
+                getSortableContainer={() =>
+                  document.getElementById('arpeggio-modifier-dialog-content')
+                }
+              />
+            </Box>
           </Flex>
 
           <Box>
@@ -241,6 +287,7 @@ class ArpeggioModifierModal extends React.Component<
               id="chord-preview"
               ticks={this.generateStaffTicks()}
               isPlaying={false}
+              showBreaks
               activeTickIndex={undefined}
               height={160}
             />

@@ -22,6 +22,7 @@ type NotesStaffProps = {
   id: string
   ticks: StaffTick[]
   isPlaying: boolean
+  showBreaks?: boolean
   activeTickIndex?: number
   height: number
   containerProps?: BoxProps
@@ -238,6 +239,12 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
         return note
       })
+
+      if (tickNotes.length === 0 && this.props.showBreaks) {
+        // Add a break symbol
+        const pause = new Vex.Flow.StaveNote({ keys: ['b/4'], duration: 'qr' })
+        tickNotes.push(pause)
+      }
 
       return tickNotes
     })

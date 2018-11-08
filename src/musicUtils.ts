@@ -19,37 +19,40 @@ import {
 } from './types'
 
 const getAllChordOptions: () => Chord[] = memoize(() => {
-  return [
-    {
-      type: 'm',
-      title: 'Minor triad',
-    },
-    {
-      type: 'M',
-      title: 'Major triad',
-    },
-    {
-      type: 'maj7',
-      title: 'Major 7th',
-    },
-    {
-      type: 'm7',
-      title: 'Minor 7th',
-    },
-    {
-      type: 'M69#11',
-      title: 'M69#11',
-    },
-    // TODO: provide better names for chords
-    ...tonalChord.names().map(name => ({ title: name, type: name })),
-  ].map(({ type, title }) => {
-    const intervals = tonalChord.intervals(type)
-    return {
-      type,
-      title,
-      notesCount: intervals.length,
-    } as Chord
-  }) as Chord[]
+  return _.uniqBy(
+    [
+      {
+        type: 'm',
+        title: 'Minor triad',
+      },
+      {
+        type: 'M',
+        title: 'Major triad',
+      },
+      {
+        type: 'maj7',
+        title: 'Major 7th',
+      },
+      {
+        type: 'm7',
+        title: 'Minor 7th',
+      },
+      {
+        type: 'M69#11',
+        title: 'M69#11',
+      },
+      // TODO: provide better names for chords
+      ...tonalChord.names().map(name => ({ title: name, type: name })),
+    ].map(({ type, title }) => {
+      const intervals = tonalChord.intervals(type)
+      return {
+        type,
+        title,
+        notesCount: intervals.length,
+      } as Chord
+    }) as Chord[],
+    'type',
+  )
 })
 
 export const chordOptions = getAllChordOptions()
@@ -187,12 +190,13 @@ export const addArpeggioNotes = (
 
   let noteNamesWithArpeggio
   const { items: arpeggioNotes, mainNoteIndex } = arpeggio.pattern
-  noteNamesWithArpeggio = arpeggioNotes.map(({ note }) => {
+  noteNamesWithArpeggio = arpeggioNotes.map(({ note, muted }) => {
+    if (muted) {
+      return undefined
+    }
     const interval = note ? chordIntervals[note - 1] || '1P' : '1P'
     return transpose(baseNote, interval)
   })
-
-  console.log('noteNamesWithArpeggio: ', noteNamesWithArpeggio)
 
   const notesWithArpeggio = noteNamesWithArpeggio.map((noteName, index) => {
     const isMainNote = mainNoteIndex === index
@@ -254,21 +258,23 @@ export const generateStaffTicks = ({
       )
     }
 
-    const notesForCardFull: StaffNote[] = notesForCard.map(
+    const notesForCardFull: (StaffNote | undefined)[] = notesForCard.map(
       note =>
-        ({
-          ...note,
-          id: uuid(),
-          noteCardId: noteCard.id,
-          midi: tonal.Note.midi(note.noteName),
-          color: note.isMainNote ? noteCard.color : note.color,
-        } as StaffNote),
+        note.noteName
+          ? ({
+              ...note,
+              id: uuid(),
+              noteCardId: noteCard.id,
+              midi: tonal.Note.midi(note.noteName),
+              color: note.isMainNote ? noteCard.color : note.color,
+            } as StaffNote)
+          : undefined,
     )
 
     let ticksForCard: StaffTick[] = notesForCardFull.map(note => ({
       id: uuid(),
       noteCardId: noteCard.id,
-      notes: [note],
+      notes: note ? [note] : [],
     }))
 
     // Add rests if needed

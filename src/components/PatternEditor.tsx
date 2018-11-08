@@ -3,32 +3,160 @@ import * as _ from 'lodash'
 
 import ArrowUpIcon from '@material-ui/icons/ArrowDropUp'
 import ArrowDownIcon from '@material-ui/icons/ArrowDropDown'
+import AddIcon from '@material-ui/icons/Add'
 
-import { ArpeggioPattern } from 'src/types'
-import { Button, NativeSelect, OutlinedInput } from '@material-ui/core'
+import {
+  SortableContainer,
+  SortableElement,
+  arrayMove,
+} from 'react-sortable-hoc'
+
+import { ArpeggioPattern, ArpeggioPatternElement } from 'src/types'
+import { Button, Tooltip, Menu, MenuItem } from '@material-ui/core'
 import { css } from 'react-emotion'
 import { Flex } from './ui/Flex'
+import { withState, compose } from 'recompose'
 
 type PatternEditorProps = {
+  getSortableContainer?: () => any
   value: ArpeggioPattern
   onChange: (pattern: ArpeggioPattern) => any
   min: number
   max: number
 }
 
-const renderSelectOptions = _.memoize(
-  (min, max) => {
-    const options: React.ReactNode[] = []
-    for (let i = min; i <= max; ++i) {
-      options.push(
-        <option key={i} value={i}>
-          {i}
-        </option>,
+const SortablePatternElement = SortableElement(
+  compose(
+    withState('menuOpen', 'setMenuOpen', false),
+    withState('menuAnchorEl', 'setMenuAnchorEl', null),
+  )(
+    // @ts-ignore
+    ({
+      menuOpen,
+      setMenuOpen,
+      menuAnchorEl,
+      setMenuAnchorEl,
+      onItemNoteChange,
+      onItemNoteMute,
+      onItemNoteDelete,
+      item,
+      itemIndex: index,
+      min,
+      max,
+    }: {
+      value: ArpeggioPatternElement
+      [k: string]: any
+    }) => {
+      return (
+        <>
+          <Menu
+            anchorReference="anchorEl"
+            anchorEl={menuAnchorEl}
+            open={menuOpen}
+            onClose={() => setMenuOpen(false)}
+          >
+            <MenuItem
+              autoFocus
+              onClick={() => {
+                onItemNoteMute(index, !item.muted)
+                setMenuOpen(false)
+              }}
+            >
+              {item.muted ? 'Unmute' : 'Mute'}
+            </MenuItem>
+            <MenuItem
+              autoFocus
+              onClick={() => {
+                onItemNoteDelete(index)
+                setMenuOpen(false)
+              }}
+            >
+              Remove
+            </MenuItem>
+          </Menu>
+
+          <Flex
+            flexDirection="column"
+            zIndex={5000}
+            alignItems="center"
+            mx={[1, 2, 2]}
+            my={[1, 2, 3]}
+            maxWidth={50}
+          >
+            <Button
+              tabIndex={-1}
+              className={css({ minWidth: '50px', padding: '0.5rem 0' })}
+              onClick={() => {
+                let value
+                if (item.note != null) {
+                  value = item.note < max ? item.note + 1 : min
+                } else {
+                  value = max
+                }
+                onItemNoteChange(index, value)
+              }}
+            >
+              <ArrowUpIcon />
+            </Button>
+
+            <Button
+              variant="outlined"
+              onClick={event => {
+                setMenuAnchorEl(event.target)
+                setMenuOpen(true)
+              }}
+              className={css({
+                fontSize: '2rem',
+                lineHeight: '2rem',
+                padding: '1rem !important',
+              })}
+            >
+              {item.muted ? '-' : item.note}
+            </Button>
+
+            <Button
+              tabIndex={-1}
+              className={css({ minWidth: '50px', padding: '0.5rem 0' })}
+              onClick={() => {
+                let value
+                if (item.note != null) {
+                  value = item.note > min ? item.note - 1 : max
+                } else {
+                  value = min
+                }
+                onItemNoteChange(index, value)
+              }}
+            >
+              <ArrowDownIcon />
+            </Button>
+          </Flex>
+        </>
       )
-    }
-    return options
-  },
-  (min, max) => `${min}:${max}`,
+    },
+  ),
+)
+
+const SortablePatternElements = SortableContainer(
+  ({ items, ...other }: { items: ArpeggioPatternElement[] }) => (
+    <Flex
+      // flex={1}
+      flexDirection="row"
+      // flexWrap="wrap"
+      // alignItems="center"
+      // justifyContent="center"
+    >
+      {items.map((item, index) => (
+        <SortablePatternElement
+          key={`item-${index}`}
+          index={index}
+          // @ts-ignore
+          item={item}
+          {...other}
+          itemIndex={index}
+        />
+      ))}
+    </Flex>
+  ),
 )
 
 // @ts-ignore
@@ -46,97 +174,83 @@ class PatternEditor extends React.Component<PatternEditorProps> {
     this.props.onChange(newPattern)
   }
 
+  handleItemNoteMutedChange = (index: number, muted: boolean) => {
+    const { value: pattern } = this.props
+
+    const newItems = [...pattern.items]
+    newItems[index].muted = muted
+
+    const newPattern = {
+      ...pattern,
+      items: newItems,
+    }
+    this.props.onChange(newPattern)
+  }
+
+  handleItemNoteDelete = (index: number) => {
+    const { value: pattern } = this.props
+
+    let newItems = [...pattern.items]
+    delete newItems[index]
+    newItems = newItems.filter(x => x)
+
+    const newPattern = {
+      ...pattern,
+      items: newItems,
+    }
+    this.props.onChange(newPattern)
+  }
+
+  handleAddNoteToPattern = () => {
+    const { value: pattern } = this.props
+    const newPattern = {
+      ...pattern,
+      items: [...pattern.items, { note: 1 }],
+    }
+    this.props.onChange(newPattern)
+  }
+
+  handleItemsReorder = ({ oldIndex, newIndex }) => {
+    const { value: pattern } = this.props
+    const newPattern = {
+      ...pattern,
+      items: arrayMove(pattern.items, oldIndex, newIndex),
+    }
+    this.props.onChange(newPattern)
+  }
+
   render() {
-    const { min, max, value: pattern } = this.props
+    const { getSortableContainer, min, max, value: pattern } = this.props
     return (
-      <Flex
-        flex={1}
-        flexDirection="row"
-        flexWrap="wrap"
-        alignItems="center"
-        justifyContent="center"
-      >
-        {pattern.items.map((item, index) => (
-          <Flex
-            flexDirection="column"
-            mx={[1, 2, 2]}
-            my={[1, 2, 3]}
-            maxWidth={50}
-          >
+      <Flex alignItems="center" justifyContent="center" flex={1}>
+        <SortablePatternElements
+          // @ts-ignore
+          onItemNoteChange={this.handleItemNoteChange}
+          onItemNoteDelete={this.handleItemNoteDelete}
+          onItemNoteMute={this.handleItemNoteMutedChange}
+          items={pattern.items}
+          axis="x"
+          distance={10}
+          onSortEnd={this.handleItemsReorder}
+          // @ts-ignore
+          min={min}
+          // @ts-ignore
+          max={max}
+          getContainer={getSortableContainer}
+        />
+        {pattern.items.length < 16 && (
+          <Tooltip title="Add note" disableFocusListener={true}>
             <Button
-              tabIndex={-1}
-              className={css({ minWidth: '50px', padding: '0.5rem 0' })}
-              onClick={() => {
-                let value
-                if (item.note != null) {
-                  value = item.note < max ? item.note + 1 : min
-                } else {
-                  value = max
-                }
-                this.handleItemNoteChange(index, value)
-              }}
+              className={css({ minWidth: '40px', marginLeft: '1rem' })}
+              variant="fab"
+              size="small"
+              aria-label="Add"
+              onClick={this.handleAddNoteToPattern}
             >
-              <ArrowUpIcon />
+              <AddIcon fontSize="small" />
             </Button>
-
-            <NativeSelect
-              value={item.note}
-              IconComponent={() => <></>}
-              classes={
-                {
-                  // select: css({ fontSize: '2rem', lineHeight: '2rem' }),
-                }
-              }
-              onChange={e => {
-                let value
-                if (e.target.value) {
-                  value = parseInt(e.target.value, 10)
-                  if (value > max) {
-                    value = max
-                  }
-                  if (value < min) {
-                    value = min
-                  }
-                }
-                this.handleItemNoteChange(index, value)
-              }}
-              input={
-                <OutlinedInput
-                  labelWidth={0}
-                  inputProps={{
-                    className: css({
-                      fontSize: '2rem',
-                      lineHeight: '2rem',
-                      padding: '1rem !important',
-                    }),
-                  }}
-                />
-              }
-            >
-              <optgroup
-                className={css({ fontSize: '1rem', lineHeight: '1rem' })}
-              >
-                {renderSelectOptions(min, max)}
-              </optgroup>
-            </NativeSelect>
-
-            <Button
-              tabIndex={-1}
-              className={css({ minWidth: '50px', padding: '0.5rem 0' })}
-              onClick={() => {
-                let value
-                if (item.note != null) {
-                  value = item.note > min ? item.note - 1 : max
-                } else {
-                  value = min
-                }
-                this.handleItemNoteChange(index, value)
-              }}
-            >
-              <ArrowDownIcon />
-            </Button>
-          </Flex>
-        ))}
+          </Tooltip>
+        )}
       </Flex>
     )
   }

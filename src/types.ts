@@ -67,7 +67,8 @@ export type ArpeggioType = 'M' | 'm' | 'maj7' | 'm7' | 'M69#11'
 export type ArpeggioPatternPreset = 'custom' | 'ascending' | 'descending'
 
 export interface ArpeggioPatternElement {
-  note?: number
+  note: number
+  muted?: boolean
 }
 
 export interface ArpeggioPattern {
