@@ -83,7 +83,7 @@ export default class AddEntityButton extends React.Component<
           onClose={this.closeMenu}
         >
           {!disableSingleNote && (
-            <MenuItem onClick={this.handleSingleNoteClick}>Note card</MenuItem>
+            <MenuItem onClick={this.handleSingleNoteClick}>Note</MenuItem>
           )}
           {!disableChords && (
             <MenuItem onClick={this.handleArpeggioClick}>Chord</MenuItem>

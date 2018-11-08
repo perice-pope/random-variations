@@ -1174,7 +1174,7 @@ class App extends React.Component<{}, AppState> {
 
                 <Button
                   variant="contained"
-                  title="Shuffle note cards"
+                  title="Shuffle notes"
                   m={[1, 2]}
                   onClick={this.handleShuffleClick}
                 >
