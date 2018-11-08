@@ -111,6 +111,7 @@ type Session = {
 }
 
 type AppState = {
+  hasInitializedOnlineStatus: boolean
   isOnline?: boolean
   isOfflineNotificationShown: boolean
   isOnlineNotificationShown: boolean
@@ -266,6 +267,8 @@ class App extends React.Component<{}, AppState> {
 
     this.state = _.merge({
       isInitialized: false,
+
+      hasInitializedOnlineStatus: false,
       isOfflineNotificationShown: false,
       isOnlineNotificationShown: false,
       isLoadingAudioFont: false,
@@ -449,19 +452,27 @@ class App extends React.Component<{}, AppState> {
     // https://firebase.google.com/docs/database/web/offline-capabilities#section-connection-state
     const connectedRef = firebase.database().ref('.info/connected')
     connectedRef.on('value', snap => {
-      if (snap && snap.val() === true) {
-        if (this.state.isOfflineNotificationShown) {
-          this.setState({ isOnlineNotificationShown: true })
+      if (snap) {
+        // Ignore the first time this callback is called
+        if (!this.state.hasInitializedOnlineStatus) {
+          this.setState({ hasInitializedOnlineStatus: true })
+          return
         }
-        this.setState({ isOnline: true, isOfflineNotificationShown: false })
-        console.log('CONNECTED: YES')
-      } else {
-        this.setState({
-          isOnline: false,
-          isOfflineNotificationShown: true,
-          isOnlineNotificationShown: false,
-        })
-        console.log('CONNECTED: NO')
+
+        if (snap.val() === true) {
+          if (this.state.isOfflineNotificationShown) {
+            this.setState({ isOnlineNotificationShown: true })
+          }
+          this.setState({ isOnline: true, isOfflineNotificationShown: false })
+          console.log('CONNECTED: YES')
+        } else {
+          this.setState({
+            isOnline: false,
+            isOfflineNotificationShown: true,
+            isOnlineNotificationShown: false,
+          })
+          console.log('CONNECTED: NO')
+        }
       }
     })
 
@@ -1526,7 +1537,7 @@ class App extends React.Component<{}, AppState> {
           vertical: 'bottom',
           horizontal: 'right',
         }}
-        autoHideDuration={30000}
+        autoHideDuration={5000}
         open={this.state.isOnlineNotificationShown}
         onClose={this.closeOnlineNotification}
         ContentProps={{
@@ -1534,9 +1545,7 @@ class App extends React.Component<{}, AppState> {
           'aria-describedby': 'online-notification-message',
         }}
         message={
-          <span id="online-notification-message">
-            You're back online - please refresh the page to enjoy all features
-          </span>
+          <span id="online-notification-message">You're back online!</span>
         }
         action={[
           <IconButton
