@@ -49,8 +49,6 @@ import NoteCards from './NoteCards'
 import {
   NoteCardType,
   StaffTick,
-  ArpeggioType,
-  ArpeggioDirection,
   NoteModifiers,
   ChromaticApproachesType,
   PlayableLoopTick,
@@ -60,13 +58,19 @@ import {
   User,
 } from '../types'
 import PickNoteModal from './PickNoteModal'
-import ArpeggioModifierModal from './ArpeggioModifierModal'
+import ArpeggioModifierModal, {
+  SubmitValuesType as ArpeggioModifierModalSubmitValues,
+} from './ArpeggioModifierModal'
 import ChromaticApproachesModifierModal from './ChromaticApproachesModifierModal'
 import PianoKeyboard from './PianoKeyboard'
 
 import SettingsModal from './SettingsModal'
 import AddEntityButton from './AddEntityButton'
-import { generateStaffTicks } from '../musicUtils'
+import {
+  generateStaffTicks,
+  generateChordPatternFromPreset,
+  chordsByChordType,
+} from '../musicUtils'
 import AudioFontsConfig, { AudioFontId } from '../audioFontsConfig'
 import AudioEngine, { AnimationCallback } from '../services/audioEngine'
 import { AudioEngineContext } from './withAudioEngine'
@@ -167,8 +171,12 @@ const createDefaultSession = () => {
     modifiers: {
       arpeggio: {
         enabled: true,
-        direction: 'up',
-        type: 'M',
+        chordType: 'M',
+        patternPreset: 'ascending',
+        pattern: generateChordPatternFromPreset({
+          chord: chordsByChordType['M'],
+          patternPreset: 'ascending',
+        }),
       },
       chromaticApproaches: {
         enabled: false,
@@ -249,8 +257,6 @@ const unpackSessionState = (session: Session) => {
 }
 
 class App extends React.Component<{}, AppState> {
-  private notesStaffRef: React.RefObject<NotesStaff>
-  private notesStaffContainerRef: React.RefObject<any>
   private unregisterAuthObserver: firebase.Unsubscribe
   private unregisterSessionsObserver: firebase.Unsubscribe
 
@@ -306,9 +312,6 @@ class App extends React.Component<{}, AppState> {
 
       settingsModalIsOpen: false,
     })
-
-    this.notesStaffRef = React.createRef()
-    this.notesStaffContainerRef = React.createRef()
   }
 
   componentDidMount() {
@@ -590,7 +593,7 @@ class App extends React.Component<{}, AppState> {
         notes: staffTick.notes,
         meta: {
           staffTickIndex: index,
-          noteCardId: staffTick.noteCardId,
+          noteCardId: staffTick.noteCardId!,
         },
       }),
     )
@@ -826,12 +829,6 @@ class App extends React.Component<{}, AppState> {
   }
 
   private handleScreenSizeUpdate = ({ width, height }) => {
-    if (this.notesStaffContainerRef.current) {
-      const {
-        width: notesStaffWidth,
-      } = this.notesStaffContainerRef.current.getBoundingClientRect()
-      this.setState({ notesStaffWidth })
-    }
     this.setState({ width, height })
   }
 
@@ -939,20 +936,15 @@ class App extends React.Component<{}, AppState> {
     })
   }
 
-  private handleArpeggioModifierModalConfirm = ({
-    type,
-    direction,
-  }: {
-    type: ArpeggioType
-    direction: ArpeggioDirection
-  }) => {
+  private handleArpeggioModifierModalConfirm = (
+    values: ArpeggioModifierModalSubmitValues,
+  ) => {
     this.updateActiveSession({
       modifiers: {
         ...this.state.modifiers,
         arpeggio: {
+          ...values,
           enabled: true,
-          type,
-          direction,
         },
       },
     })
@@ -1062,399 +1054,404 @@ class App extends React.Component<{}, AppState> {
 
     return (
       <>
-        <AppBar position="static">
-          <Toolbar variant="dense">
-            <IconButton color="inherit" onClick={this.openSettingsModal}>
-              <SettingsIcon />
-            </IconButton>
+        <MeasureScreenSize onUpdate={this.handleScreenSizeUpdate} fireOnMount>
+          <AppBar position="static">
+            <Toolbar variant="dense">
+              <IconButton color="inherit" onClick={this.openSettingsModal}>
+                <SettingsIcon />
+              </IconButton>
 
-            {activeSession &&
-              isSignedIn && (
+              {activeSession &&
+                isSignedIn && (
+                  <MuiButton
+                    color="inherit"
+                    variant="flat"
+                    onClick={!isSignedIn ? this.openSignInModal : undefined}
+                  >
+                    <ListIcon />
+                    <Hidden xsDown>My sessions</Hidden>
+                  </MuiButton>
+                )}
+
+              {!isSignedIn && (
+                <MuiButton
+                  color="secondary"
+                  variant="raised"
+                  onClick={!isSignedIn ? this.openSignInModal : undefined}
+                >
+                  <SaveIcon />
+                  <Hidden xsDown>Save</Hidden>
+                </MuiButton>
+              )}
+
+              {activeSession && (
                 <MuiButton
                   color="inherit"
                   variant="flat"
                   onClick={!isSignedIn ? this.openSignInModal : undefined}
                 >
-                  <ListIcon />
-                  <Hidden xsDown>My sessions</Hidden>
+                  <ShareIcon />
+                  <Hidden xsDown>Share</Hidden>
                 </MuiButton>
               )}
 
-            {!isSignedIn && (
-              <MuiButton
-                color="secondary"
-                variant="raised"
-                onClick={!isSignedIn ? this.openSignInModal : undefined}
-              >
-                <SaveIcon />
-                <Hidden xsDown>Save</Hidden>
-              </MuiButton>
-            )}
+              <Box className={css({ flexGrow: 1 })} />
 
-            {activeSession && (
-              <MuiButton
-                color="inherit"
-                variant="flat"
-                onClick={!isSignedIn ? this.openSignInModal : undefined}
-              >
-                <ShareIcon />
-                <Hidden xsDown>Share</Hidden>
-              </MuiButton>
-            )}
-
-            <Box className={css({ flexGrow: 1 })} />
-
-            {!isSignedIn ? (
-              <MuiButton
-                // color="primary"
-                color="secondary"
-                onClick={this.openSignInModal}
-                variant="raised"
-              >
-                Sign in
-              </MuiButton>
-            ) : (
-              <MuiButton color="inherit" onClick={this.signOut} variant="flat">
-                <Avatar
-                  className={css({
-                    height: 30,
-                    width: 30,
-                  })}
-                  src={
-                    currentUser && currentUser.photoURL
-                      ? currentUser.photoURL
-                      : undefined
-                  }
+              {!isSignedIn ? (
+                <MuiButton
+                  // color="primary"
+                  color="secondary"
+                  onClick={this.openSignInModal}
+                  variant="raised"
                 >
-                  {currentUser && currentUser.displayName
-                    ? currentUser.displayName
-                    : null}
-                </Avatar>
-                <Text ml={2}>Log out</Text>
-              </MuiButton>
-            )}
-          </Toolbar>
-        </AppBar>
+                  Sign in
+                </MuiButton>
+              ) : (
+                <MuiButton
+                  color="inherit"
+                  onClick={this.signOut}
+                  variant="flat"
+                >
+                  <Avatar
+                    className={css({
+                      height: 30,
+                      width: 30,
+                    })}
+                    src={
+                      currentUser && currentUser.photoURL
+                        ? currentUser.photoURL
+                        : undefined
+                    }
+                  >
+                    {currentUser && currentUser.displayName
+                      ? currentUser.displayName
+                      : null}
+                  </Avatar>
+                  <Text ml={2}>Log out</Text>
+                </MuiButton>
+              )}
+            </Toolbar>
+          </AppBar>
 
-        <Flex
-          pt={[3, 3, 4]}
-          flex={1}
-          px={[3]}
-          width={1}
-          maxWidth={960}
-          justifyContent="center"
-          alignItems="center"
-          flexDirection="column"
-        >
           <Flex
-            alignItems="center"
-            flexDirection="row"
-            mb={3}
+            pt={[3, 3, 4]}
+            flex={1}
+            px={[3]}
             width={1}
-            flexWrap="wrap"
+            maxWidth={960}
             justifyContent="center"
-          >
-            <Box
-              flex="1"
-              className={css({ whiteSpace: 'nowrap' })}
-              mb={1}
-              mr={2}
-            >
-              <Button
-                title={isPlaying ? 'Stop' : 'Play'}
-                bg={isPlaying ? 'red' : '#00c200'}
-                m={[1, 2]}
-                className={css({ maxWidth: '100px' })}
-                onClick={this.togglePlayback}
-              >
-                {isPlaying ? (
-                  <StopIcon className={css({ margin: '0 0.5rem' })} />
-                ) : (
-                  <PlayIcon className={css({ margin: '0 0.5rem' })} />
-                )}
-                <Hidden xsDown>{isPlaying ? 'Stop' : 'Play'}</Hidden>
-              </Button>
-
-              <Button
-                variant="contained"
-                title="Shuffle note cards"
-                m={[1, 2]}
-                onClick={this.handleShuffleClick}
-              >
-                <ArrowsIcon className={css({ margin: '0 0.5rem' })} />
-                <Hidden smDown>Shuffle</Hidden>
-              </Button>
-
-              <Button
-                color={countInEnabled ? 'primary' : 'default'}
-                title={
-                  countInEnabled
-                    ? 'Turn off counting in'
-                    : 'Turn on counting in'
-                }
-                m={[1, 2]}
-                onClick={this.handleCountInToggle}
-              >
-                <TimerIcon className={css({ margin: '0 0.5rem' })} />
-                <Hidden smDown>Count in</Hidden>
-              </Button>
-
-              <Button
-                color={metronomeEnabled ? 'primary' : 'default'}
-                title={
-                  metronomeEnabled ? 'Turn metronome off' : 'Turn metronome on'
-                }
-                m={[1, 2]}
-                onClick={this.handleMetronomeToggle}
-              >
-                <MetronomeIcon className={css({ margin: '0 0.5rem' })} />
-                <Hidden smDown>Metronome</Hidden>
-              </Button>
-            </Box>
-
-            <Box mb={1}>
-              <TextField
-                className={css({ maxWidth: '95px' })}
-                label="Tempo"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">BPM</InputAdornment>
-                  ),
-                  className: css({ fontSize: '1.3rem' }),
-                }}
-                id="bpm"
-                type="number"
-                // @ts-ignore
-                step="1"
-                min="0"
-                max="400"
-                value={`${bpm}`}
-                onChange={this.handleBpmChange}
-              />
-
-              <TextField
-                className={css({
-                  marginLeft: '15px',
-                  maxWidth: '50px',
-                })}
-                InputProps={{
-                  className: css({ fontSize: '1.3rem' }),
-                }}
-                label="Rests"
-                id="rests"
-                type="number"
-                // @ts-ignore
-                step="1"
-                min="0"
-                max="8"
-                value={`${rests}`}
-                onChange={this.handleRestsChange}
-              />
-
-              <TextField
-                className={css({
-                  marginLeft: '15px',
-                  maxWidth: '65px',
-                })}
-                InputProps={{
-                  className: css({ fontSize: '1.3rem' }),
-                }}
-                label="Count in"
-                id="countInCounts"
-                disabled={!countInEnabled}
-                type="number"
-                // @ts-ignore
-                step="1"
-                min="0"
-                max="16"
-                value={`${countInCounts}`}
-                onChange={this.handleCountInCountsChange}
-              />
-            </Box>
-          </Flex>
-
-          <Flex
-            flex={2}
             alignItems="center"
-            justifyContent="center"
             flexDirection="column"
-            maxHeight={400}
-            width={1}
-            maxWidth={700}
           >
-            <NoteCards
-              noteCards={noteCards}
-              activeNoteCard={activeNoteCard}
-              onChangeToEnharmonicClick={
-                this.handleChangeNoteCardToEnharmonicClick
-              }
-              onMouseOver={this.handleMouseOverNoteCard}
-              onMouseLeave={this.handleMouseLeaveNoteCard}
-              onEditClick={this.handleEditCardClick}
-              onDeleteClick={this.handleDeleteCardClick}
-              onCardsReorder={this.handleCardsReorder}
-              onCardDraggedOut={this.handleNoteCardDraggedOut}
-            />
+            <Flex
+              alignItems="center"
+              flexDirection="row"
+              mb={3}
+              width={1}
+              flexWrap="wrap"
+              justifyContent="center"
+            >
+              <Box
+                flex="1"
+                className={css({ whiteSpace: 'nowrap' })}
+                mb={1}
+                mr={2}
+              >
+                <Button
+                  title={isPlaying ? 'Stop' : 'Play'}
+                  bg={isPlaying ? 'red' : '#00c200'}
+                  m={[1, 2]}
+                  className={css({ maxWidth: '100px' })}
+                  onClick={this.togglePlayback}
+                >
+                  {isPlaying ? (
+                    <StopIcon className={css({ margin: '0 0.5rem' })} />
+                  ) : (
+                    <PlayIcon className={css({ margin: '0 0.5rem' })} />
+                  )}
+                  <Hidden xsDown>{isPlaying ? 'Stop' : 'Play'}</Hidden>
+                </Button>
+
+                <Button
+                  variant="contained"
+                  title="Shuffle note cards"
+                  m={[1, 2]}
+                  onClick={this.handleShuffleClick}
+                >
+                  <ArrowsIcon className={css({ margin: '0 0.5rem' })} />
+                  <Hidden smDown>Shuffle</Hidden>
+                </Button>
+
+                <Button
+                  color={countInEnabled ? 'primary' : 'default'}
+                  title={
+                    countInEnabled
+                      ? 'Turn off counting in'
+                      : 'Turn on counting in'
+                  }
+                  m={[1, 2]}
+                  onClick={this.handleCountInToggle}
+                >
+                  <TimerIcon className={css({ margin: '0 0.5rem' })} />
+                  <Hidden smDown>Count in</Hidden>
+                </Button>
+
+                <Button
+                  color={metronomeEnabled ? 'primary' : 'default'}
+                  title={
+                    metronomeEnabled
+                      ? 'Turn metronome off'
+                      : 'Turn metronome on'
+                  }
+                  m={[1, 2]}
+                  onClick={this.handleMetronomeToggle}
+                >
+                  <MetronomeIcon className={css({ margin: '0 0.5rem' })} />
+                  <Hidden smDown>Metronome</Hidden>
+                </Button>
+              </Box>
+
+              <Box mb={1}>
+                <TextField
+                  className={css({ maxWidth: '95px' })}
+                  label="Tempo"
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">BPM</InputAdornment>
+                    ),
+                    className: css({ fontSize: '1.3rem' }),
+                  }}
+                  id="bpm"
+                  type="number"
+                  // @ts-ignore
+                  step="1"
+                  min="0"
+                  max="400"
+                  value={`${bpm}`}
+                  onChange={this.handleBpmChange}
+                />
+
+                <TextField
+                  className={css({
+                    marginLeft: '15px',
+                    maxWidth: '50px',
+                  })}
+                  InputProps={{
+                    className: css({ fontSize: '1.3rem' }),
+                  }}
+                  label="Rests"
+                  id="rests"
+                  type="number"
+                  // @ts-ignore
+                  step="1"
+                  min="0"
+                  max="8"
+                  value={`${rests}`}
+                  onChange={this.handleRestsChange}
+                />
+
+                <TextField
+                  className={css({
+                    marginLeft: '15px',
+                    maxWidth: '65px',
+                  })}
+                  InputProps={{
+                    className: css({ fontSize: '1.3rem' }),
+                  }}
+                  label="Count in"
+                  id="countInCounts"
+                  disabled={!countInEnabled}
+                  type="number"
+                  // @ts-ignore
+                  step="1"
+                  min="0"
+                  max="16"
+                  value={`${countInCounts}`}
+                  onChange={this.handleCountInCountsChange}
+                />
+              </Box>
+            </Flex>
 
             <Flex
-              flexDirection="row-reverse"
+              flex={2}
               alignItems="center"
+              justifyContent="center"
+              flexDirection="column"
+              maxHeight={400}
               width={1}
-              px={[1, 2, 2]}
-              mt={[4, 2, 3]}
-              mb={[2, 2, 3]}
+              maxWidth={700}
             >
-              <AddEntityButton
-                onAddSingleNoteClick={this.openNoteAddingModal}
-                onAddArpeggioClick={this.openArpeggioAddingModal}
-                onAddChromaticApproachesClick={
-                  this.openChromaticApproachesModal
+              <NoteCards
+                noteCards={noteCards}
+                activeNoteCard={activeNoteCard}
+                onChangeToEnharmonicClick={
+                  this.handleChangeNoteCardToEnharmonicClick
                 }
-                disableSingleNote={this.state.noteCards.length >= 12}
-                disableChords={this.state.modifiers.arpeggio.enabled}
-                disableChromaticApproaches={
-                  this.state.modifiers.chromaticApproaches.enabled
-                }
-                buttonProps={{
-                  disabled: isPlaying,
-                  className: css({
-                    marginLeft: '1rem',
-                  }),
-                }}
+                onMouseOver={this.handleMouseOverNoteCard}
+                onMouseLeave={this.handleMouseLeaveNoteCard}
+                onEditClick={this.handleEditCardClick}
+                onDeleteClick={this.handleDeleteCardClick}
+                onCardsReorder={this.handleCardsReorder}
+                onCardDraggedOut={this.handleNoteCardDraggedOut}
               />
 
-              <Flex flex-direction="row" flex={1} alignItems="center">
-                {this.state.modifiers.arpeggio.enabled && (
-                  <Chip
-                    color="primary"
-                    label={`Chords: ${this.state.modifiers.arpeggio.type} / ${
-                      this.state.modifiers.arpeggio.direction
-                    }`}
-                    onClick={this.openArpeggioAddingModal}
-                    onDelete={this.handleRemoveArpeggioClick}
-                    classes={{
-                      root: css({ marginRight: '0.5rem' }),
-                    }}
-                  />
-                )}
-                {this.state.modifiers.chromaticApproaches.enabled && (
-                  <Chip
-                    color="primary"
-                    label={`Enclosure / ${
-                      this.state.modifiers.chromaticApproaches.type
-                    }`}
-                    onClick={this.openChromaticApproachesModal}
-                    onDelete={this.handleRemoveChromaticApproachesClick}
-                    classes={{
-                      root: css({ marginRight: '0.5rem' }),
-                    }}
-                  />
-                )}
+              <Flex
+                flexDirection="row-reverse"
+                alignItems="center"
+                width={1}
+                px={[1, 2, 2]}
+                mt={[4, 2, 3]}
+                mb={[2, 2, 3]}
+              >
+                <AddEntityButton
+                  onAddSingleNoteClick={this.openNoteAddingModal}
+                  onAddArpeggioClick={this.openArpeggioAddingModal}
+                  onAddChromaticApproachesClick={
+                    this.openChromaticApproachesModal
+                  }
+                  disableSingleNote={this.state.noteCards.length >= 12}
+                  disableChords={this.state.modifiers.arpeggio.enabled}
+                  disableChromaticApproaches={
+                    this.state.modifiers.chromaticApproaches.enabled
+                  }
+                  buttonProps={{
+                    disabled: isPlaying,
+                    className: css({
+                      marginLeft: '1rem',
+                    }),
+                  }}
+                />
+
+                <Flex flex-direction="row" flex={1} alignItems="center">
+                  {this.state.modifiers.arpeggio.enabled && (
+                    <Chip
+                      color="primary"
+                      label={`Chords: ${
+                        this.state.modifiers.arpeggio.chordType
+                      }`}
+                      onClick={this.openArpeggioAddingModal}
+                      onDelete={this.handleRemoveArpeggioClick}
+                      classes={{
+                        root: css({ marginRight: '0.5rem' }),
+                      }}
+                    />
+                  )}
+                  {this.state.modifiers.chromaticApproaches.enabled && (
+                    <Chip
+                      color="primary"
+                      label={`Enclosure / ${
+                        this.state.modifiers.chromaticApproaches.type
+                      }`}
+                      onClick={this.openChromaticApproachesModal}
+                      onDelete={this.handleRemoveChromaticApproachesClick}
+                      classes={{
+                        root: css({ marginRight: '0.5rem' }),
+                      }}
+                    />
+                  )}
+                </Flex>
               </Flex>
             </Flex>
+
+            <NotesStaff
+              isPlaying={isPlaying}
+              id="notation"
+              ticks={this.state.staffTicks}
+              activeTickIndex={isPlaying ? activeStaffTickIndex : undefined}
+              height={160}
+            />
           </Flex>
 
-          <MeasureScreenSize onUpdate={this.handleScreenSizeUpdate} fireOnMount>
-            <Box innerRef={this.notesStaffContainerRef} width={1}>
-              <NotesStaff
-                isPlaying={isPlaying}
-                id="notation"
-                ticks={this.state.staffTicks}
-                activeTickIndex={isPlaying ? activeStaffTickIndex : undefined}
-                ref={this.notesStaffRef}
-                height={160}
-                width={this.state.notesStaffWidth}
-              />
-            </Box>
-          </MeasureScreenSize>
-        </Flex>
-
-        <Box mt={[1, 2, 3]}>
-          <PianoKeyboard
-            width={Math.max(layoutMinWidth, this.state.width)}
-            height={this.getPianoHeight()}
-            secondaryNotesMidi={
-              activeNoteCardTicks
-                ? _.flatten(
-                    activeNoteCardTicks.map(t => t.notes.map(n => n.midi)),
-                  )
-                : noteCardWithMouseOverTicks
+          <Box mt={[1, 2, 3]}>
+            <PianoKeyboard
+              width={Math.max(layoutMinWidth, this.state.width)}
+              height={this.getPianoHeight()}
+              secondaryNotesMidi={
+                activeNoteCardTicks
                   ? _.flatten(
-                      noteCardWithMouseOverTicks.map(t =>
-                        t.notes.map(n => n.midi),
-                      ),
+                      activeNoteCardTicks.map(t => t.notes.map(n => n.midi)),
                     )
-                  : undefined
-            }
-            primaryNotesMidi={
-              activeStaffTick
-                ? activeStaffTick.notes.map(n => n.midi)
-                : noteCardWithMouseOver
-                  ? [noteCardWithMouseOver.midi]
-                  : undefined
-            }
-            notesColor={
-              activeNoteCard
-                ? activeNoteCard.color
-                : noteCardWithMouseOver
-                  ? noteCardWithMouseOver.color
-                  : undefined
-            }
+                  : noteCardWithMouseOverTicks
+                    ? _.flatten(
+                        noteCardWithMouseOverTicks.map(t =>
+                          t.notes.map(n => n.midi),
+                        ),
+                      )
+                    : undefined
+              }
+              primaryNotesMidi={
+                activeStaffTick
+                  ? activeStaffTick.notes.map(n => n.midi)
+                  : noteCardWithMouseOver
+                    ? [noteCardWithMouseOver.midi]
+                    : undefined
+              }
+              notesColor={
+                activeNoteCard
+                  ? activeNoteCard.color
+                  : noteCardWithMouseOver
+                    ? noteCardWithMouseOver.color
+                    : undefined
+              }
+            />
+          </Box>
+
+          <SignInModal
+            isOpen={this.state.signInModalIsOpen}
+            onClose={this.closeSignInModal}
           />
-        </Box>
 
-        <SignInModal
-          isOpen={this.state.signInModalIsOpen}
-          onClose={this.closeSignInModal}
-        />
+          <SettingsModal
+            isOpen={this.state.settingsModalIsOpen}
+            onClose={this.closeSettingsModal}
+            defaultValues={{
+              audioFontId: this.state.audioFontId,
+            }}
+            onSubmit={this.closeSettingsModal}
+            onAudioFontChanged={this.handleAudioFontChanged}
+          />
 
-        <SettingsModal
-          isOpen={this.state.settingsModalIsOpen}
-          onClose={this.closeSettingsModal}
-          defaultValues={{
-            audioFontId: this.state.audioFontId,
-          }}
-          onSubmit={this.closeSettingsModal}
-          onAudioFontChanged={this.handleAudioFontChanged}
-        />
+          <ArpeggioModifierModal
+            isOpen={this.state.chordsModalIsOpen}
+            onClose={this.closeArpeggioAddingModal}
+            onSubmit={this.handleArpeggioModifierModalConfirm}
+            initialValues={{
+              chordType: this.state.modifiers.arpeggio.chordType,
+              patternPreset: this.state.modifiers.arpeggio.patternPreset,
+              pattern: this.state.modifiers.arpeggio.pattern,
+            }}
+          />
 
-        <ArpeggioModifierModal
-          isOpen={this.state.chordsModalIsOpen}
-          onClose={this.closeArpeggioAddingModal}
-          onSubmit={this.handleArpeggioModifierModalConfirm}
-          defaultDirection={this.state.modifiers.arpeggio.direction}
-          defaultType={this.state.modifiers.arpeggio.type}
-        />
+          <ChromaticApproachesModifierModal
+            isOpen={this.state.chromaticApproachesModalIsOpen}
+            onClose={this.closeChromaticApproachesModal}
+            onSubmit={this.handleChromaticApproachModifierModalConfirm}
+            defaultType={this.state.modifiers.chromaticApproaches.type}
+          />
 
-        <ChromaticApproachesModifierModal
-          isOpen={this.state.chromaticApproachesModalIsOpen}
-          onClose={this.closeChromaticApproachesModal}
-          onSubmit={this.handleChromaticApproachModifierModalConfirm}
-          defaultType={this.state.modifiers.chromaticApproaches.type}
-        />
-
-        <PickNoteModal
-          isOpen={this.state.noteAddingModalIsOpen}
-          onClose={this.closeNoteAddingModal}
-          onSubmit={this.handleNoteClickInNoteCardAddingModal}
-          enharmonicFlatsMap={this.state.enharmonicFlatsMap}
-          onEnharmonicFlatsMapToggle={this.handleEnharmonicMapToggle}
-        />
-
-        {this.state.noteEditingModalIsOpen && (
           <PickNoteModal
-            isOpen
-            noteName={
-              this.state.noteEditingModalNoteCard
-                ? this.state.noteEditingModalNoteCard.noteName
-                : undefined
-            }
-            onClose={this.closeNoteEditingModal}
-            onSubmit={this.handleNoteClickInNoteCardEditingModal}
+            isOpen={this.state.noteAddingModalIsOpen}
+            onClose={this.closeNoteAddingModal}
+            onSubmit={this.handleNoteClickInNoteCardAddingModal}
             enharmonicFlatsMap={this.state.enharmonicFlatsMap}
             onEnharmonicFlatsMapToggle={this.handleEnharmonicMapToggle}
           />
-        )}
+
+          {this.state.noteEditingModalIsOpen && (
+            <PickNoteModal
+              isOpen
+              noteName={
+                this.state.noteEditingModalNoteCard
+                  ? this.state.noteEditingModalNoteCard.noteName
+                  : undefined
+              }
+              onClose={this.closeNoteEditingModal}
+              onSubmit={this.handleNoteClickInNoteCardEditingModal}
+              enharmonicFlatsMap={this.state.enharmonicFlatsMap}
+              onEnharmonicFlatsMapToggle={this.handleEnharmonicMapToggle}
+            />
+          )}
+        </MeasureScreenSize>
       </>
     )
   }
@@ -1502,7 +1499,8 @@ class App extends React.Component<{}, AppState> {
         }}
         message={
           <span id="offline-notification-message">
-            You're offline - you won't be able to use your saved sessions and a few other features
+            You're offline - you won't be able to use your saved sessions and a
+            few other features
           </span>
         }
         action={[

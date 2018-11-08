@@ -41,9 +41,9 @@ export interface StaffNote extends PlayableNote {
 
 export interface StaffTick {
   id: string
-  noteCardId: string
-
   notes: StaffNote[]
+
+  noteCardId?: string
 }
 
 export interface NoteCardType extends PlayableNote {
@@ -55,13 +55,34 @@ export interface NoteCardType extends PlayableNote {
   color: string
 }
 
-export type ArpeggioType = 'M' | 'm' | 'maj7' | 'm7' | 'M69#11'
-export type ArpeggioDirection = 'up' | 'down' | 'up down' | 'down up'
+export type ChordType = 'M' | 'm' | 'maj7' | 'm7' | 'M69#11'
 
-export type ArpeggioModifier = {
+export interface Chord {
+  type: ChordType
+  title: string
+  notesCount: number
+}
+
+export type ArpeggioType = 'M' | 'm' | 'maj7' | 'm7' | 'M69#11'
+export type ArpeggioPatternPreset = 'custom' | 'ascending' | 'descending'
+
+export interface ArpeggioPatternElement {
+  note?: number
+}
+
+export interface ArpeggioPattern {
+  items: ArpeggioPatternElement[]
+  mainNoteIndex: number
+}
+
+// TODO: rename to "ChordModifier"
+// TODO: rename "type" to "chord"
+// TODO: add "type" = "harmonic" | "melodic"
+export interface ArpeggioModifier {
   enabled: boolean
-  type: ArpeggioType
-  direction: ArpeggioDirection
+  chordType: ChordType
+  patternPreset: ArpeggioPatternPreset
+  pattern: ArpeggioPattern
 }
 
 export type ChromaticApproachesType =
@@ -71,12 +92,12 @@ export type ChromaticApproachesType =
   | 'down up'
   | 'random'
 
-export type ChromaticApproachesModifier = {
+export interface ChromaticApproachesModifier {
   enabled: boolean
   type: ChromaticApproachesType
 }
 
-export type NoteModifiers = {
+export interface NoteModifiers {
   arpeggio: ArpeggioModifier
   chromaticApproaches: ChromaticApproachesModifier
 }

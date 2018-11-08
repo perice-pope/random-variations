@@ -1,7 +1,8 @@
 import * as tonal from 'tonal'
-import * as Chord from 'tonal-chord'
+import * as tonalChord from 'tonal-chord'
 import { transpose } from 'tonal-distance'
 import * as _ from 'lodash'
+import { memoize } from 'lodash/fp'
 import uuid from 'uuid/v4'
 
 import {
@@ -11,7 +12,84 @@ import {
   ChromaticApproachesModifier,
   StaffTick,
   NoteCardType,
+  Chord,
+  ArpeggioPattern,
+  ArpeggioPatternElement,
+  ArpeggioPatternPreset,
 } from './types'
+
+const getAllChordOptions: () => Chord[] = memoize(() => {
+  return [
+    {
+      type: 'm',
+      title: 'Minor triad',
+    },
+    {
+      type: 'M',
+      title: 'Major triad',
+    },
+    {
+      type: 'maj7',
+      title: 'Major 7th',
+    },
+    {
+      type: 'm7',
+      title: 'Minor 7th',
+    },
+    {
+      type: 'M69#11',
+      title: 'M69#11',
+    },
+    // TODO: provide better names for chords
+    ...tonalChord.names().map(name => ({ title: name, type: name })),
+  ].map(({ type, title }) => {
+    const intervals = tonalChord.intervals(type)
+    return {
+      type,
+      title,
+      notesCount: intervals.length,
+    } as Chord
+  }) as Chord[]
+})
+
+export const chordOptions = getAllChordOptions()
+export const chordsByChordType = _.keyBy(chordOptions, 'type')
+
+export const generateChordPatternFromPreset = ({
+  chord,
+  patternPreset,
+}: {
+  chord: Chord
+  patternPreset: ArpeggioPatternPreset
+}) => {
+  let items: ArpeggioPatternElement[]
+  let mainNoteIndex
+  switch (patternPreset) {
+    case 'ascending': {
+      items = _.range(1, chord.notesCount + 1, 1).map(note => ({ note }))
+      mainNoteIndex = 0
+      break
+    }
+    case 'descending': {
+      items = _.range(chord.notesCount, 0, -1).map(note => ({ note }))
+      mainNoteIndex = items.length - 1
+      break
+    }
+    default: {
+      // "Should never happen" (c)
+      items = []
+      mainNoteIndex = undefined
+      break
+    }
+  }
+
+  const pattern: ArpeggioPattern = {
+    items,
+    mainNoteIndex,
+  }
+
+  return pattern
+}
 
 type PartialStaffNote = {
   // Full note name, e.g. "C4"
@@ -103,85 +181,26 @@ export const addArpeggioNotes = (
   }
   const baseNote = notes[baseNoteIndex].noteName
 
-  const chordName = arpeggio.type
+  const chordName = arpeggio.chordType
 
-  const chordIntervals = Chord.intervals(chordName)
+  const chordIntervals = tonalChord.intervals(chordName)
 
   let noteNamesWithArpeggio
-  let mainNoteIndex
-  switch (arpeggio.direction) {
-    case 'up': {
-      noteNamesWithArpeggio = [
-        ...chordIntervals.map(interval => transpose(baseNote, interval)),
-      ]
-      mainNoteIndex = 0
-      break
-    }
-    case 'down': {
-      noteNamesWithArpeggio = [
-        ..._.reverse([
-          ...chordIntervals.map(interval => transpose(baseNote, interval)),
-        ]),
-      ]
-      mainNoteIndex = noteNamesWithArpeggio.length - 1
-      break
-    }
-    case 'up down': {
-      const arpeggioNotes = chordIntervals.map(interval =>
-        transpose(baseNote, interval),
-      )
-      noteNamesWithArpeggio = [
-        ...arpeggioNotes,
-        ..._.reverse([...arpeggioNotes]),
-      ]
-      mainNoteIndex = 0
-      break
-    }
-    case 'down up': {
-      const arpeggioNotes = _.reverse([
-        ...chordIntervals.map(interval => transpose(baseNote, interval)),
-      ])
-      noteNamesWithArpeggio = [
-        ...arpeggioNotes,
-        ..._.reverse([...arpeggioNotes]).slice(1),
-      ]
-      mainNoteIndex = arpeggioNotes.length - 1
-      break
-    }
-    default:
-      throw new Error(`Unknown arpeggio direction: ${arpeggio.direction}`)
-  }
+  const { items: arpeggioNotes, mainNoteIndex } = arpeggio.pattern
+  noteNamesWithArpeggio = arpeggioNotes.map(({ note }) => {
+    const interval = note ? chordIntervals[note - 1] || '1P' : '1P'
+    return transpose(baseNote, interval)
+  })
+
+  console.log('noteNamesWithArpeggio: ', noteNamesWithArpeggio)
 
   const notesWithArpeggio = noteNamesWithArpeggio.map((noteName, index) => {
     const isMainNote = mainNoteIndex === index
 
-    const mainColor = 'black'
-    const upColor = '#10520A'
-    const downColor = '#801415'
-
-    let color = mainColor
-    if (arpeggio.direction === 'up') {
-      color = isMainNote ? mainColor : upColor
-    } else if (arpeggio.direction === 'down') {
-      color = isMainNote ? mainColor : downColor
-    } else if (arpeggio.direction === 'up down') {
-      if (index >= noteNamesWithArpeggio.length / 2) {
-        color = downColor
-      } else if (index < noteNamesWithArpeggio.length / 2) {
-        color = upColor
-      }
-    } else if (arpeggio.direction === 'down up') {
-      if (index < mainNoteIndex) {
-        color = downColor
-      } else if (index > mainNoteIndex) {
-        color = upColor
-      }
-    }
-
     return {
       noteName,
       isMainNote,
-      color,
+      color: 'black',
     }
   })
 

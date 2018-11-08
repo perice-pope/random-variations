@@ -7,6 +7,7 @@ import { darken, getLuminance } from 'polished'
 
 import { Box, BoxProps } from './ui'
 import { StaffTick } from '../types'
+import MeasureScreenSize from './MeasureScreenSize'
 
 const activeNoteClasses = {
   base: css({
@@ -22,15 +23,24 @@ type NotesStaffProps = {
   ticks: StaffTick[]
   isPlaying: boolean
   activeTickIndex?: number
-  width: number
   height: number
   containerProps?: BoxProps
 }
 
-class NotesStaff extends React.Component<NotesStaffProps, {}> {
+type NotesStaffState = {
+  boxWidth: number
+}
+
+class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
+  state: NotesStaffState = {
+    boxWidth: 0,
+  }
+
   private root: HTMLElement
   private renderer: Vex.Flow.Renderer
   private renderContext: Vex.IRenderContext
+
+  private boxRef: React.RefObject<any> = React.createRef()
 
   private notesPerTick: Vex.Flow.StaveNote[][] = []
   private stave?: Vex.Flow.Stave
@@ -41,10 +51,7 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
   }
 
   componentDidUpdate(prevProps) {
-    if (
-      prevProps.width !== this.props.width ||
-      prevProps.height !== this.props.height
-    ) {
+    if (prevProps.height !== this.props.height) {
       this.redraw()
       return
     }
@@ -84,7 +91,8 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
 
   private redraw = () => {
     console.log('NotesStaff -> redraw')
-    const { width, height } = this.props
+    const { height } = this.props
+    const width = this.state.boxWidth
 
     // Configure the rendering context
     this.renderer.resize(width, height)
@@ -170,7 +178,7 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
 
   private drawStaveAndClef = () => {
     console.log('NotesStaff -> drawStaveAndClef')
-    const { width } = this.props
+    const width = this.state.boxWidth
 
     // Create a stave of at position 10, 40 on the canvas.
     const stave = new Vex.Flow.Stave(10, 0, width)
@@ -278,12 +286,32 @@ class NotesStaff extends React.Component<NotesStaffProps, {}> {
     }
   }
 
+  private handleScreenSizeUpdate = () => {
+    if (this.boxRef && this.boxRef.current) {
+      const { width: boxWidth } = this.boxRef.current.getBoundingClientRect()
+      this.setState({ boxWidth }, this.redraw)
+    }
+  }
+
   public render() {
     const { id, height, containerProps } = this.props
 
-    return (
+    const content = (
       // @ts-ignore
-      <Box width={1} id={id} height={height} {...containerProps} />
+      <Box
+        width={1}
+        {...containerProps}
+        // @ts-ignore
+        innerRef={this.boxRef}
+      >
+        <Box height={height} width={1} id={id} />
+      </Box>
+    )
+
+    return (
+      <MeasureScreenSize onUpdate={this.handleScreenSizeUpdate} fireOnMount>
+        {content}
+      </MeasureScreenSize>
     )
   }
 }
