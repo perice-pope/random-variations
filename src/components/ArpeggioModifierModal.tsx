@@ -58,19 +58,13 @@ type ChordTypeOption = {
   value: ChordType
 }
 
-const chordTypeOptions: ChordTypeOption[] = chordOptions.map(
-  ({ type, title }) => ({
+const chordTypeOptions: ChordTypeOption[] = _.sortBy(
+  chordOptions.map(({ type, title }) => ({
     title,
     value: type,
-  }),
-)
-
-const chordTypeOptionsGroupedByNumberOfNotes = _.groupBy(
-  chordTypeOptions,
-  (chordOption: ChordTypeOption) => {
-    const chord = chordsByChordType[chordOption.value]
-    return chord.notesCount
-  },
+    notesCount: chordsByChordType[type].notesCount,
+  })),
+  'notesCount',
 )
 
 type PatternPresetOption = {
@@ -208,24 +202,11 @@ class ArpeggioModifierModal extends React.Component<
                 name="chordType"
                 input={<Input id="chord-type" />}
               >
-                <optgroup label="Chords">
-                  {chordTypeOptionsGroupedByNumberOfNotes[3].map(
-                    ({ title, value }) => (
-                      <option key={value} value={value}>
-                        {title}
-                      </option>
-                    ),
-                  )}
-                </optgroup>
-                <optgroup label="7th chords">
-                  {chordTypeOptionsGroupedByNumberOfNotes[4].map(
-                    ({ title, value }) => (
-                      <option key={value} value={value}>
-                        {title}
-                      </option>
-                    ),
-                  )}
-                </optgroup>
+                {chordTypeOptions.map(({ title, value }) => (
+                  <option key={value} value={value}>
+                    {title}
+                  </option>
+                ))}
               </NativeSelect>
             </FormControl>
 
