@@ -16,7 +16,7 @@ export interface PlayableLoopTick {
   meta: {
     // ID of the note card from which this tick was generated
     noteCardId: string
-    staffTickIndex: number
+    staffTickIndex?: number
   }
 }
 
@@ -79,9 +79,10 @@ export interface ArpeggioPattern {
 // TODO: rename to "ChordModifier"
 // TODO: rename "type" to "chord"
 // TODO: add "type" = "harmonic" | "melodic"
-export interface ArpeggioModifier {
+export interface ChordModifier {
   enabled: boolean
   chordType: ChordType
+  isMelodic: boolean
   patternPreset: ArpeggioPatternPreset
   pattern: ArpeggioPattern
 }
@@ -99,6 +100,6 @@ export interface ChromaticApproachesModifier {
 }
 
 export interface NoteModifiers {
-  arpeggio: ArpeggioModifier
+  chords: ChordModifier
   chromaticApproaches: ChromaticApproachesModifier
 }

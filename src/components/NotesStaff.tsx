@@ -206,19 +206,41 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     renderContext.svg.querySelectorAll('.vf-stavenote').forEach(n => n.remove())
 
     const notesPerTick = ticks.map(tick => {
-      const tickNotes = tick.notes.map(noteConfig => {
+      const tickNoteKeys = tick.notes.map(noteConfig => {
         const [letter, accidental, octave] = tonal.Note.tokenize(
           noteConfig.noteName,
         )
 
-        const vexFlowNoteConfig = {
-          keys: [`${letter}${accidental}/${octave}`],
-          duration: '4',
-        }
+        const noteFullName = `${letter}${accidental}/${octave}`
+        return noteFullName
+      })
 
-        const note = new Vex.Flow.StaveNote(vexFlowNoteConfig)
+      let vexFlowTickConfig
+      if (tick.notes.length === 0) {
+        if (this.props.showBreaks) {
+          vexFlowTickConfig = {
+            keys: ['b/4'],
+            duration: 'qr',
+          }
+        }
+      } else {
+        vexFlowTickConfig = {
+          keys: tickNoteKeys,
+          duration: 'q',
+        }
+      }
+
+      if (!vexFlowTickConfig) {
+        return []
+      }
+
+      const vexFlowNote = new Vex.Flow.StaveNote(vexFlowTickConfig)
+
+      tick.notes.forEach((noteConfig, index) => {
+        const [, accidental] = tonal.Note.tokenize(noteConfig.noteName)
+
         if (accidental) {
-          note.addAccidental(0, new Vex.Flow.Accidental(accidental))
+          vexFlowNote.addAccidental(index, new Vex.Flow.Accidental(accidental))
         }
 
         const cardColorLuminance = getLuminance(noteConfig.color)
@@ -227,26 +249,18 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
             ? darken(0.2, noteConfig.color)
             : noteConfig.color
 
-        note.setStyle({
+        vexFlowNote.setKeyStyle(index, {
           fillStyle: noteColor,
           strokeStyle: noteColor,
         })
 
         // Hide the stems
-        note
+        vexFlowNote
           .getStem()
           .setStyle({ fillStyle: 'transparent', strokeStyle: 'transparent' })
-
-        return note
       })
 
-      if (tickNotes.length === 0 && this.props.showBreaks) {
-        // Add a break symbol
-        const pause = new Vex.Flow.StaveNote({ keys: ['b/4'], duration: 'qr' })
-        tickNotes.push(pause)
-      }
-
-      return tickNotes
+      return [vexFlowNote]
     })
 
     Vex.Flow.Formatter.FormatAndDraw(

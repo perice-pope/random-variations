@@ -8,7 +8,7 @@ import uuid from 'uuid/v4'
 import {
   NoteModifiers,
   StaffNote,
-  ArpeggioModifier,
+  ChordModifier,
   ChromaticApproachesModifier,
   StaffTick,
   NoteCardType,
@@ -94,26 +94,26 @@ export const generateChordPatternFromPreset = ({
   return pattern
 }
 
-type PartialStaffNote = {
-  // Full note name, e.g. "C4"
-  noteName: string
-  color: string
-  isMainNote?: boolean
-}
-
 export const addApproachNotes = (
-  notes: Partial<PartialStaffNote>[],
+  ticks: StaffTick[],
   approach: ChromaticApproachesModifier,
-): PartialStaffNote[] => {
-  const baseNoteIndex = notes.findIndex(n => n.isMainNote === true)
-  if (baseNoteIndex < 0) {
+): StaffTick[] => {
+  const tickWithBaseNoteIndex = ticks.findIndex(
+    ({ notes }) => notes.find(n => n.isMainNote === true) != null,
+  )
+  if (tickWithBaseNoteIndex < 0) {
     throw new Error(
-      '"notes" must have exactly one note with "note.isMainNote ==== true"',
+      '"ticks" must have exactly one tick with "tick.notes[i].isMainNote ==== true"',
     )
   }
-  const baseNote = notes[baseNoteIndex].noteName
 
-  let approachNotes: Partial<PartialStaffNote>[] = []
+  const tickWithBaseNote = ticks[tickWithBaseNoteIndex]
+  const baseNoteIndex = tickWithBaseNote.notes.findIndex(
+    n => n.isMainNote === true,
+  )
+  const baseNote = tickWithBaseNote.notes[baseNoteIndex]
+
+  let approachNotes: Partial<StaffNote>[] = []
 
   const approachType =
     approach.type === 'random' ? _.sample(['above', 'below']) : approach.type
@@ -123,99 +123,134 @@ export const addApproachNotes = (
   if (approachType === 'above') {
     approachNotes = [
       {
-        noteName: transpose(baseNote, intervalUp),
+        noteName: transpose(baseNote.noteName, intervalUp),
       },
     ]
   } else if (approachType === 'below') {
     approachNotes = [
       {
-        noteName: transpose(baseNote, intervalDown),
+        noteName: transpose(baseNote.noteName, intervalDown),
       },
     ]
   } else if (approachType === 'up down') {
     approachNotes = [
       {
-        noteName: transpose(baseNote, intervalUp),
+        noteName: transpose(baseNote.noteName, intervalUp),
       },
       {
-        noteName: transpose(baseNote, intervalDown),
+        noteName: transpose(baseNote.noteName, intervalDown),
       },
     ]
   } else if (approachType === 'down up') {
     approachNotes = [
       {
-        noteName: transpose(baseNote, intervalDown),
+        noteName: transpose(baseNote.noteName, intervalDown),
       },
       {
-        noteName: transpose(baseNote, intervalUp),
+        noteName: transpose(baseNote.noteName, intervalUp),
       },
     ]
   }
 
   const approachNotesColor = '#1B34AC'
-  approachNotes = approachNotes.map(
-    note =>
+
+  const ticksWithApproachNotes = approachNotes.map(
+    ({ noteName }) =>
       ({
-        ...note,
-        isMainNote: false,
-        color: approachNotesColor,
-      } as PartialStaffNote),
+        noteCardId: tickWithBaseNote.noteCardId,
+        id: uuid(),
+        notes: [
+          {
+            noteName,
+            midi: tonal.Note.midi(noteName),
+            isMainNote: false,
+            color: approachNotesColor,
+            id: uuid(),
+          } as StaffNote,
+        ],
+      } as StaffTick),
   )
-
-  const notesWithApproachNotes = [...notes] as PartialStaffNote[]
-  notesWithApproachNotes.splice(
-    baseNoteIndex,
-    0,
-    ...(approachNotes as PartialStaffNote[]),
-  )
-
-  return notesWithApproachNotes
+  const updatedTicks = [...ticks]
+  updatedTicks.splice(tickWithBaseNoteIndex, 0, ...ticksWithApproachNotes)
+  return updatedTicks
 }
 
-export const addArpeggioNotes = (
-  notes: Partial<PartialStaffNote>[],
-  arpeggio: ArpeggioModifier,
-): PartialStaffNote[] => {
-  const baseNoteIndex = notes.findIndex(n => n.isMainNote === true)
-  if (baseNoteIndex < 0) {
+export const addChordNotes = (
+  ticks: StaffTick[],
+  chords: ChordModifier,
+): StaffTick[] => {
+  const tickWithBaseNoteIndex = ticks.findIndex(
+    ({ notes }) => notes.find(n => n.isMainNote === true) != null,
+  )
+  if (tickWithBaseNoteIndex < 0) {
     throw new Error(
-      '"notes" must have exactly one note with "note.isMainNote ==== true"',
+      '"ticks" must have exactly one tick with "tick.notes[i].isMainNote ==== true"',
     )
   }
-  const baseNote = notes[baseNoteIndex].noteName
 
-  const chordName = arpeggio.chordType
+  const tickWithBaseNote = ticks[tickWithBaseNoteIndex]
+  const baseNoteIndex = tickWithBaseNote.notes.findIndex(
+    n => n.isMainNote === true,
+  )
+  const baseNote = tickWithBaseNote.notes[baseNoteIndex]
 
-  const chordIntervals = tonalChord.intervals(chordName)
+  const chordIntervals = tonalChord.intervals(chords.chordType)
 
+  if (!chords.isMelodic) {
+    // Add harmonic chord notes in a single staff tick
+    const ticksUpdated = [...ticks]
+    ticksUpdated.splice(tickWithBaseNoteIndex, 1, {
+      ...tickWithBaseNote,
+      notes: chordIntervals
+        .map(interval => transpose(baseNote.noteName, interval))
+        .map(
+          noteName =>
+            ({
+              noteName,
+              midi: tonal.Note.midi(noteName),
+              id: uuid(),
+              color: noteName === baseNote.noteName ? baseNote.color : 'black',
+              isMainNote: noteName === baseNote.noteName,
+            } as StaffNote),
+        ),
+    })
+
+    return ticksUpdated
+  }
+
+  // Add melodic (arpeggio) chord notes, each in its own staff tick
   let noteNamesWithArpeggio
-  const { items: arpeggioNotes, mainNoteIndex } = arpeggio.pattern
+  const { items: arpeggioNotes, mainNoteIndex } = chords.pattern
   noteNamesWithArpeggio = arpeggioNotes.map(({ note, muted }) => {
     if (muted) {
       return undefined
     }
     const interval = note ? chordIntervals[note - 1] || '1P' : '1P'
-    return transpose(baseNote, interval)
+    return transpose(baseNote.noteName, interval)
   })
 
-  const notesWithArpeggio = noteNamesWithArpeggio.map((noteName, index) => {
-    const isMainNote = mainNoteIndex === index
-
-    return {
-      noteName,
-      isMainNote,
-      color: 'black',
-    }
-  })
-
-  const notesWithBaseReplacedWithArpeggio = [...notes] as PartialStaffNote[]
-  notesWithBaseReplacedWithArpeggio.splice(
-    baseNoteIndex,
-    1,
-    ...notesWithArpeggio,
+  const ticksWithArpeggioNotes = noteNamesWithArpeggio.map(
+    (noteName, index) =>
+      ({
+        noteCardId: tickWithBaseNote.noteCardId,
+        id: uuid(),
+        notes: noteName
+          ? [
+              {
+                noteName,
+                id: uuid(),
+                midi: tonal.Note.midi(noteName),
+                isMainNote: mainNoteIndex === index,
+                color: mainNoteIndex === index ? baseNote.color : 'black',
+              } as StaffNote,
+            ]
+          : [],
+      } as StaffTick),
   )
 
-  return notesWithBaseReplacedWithArpeggio
+  const ticksUpdated = [...ticks]
+  ticksUpdated.splice(tickWithBaseNoteIndex, 1, ...ticksWithArpeggioNotes)
+  return ticksUpdated
 }
 
 /**
@@ -237,54 +272,44 @@ export const generateStaffTicks = ({
   const ticksPerCard: StaffTick[][] = []
 
   noteCards.forEach(noteCard => {
-    let notesForCard: Partial<StaffNote>[] = []
+    let ticksForCard: StaffTick[] = [
+      {
+        noteCardId: noteCard.id,
+        id: uuid(),
+        notes: [
+          {
+            id: uuid(),
+            noteName: noteCard.noteName,
+            midi: tonal.Note.midi(noteCard.noteName),
+            color: noteCard.color,
+            isMainNote: true,
+          },
+        ],
+      },
+    ]
 
-    const baseStaffNote = {
-      noteName: noteCard.noteName,
-      color: noteCard.color,
-      isMainNote: true,
-    }
-
-    notesForCard = [baseStaffNote]
-
-    if (modifiers.arpeggio.enabled) {
-      notesForCard = addArpeggioNotes(notesForCard, modifiers.arpeggio)
+    if (modifiers.chords.enabled) {
+      ticksForCard = addChordNotes(ticksForCard, modifiers.chords)
     }
 
     if (modifiers.chromaticApproaches.enabled) {
-      notesForCard = addApproachNotes(
-        notesForCard,
+      ticksForCard = addApproachNotes(
+        ticksForCard,
         modifiers.chromaticApproaches,
       )
     }
 
-    const notesForCardFull: (StaffNote | undefined)[] = notesForCard.map(
-      note =>
-        note.noteName
-          ? ({
-              ...note,
-              id: uuid(),
-              noteCardId: noteCard.id,
-              midi: tonal.Note.midi(note.noteName),
-              color: note.isMainNote ? noteCard.color : note.color,
-            } as StaffNote)
-          : undefined,
-    )
-
-    let ticksForCard: StaffTick[] = notesForCardFull.map(note => ({
-      id: uuid(),
-      noteCardId: noteCard.id,
-      notes: note ? [note] : [],
-    }))
-
     // Add rests if needed
     if (rests) {
-      const breakTicksForCard = new Array(rests).fill(null).map(() => ({
-        id: uuid(),
-        noteCardId: noteCard.id,
-        // Empty array means it's a break
-        notes: [],
-      }))
+      const breakTicksForCard = new Array(rests).fill(null).map(
+        () =>
+          ({
+            id: uuid(),
+            noteCardId: noteCard.id,
+            // Empty array means it's a break
+            notes: [],
+          } as StaffTick),
+      )
       ticksForCard = [...ticksForCard, ...breakTicksForCard]
     }
 

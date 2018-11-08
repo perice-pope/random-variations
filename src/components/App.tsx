@@ -169,8 +169,9 @@ const createDefaultSession = () => {
     countInCounts: 3,
     countInEnabled: false,
     modifiers: {
-      arpeggio: {
+      chords: {
         enabled: true,
+        isMelodic: true,
         chordType: 'M',
         patternPreset: 'ascending',
         pattern: generateChordPatternFromPreset({
@@ -270,6 +271,8 @@ class App extends React.Component<{}, AppState> {
       isLoadingAudioFont: false,
       audioFontId: AudioFontsConfig[1].id,
 
+      ...unpackSessionState(createDefaultSession() as Session),
+
       sessionsById: {},
 
       bpm: 120,
@@ -288,18 +291,6 @@ class App extends React.Component<{}, AppState> {
       staffTicksPerCard: {},
       activeNoteCardIndex: 0,
       activeStaffTickIndex: 0,
-
-      modifiers: {
-        arpeggio: {
-          enabled: true,
-          direction: 'up',
-          type: 'M',
-        },
-        chromaticApproaches: {
-          enabled: false,
-          type: 'above',
-        },
-      },
 
       signInModalIsOpen: false,
       isSignedIn: false,
@@ -612,20 +603,28 @@ class App extends React.Component<{}, AppState> {
     this.saveAppState()
   }
 
-  private drawAnimation: AnimationCallback = ({ tick }) => {
+  private drawAnimation: AnimationCallback = ({
+    tick,
+  }: {
+    tick: PlayableLoopTick
+  }) => {
     this.setState(state => {
       if (!state.isPlaying) {
         return null
       }
 
       const nextStaffNoteIndex = tick.meta.staffTickIndex
+      console.log('nextStaffNoteIndex: ', nextStaffNoteIndex)
+      if (nextStaffNoteIndex == null) {
+        return null
+      }
       // (state.activeStaffTickIndex + 1) % this.state.staffTicks.length
       const nextStaffNote = this.state.staffTicks[nextStaffNoteIndex]
-      // TODO: optimize this serial search code to a hash lookup
       if (!nextStaffNote) {
         return null
       }
 
+      // TODO: optimize this serial search code to a hash lookup
       const nextNoteCardIndex = this.state.noteCards.findIndex(
         nc => nc.id === nextStaffNote.noteCardId,
       )
@@ -942,7 +941,7 @@ class App extends React.Component<{}, AppState> {
     this.updateActiveSession({
       modifiers: {
         ...this.state.modifiers,
-        arpeggio: {
+        chords: {
           ...values,
           enabled: true,
         },
@@ -974,8 +973,8 @@ class App extends React.Component<{}, AppState> {
     this.updateActiveSession({
       modifiers: {
         ...this.state.modifiers,
-        arpeggio: {
-          ...this.state.modifiers.arpeggio,
+        chords: {
+          ...this.state.modifiers.chords,
           enabled: false,
         },
       },
@@ -1310,7 +1309,7 @@ class App extends React.Component<{}, AppState> {
                     this.openChromaticApproachesModal
                   }
                   disableSingleNote={this.state.noteCards.length >= 12}
-                  disableChords={this.state.modifiers.arpeggio.enabled}
+                  disableChords={this.state.modifiers.chords.enabled}
                   disableChromaticApproaches={
                     this.state.modifiers.chromaticApproaches.enabled
                   }
@@ -1323,12 +1322,10 @@ class App extends React.Component<{}, AppState> {
                 />
 
                 <Flex flex-direction="row" flex={1} alignItems="center">
-                  {this.state.modifiers.arpeggio.enabled && (
+                  {this.state.modifiers.chords.enabled && (
                     <Chip
                       color="primary"
-                      label={`Chords: ${
-                        this.state.modifiers.arpeggio.chordType
-                      }`}
+                      label={`Chords: ${this.state.modifiers.chords.chordType}`}
                       onClick={this.openArpeggioAddingModal}
                       onDelete={this.handleRemoveArpeggioClick}
                       classes={{
@@ -1416,9 +1413,10 @@ class App extends React.Component<{}, AppState> {
             onClose={this.closeArpeggioAddingModal}
             onSubmit={this.handleArpeggioModifierModalConfirm}
             initialValues={{
-              chordType: this.state.modifiers.arpeggio.chordType,
-              patternPreset: this.state.modifiers.arpeggio.patternPreset,
-              pattern: this.state.modifiers.arpeggio.pattern,
+              chordType: this.state.modifiers.chords.chordType,
+              patternPreset: this.state.modifiers.chords.patternPreset,
+              pattern: this.state.modifiers.chords.pattern,
+              isMelodic: this.state.modifiers.chords.isMelodic,
             }}
           />
 
