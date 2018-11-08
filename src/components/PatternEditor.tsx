@@ -85,7 +85,7 @@ const SortablePatternElement = SortableElement(
           >
             <Button
               tabIndex={-1}
-              className={css({ minWidth: '50px', padding: '0.5rem 0' })}
+              className={css({ minWidth: '30px', padding: '0.5rem 0' })}
               onClick={() => {
                 let value
                 if (item.note != null) {
@@ -106,6 +106,7 @@ const SortablePatternElement = SortableElement(
                 setMenuOpen(true)
               }}
               className={css({
+                minWidth: '30px',
                 fontSize: '2rem',
                 lineHeight: '2rem',
                 padding: '1rem !important',
@@ -116,7 +117,7 @@ const SortablePatternElement = SortableElement(
 
             <Button
               tabIndex={-1}
-              className={css({ minWidth: '50px', padding: '0.5rem 0' })}
+              className={css({ minWidth: '30px', padding: '0.5rem 0' })}
               onClick={() => {
                 let value
                 if (item.note != null) {
@@ -138,13 +139,7 @@ const SortablePatternElement = SortableElement(
 
 const SortablePatternElements = SortableContainer(
   ({ items, ...other }: { items: ArpeggioPatternElement[] }) => (
-    <Flex
-      // flex={1}
-      flexDirection="row"
-      // flexWrap="wrap"
-      // alignItems="center"
-      // justifyContent="center"
-    >
+    <>
       {items.map((item, index) => (
         <SortablePatternElement
           key={`item-${index}`}
@@ -155,7 +150,7 @@ const SortablePatternElements = SortableContainer(
           itemIndex={index}
         />
       ))}
-    </Flex>
+    </>
   ),
 )
 
@@ -222,7 +217,12 @@ class PatternEditor extends React.Component<PatternEditorProps> {
   render() {
     const { getSortableContainer, min, max, value: pattern } = this.props
     return (
-      <Flex alignItems="center" justifyContent="center" flex={1}>
+      <Flex
+        alignItems="center"
+        justifyContent="center"
+        flex={1}
+        flexWrap="wrap"
+      >
         <SortablePatternElements
           // @ts-ignore
           onItemNoteChange={this.handleItemNoteChange}
