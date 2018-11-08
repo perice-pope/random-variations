@@ -167,7 +167,7 @@ class ArpeggioModifierModal extends React.Component<
           notes: note
             ? [
                 {
-                  color: 'black',
+                  color: item.note === 1 ? 'red' : 'black',
                   id: `${index}`,
                   isMainNote: false,
                   midi: tonal.Note.midi(note),
