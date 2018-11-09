@@ -37,8 +37,11 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     boxWidth: 0,
   }
 
+  // @ts-ignore
   private root: HTMLElement
+  // @ts-ignore
   private renderer: Vex.Flow.Renderer
+  // @ts-ignore
   private renderContext: Vex.IRenderContext
 
   private boxRef: React.RefObject<any> = React.createRef()

@@ -20,7 +20,7 @@ import withMobileDialog, {
 import { Flex, Box, BaseButton, Paper, BaseButtonProps } from './ui'
 
 import { getNoteCardColorByNoteName } from '../utils'
-import { EnharmonicFlatsMap, ChromaticNoteSharps } from 'src/types'
+import { EnharmonicFlatsMap, ChromaticNoteSharps } from '../types'
 import { css } from 'emotion'
 import { lighten } from 'polished'
 import { withAudioEngine } from './withAudioEngine'

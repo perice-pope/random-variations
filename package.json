@@ -19,13 +19,16 @@
     "polished": "^2.2.0",
     "re-base": "^4.0.0",
     "react": "^16.5.2",
+    "react-app-rewire-hot-loader": "^1.0.3",
+    "react-app-rewired": "^1.6.2",
     "react-dom": "^16.5.2",
     "react-emotion": "^9.2.12",
     "react-firebaseui": "^3.1.2",
     "react-flip-toolkit": "^5.0.2",
+    "react-hot-loader": "^4.3.12",
     "react-jss": "^8.6.1",
     "react-piano": "^3.1.0",
-    "react-scripts-ts": "3.1.0",
+    "react-scripts": "^2.1.1",
     "react-sortable-hoc": "^0.8.3",
     "recompose": "^0.30.0",
     "styled-system": "^3.1.6",
@@ -40,10 +43,10 @@
     "webaudiofont": "^2.5.26"
   },
   "scripts": {
-    "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build",
-    "test": "react-scripts-ts test --env=jsdom",
-    "eject": "react-scripts-ts eject"
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test --env=jsdom",
+    "eject": "react-app-rewired eject"
   },
   "devDependencies": {
     "@types/jest": "^23.3.3",
@@ -52,5 +55,11 @@
     "@types/react-dom": "^16.0.8",
     "prettier": "^1.14.3",
     "typescript": "^3.1.1"
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

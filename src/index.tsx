@@ -7,16 +7,10 @@ import './index.css'
 import registerServiceWorker from './registerServiceWorker'
 
 const rootEl = document.getElementById('root') as HTMLElement
-ReactDOM.render(<Root />, rootEl)
-registerServiceWorker()
 
-// @ts-ignore
-if (module.hot) {
-  console.log('ENABLING HMR')
-  // @ts-ignore
-  module.hot.accept('./components/Root', () => {
-    console.log('DOING HMR...')
-    const NextRoot = require('./components/Root').default
-    ReactDOM.render(<NextRoot />, rootEl)
-  })
+const render = (Component) => {
+  ReactDOM.render(<Component />, rootEl)
 }
+
+render(Root)
+registerServiceWorker()

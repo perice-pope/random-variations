@@ -15,7 +15,7 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 
-import AudioFontConfig, { AudioFontId } from 'src/audioFontsConfig'
+import AudioFontConfig, { AudioFontId } from '../audioFontsConfig'
 
 type FormValues = {
   audioFontId: AudioFontId

@@ -1,6 +1,15 @@
 import * as React from 'react'
+import { hot } from 'react-hot-loader'
 import App from './App'
 
-const Root = () => <App />
+class Root extends React.Component {
+  render() {
+    return (
+      <div>
+        <App />
+      </div>
+    )
+  }
+}
 
-export default Root
+export default hot(module)(Root)

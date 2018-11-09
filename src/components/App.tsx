@@ -74,7 +74,7 @@ import {
 import AudioFontsConfig, { AudioFontId } from '../audioFontsConfig'
 import AudioEngine, { AnimationCallback } from '../services/audioEngine'
 import { AudioEngineContext } from './withAudioEngine'
-import firebase, { FirebaseContext, base } from 'src/services/firebase'
+import firebase, { FirebaseContext, base } from '../services/firebase'
 import SignInModal from './SignInModal'
 import { CircularProgress, Avatar } from '@material-ui/core'
 
@@ -260,7 +260,9 @@ const unpackSessionState = (session: Session) => {
 }
 
 class App extends React.Component<{}, AppState> {
+  // @ts-ignore
   private unregisterAuthObserver: firebase.Unsubscribe
+  // @ts-ignore
   private unregisterSessionsObserver: firebase.Unsubscribe
 
   constructor(props) {

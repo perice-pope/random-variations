@@ -15,10 +15,10 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 
-import { ChromaticApproachesType } from 'src/types'
+import { ChromaticApproachesType } from '../types'
 
 type SubmitArgsType = {
-  type?: ChromaticApproachesType
+  type: ChromaticApproachesType
 }
 
 type ChromaticApproachesModifierModalProps = {

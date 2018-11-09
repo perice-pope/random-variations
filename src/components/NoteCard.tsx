@@ -82,4 +82,5 @@ const NoteCard = styled(BoxWithTouchRipple)<NoteCardProps>`
   }
 `
 
+// @ts-ignore
 export default enhance(NoteCard) as typeof NoteCard

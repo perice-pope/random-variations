@@ -4,8 +4,8 @@ import * as _ from 'lodash'
 import * as tonal from 'tonal'
 import UnmuteButton from 'unmute'
 
-import { PlayableLoop, PlayableNote, PlayableLoopTick } from 'src/types'
-import audioFontsConfig, { AudioFontId, AudioFont } from 'src/audioFontsConfig'
+import { PlayableLoop, PlayableNote, PlayableLoopTick } from '../types'
+import audioFontsConfig, { AudioFontId, AudioFont } from '../audioFontsConfig'
 
 const audioFontsConfigById = _.keyBy(audioFontsConfig, 'id')
 

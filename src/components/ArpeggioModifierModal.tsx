@@ -24,7 +24,7 @@ import {
   ArpeggioPatternPreset,
   ChordType,
   StaffTick,
-} from 'src/types'
+} from '../types'
 import { ChangeEvent } from 'react'
 import { Input, Tooltip, Switch, FormControlLabel } from '@material-ui/core'
 import { css } from 'react-emotion'
@@ -32,7 +32,7 @@ import {
   generateChordPatternFromPreset,
   chordOptions,
   chordsByChordType,
-} from 'src/musicUtils'
+} from '../musicUtils'
 import { Flex } from './ui/Flex'
 import { Box } from './ui'
 import NotesStaff from './NotesStaff'

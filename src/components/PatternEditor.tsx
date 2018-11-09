@@ -11,7 +11,7 @@ import {
   arrayMove,
 } from 'react-sortable-hoc'
 
-import { ArpeggioPattern, ArpeggioPatternElement } from 'src/types'
+import { ArpeggioPattern, ArpeggioPatternElement } from '../types'
 import { Button, Tooltip, Menu, MenuItem } from '@material-ui/core'
 import { css } from 'react-emotion'
 import { Flex } from './ui/Flex'
