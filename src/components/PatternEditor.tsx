@@ -247,12 +247,14 @@ class PatternEditor extends React.Component<PatternEditorProps> {
           items={pattern.items}
           useLetters={useLetters}
           axis="x"
+          lockAxis="x"
           distance={10}
           onSortEnd={this.handleItemsReorder}
           // @ts-ignore
           min={min}
           // @ts-ignore
           max={max}
+          lockToContainerEdges
           getContainer={getSortableContainer}
         />
         {pattern.items.length < 16 && (

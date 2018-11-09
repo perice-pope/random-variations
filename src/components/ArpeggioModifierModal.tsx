@@ -314,7 +314,9 @@ class ArpeggioModifierModal extends React.Component<
                   onChange={this.handleIsMelodicSwitchChange}
                 />
               }
-              label={this.state.values.isMelodic ? 'Broken' : 'Stacked'}
+              label={
+                this.state.values.isMelodic ? 'Broken chord' : 'Stacked chord'
+              }
             />
           </Flex>
 
