@@ -83,6 +83,7 @@ export interface ChordModifier {
   enabled: boolean
   chordType: ChordType
   isMelodic: boolean
+  chordInversion: number
   patternPreset: ArpeggioPatternPreset
   pattern: ArpeggioPattern
 }

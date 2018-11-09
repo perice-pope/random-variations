@@ -173,6 +173,7 @@ const createDefaultSession = () => {
       chords: {
         enabled: true,
         isMelodic: true,
+        chordInversion: 0,
         chordType: 'M',
         patternPreset: 'ascending',
         pattern: generateChordPatternFromPreset({
@@ -309,10 +310,15 @@ class App extends React.Component<{}, AppState> {
   }
 
   componentDidMount() {
-    this.init()
+    console.log('componentDidMount', this.state.isInitialized)
+    if (!this.state.isInitialized) {
+      this.init()
+    }
   }
 
   componentWillUnmount() {
+    console.log('componentWillUnmount')
+    if (1 < 2 ) { return }
     audioEngine.cleanUp()
 
     if (this.unregisterAuthObserver) {
@@ -1052,11 +1058,11 @@ class App extends React.Component<{}, AppState> {
       ? staffTicks[activeStaffTickIndex]
       : undefined
 
-    const activeNoteCardTicks = activeNoteCard
+    const activeNoteCardStaffTicks = activeNoteCard
       ? staffTicksPerCard[activeNoteCard.id]
       : undefined
 
-    const noteCardWithMouseOverTicks = noteCardWithMouseOver
+    const noteCardWithMouseOverStaffTicks = noteCardWithMouseOver
       ? staffTicksPerCard[noteCardWithMouseOver.id]
       : undefined
 
@@ -1375,13 +1381,13 @@ class App extends React.Component<{}, AppState> {
               width={Math.max(layoutMinWidth, this.state.width)}
               height={this.getPianoHeight()}
               secondaryNotesMidi={
-                activeNoteCardTicks
+                activeNoteCardStaffTicks
                   ? _.flatten(
-                      activeNoteCardTicks.map(t => t.notes.map(n => n.midi)),
+                      activeNoteCardStaffTicks.map(t => t.notes.map(n => n.midi)),
                     )
-                  : noteCardWithMouseOverTicks
+                  : noteCardWithMouseOverStaffTicks
                     ? _.flatten(
-                        noteCardWithMouseOverTicks.map(t =>
+                        noteCardWithMouseOverStaffTicks.map(t =>
                           t.notes.map(n => n.midi),
                         ),
                       )
@@ -1424,6 +1430,7 @@ class App extends React.Component<{}, AppState> {
             onClose={this.closeArpeggioAddingModal}
             onSubmit={this.handleArpeggioModifierModalConfirm}
             initialValues={{
+              chordInversion: this.state.modifiers.chords.chordInversion,
               chordType: this.state.modifiers.chords.chordType,
               patternPreset: this.state.modifiers.chords.patternPreset,
               pattern: this.state.modifiers.chords.pattern,

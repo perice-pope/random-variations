@@ -177,7 +177,7 @@ export const addApproachNotes = (
 
 export const addChordNotes = (
   ticks: StaffTick[],
-  chords: ChordModifier,
+  chordModifier: ChordModifier,
 ): StaffTick[] => {
   const tickWithBaseNoteIndex = ticks.findIndex(
     ({ notes }) => notes.find(n => n.isMainNote === true) != null,
@@ -194,25 +194,37 @@ export const addChordNotes = (
   )
   const baseNote = tickWithBaseNote.notes[baseNoteIndex]
 
-  const chordIntervals = tonalChord.intervals(chords.chordType)
+  const chordIntervals = tonalChord.intervals(chordModifier.chordType)
 
-  if (!chords.isMelodic) {
+  if (!chordModifier.isMelodic) {
     // Add harmonic chord notes in a single staff tick
     const ticksUpdated = [...ticks]
     ticksUpdated.splice(tickWithBaseNoteIndex, 1, {
       ...tickWithBaseNote,
-      notes: chordIntervals
-        .map(interval => transpose(baseNote.noteName, interval))
-        .map(
-          noteName =>
-            ({
+      notes: _.sortBy(
+        chordIntervals
+          .map((interval, index) => {
+            let resultNote = transpose(baseNote.noteName, interval)
+            if (
+              chordModifier.chordInversion > 0 &&
+              index >= chordModifier.chordInversion
+            ) {
+              resultNote = transpose(resultNote, '-8P')
+            }
+            return resultNote
+          })
+          .map((noteName, index) => {
+            const isRootNote = index === 0
+            return {
               noteName,
               midi: tonal.Note.midi(noteName),
               id: uuid(),
-              color: noteName === baseNote.noteName ? baseNote.color : 'black',
-              isMainNote: noteName === baseNote.noteName,
-            } as StaffNote),
-        ),
+              color: isRootNote ? baseNote.color : 'black',
+              isMainNote: isRootNote,
+            } as StaffNote
+          }),
+        'midi',
+      ),
     })
 
     return ticksUpdated
@@ -220,7 +232,7 @@ export const addChordNotes = (
 
   // Add melodic (arpeggio) chord notes, each in its own staff tick
   let noteNamesWithArpeggio
-  const { items: arpeggioNotes, mainNoteIndex } = chords.pattern
+  const { items: arpeggioNotes, mainNoteIndex } = chordModifier.pattern
   noteNamesWithArpeggio = arpeggioNotes.map(({ note, muted }) => {
     if (muted) {
       return undefined

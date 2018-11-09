@@ -41,6 +41,7 @@ export type SubmitValuesType = {
   chordType: ChordType
   patternPreset: ArpeggioPatternPreset
   pattern: ArpeggioPattern
+  chordInversion: number
   isMelodic: boolean
 }
 
@@ -80,6 +81,20 @@ const patternPresetOptions: PatternPresetOption[] = [
   { title: 'Descending', value: 'descending' },
 ]
 
+const numberToPositionalAdjectiveMap = [undefined, '1st', '2nd', '3rd']
+
+const getChordInversionOptions = _.memoize((notesCount: number) => [
+  { title: 'No inversion', value: '0' },
+  ..._.range(1, notesCount).map(inversionNumber => ({
+    title: `${
+      inversionNumber < 4
+        ? numberToPositionalAdjectiveMap[inversionNumber]
+        : `${inversionNumber}th`
+    } inversion`,
+    value: `${inversionNumber}`,
+  })),
+])
+
 // @ts-ignore
 class ArpeggioModifierModal extends React.Component<
   ArpeggioModifierModalProps & { fullScreen: boolean },
@@ -89,6 +104,7 @@ class ArpeggioModifierModal extends React.Component<
     initialValues: {
       chordType: 'M',
       isMelodic: true,
+      chordInversion: 0,
       patternPreset: 'ascending',
       pattern: generateChordPatternFromPreset({
         chord: chordsByChordType['M'],
@@ -117,14 +133,20 @@ class ArpeggioModifierModal extends React.Component<
 
   handleChordTypeSelected = (e: ChangeEvent<HTMLSelectElement>) => {
     const chordType = e.target.value as ChordType
+    const chord = chordsByChordType[chordType]
+
     this.setState({
       values: {
         ...this.state.values,
         chordType,
+        chordInversion: Math.min(
+          chord.notesCount - 1,
+          this.state.values.chordInversion,
+        ),
         pattern:
           this.state.values.patternPreset !== 'custom'
             ? generateChordPatternFromPreset({
-                chord: chordsByChordType[chordType],
+                chord,
                 patternPreset: this.state.values.patternPreset,
               })
             : // TODO: adapt the pattern to the new chord (e.g. when new chord has less notes, etc)
@@ -161,8 +183,19 @@ class ArpeggioModifierModal extends React.Component<
     })
   }
 
+  handleChordInversionChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const chordInversion: number = parseInt(e.target.value, 10)
+    this.setState({
+      values: {
+        ...this.state.values,
+        chordInversion,
+      },
+    })
+  }
+
   generateStaffTicks = () => {
-    const chord = chordsByChordType[this.state.values.chordType]
+    const { chordType, chordInversion } = this.state.values
+    const chord = chordsByChordType[chordType]
     const intervals = tonalChord.intervals(chord.type)
     const baseNote = 'C4'
 
@@ -191,15 +224,27 @@ class ArpeggioModifierModal extends React.Component<
       staffTicks = [
         {
           id: `tick-id`,
-          notes: intervals
-            .map(interval => transpose(baseNote, interval))
-            .map((note, index) => ({
-              color: note === baseNote ? 'red' : 'black',
-              id: `${index}`,
-              isMainNote: note === baseNote,
-              midi: tonal.Note.midi(note),
-              noteName: note,
-            })),
+          notes: _.sortBy(
+            intervals
+              .map((interval, index) => {
+                let resultNote = transpose(baseNote, interval)
+                if (chordInversion > 0 && index >= chordInversion) {
+                  resultNote = transpose(resultNote, '-8P')
+                }
+                return resultNote
+              })
+              .map((noteName, index) => {
+                const isRootNote = index === 0
+                return {
+                  noteName,
+                  isMainNote: isRootNote,
+                  color: isRootNote ? 'red' : 'black',
+                  id: `${index}`,
+                  midi: tonal.Note.midi(noteName),
+                }
+              }),
+            'midi',
+          ),
         } as StaffTick,
       ]
     }
@@ -269,13 +314,13 @@ class ArpeggioModifierModal extends React.Component<
                   onChange={this.handleIsMelodicSwitchChange}
                 />
               }
-              label={this.state.values.isMelodic ? 'Melodic' : 'Harmonic'}
+              label={this.state.values.isMelodic ? 'Broken' : 'Stacked'}
             />
           </Flex>
 
-          {isMelodic && (
-            <Flex mt={[1, 2, 4]} flexDirection="column">
-              <Flex flexWrap="wrap" flexDirection="row" mt={4}>
+          <Flex mt={[1, 2, 4]} flexDirection="column">
+            <Flex flexWrap="wrap" flexDirection="row" mt={4}>
+              {isMelodic && (
                 <FormControl className={css({ flex: 1, marginRight: '1rem' })}>
                   <InputLabel htmlFor="arp-pattern-preset">Pattern</InputLabel>
                   <NativeSelect
@@ -291,7 +336,31 @@ class ArpeggioModifierModal extends React.Component<
                     ))}
                   </NativeSelect>
                 </FormControl>
+              )}
 
+              {!isMelodic && (
+                <FormControl className={css({ flex: 1, marginRight: '1rem' })}>
+                  <InputLabel htmlFor="arp-chord-inversion">
+                    Inversion
+                  </InputLabel>
+                  <NativeSelect
+                    value={this.state.values.chordInversion}
+                    onChange={this.handleChordInversionChange}
+                    name="chordInversion"
+                    input={<Input id="arp-chord-inversion" />}
+                  >
+                    {getChordInversionOptions(chord.notesCount).map(
+                      ({ title, value }) => (
+                        <option key={value} value={value}>
+                          {title}
+                        </option>
+                      ),
+                    )}
+                  </NativeSelect>
+                </FormControl>
+              )}
+
+              {isMelodic && (
                 <Tooltip title="Randomize pattern" disableFocusListener={true}>
                   <MuButton
                     color="primary"
@@ -309,8 +378,10 @@ class ArpeggioModifierModal extends React.Component<
                     Randomize
                   </MuButton>
                 </Tooltip>
-              </Flex>
+              )}
+            </Flex>
 
+            {isMelodic && (
               <Box width={1} mt={3}>
                 <PatternEditor
                   useLetters
@@ -323,8 +394,8 @@ class ArpeggioModifierModal extends React.Component<
                   }
                 />
               </Box>
-            </Flex>
-          )}
+            )}
+          </Flex>
 
           <Box>
             <NotesStaff
