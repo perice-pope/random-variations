@@ -312,15 +312,12 @@ class App extends React.Component<{}, AppState> {
   }
 
   componentDidMount() {
-    console.log('componentDidMount', this.state.isInitialized)
     if (!this.state.isInitialized) {
       this.init()
     }
   }
 
   componentWillUnmount() {
-    console.log('componentWillUnmount')
-    if (1 < 2 ) { return }
     audioEngine.cleanUp()
 
     if (this.unregisterAuthObserver) {
@@ -1344,10 +1341,13 @@ class App extends React.Component<{}, AppState> {
                   {this.state.modifiers.chords.enabled && (
                     <Tooltip
                       title="Change chords settings"
+                      disableFocusListener
                     >
                       <Chip
                         color="primary"
-                        label={`Chords: ${this.state.modifiers.chords.chordType}`}
+                        label={`Chords: ${
+                          this.state.modifiers.chords.chordType
+                        }`}
                         onClick={this.openArpeggioAddingModal}
                         onDelete={this.handleRemoveArpeggioClick}
                         classes={{
@@ -1358,7 +1358,8 @@ class App extends React.Component<{}, AppState> {
                   )}
                   {this.state.modifiers.chromaticApproaches.enabled && (
                     <Tooltip
-                      title="Change enclosure settings"
+                      title="Change enclosures settings"
+                      disableFocusListener
                     >
                       <Chip
                         color="primary"
@@ -1393,7 +1394,9 @@ class App extends React.Component<{}, AppState> {
               secondaryNotesMidi={
                 activeNoteCardStaffTicks
                   ? _.flatten(
-                      activeNoteCardStaffTicks.map(t => t.notes.map(n => n.midi)),
+                      activeNoteCardStaffTicks.map(t =>
+                        t.notes.map(n => n.midi),
+                      ),
                     )
                   : noteCardWithMouseOverStaffTicks
                     ? _.flatten(
