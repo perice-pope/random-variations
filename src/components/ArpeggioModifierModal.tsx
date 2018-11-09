@@ -313,6 +313,7 @@ class ArpeggioModifierModal extends React.Component<
 
               <Box width={1} mt={3}>
                 <PatternEditor
+                  useLetters
                   value={this.state.values.pattern}
                   onChange={this.handlePatternChange}
                   min={1}

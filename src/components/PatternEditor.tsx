@@ -19,11 +19,15 @@ import { withState, compose } from 'recompose'
 
 type PatternEditorProps = {
   getSortableContainer?: () => any
+  useLetters?: boolean
   value: ArpeggioPattern
   onChange: (pattern: ArpeggioPattern) => any
   min: number
   max: number
 }
+
+const numberToLetter = (value: number) =>
+  String.fromCharCode('A'.charCodeAt(0) + value - 1)
 
 const SortablePatternElement = SortableElement(
   compose(
@@ -32,6 +36,7 @@ const SortablePatternElement = SortableElement(
   )(
     // @ts-ignore
     ({
+      useLetters,
       menuOpen,
       setMenuOpen,
       menuAnchorEl,
@@ -47,6 +52,11 @@ const SortablePatternElement = SortableElement(
       value: ArpeggioPatternElement
       [k: string]: any
     }) => {
+      let buttonText = '-'
+      if (!item.muted) {
+        buttonText = useLetters ? numberToLetter(item.note) : item.note
+      }
+
       return (
         <>
           <Menu
@@ -112,7 +122,7 @@ const SortablePatternElement = SortableElement(
                 padding: '1rem !important',
               })}
             >
-              {item.muted ? '-' : item.note}
+              {buttonText}
             </Button>
 
             <Button
@@ -215,7 +225,13 @@ class PatternEditor extends React.Component<PatternEditorProps> {
   }
 
   render() {
-    const { getSortableContainer, min, max, value: pattern } = this.props
+    const {
+      useLetters,
+      getSortableContainer,
+      min,
+      max,
+      value: pattern,
+    } = this.props
     return (
       <Flex
         alignItems="center"
@@ -229,6 +245,7 @@ class PatternEditor extends React.Component<PatternEditorProps> {
           onItemNoteDelete={this.handleItemNoteDelete}
           onItemNoteMute={this.handleItemNoteMutedChange}
           items={pattern.items}
+          useLetters={useLetters}
           axis="x"
           distance={10}
           onSortEnd={this.handleItemsReorder}
