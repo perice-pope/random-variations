@@ -76,7 +76,7 @@ import AudioEngine, { AnimationCallback } from '../services/audioEngine'
 import { AudioEngineContext } from './withAudioEngine'
 import firebase, { FirebaseContext, base } from '../services/firebase'
 import SignInModal from './SignInModal'
-import { CircularProgress, Avatar } from '@material-ui/core'
+import { CircularProgress, Avatar, Tooltip } from '@material-ui/core'
 
 globalStyles()
 
@@ -1342,28 +1342,36 @@ class App extends React.Component<{}, AppState> {
 
                 <Flex flex-direction="row" flex={1} alignItems="center">
                   {this.state.modifiers.chords.enabled && (
-                    <Chip
-                      color="primary"
-                      label={`Chords: ${this.state.modifiers.chords.chordType}`}
-                      onClick={this.openArpeggioAddingModal}
-                      onDelete={this.handleRemoveArpeggioClick}
-                      classes={{
-                        root: css({ marginRight: '0.5rem' }),
-                      }}
-                    />
+                    <Tooltip
+                      title="Change chords settings"
+                    >
+                      <Chip
+                        color="primary"
+                        label={`Chords: ${this.state.modifiers.chords.chordType}`}
+                        onClick={this.openArpeggioAddingModal}
+                        onDelete={this.handleRemoveArpeggioClick}
+                        classes={{
+                          root: css({ marginRight: '0.5rem' }),
+                        }}
+                      />
+                    </Tooltip>
                   )}
                   {this.state.modifiers.chromaticApproaches.enabled && (
-                    <Chip
-                      color="primary"
-                      label={`Enclosure / ${
-                        this.state.modifiers.chromaticApproaches.type
-                      }`}
-                      onClick={this.openChromaticApproachesModal}
-                      onDelete={this.handleRemoveChromaticApproachesClick}
-                      classes={{
-                        root: css({ marginRight: '0.5rem' }),
-                      }}
-                    />
+                    <Tooltip
+                      title="Change enclosure settings"
+                    >
+                      <Chip
+                        color="primary"
+                        label={`Enclosure: ${
+                          this.state.modifiers.chromaticApproaches.type
+                        }`}
+                        onClick={this.openChromaticApproachesModal}
+                        onDelete={this.handleRemoveChromaticApproachesClick}
+                        classes={{
+                          root: css({ marginRight: '0.5rem' }),
+                        }}
+                      />
+                    </Tooltip>
                   )}
                 </Flex>
               </Flex>

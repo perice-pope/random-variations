@@ -6,7 +6,6 @@ import { default as MuButton } from '@material-ui/core/Button'
 
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
-import ListSubheader from '@material-ui/core/ListSubheader'
 import ListItemText from '@material-ui/core/ListItemText'
 
 import Dialog from '@material-ui/core/Dialog'
@@ -38,11 +37,11 @@ type ChromaticApproachesOption = {
 }
 
 const ChromaticApproachesOptions: ChromaticApproachesOption[] = [
-  { title: 'From above', value: 'above' },
-  { title: 'From below', value: 'below' },
-  { title: 'Random: from above or below', value: 'random' },
-  { title: 'Up, down, then to base note', value: 'up down' },
-  { title: 'Down, up, then to base note', value: 'down up' },
+  { title: 'One up', value: 'above' },
+  { title: 'One down', value: 'below' },
+  { title: 'Random: one up or down', value: 'random' },
+  { title: 'One Up, then one down', value: 'up down' },
+  { title: 'One down, then one up', value: 'down up' },
 ]
 
 // @ts-ignore
@@ -89,7 +88,6 @@ class ChromaticApproachesModifierModal extends React.Component<
               overflow: 'auto',
             })}
           >
-            <ListSubheader>Approach type</ListSubheader>
             {ChromaticApproachesOptions.map(({ title, value }) => (
               <ListItem
                 selected={value === this.state.type}

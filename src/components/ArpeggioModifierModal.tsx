@@ -24,6 +24,7 @@ import {
   ArpeggioPatternPreset,
   ChordType,
   StaffTick,
+  Chord,
 } from '../types'
 import { ChangeEvent } from 'react'
 import { Input, Tooltip, Switch, FormControlLabel } from '@material-ui/core'
@@ -133,14 +134,15 @@ class ArpeggioModifierModal extends React.Component<
 
   handleChordTypeSelected = (e: ChangeEvent<HTMLSelectElement>) => {
     const chordType = e.target.value as ChordType
-    const chord = chordsByChordType[chordType]
+    const chord = chordsByChordType[chordType] as Chord
+    const { notesCount } = chord
 
     this.setState({
       values: {
         ...this.state.values,
         chordType,
         chordInversion: Math.min(
-          chord.notesCount - 1,
+          notesCount - 1,
           this.state.values.chordInversion,
         ),
         pattern:
@@ -149,8 +151,14 @@ class ArpeggioModifierModal extends React.Component<
                 chord,
                 patternPreset: this.state.values.patternPreset,
               })
-            : // TODO: adapt the pattern to the new chord (e.g. when new chord has less notes, etc)
-              this.state.values.pattern,
+            : {
+                ...this.state.values.pattern,
+                items: this.state.values.pattern.items.map(item => ({
+                  ...item,
+                   // Adapt the pattern to the new chord (e.g. when new chord has less notes, etc)
+                  note: item.note > notesCount ? 1 + (item.note - 1) % notesCount : item.note
+                }))
+              }
       },
     })
   }
