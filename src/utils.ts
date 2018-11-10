@@ -1,6 +1,5 @@
 import { mix } from 'polished'
 import * as tonal from 'tonal'
-import uuid from 'uuid/v4'
 import { arrayMove as reactHocArrayMove } from 'react-sortable-hoc'
 import { Session } from './types'
 import {
@@ -96,7 +95,7 @@ export const createDefaultSession = () => {
         }),
       },
       chords: {
-        enabled: true,
+        enabled: false,
         isMelodic: true,
         chordInversion: 0,
         chordType: 'M',
@@ -111,24 +110,7 @@ export const createDefaultSession = () => {
         type: 'above',
       },
     },
-    noteCards: [
-      {
-        id: uuid(),
-        noteName: 'C4',
-      },
-      {
-        id: uuid(),
-        noteName: 'G4',
-      },
-      {
-        id: uuid(),
-        noteName: 'F4',
-      },
-      {
-        id: uuid(),
-        noteName: 'D4',
-      },
-    ],
+    noteCards: [],
   }
 
   return defaultSession

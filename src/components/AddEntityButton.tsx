@@ -14,6 +14,7 @@ type AddEntityButtonProps = {
   onAddChromaticApproachesClick: () => any
   buttonProps?: ButtonProps
   disableSingleNote?: boolean
+  showHelpTooltip?: boolean
   disableChords?: boolean
   disableScales?: boolean
   disableChromaticApproaches?: boolean
@@ -79,6 +80,7 @@ export default class AddEntityButton extends React.Component<
       disableScales,
       disableSingleNote,
       disableChromaticApproaches,
+      showHelpTooltip,
     } = this.props
 
     const allOptionsAreDisabled =
@@ -113,8 +115,25 @@ export default class AddEntityButton extends React.Component<
         </Menu>
 
         <Tooltip
-          title="Add a note, sequence or a modifier"
-          disableFocusListener={true}
+          open={showHelpTooltip || undefined}
+          enterDelay={1000}
+          title={
+            showHelpTooltip
+              ? 'Start with adding a note!'
+              : 'Add a note, sequence or a modifier'
+          }
+          PopperProps={{ className: css({ zIndex: 100 }) }}
+          classes={{
+            tooltip: css({
+              fontSize: '1rem',
+              background: '#3f51b5',
+              userSelect: 'none',
+            }),
+          }}
+          placement={showHelpTooltip ? 'left' : undefined}
+          disableFocusListener={showHelpTooltip}
+          disableHoverListener={showHelpTooltip}
+          disableTouchListener={showHelpTooltip}
         >
           <Button
             buttonRef={this.buttonRef}

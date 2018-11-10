@@ -82,7 +82,13 @@ import AudioEngine, { AnimationCallback } from '../services/audioEngine'
 import { AudioEngineContext } from './withAudioEngine'
 import firebase, { FirebaseContext, base } from '../services/firebase'
 import SignInModal from './SignInModal'
-import { CircularProgress, Avatar, Tooltip } from '@material-ui/core'
+import {
+  CircularProgress,
+  Avatar,
+  Tooltip,
+  Fade,
+  Grow,
+} from '@material-ui/core'
 
 globalStyles()
 
@@ -1277,112 +1283,125 @@ class App extends React.Component<{}, AppState> {
             <Toolbar variant="dense">{ToolbarContent}</Toolbar>
           </AppBar>
 
-          <Flex
-            pt={[3, 3, 4]}
-            flex={1}
-            px={[3]}
-            width={1}
-            maxWidth={960}
-            justifyContent="center"
-            alignItems="center"
-            flexDirection="column"
-          >
+          <Fade in appear timeout={{ enter: 1000 }}>
             <Flex
-              alignItems="center"
-              flexDirection="row"
-              mb={3}
+              pt={[3, 3, 4]}
+              flex={1}
+              px={[3]}
               width={1}
-              flexWrap="wrap"
+              maxWidth={960}
               justifyContent="center"
-            >
-              <Box
-                flex="1"
-                className={css({ whiteSpace: 'nowrap' })}
-                mb={1}
-                mr={2}
-              >
-                {TogglePlaybackButton}
-                {ShuffleButton}
-                {TgogleCountInButton}
-                {ToggleMetronomeButton}
-              </Box>
-
-              {SessionControls}
-            </Flex>
-
-            <Flex
-              flex={2}
               alignItems="center"
-              justifyContent="center"
               flexDirection="column"
-              maxHeight={400}
-              width={1}
-              maxWidth={700}
             >
-              <NoteCards
-                noteCards={noteCards}
-                activeNoteCard={activeNoteCard}
-                onChangeToEnharmonicClick={
-                  this.handleChangeNoteCardToEnharmonicClick
-                }
-                onMouseOver={this.handleMouseOverNoteCard}
-                onMouseLeave={this.handleMouseLeaveNoteCard}
-                onEditClick={this.handleEditCardClick}
-                onDeleteClick={this.handleDeleteCardClick}
-                onCardsReorder={this.handleCardsReorder}
-                onCardDraggedOut={this.handleNoteCardDraggedOut}
-              />
+              <Flex
+                alignItems="center"
+                flexDirection="row"
+                mb={3}
+                width={1}
+                flexWrap="wrap"
+                justifyContent="center"
+              >
+                <Box
+                  flex="1"
+                  className={css({ whiteSpace: 'nowrap' })}
+                  mb={1}
+                  mr={2}
+                >
+                  {TogglePlaybackButton}
+                  {ShuffleButton}
+                  {TgogleCountInButton}
+                  {ToggleMetronomeButton}
+                </Box>
+
+                {SessionControls}
+              </Flex>
 
               <Flex
-                flexDirection="row-reverse"
+                flex={2}
                 alignItems="center"
+                justifyContent="center"
+                flexDirection="column"
+                maxHeight={400}
                 width={1}
-                px={[1, 2, 2]}
-                mt={[4, 2, 3]}
-                mb={[2, 2, 3]}
+                maxWidth={700}
               >
-                <AddEntityButton
-                  onAddSingleNoteClick={this.openNoteAddingModal}
-                  onAddArpeggioClick={this.openArpeggioAddingModal}
-                  onAddScaleClick={this.openScalesModal}
-                  onAddChromaticApproachesClick={
-                    this.openChromaticApproachesModal
-                  }
-                  disableSingleNote={this.state.noteCards.length >= 12}
-                  disableChords={
-                    this.state.modifiers.chords.enabled ||
-                    this.state.modifiers.scales.enabled
-                  }
-                  disableScales={
-                    this.state.modifiers.scales.enabled ||
-                    this.state.modifiers.chords.enabled
-                  }
-                  disableChromaticApproaches={
-                    this.state.modifiers.chromaticApproaches.enabled
-                  }
-                  buttonProps={{
-                    disabled: isPlaying,
-                    className: css({
-                      marginLeft: '1rem',
-                    }),
-                  }}
-                />
+                <Grow
+                  in={this.state.isInitialized}
+                  timeout={{ enter: 5000 }}
+                  appear
+                >
+                  <NoteCards
+                    noteCards={noteCards}
+                    activeNoteCard={activeNoteCard}
+                    onChangeToEnharmonicClick={
+                      this.handleChangeNoteCardToEnharmonicClick
+                    }
+                    onMouseOver={this.handleMouseOverNoteCard}
+                    onMouseLeave={this.handleMouseLeaveNoteCard}
+                    onEditClick={this.handleEditCardClick}
+                    onDeleteClick={this.handleDeleteCardClick}
+                    onCardsReorder={this.handleCardsReorder}
+                    onCardDraggedOut={this.handleNoteCardDraggedOut}
+                  />
+                </Grow>
 
-                <Flex flex-direction="row" flex={1} alignItems="center">
-                  {ModifierChips}
+                <Flex
+                  flexDirection="row-reverse"
+                  alignItems="center"
+                  width={1}
+                  px={[1, 2, 2]}
+                  mt={[4, 2, 3]}
+                  mb={[2, 2, 3]}
+                >
+                  <Fade in={this.state.isInitialized} appear>
+                    <div>
+                      <AddEntityButton
+                        showHelpTooltip={noteCards.length === 0}
+                        onAddSingleNoteClick={this.openNoteAddingModal}
+                        onAddArpeggioClick={this.openArpeggioAddingModal}
+                        onAddScaleClick={this.openScalesModal}
+                        onAddChromaticApproachesClick={
+                          this.openChromaticApproachesModal
+                        }
+                        disableSingleNote={this.state.noteCards.length >= 12}
+                        disableChords={
+                          this.state.modifiers.chords.enabled ||
+                          this.state.modifiers.scales.enabled
+                        }
+                        disableScales={
+                          this.state.modifiers.scales.enabled ||
+                          this.state.modifiers.chords.enabled
+                        }
+                        disableChromaticApproaches={
+                          this.state.modifiers.chromaticApproaches.enabled
+                        }
+                        buttonProps={{
+                          disabled: isPlaying,
+                          className: css({
+                            marginLeft: '1rem',
+                          }),
+                        }}
+                      />
+                    </div>
+                  </Fade>
+
+                  <Flex flex-direction="row" flex={1} alignItems="center">
+                    {ModifierChips}
+                  </Flex>
                 </Flex>
               </Flex>
-            </Flex>
 
-            <NotesStaff
-              isPlaying={isPlaying}
-              showEnd
-              id="notation"
-              ticks={this.state.staffTicks}
-              activeTickIndex={isPlaying ? activeStaffTickIndex : undefined}
-              height={160}
-            />
-          </Flex>
+              <NotesStaff
+                isPlaying={isPlaying}
+                showEnd
+                id="notation"
+                ticks={this.state.staffTicks}
+                activeTickIndex={isPlaying ? activeStaffTickIndex : undefined}
+                height={160}
+              />
+            </Flex>
+          </Fade>
 
           <Box mt={[1, 2, 3]}>
             <PianoKeyboard
@@ -1495,9 +1514,11 @@ class App extends React.Component<{}, AppState> {
         <Typography variant="h4" color="primary">
           Random Variations
         </Typography>
-        <Typography variant="h6" color="secondary">
-          Your music practice app
-        </Typography>
+        <Fade in appear timeout={{ enter: 1000 }}>
+          <Typography variant="h6" color="secondary">
+            Your music practice app
+          </Typography>
+        </Fade>
         <Box mt={3}>
           <CircularProgress size={50} />
         </Box>
