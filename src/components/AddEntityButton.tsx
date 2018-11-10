@@ -115,12 +115,12 @@ export default class AddEntityButton extends React.Component<
         </Menu>
 
         <Tooltip
+          key={showHelpTooltip === true ? 'on' : 'off'}
           open={showHelpTooltip || undefined}
-          enterDelay={1000}
           title={
             showHelpTooltip
               ? 'Start with adding a note!'
-              : 'Add a note, sequence or a modifier'
+              : 'Add items to your practice session'
           }
           PopperProps={{ className: css({ zIndex: 100 }) }}
           classes={{
@@ -131,9 +131,9 @@ export default class AddEntityButton extends React.Component<
             }),
           }}
           placement={showHelpTooltip ? 'left' : undefined}
-          disableFocusListener={showHelpTooltip}
-          disableHoverListener={showHelpTooltip}
-          disableTouchListener={showHelpTooltip}
+          disableFocusListener={showHelpTooltip || false}
+          disableHoverListener={showHelpTooltip || false}
+          disableTouchListener={showHelpTooltip || false}
         >
           <Button
             buttonRef={this.buttonRef}
