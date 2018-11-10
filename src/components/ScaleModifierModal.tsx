@@ -20,13 +20,12 @@ import ArrowsIcon from '@material-ui/icons/Cached'
 import PatternEditor from './PatternEditor'
 
 import {
-  ArpeggioPattern,
+  ScalePattern,
   ScalePatternPreset,
   ScaleType,
   StaffTick,
   Scale,
   ScaleModifier,
-  ScalePattern,
 } from '../types'
 import { ChangeEvent } from 'react'
 import { Input, Tooltip } from '@material-ui/core'
@@ -43,14 +42,14 @@ import { Omit } from '../utils'
 
 export type SubmitValuesType = Omit<ScaleModifier, 'enabled'>
 
-type ArpeggioModifierModalProps = {
+type ScaleModifierModalProps = {
   isOpen: boolean
   onClose: () => any
   onSubmit: (args: SubmitValuesType) => any
   initialValues?: SubmitValuesType
 }
 
-type ArpeggioModifierModalState = {
+type ScaleModifierModalState = {
   values: SubmitValuesType
 }
 
@@ -108,14 +107,14 @@ const patternPresetOptions: PatternPresetOption[] = [
   ),
 ]
 
-type Props = ArpeggioModifierModalProps & { fullScreen: boolean }
+type Props = ScaleModifierModalProps & { fullScreen: boolean }
 
 // @ts-ignore
-class ArpeggioModifierModal extends React.Component<
+class ScaleModifierModal extends React.Component<
   Props,
-  ArpeggioModifierModalState
+  ScaleModifierModalState
 > {
-  static defaultProps: Partial<ArpeggioModifierModalProps> = {
+  static defaultProps: Partial<ScaleModifierModalProps> = {
     initialValues: {
       scaleType: 'major',
       patternPreset: 'up',
@@ -191,7 +190,7 @@ class ArpeggioModifierModal extends React.Component<
     })
   }
 
-  handlePatternChange = (pattern: ArpeggioPattern) => {
+  handlePatternChange = (pattern: ScalePattern) => {
     this.setState({
       values: {
         ...this.state.values,
@@ -363,6 +362,4 @@ class ArpeggioModifierModal extends React.Component<
   }
 }
 
-export default withMobileDialog<ArpeggioModifierModalProps>()(
-  ArpeggioModifierModal,
-)
+export default withMobileDialog<ScaleModifierModalProps>()(ScaleModifierModal)

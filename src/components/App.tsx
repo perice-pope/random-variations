@@ -296,18 +296,10 @@ class App extends React.Component<{}, AppState> {
     }
 
     this.setState(
-      _.merge(
-        {
-          modifiers: unpackSessionState(_.omit(
-            createDefaultSession(),
-            'noteCard',
-          ) as Session).modifiers,
-        },
-        {
-          activeSessionId: sessionId,
-          ...unpackSessionState(session),
-        },
-      ),
+      {
+        activeSessionId: sessionId,
+        ...unpackSessionState(session),
+      },
       this.onNotesUpdated,
     )
   }
