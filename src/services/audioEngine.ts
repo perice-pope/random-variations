@@ -33,7 +33,7 @@ export default class AudioEngine {
 
   private animationCallback?: AnimationCallback
 
-  private audioFontId: AudioFontId = audioFontsConfig[0].id
+  private audioFontId: AudioFontId = audioFontsConfig[1].id
   private audioFontPlayer?: typeof WebAudioFontPlayer
   private audioFontCache: { [audioFontId in AudioFontId]?: AudioFont } = {}
   private hasLoadedAudioFontMap: { [audioFontId in AudioFontId]?: boolean } = {}
@@ -153,6 +153,7 @@ export default class AudioEngine {
     note: PlayableNote,
     when: number = 0,
     duration: number = 10000000,
+    audioFontId?: AudioFontId,
   ) => {
     if (!this.audioFontPlayer || !this.hasLoadedAudioFont(this.audioFontId)) {
       return

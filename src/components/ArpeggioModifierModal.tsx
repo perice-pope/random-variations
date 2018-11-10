@@ -155,10 +155,13 @@ class ArpeggioModifierModal extends React.Component<
                 ...this.state.values.pattern,
                 items: this.state.values.pattern.items.map(item => ({
                   ...item,
-                   // Adapt the pattern to the new chord (e.g. when new chord has less notes, etc)
-                  note: item.note > notesCount ? 1 + (item.note - 1) % notesCount : item.note
-                }))
-              }
+                  // Adapt the pattern to the new chord (e.g. when new chord has less notes, etc)
+                  note:
+                    item.note > notesCount
+                      ? 1 + ((item.note - 1) % notesCount)
+                      : item.note,
+                })),
+              },
       },
     })
   }
@@ -273,6 +276,10 @@ class ArpeggioModifierModal extends React.Component<
   }
 
   render() {
+    if (!this.props.isOpen) {
+      return null
+    }
+
     const chord = chordsByChordType[this.state.values.chordType]
     const { isMelodic } = this.state.values
 

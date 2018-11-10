@@ -9,6 +9,7 @@ import { lighten, darken, getLuminance, opacify, rgb, rgba } from 'polished'
 import { Box } from './ui'
 import { withAudioEngine } from './withAudioEngine'
 import AudioEngine from '../services/audioEngine'
+import { AudioFontId } from '../audioFontsConfig'
 
 const pianoNoteRangeWide: MidiNoteRange = {
   first: tonal.Note.midi('C3'),
@@ -38,6 +39,7 @@ type MidiNoteRange = {
 
 type PianoKeyboardProps = {
   audioEngine: AudioEngine
+  audioFontId: AudioFontId
   className?: any
   width: number
   height: number
@@ -80,9 +82,13 @@ class PianoKeyboard extends React.Component<
       this.props.onPlayNote(noteMidi)
     }
 
-    this.playingNoteEnvelopes[noteMidi] = this.props.audioEngine.playNote({
-      midi: noteMidi,
-    })
+    this.playingNoteEnvelopes[noteMidi] = this.props.audioEngine.playNote(
+      {
+        midi: noteMidi,
+      },
+      0,
+      1.5,
+    )
   }
 
   private onStopNote = noteMidi => {

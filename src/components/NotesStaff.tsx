@@ -23,6 +23,7 @@ type NotesStaffProps = {
   ticks: StaffTick[]
   isPlaying: boolean
   showBreaks?: boolean
+  showEnd?: boolean
   activeTickIndex?: number
   height: number
   containerProps?: BoxProps
@@ -46,7 +47,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
   private boxRef: React.RefObject<any> = React.createRef()
 
-  private notesPerTick: Vex.Flow.StaveNote[][] = []
+  private notesPerTick: Vex.Flow.Note[][] = []
   private stave?: Vex.Flow.Stave
   private activeLineEl?: SVGElement
 
@@ -149,6 +150,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
           20,
       )
       .stroke()
+    this.renderContext.restore()
 
     this.activeLineEl.classList.add('vf-active-line', activeNoteClasses.base)
 
@@ -186,6 +188,9 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
     // Create a stave of at position 10, 40 on the canvas.
     const stave = new Vex.Flow.Stave(10, 0, width)
+    if (this.props.showEnd) {
+      stave.setEndBarType(Vex.Flow.Barline.type.DOUBLE)
+    }
     this.stave = stave
 
     // Add a clef and time signature.
@@ -200,15 +205,25 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     const { ticks } = this.props
     const { stave, renderContext } = this
 
-    if (!stave) {
+    // Clear the old notes
+    renderContext.clear()
+    this.drawStaveAndClef()
+    this.drawActiveNoteLine()
+    // @ts-ignore
+    renderContext.svg.querySelectorAll('.vf-stavenote').forEach(n => n.remove())
+    // @ts-ignore
+    // renderContext.svg.querySelectorAll('.rect').forEach(n => n.remove())
+
+    if (!stave || !ticks || ticks.length === 0) {
       return
     }
 
-    // Clear the old notes
-    // @ts-ignore
-    renderContext.svg.querySelectorAll('.vf-stavenote').forEach(n => n.remove())
+    let noteCardId = ticks[0].noteCardId
 
-    const notesPerTick = ticks.map(tick => {
+    const notesPerTick = ticks.map((tick, index) => {
+      const shouldAddMeasureLine = tick.noteCardId !== noteCardId
+      noteCardId = tick.noteCardId
+
       const tickNoteKeys = tick.notes.map(noteConfig => {
         const [letter, accidental, octave] = tonal.Note.tokenize(
           noteConfig.noteName,
@@ -263,7 +278,18 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
           .setStyle({ fillStyle: 'transparent', strokeStyle: 'transparent' })
       })
 
-      return [vexFlowNote]
+      let notes: Vex.Flow.Note[] = [vexFlowNote]
+
+      if (shouldAddMeasureLine) {
+        const measureLineNote = new Vex.Flow.BarNote().setType(
+          Vex.Flow.Barline.type.SINGLE,
+        )
+        // @ts-ignore
+        window.measureLineNote = measureLineNote
+        notes = [measureLineNote, ...notes]
+      }
+
+      return notes
     })
 
     Vex.Flow.Formatter.FormatAndDraw(
@@ -293,7 +319,9 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
       activeTickIndex < ticks.length
     ) {
       const notesPerActiveTick = notesPerTick[activeTickIndex]
-      const activeNote = notesPerActiveTick[0]
+      const activeNote = notesPerActiveTick.find(
+        n => n instanceof Vex.Flow.StaveNote,
+      ) as Vex.Flow.StaveNote | undefined
 
       if (activeNote) {
         const noteHeadX =

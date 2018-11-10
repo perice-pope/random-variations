@@ -188,6 +188,7 @@ class ArpeggioModifierModal extends React.Component<
     let staffTicks: StaffTick[]
 
     staffTicks = this.state.values.pattern.items.map((item, index) => {
+      console.log('generateStaffTicks', item)
       const note = item.muted
         ? undefined
         : transpose(baseNote, intervals[item.note - 1])
@@ -223,6 +224,10 @@ class ArpeggioModifierModal extends React.Component<
   }
 
   render() {
+    if (!this.props.isOpen) {
+      return null
+    }
+
     const scale = scaleByScaleType[this.state.values.scaleType]
 
     return (

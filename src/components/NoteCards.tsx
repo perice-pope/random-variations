@@ -19,6 +19,7 @@ const FlipperStyled = styled(Flipper)`
   height: 100%;
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   align-content: center;
   align-items: center;
 `

@@ -1,7 +1,12 @@
 import * as React from 'react'
 import AudioEngine from '../services/audioEngine'
+import { AudioFontId } from '../audioFontsConfig'
 
-export const AudioEngineContext = React.createContext<AudioEngine | null>(null)
+type ContextType = {
+  audioEngine?: AudioEngine
+  audioFontId?: AudioFontId
+}
+export const AudioEngineContext = React.createContext<ContextType>({})
 
 // This function takes a component...
 export function withAudioEngine(Component) {
@@ -11,7 +16,13 @@ export function withAudioEngine(Component) {
     // Notice that we pass through any additional props as well
     return (
       <AudioEngineContext.Consumer>
-        {audioEngine => <Component {...props} audioEngine={audioEngine} />}
+        {({ audioEngine, audioFontId }) => (
+          <Component
+            {...props}
+            audioEngine={audioEngine}
+            audioFontId={audioFontId}
+          />
+        )}
       </AudioEngineContext.Consumer>
     )
   }

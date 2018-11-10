@@ -175,12 +175,13 @@ export const generateScalePatternFromPreset = ({
     }
     case 'up, skip 1': {
       items = ladderUp(1, scale.notesCount).map(note => ({ note }))
+      console.log('items = ', items)
       mainNoteIndex = 0
       break
     }
     case 'down': {
       items = _.range(scale.notesCount, 0, -1).map(note => ({ note }))
-      mainNoteIndex = items.length - 1
+      mainNoteIndex = 0
       break
     }
     case 'down, skip 1': {

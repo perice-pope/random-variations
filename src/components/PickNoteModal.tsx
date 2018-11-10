@@ -26,9 +26,11 @@ import { lighten } from 'polished'
 import { withAudioEngine } from './withAudioEngine'
 import AudioEngine from '../services/audioEngine'
 import styled from 'react-emotion'
+import { AudioFontId } from '../audioFontsConfig'
 
 type PickNoteModalProps = {
   audioEngine: AudioEngine
+  audioFontId: AudioFontId
   isOpen: boolean
   enharmonicFlatsMap: EnharmonicFlatsMap
   onClose: () => any
@@ -38,6 +40,7 @@ type PickNoteModalProps = {
 }
 
 type PickNoteModalState = {
+  range?: any
   noteName?: string
   notePitchName?: string
   octave?: number
@@ -68,6 +71,7 @@ class PickNoteModal extends React.Component<
   constructor(props) {
     super(props)
     this.state = {
+      range: this.getNoteRange(props.noteName),
       noteName: props.noteName,
       octave: props.noteName ? tonal.Note.oct(props.noteName) : 4,
       notePitchName: props.noteName ? tonal.Note.pc(props.noteName) : undefined,
@@ -76,6 +80,7 @@ class PickNoteModal extends React.Component<
   }
 
   getNoteRange = noteName => {
+    console.log('getNoteRange', noteName)
     const octave = noteName ? tonal.Note.oct(noteName) : 4
     const firstNote = octave === 1 ? `C${octave}` : `A${octave - 1}`
     const lastNote = octave === 6 ? `B${octave}` : `D${octave + 1}`
@@ -139,7 +144,7 @@ class PickNoteModal extends React.Component<
     }
   }
 
-  onNoteSelected = (noteName?: string) => {
+  onNoteSelected = (noteName?: string, skipPlayingNote?: boolean) => {
     if (!noteName) {
       this.setState({
         noteName: undefined,
@@ -151,6 +156,18 @@ class PickNoteModal extends React.Component<
 
     console.log('TCL: onNoteSelected -> noteName', noteName)
     const noteEnharmonicName = tonal.Note.enharmonic(noteName)
+
+    setTimeout(() => this.setState({ range: this.getNoteRange(noteName) }), 100)
+
+    if (!skipPlayingNote) {
+      this.props.audioEngine.playNote(
+        {
+          midi: tonal.Note.midi(noteName),
+        },
+        0,
+        0.5,
+      )
+    }
 
     if (noteName !== noteEnharmonicName && this.state.noteName === noteName) {
       // This is a second click on a card with "enharmonic-capable" note...
@@ -176,24 +193,8 @@ class PickNoteModal extends React.Component<
         this.props.onEnharmonicFlatsMapToggle(notePitchWithSharp)
       }
 
-      this.props.audioEngine.playNote(
-        {
-          midi: tonal.Note.midi(noteName),
-        },
-        0,
-        1.0,
-      )
-
       return
     }
-
-    this.props.audioEngine.playNote(
-      {
-        midi: tonal.Note.midi(noteName),
-      },
-      0,
-      1.0,
-    )
 
     this.setState({
       noteName: noteName,
@@ -308,7 +309,7 @@ class PickNoteModal extends React.Component<
             <Box mt={4} width={1}>
               <PianoKeyboard
                 height={100}
-                noteRange={this.getNoteRange(this.state.noteName)}
+                noteRange={this.state.range}
                 onPlayNote={midiNote => {
                   const noteNameWithSharp = tonal.Note.fromMidi(midiNote, true)
                   const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)
@@ -317,7 +318,8 @@ class PickNoteModal extends React.Component<
                   ]
                     ? tonal.Note.enharmonic(noteNameWithSharp)
                     : noteNameWithSharp
-                  this.onNoteSelected(noteName)
+
+                  this.onNoteSelected(noteName, true)
                 }}
                 primaryNotesMidi={
                   this.state.noteName

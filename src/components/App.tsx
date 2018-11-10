@@ -243,9 +243,7 @@ class App extends React.Component<{}, AppState> {
   }
 
   componentDidMount() {
-    if (!this.state.isInitialized) {
-      this.init()
-    }
+    this.init()
   }
 
   componentWillUnmount() {
@@ -299,11 +297,16 @@ class App extends React.Component<{}, AppState> {
 
     this.setState(
       _.merge(
-        unpackSessionState(createDefaultSession() as Session), 
+        {
+          modifiers: unpackSessionState(_.omit(
+            createDefaultSession(),
+            'noteCard',
+          ) as Session).modifiers,
+        },
         {
           activeSessionId: sessionId,
           ...unpackSessionState(session),
-        }
+        },
       ),
       this.onNotesUpdated,
     )
@@ -385,6 +388,11 @@ class App extends React.Component<{}, AppState> {
   }
 
   private init = async () => {
+    await this.initAudioEngine()
+    if (this.state.isInitialized) {
+      return
+    }
+
     this.restoreLocalState()
 
     // Track the "online/offline" state, see:
@@ -440,7 +448,6 @@ class App extends React.Component<{}, AppState> {
     })
 
     await this.updateStaffNotes()
-    await this.initAudioEngine()
     await this.onNotesUpdated()
 
     this.setState({ isInitialized: true }, () => {
@@ -483,12 +490,12 @@ class App extends React.Component<{}, AppState> {
   private getPianoHeight = () => {
     const { height } = this.state
     if (height > 600) {
-      return 200
-    }
-    if (height > 300) {
       return 130
     }
-    return 80
+    if (height > 300) {
+      return 80
+    }
+    return 40
   }
 
   private handleShuffleClick = () => {
@@ -516,6 +523,7 @@ class App extends React.Component<{}, AppState> {
     if (!user || !session) {
       return
     }
+    console.log('Save session: ', session)
     base.update(`users/${user.uid}/sessions/${session.key}`, { data: session })
   }
 
@@ -549,8 +557,6 @@ class App extends React.Component<{}, AppState> {
 
     const loop = this.generateLoop()
     audioEngine.setLoop(loop)
-
-    this.saveAppState()
   }
 
   private drawAnimation: AnimationCallback = ({
@@ -563,26 +569,26 @@ class App extends React.Component<{}, AppState> {
         return null
       }
 
-      const nextStaffNoteIndex = tick.meta.staffTickIndex
-      console.log('nextStaffNoteIndex: ', nextStaffNoteIndex)
-      if (nextStaffNoteIndex == null) {
+      const nextStaffTickIndex = tick.meta.staffTickIndex
+      console.log('nextStaffNoteIndex: ', nextStaffTickIndex)
+      if (nextStaffTickIndex == null) {
         return null
       }
       // (state.activeStaffTickIndex + 1) % this.state.staffTicks.length
-      const nextStaffNote = this.state.staffTicks[nextStaffNoteIndex]
-      if (!nextStaffNote) {
+      const nextStaffTick = this.state.staffTicks[nextStaffTickIndex]
+      if (!nextStaffTick) {
         return null
       }
 
       // TODO: optimize this serial search code to a hash lookup
       const nextNoteCardIndex = this.state.noteCards.findIndex(
-        nc => nc.id === nextStaffNote.noteCardId,
+        nc => nc.id === nextStaffTick.noteCardId,
       )
       return {
-        activeStaffTickIndex: nextStaffNoteIndex,
+        activeStaffTickIndex: nextStaffTickIndex,
         activeNoteCardIndex: nextNoteCardIndex,
       }
-    }, this.updateStaffNotes)
+    })
   }
 
   private startPlaying = () => {
@@ -872,13 +878,10 @@ class App extends React.Component<{}, AppState> {
       }
     })
 
-    this.setState(
-      {
-        noteCards: newNoteCards,
-        noteCardsById: _.keyBy(newNoteCards, 'id'),
-      },
-      this.onNotesUpdated,
-    )
+    this.updateActiveSession({
+      noteCards: newNoteCards,
+      noteCardsById: _.keyBy(newNoteCards, 'id'),
+    })
   }
 
   private handleNoteClickInNoteCardEditingModal = ({ noteName }) => {
@@ -1245,7 +1248,9 @@ class App extends React.Component<{}, AppState> {
             <Chip
               color="primary"
               label={`Scale: ${
-                (scaleByScaleType[this.state.modifiers.scales.scaleType] as Scale).title
+                (scaleByScaleType[
+                  this.state.modifiers.scales.scaleType
+                ] as Scale).title
               }`}
               onClick={this.openScalesModal}
               onDelete={this.handleRemoveScalesClick}
@@ -1379,6 +1384,7 @@ class App extends React.Component<{}, AppState> {
 
             <NotesStaff
               isPlaying={isPlaying}
+              showEnd
               id="notation"
               ticks={this.state.staffTicks}
               activeTickIndex={isPlaying ? activeStaffTickIndex : undefined}
@@ -1590,7 +1596,9 @@ class App extends React.Component<{}, AppState> {
   public render() {
     return (
       <ThemeProvider theme={theme}>
-        <AudioEngineContext.Provider value={audioEngine}>
+        <AudioEngineContext.Provider
+          value={{ audioEngine, audioFontId: this.state.audioFontId }}
+        >
           <FirebaseContext.Provider value={firebase}>
             <JssProvider jss={jss} generateClassName={generateClassName}>
               <>

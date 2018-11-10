@@ -5,6 +5,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 import AddIcon from '@material-ui/icons/Add'
 import Button, { ButtonProps } from '@material-ui/core/Button'
 import Tooltip from '@material-ui/core/Tooltip'
+import { css } from 'emotion'
 
 type AddEntityButtonProps = {
   onAddSingleNoteClick: () => any
@@ -117,6 +118,12 @@ export default class AddEntityButton extends React.Component<
         >
           <Button
             buttonRef={this.buttonRef}
+            classes={{
+              fab: css({
+                width: '40px !important',
+                height: '40px !important',
+              }),
+            }}
             variant="fab"
             color="secondary"
             aria-label="Add"
