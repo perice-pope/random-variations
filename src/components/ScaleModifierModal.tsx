@@ -26,6 +26,7 @@ import {
   StaffTick,
   Scale,
   ScaleModifier,
+  ScalePattern,
 } from '../types'
 import { ChangeEvent } from 'react'
 import { Input, Tooltip } from '@material-ui/core'
@@ -71,6 +72,26 @@ type PatternPresetOption = {
   value: ScalePatternPreset
 }
 
+const adaptPatternForScale = ({
+  pattern,
+  scale,
+}: {
+  pattern: ScalePattern
+  scale: Scale
+}) => {
+  return {
+    ...pattern,
+    items: pattern.items.map(item => ({
+      ...item,
+      // Adapt the pattern to the new Scale (e.g. when new Scale has less notes, etc)
+      note:
+        item.note > scale.notesCount
+          ? 1 + ((item.note - 1) % scale.notesCount)
+          : item.note,
+    })),
+  } as ScalePattern
+}
+
 const patternPresetOptions: PatternPresetOption[] = [
   { title: 'Custom', value: 'custom' },
   ...[
@@ -87,9 +108,11 @@ const patternPresetOptions: PatternPresetOption[] = [
   ),
 ]
 
+type Props = ArpeggioModifierModalProps & { fullScreen: boolean }
+
 // @ts-ignore
 class ArpeggioModifierModal extends React.Component<
-  ArpeggioModifierModalProps & { fullScreen: boolean },
+  Props,
   ArpeggioModifierModalState
 > {
   static defaultProps: Partial<ArpeggioModifierModalProps> = {
@@ -103,11 +126,18 @@ class ArpeggioModifierModal extends React.Component<
     },
   }
 
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
 
+    const scale = scaleByScaleType[props.initialValues!.scaleType] as Scale
     this.state = {
-      values: props.initialValues,
+      values: {
+        ...props.initialValues!,
+        pattern: adaptPatternForScale({
+          pattern: props.initialValues!.pattern,
+          scale,
+        }),
+      },
     }
   }
 
@@ -124,7 +154,6 @@ class ArpeggioModifierModal extends React.Component<
   handleScaleTypeSelected = (e: ChangeEvent<HTMLSelectElement>) => {
     const scaleType = e.target.value as ScaleType
     const scale = scaleByScaleType[scaleType] as Scale
-    const { notesCount } = scale
 
     this.setState({
       values: {
@@ -136,17 +165,10 @@ class ArpeggioModifierModal extends React.Component<
                 scale,
                 patternPreset: this.state.values.patternPreset,
               })
-            : {
-                ...this.state.values.pattern,
-                items: this.state.values.pattern.items.map(item => ({
-                  ...item,
-                  // Adapt the pattern to the new Scale (e.g. when new Scale has less notes, etc)
-                  note:
-                    item.note > notesCount
-                      ? 1 + ((item.note - 1) % notesCount)
-                      : item.note,
-                })),
-              },
+            : adaptPatternForScale({
+                scale,
+                pattern: this.state.values.pattern,
+              }),
       },
     })
   }
@@ -188,7 +210,6 @@ class ArpeggioModifierModal extends React.Component<
     let staffTicks: StaffTick[]
 
     staffTicks = this.state.values.pattern.items.map((item, index) => {
-      console.log('generateStaffTicks', item)
       const note = item.muted
         ? undefined
         : transpose(baseNote, intervals[item.note - 1])
