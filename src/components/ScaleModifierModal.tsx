@@ -73,8 +73,18 @@ type PatternPresetOption = {
 
 const patternPresetOptions: PatternPresetOption[] = [
   { title: 'Custom', value: 'custom' },
-  { title: 'Ascending', value: 'ascending' },
-  { title: 'Descending', value: 'descending' },
+  ...[
+    'up',
+    'down',
+    'up down',
+    'down up',
+    'up, skip 1',
+    'down, skip 1',
+    'up down, skip 1',
+    'down up, skip 1',
+  ].map(
+    type => ({ value: type, title: _.capitalize(type) } as PatternPresetOption),
+  ),
 ]
 
 // @ts-ignore
@@ -85,10 +95,10 @@ class ArpeggioModifierModal extends React.Component<
   static defaultProps: Partial<ArpeggioModifierModalProps> = {
     initialValues: {
       scaleType: 'major',
-      patternPreset: 'ascending',
+      patternPreset: 'up',
       pattern: generateScalePatternFromPreset({
         scale: scaleByScaleType['major'],
-        patternPreset: 'ascending',
+        patternPreset: 'up',
       }),
     },
   }

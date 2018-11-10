@@ -119,6 +119,45 @@ export const generateChordPatternFromPreset = ({
   return pattern
 }
 
+const ladderUp = (start: number, end: number) => {
+  const result: number[] = []
+
+  if (start === end) {
+    return [start]
+  }
+
+  if (start === end - 1) {
+    return [start, end]
+  }
+
+  let i = start
+  while (i + 2 <= end) {
+    result.push(i)
+    result.push(i + 2)
+    i += 1
+  }
+  return result
+}
+
+const ladderDown = (start: number, end: number) => {
+  const result: number[] = []
+  if (start === end) {
+    return [start]
+  }
+
+  if (start === end - 1) {
+    return [end, start]
+  }
+
+  let i = end
+  while (i - 2 >= start) {
+    result.push(i)
+    result.push(i - 2)
+    i -= 1
+  }
+  return result
+}
+
 export const generateScalePatternFromPreset = ({
   scale,
   patternPreset,
@@ -129,14 +168,56 @@ export const generateScalePatternFromPreset = ({
   let items: ArpeggioPatternElement[]
   let mainNoteIndex
   switch (patternPreset) {
-    case 'ascending': {
+    case 'up': {
       items = _.range(1, scale.notesCount + 1, 1).map(note => ({ note }))
       mainNoteIndex = 0
       break
     }
-    case 'descending': {
+    case 'up, skip 1': {
+      items = ladderUp(1, scale.notesCount).map(note => ({ note }))
+      mainNoteIndex = 0
+      break
+    }
+    case 'down': {
       items = _.range(scale.notesCount, 0, -1).map(note => ({ note }))
       mainNoteIndex = items.length - 1
+      break
+    }
+    case 'down, skip 1': {
+      items = ladderDown(1, scale.notesCount).map(note => ({ note }))
+      mainNoteIndex = 0
+      break
+    }
+    case 'up down': {
+      items = [
+        ..._.range(1, scale.notesCount + 1, 1).map(note => ({ note })),
+        ..._.range(scale.notesCount - 1, 0, -1).map(note => ({ note })),
+      ]
+      mainNoteIndex = 0
+      break
+    }
+    case 'down up': {
+      items = [
+        ..._.range(scale.notesCount, 0, -1).map(note => ({ note })),
+        ..._.range(2, scale.notesCount + 1, 1).map(note => ({ note })),
+      ]
+      mainNoteIndex = 0
+      break
+    }
+    case 'down up, skip 1': {
+      items = [
+        ...ladderDown(1, scale.notesCount),
+        ..._.slice(ladderUp(1, scale.notesCount), 1),
+      ].map(note => ({ note }))
+      mainNoteIndex = 0
+      break
+    }
+    case 'up down, skip 1': {
+      items = [
+        ...ladderUp(1, scale.notesCount),
+        ..._.slice(ladderDown(1, scale.notesCount), 1),
+      ].map(note => ({ note }))
+      mainNoteIndex = 0
       break
     }
     default: {
@@ -280,7 +361,7 @@ export const addChordNotes = (
               noteName,
               midi: tonal.Note.midi(noteName),
               id: uuid(),
-              color: isRootNote ? baseNote.color : 'black',
+              color: 'black',
               isMainNote: isRootNote,
             } as StaffNote
           }),
@@ -314,7 +395,7 @@ export const addChordNotes = (
                 id: uuid(),
                 midi: tonal.Note.midi(noteName),
                 isMainNote: mainNoteIndex === index,
-                color: mainNoteIndex === index ? baseNote.color : 'black',
+                color: 'black',
               } as StaffNote,
             ]
           : [],
@@ -371,7 +452,7 @@ export const addScaleNotes = (
                 id: uuid(),
                 midi: tonal.Note.midi(noteName),
                 isMainNote: mainNoteIndex === index,
-                color: mainNoteIndex === index ? baseNote.color : 'black',
+                color: 'black',
               } as StaffNote,
             ]
           : [],
@@ -399,6 +480,7 @@ export const generateStaffTicks = ({
   // Number of rests to add after each note card
   rests: number
 }): StaffTick[] => {
+  console.log('generateStaffTicks')
   const ticksPerCard: StaffTick[][] = []
 
   noteCards.forEach(noteCard => {
@@ -430,6 +512,13 @@ export const generateStaffTicks = ({
         modifiers.chromaticApproaches,
       )
     }
+
+    ticksForCard.forEach(tick => {
+      tick.notes.forEach(note => {
+        note.color =
+          note.noteName === noteCard.noteName ? noteCard.color : note.color
+      })
+    })
 
     // Add rests if needed
     if (rests) {

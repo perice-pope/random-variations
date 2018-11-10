@@ -97,7 +97,18 @@ export interface ChordModifier {
   pattern: ArpeggioPattern
 }
 
-export type ScalePatternPreset = 'custom' | 'ascending' | 'descending'
+export type ScalePatternPreset =
+  | 'custom'
+  | 'up'
+  | 'down'
+  | 'up down'
+  | 'down up'
+  | 'up, skip 1'
+  | 'down, skip 1'
+  | 'up down, skip 1'
+  | 'down, skip 1'
+  | 'down up, skip 1'
+
 export interface ScalePattern extends ArpeggioPattern {}
 
 export interface ScaleModifier {

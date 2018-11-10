@@ -89,7 +89,7 @@ const SortablePatternElement = SortableElement(
             flexDirection="column"
             zIndex={5000}
             alignItems="center"
-            mx={[1, 2, 2]}
+            mx={[1]}
             my={[1, 2, 3]}
             maxWidth={50}
           >
@@ -117,8 +117,8 @@ const SortablePatternElement = SortableElement(
               }}
               className={css({
                 minWidth: '30px',
-                fontSize: '2rem',
-                lineHeight: '2rem',
+                fontSize: '1.4rem',
+                lineHeight: '1.4rem',
                 padding: '1rem !important',
               })}
             >

@@ -89,10 +89,10 @@ export const createDefaultSession = () => {
       scales: {
         enabled: false,
         scaleType: 'major',
-        patternPreset: 'ascending',
+        patternPreset: 'up',
         pattern: generateScalePatternFromPreset({
           scale: scaleByScaleType['major'],
-          patternPreset: 'ascending',
+          patternPreset: 'up',
         }),
       },
       chords: {
