@@ -55,10 +55,22 @@ export interface NoteCardType extends PlayableNote {
   color: string
 }
 
-export type ChordType = 'M' | 'm' | 'maj7' | 'm7' | 'M69#11'
+// Add more
+export type ChordType = 'M' | 'm' | 'maj7' | 'm7' | 'M69#11' | string
 
 export interface Chord {
   type: ChordType
+  title: string
+  notesCount: number
+}
+
+// Add more
+export type ScaleType = 'major' | 'minor' | string
+
+export interface Scale {
+  type: ScaleType
+  // Intervals of "tonal" JS library: "1P", "2M" and so on
+  intervals: string[]
   title: string
   notesCount: number
 }
@@ -76,9 +88,6 @@ export interface ArpeggioPattern {
   mainNoteIndex: number
 }
 
-// TODO: rename to "ChordModifier"
-// TODO: rename "type" to "chord"
-// TODO: add "type" = "harmonic" | "melodic"
 export interface ChordModifier {
   enabled: boolean
   chordType: ChordType
@@ -86,6 +95,16 @@ export interface ChordModifier {
   chordInversion: number
   patternPreset: ArpeggioPatternPreset
   pattern: ArpeggioPattern
+}
+
+export type ScalePatternPreset = 'custom' | 'ascending' | 'descending'
+export interface ScalePattern extends ArpeggioPattern {}
+
+export interface ScaleModifier {
+  enabled: boolean
+  scaleType: ScaleType
+  patternPreset: ScalePatternPreset
+  pattern: ScalePattern
 }
 
 export type ChromaticApproachesType =
@@ -102,5 +121,33 @@ export interface ChromaticApproachesModifier {
 
 export interface NoteModifiers {
   chords: ChordModifier
+  scales: ScaleModifier
   chromaticApproaches: ChromaticApproachesModifier
+}
+
+export interface SessionNoteCard {
+  id: string
+  noteName: string
+}
+
+/**
+ * Persisted sharable session
+ */
+export interface Session {
+  key: string
+  author?: string
+  name: string
+
+  createdAt: string
+  updatedAt: string
+
+  bpm: number
+  rests: number
+
+  countInCounts: number
+  countInEnabled: boolean
+  metronomeEnabled: boolean
+
+  noteCards: SessionNoteCard[]
+  modifiers: NoteModifiers
 }

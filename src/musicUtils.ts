@@ -1,6 +1,7 @@
 import * as tonal from 'tonal'
 import * as tonalChord from 'tonal-chord'
 import { transpose } from 'tonal-distance'
+import { scale } from 'tonal-dictionary'
 import * as _ from 'lodash'
 import { memoize } from 'lodash/fp'
 import uuid from 'uuid/v4'
@@ -16,6 +17,9 @@ import {
   ArpeggioPattern,
   ArpeggioPatternElement,
   ArpeggioPatternPreset,
+  Scale,
+  ScalePatternPreset,
+  ScaleModifier,
 } from './types'
 
 const getAllChordOptions: () => Chord[] = memoize(() => {
@@ -55,8 +59,29 @@ const getAllChordOptions: () => Chord[] = memoize(() => {
   )
 })
 
+const getAllScaleOptions: () => Scale[] = memoize(() => {
+  return _.uniqBy(
+    [
+      // @ts-ignore
+      ...scale.names().map(name => ({ title: _.capitalize(name), type: name })),
+    ].map(({ type, title }) => {
+      const intervals = scale(type)
+      return {
+        type,
+        title,
+        intervals,
+        notesCount: intervals.length,
+      } as Scale
+    }) as Scale[],
+    'type',
+  )
+})
+
 export const chordOptions = getAllChordOptions()
 export const chordsByChordType = _.keyBy(chordOptions, 'type')
+
+export const scaleOptions = getAllScaleOptions()
+export const scaleByScaleType = _.keyBy(scaleOptions, 'type')
 
 export const generateChordPatternFromPreset = ({
   chord,
@@ -75,6 +100,42 @@ export const generateChordPatternFromPreset = ({
     }
     case 'descending': {
       items = _.range(chord.notesCount, 0, -1).map(note => ({ note }))
+      mainNoteIndex = items.length - 1
+      break
+    }
+    default: {
+      // "Should never happen" (c)
+      items = []
+      mainNoteIndex = undefined
+      break
+    }
+  }
+
+  const pattern: ArpeggioPattern = {
+    items,
+    mainNoteIndex,
+  }
+
+  return pattern
+}
+
+export const generateScalePatternFromPreset = ({
+  scale,
+  patternPreset,
+}: {
+  scale: Scale
+  patternPreset: ScalePatternPreset
+}) => {
+  let items: ArpeggioPatternElement[]
+  let mainNoteIndex
+  switch (patternPreset) {
+    case 'ascending': {
+      items = _.range(1, scale.notesCount + 1, 1).map(note => ({ note }))
+      mainNoteIndex = 0
+      break
+    }
+    case 'descending': {
+      items = _.range(scale.notesCount, 0, -1).map(note => ({ note }))
       mainNoteIndex = items.length - 1
       break
     }
@@ -265,6 +326,63 @@ export const addChordNotes = (
   return ticksUpdated
 }
 
+export const addScaleNotes = (
+  ticks: StaffTick[],
+  scaleModifier: ScaleModifier,
+): StaffTick[] => {
+  const tickWithBaseNoteIndex = ticks.findIndex(
+    ({ notes }) => notes.find(n => n.isMainNote === true) != null,
+  )
+  if (tickWithBaseNoteIndex < 0) {
+    throw new Error(
+      '"ticks" must have exactly one tick with "tick.notes[i].isMainNote ==== true"',
+    )
+  }
+
+  const tickWithBaseNote = ticks[tickWithBaseNoteIndex]
+  const baseNoteIndex = tickWithBaseNote.notes.findIndex(
+    n => n.isMainNote === true,
+  )
+  const baseNote = tickWithBaseNote.notes[baseNoteIndex]
+
+  const scale = scaleByScaleType[scaleModifier.scaleType]
+  const chordIntervals = scale.intervals
+
+  // Add melodic (arpeggio) scale notes, each in its own staff tick
+  let noteNamesWithArpeggio
+  const { items: arpeggioNotes, mainNoteIndex } = scaleModifier.pattern
+  noteNamesWithArpeggio = arpeggioNotes.map(({ note, muted }) => {
+    if (muted) {
+      return undefined
+    }
+    const interval = note ? chordIntervals[note - 1] || '1P' : '1P'
+    return transpose(baseNote.noteName, interval)
+  })
+
+  const ticksWithArpeggioNotes = noteNamesWithArpeggio.map(
+    (noteName, index) =>
+      ({
+        noteCardId: tickWithBaseNote.noteCardId,
+        id: uuid(),
+        notes: noteName
+          ? [
+              {
+                noteName,
+                id: uuid(),
+                midi: tonal.Note.midi(noteName),
+                isMainNote: mainNoteIndex === index,
+                color: mainNoteIndex === index ? baseNote.color : 'black',
+              } as StaffNote,
+            ]
+          : [],
+      } as StaffTick),
+  )
+
+  const ticksUpdated = [...ticks]
+  ticksUpdated.splice(tickWithBaseNoteIndex, 1, ...ticksWithArpeggioNotes)
+  return ticksUpdated
+}
+
 /**
  * Generates a collection of staff notes for the session, given the note cards and session modifiers.
  *
@@ -302,6 +420,8 @@ export const generateStaffTicks = ({
 
     if (modifiers.chords.enabled) {
       ticksForCard = addChordNotes(ticksForCard, modifiers.chords)
+    } else if (modifiers.scales.enabled) {
+      ticksForCard = addScaleNotes(ticksForCard, modifiers.scales)
     }
 
     if (modifiers.chromaticApproaches.enabled) {

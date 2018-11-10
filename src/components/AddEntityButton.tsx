@@ -9,10 +9,12 @@ import Tooltip from '@material-ui/core/Tooltip'
 type AddEntityButtonProps = {
   onAddSingleNoteClick: () => any
   onAddArpeggioClick: () => any
+  onAddScaleClick: () => any
   onAddChromaticApproachesClick: () => any
   buttonProps?: ButtonProps
   disableSingleNote?: boolean
   disableChords?: boolean
+  disableScales?: boolean
   disableChromaticApproaches?: boolean
 }
 
@@ -56,6 +58,13 @@ export default class AddEntityButton extends React.Component<
     }
   }
 
+  private handleScaleClick = () => {
+    this.closeMenu()
+    if (this.props.onAddScaleClick) {
+      this.props.onAddScaleClick()
+    }
+  }
+
   private handleChromaticApproachesClick = () => {
     this.closeMenu()
     if (this.props.onAddChromaticApproachesClick) {
@@ -66,12 +75,16 @@ export default class AddEntityButton extends React.Component<
   render() {
     const {
       disableChords,
+      disableScales,
       disableSingleNote,
       disableChromaticApproaches,
     } = this.props
 
     const allOptionsAreDisabled =
-      disableSingleNote && disableChords && disableChromaticApproaches
+      disableSingleNote &&
+      disableChords &&
+      disableChromaticApproaches &&
+      disableScales
     const buttonProps = this.props.buttonProps || {}
 
     return (
@@ -87,6 +100,9 @@ export default class AddEntityButton extends React.Component<
           )}
           {!disableChords && (
             <MenuItem onClick={this.handleArpeggioClick}>Chord</MenuItem>
+          )}
+          {!disableScales && (
+            <MenuItem onClick={this.handleScaleClick}>Scale</MenuItem>
           )}
           {!disableChromaticApproaches && (
             <MenuItem onClick={this.handleChromaticApproachesClick}>

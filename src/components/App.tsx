@@ -39,7 +39,12 @@ import { Flex, Box, Button, Text } from './ui'
 import NotesStaff from './NotesStaff'
 import MeasureScreenSize from './MeasureScreenSize'
 
-import { shuffle, arrayMove, getNoteCardColorByNoteName } from '../utils'
+import {
+  shuffle,
+  arrayMove,
+  getNoteCardColorByNoteName,
+  createDefaultSession,
+} from '../utils'
 
 import theme from '../styles/theme'
 import globalStyles from '../styles/globalStyles'
@@ -56,21 +61,22 @@ import {
   EnharmonicFlatsMap,
   ChromaticNoteSharps,
   User,
+  Session,
+  Scale,
 } from '../types'
 import PickNoteModal from './PickNoteModal'
 import ArpeggioModifierModal, {
   SubmitValuesType as ArpeggioModifierModalSubmitValues,
 } from './ArpeggioModifierModal'
+import ScaleModifierModal, {
+  SubmitValuesType as ScaleModifierModalSubmitValues,
+} from './ScaleModifierModal'
 import ChromaticApproachesModifierModal from './ChromaticApproachesModifierModal'
 import PianoKeyboard from './PianoKeyboard'
 
 import SettingsModal from './SettingsModal'
 import AddEntityButton from './AddEntityButton'
-import {
-  generateStaffTicks,
-  generateChordPatternFromPreset,
-  chordsByChordType,
-} from '../musicUtils'
+import { generateStaffTicks, scaleByScaleType } from '../musicUtils'
 import AudioFontsConfig, { AudioFontId } from '../audioFontsConfig'
 import AudioEngine, { AnimationCallback } from '../services/audioEngine'
 import { AudioEngineContext } from './withAudioEngine'
@@ -82,33 +88,6 @@ globalStyles()
 
 console.log('All supported audio fonts: ', _.map(AudioFontsConfig, 'title'))
 console.log('All supported chord names: ', Chord.names())
-
-type SessionNoteCard = {
-  id: string
-  noteName: string
-}
-
-/**
- * Persisted sharable session
- */
-type Session = {
-  key: string
-  author?: string
-  name: string
-
-  createdAt: string
-  updatedAt: string
-
-  bpm: number
-  rests: number
-
-  countInCounts: number
-  countInEnabled: boolean
-  metronomeEnabled: boolean
-
-  noteCards: SessionNoteCard[]
-  modifiers: NoteModifiers
-}
 
 type AppState = {
   hasInitializedOnlineStatus: boolean
@@ -153,60 +132,11 @@ type AppState = {
   settingsModalIsOpen: boolean
   chromaticApproachesModalIsOpen: boolean
   chordsModalIsOpen: boolean
+  scalesModalIsOpen: boolean
 
   noteAddingModalIsOpen: boolean
   noteEditingModalIsOpen: boolean
   noteEditingModalNoteCard?: NoteCardType
-}
-
-const createDefaultSession = () => {
-  const defaultSession: Partial<Session> = {
-    name: 'default',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-
-    bpm: 120,
-    rests: 1,
-    countInCounts: 3,
-    countInEnabled: false,
-    modifiers: {
-      chords: {
-        enabled: true,
-        isMelodic: true,
-        chordInversion: 0,
-        chordType: 'M',
-        patternPreset: 'ascending',
-        pattern: generateChordPatternFromPreset({
-          chord: chordsByChordType['M'],
-          patternPreset: 'ascending',
-        }),
-      },
-      chromaticApproaches: {
-        enabled: false,
-        type: 'above',
-      },
-    },
-    noteCards: [
-      {
-        id: uuid(),
-        noteName: 'C4',
-      },
-      {
-        id: uuid(),
-        noteName: 'G4',
-      },
-      {
-        id: uuid(),
-        noteName: 'F4',
-      },
-      {
-        id: uuid(),
-        noteName: 'D4',
-      },
-    ],
-  }
-
-  return defaultSession
 }
 
 const defaultSession = createDefaultSession()
@@ -303,6 +233,7 @@ class App extends React.Component<{}, AppState> {
 
       chromaticApproachesModalIsOpen: false,
       chordsModalIsOpen: false,
+      scalesModalIsOpen: false,
       noteAddingModalIsOpen: false,
       noteEditingModalIsOpen: false,
       noteEditingModalNoteCard: undefined,
@@ -367,10 +298,13 @@ class App extends React.Component<{}, AppState> {
     }
 
     this.setState(
-      {
-        activeSessionId: sessionId,
-        ...unpackSessionState(session),
-      },
+      _.merge(
+        unpackSessionState(createDefaultSession() as Session), 
+        {
+          activeSessionId: sessionId,
+          ...unpackSessionState(session),
+        }
+      ),
       this.onNotesUpdated,
     )
   }
@@ -898,6 +832,18 @@ class App extends React.Component<{}, AppState> {
     })
   }
 
+  private openScalesModal = () => {
+    this.setState({
+      scalesModalIsOpen: true,
+    })
+  }
+
+  private closeScalesModal = () => {
+    this.setState({
+      scalesModalIsOpen: false,
+    })
+  }
+
   private openChromaticApproachesModal = () => {
     this.setState({
       chromaticApproachesModalIsOpen: true,
@@ -967,6 +913,22 @@ class App extends React.Component<{}, AppState> {
     this.closeArpeggioAddingModal()
   }
 
+  private handleScaleModifierModalConfirm = (
+    values: ScaleModifierModalSubmitValues,
+  ) => {
+    this.updateActiveSession({
+      modifiers: {
+        ...this.state.modifiers,
+        scales: {
+          ...values,
+          enabled: true,
+        },
+      },
+    })
+
+    this.closeScalesModal()
+  }
+
   handleChromaticApproachModifierModalConfirm = ({
     type,
   }: {
@@ -991,6 +953,18 @@ class App extends React.Component<{}, AppState> {
         ...this.state.modifiers,
         chords: {
           ...this.state.modifiers.chords,
+          enabled: false,
+        },
+      },
+    })
+  }
+
+  private handleRemoveScalesClick = () => {
+    this.updateActiveSession({
+      modifiers: {
+        ...this.state.modifiers,
+        scales: {
+          ...this.state.modifiers.scales,
           enabled: false,
         },
       },
@@ -1067,85 +1041,243 @@ class App extends React.Component<{}, AppState> {
 
     const currentUser = firebase.auth().currentUser
 
+    const SessionControls = (
+      <Box mb={1}>
+        <TextField
+          className={css({ maxWidth: '95px' })}
+          label="Tempo"
+          InputProps={{
+            endAdornment: <InputAdornment position="end">BPM</InputAdornment>,
+            className: css({ fontSize: '1.3rem' }),
+          }}
+          id="bpm"
+          type="number"
+          // @ts-ignore
+          step="1"
+          min="0"
+          max="400"
+          value={`${bpm}`}
+          onChange={this.handleBpmChange}
+        />
+
+        <TextField
+          className={css({
+            marginLeft: '15px',
+            maxWidth: '50px',
+          })}
+          InputProps={{
+            className: css({ fontSize: '1.3rem' }),
+          }}
+          label="Rests"
+          id="rests"
+          type="number"
+          // @ts-ignore
+          step="1"
+          min="0"
+          max="8"
+          value={`${rests}`}
+          onChange={this.handleRestsChange}
+        />
+
+        <TextField
+          className={css({
+            marginLeft: '15px',
+            maxWidth: '65px',
+          })}
+          InputProps={{
+            className: css({ fontSize: '1.3rem' }),
+          }}
+          label="Count in"
+          id="countInCounts"
+          disabled={!countInEnabled}
+          type="number"
+          // @ts-ignore
+          step="1"
+          min="0"
+          max="16"
+          value={`${countInCounts}`}
+          onChange={this.handleCountInCountsChange}
+        />
+      </Box>
+    )
+
+    const TogglePlaybackButton = (
+      <Button
+        title={isPlaying ? 'Stop' : 'Play'}
+        bg={isPlaying ? 'red' : '#00c200'}
+        m={[1, 2]}
+        className={css({ maxWidth: '100px' })}
+        onClick={this.togglePlayback}
+      >
+        {isPlaying ? (
+          <StopIcon className={css({ margin: '0 0.5rem' })} />
+        ) : (
+          <PlayIcon className={css({ margin: '0 0.5rem' })} />
+        )}
+        <Hidden xsDown>{isPlaying ? 'Stop' : 'Play'}</Hidden>
+      </Button>
+    )
+
+    const ShuffleButton = (
+      <Button
+        variant="contained"
+        title="Shuffle notes"
+        m={[1, 2]}
+        onClick={this.handleShuffleClick}
+      >
+        <ArrowsIcon className={css({ margin: '0 0.5rem' })} />
+        <Hidden smDown>Shuffle</Hidden>
+      </Button>
+    )
+    const TgogleCountInButton = (
+      <Button
+        color={countInEnabled ? 'primary' : 'default'}
+        title={countInEnabled ? 'Turn off counting in' : 'Turn on counting in'}
+        m={[1, 2]}
+        onClick={this.handleCountInToggle}
+      >
+        <TimerIcon className={css({ margin: '0 0.5rem' })} />
+        <Hidden smDown>Count in</Hidden>
+      </Button>
+    )
+    const ToggleMetronomeButton = (
+      <Button
+        color={metronomeEnabled ? 'primary' : 'default'}
+        title={metronomeEnabled ? 'Turn metronome off' : 'Turn metronome on'}
+        m={[1, 2]}
+        onClick={this.handleMetronomeToggle}
+      >
+        <MetronomeIcon className={css({ margin: '0 0.5rem' })} />
+        <Hidden smDown>Metronome</Hidden>
+      </Button>
+    )
+    const ToolbarContent = (
+      <>
+        <IconButton color="inherit" onClick={this.openSettingsModal}>
+          <SettingsIcon />
+        </IconButton>
+
+        {activeSession &&
+          isSignedIn && (
+            <MuiButton
+              color="inherit"
+              variant="flat"
+              onClick={!isSignedIn ? this.openSignInModal : undefined}
+            >
+              <ListIcon />
+              <Hidden xsDown>My sessions</Hidden>
+            </MuiButton>
+          )}
+
+        {!isSignedIn && (
+          <MuiButton
+            color="secondary"
+            variant="raised"
+            onClick={!isSignedIn ? this.openSignInModal : undefined}
+          >
+            <SaveIcon />
+            <Hidden xsDown>Save</Hidden>
+          </MuiButton>
+        )}
+
+        {activeSession && (
+          <MuiButton
+            color="inherit"
+            variant="flat"
+            onClick={!isSignedIn ? this.openSignInModal : undefined}
+          >
+            <ShareIcon />
+            <Hidden xsDown>Share</Hidden>
+          </MuiButton>
+        )}
+
+        <Box className={css({ flexGrow: 1 })} />
+
+        {!isSignedIn ? (
+          <MuiButton
+            // color="primary"
+            color="secondary"
+            onClick={this.openSignInModal}
+            variant="raised"
+          >
+            Sign in
+          </MuiButton>
+        ) : (
+          <MuiButton color="inherit" onClick={this.signOut} variant="flat">
+            <Avatar
+              className={css({
+                height: 30,
+                width: 30,
+              })}
+              src={
+                currentUser && currentUser.photoURL
+                  ? currentUser.photoURL
+                  : undefined
+              }
+            >
+              {currentUser && currentUser.displayName
+                ? currentUser.displayName
+                : null}
+            </Avatar>
+            <Text ml={2}>Log out</Text>
+          </MuiButton>
+        )}
+      </>
+    )
+
+    const ModifierChips = (
+      <>
+        {this.state.modifiers.chords.enabled && (
+          <Tooltip title="Change chords settings" disableFocusListener>
+            <Chip
+              color="primary"
+              label={`Chords: ${this.state.modifiers.chords.chordType}`}
+              onClick={this.openArpeggioAddingModal}
+              onDelete={this.handleRemoveArpeggioClick}
+              classes={{
+                root: css({ marginRight: '0.5rem' }),
+              }}
+            />
+          </Tooltip>
+        )}
+        {this.state.modifiers.scales.enabled && (
+          <Tooltip title="Change scales settings" disableFocusListener>
+            <Chip
+              color="primary"
+              label={`Scale: ${
+                (scaleByScaleType[this.state.modifiers.scales.scaleType] as Scale).title
+              }`}
+              onClick={this.openScalesModal}
+              onDelete={this.handleRemoveScalesClick}
+              classes={{
+                root: css({ marginRight: '0.5rem' }),
+              }}
+            />
+          </Tooltip>
+        )}
+        {this.state.modifiers.chromaticApproaches.enabled && (
+          <Tooltip title="Change enclosures settings" disableFocusListener>
+            <Chip
+              color="primary"
+              label={`Enclosure: ${
+                this.state.modifiers.chromaticApproaches.type
+              }`}
+              onClick={this.openChromaticApproachesModal}
+              onDelete={this.handleRemoveChromaticApproachesClick}
+              classes={{
+                root: css({ marginRight: '0.5rem' }),
+              }}
+            />
+          </Tooltip>
+        )}
+      </>
+    )
+
     return (
       <>
         <MeasureScreenSize onUpdate={this.handleScreenSizeUpdate} fireOnMount>
           <AppBar position="static">
-            <Toolbar variant="dense">
-              <IconButton color="inherit" onClick={this.openSettingsModal}>
-                <SettingsIcon />
-              </IconButton>
-
-              {activeSession &&
-                isSignedIn && (
-                  <MuiButton
-                    color="inherit"
-                    variant="flat"
-                    onClick={!isSignedIn ? this.openSignInModal : undefined}
-                  >
-                    <ListIcon />
-                    <Hidden xsDown>My sessions</Hidden>
-                  </MuiButton>
-                )}
-
-              {!isSignedIn && (
-                <MuiButton
-                  color="secondary"
-                  variant="raised"
-                  onClick={!isSignedIn ? this.openSignInModal : undefined}
-                >
-                  <SaveIcon />
-                  <Hidden xsDown>Save</Hidden>
-                </MuiButton>
-              )}
-
-              {activeSession && (
-                <MuiButton
-                  color="inherit"
-                  variant="flat"
-                  onClick={!isSignedIn ? this.openSignInModal : undefined}
-                >
-                  <ShareIcon />
-                  <Hidden xsDown>Share</Hidden>
-                </MuiButton>
-              )}
-
-              <Box className={css({ flexGrow: 1 })} />
-
-              {!isSignedIn ? (
-                <MuiButton
-                  // color="primary"
-                  color="secondary"
-                  onClick={this.openSignInModal}
-                  variant="raised"
-                >
-                  Sign in
-                </MuiButton>
-              ) : (
-                <MuiButton
-                  color="inherit"
-                  onClick={this.signOut}
-                  variant="flat"
-                >
-                  <Avatar
-                    className={css({
-                      height: 30,
-                      width: 30,
-                    })}
-                    src={
-                      currentUser && currentUser.photoURL
-                        ? currentUser.photoURL
-                        : undefined
-                    }
-                  >
-                    {currentUser && currentUser.displayName
-                      ? currentUser.displayName
-                      : null}
-                  </Avatar>
-                  <Text ml={2}>Log out</Text>
-                </MuiButton>
-              )}
-            </Toolbar>
+            <Toolbar variant="dense">{ToolbarContent}</Toolbar>
           </AppBar>
 
           <Flex
@@ -1172,119 +1304,13 @@ class App extends React.Component<{}, AppState> {
                 mb={1}
                 mr={2}
               >
-                <Button
-                  title={isPlaying ? 'Stop' : 'Play'}
-                  bg={isPlaying ? 'red' : '#00c200'}
-                  m={[1, 2]}
-                  className={css({ maxWidth: '100px' })}
-                  onClick={this.togglePlayback}
-                >
-                  {isPlaying ? (
-                    <StopIcon className={css({ margin: '0 0.5rem' })} />
-                  ) : (
-                    <PlayIcon className={css({ margin: '0 0.5rem' })} />
-                  )}
-                  <Hidden xsDown>{isPlaying ? 'Stop' : 'Play'}</Hidden>
-                </Button>
-
-                <Button
-                  variant="contained"
-                  title="Shuffle notes"
-                  m={[1, 2]}
-                  onClick={this.handleShuffleClick}
-                >
-                  <ArrowsIcon className={css({ margin: '0 0.5rem' })} />
-                  <Hidden smDown>Shuffle</Hidden>
-                </Button>
-
-                <Button
-                  color={countInEnabled ? 'primary' : 'default'}
-                  title={
-                    countInEnabled
-                      ? 'Turn off counting in'
-                      : 'Turn on counting in'
-                  }
-                  m={[1, 2]}
-                  onClick={this.handleCountInToggle}
-                >
-                  <TimerIcon className={css({ margin: '0 0.5rem' })} />
-                  <Hidden smDown>Count in</Hidden>
-                </Button>
-
-                <Button
-                  color={metronomeEnabled ? 'primary' : 'default'}
-                  title={
-                    metronomeEnabled
-                      ? 'Turn metronome off'
-                      : 'Turn metronome on'
-                  }
-                  m={[1, 2]}
-                  onClick={this.handleMetronomeToggle}
-                >
-                  <MetronomeIcon className={css({ margin: '0 0.5rem' })} />
-                  <Hidden smDown>Metronome</Hidden>
-                </Button>
+                {TogglePlaybackButton}
+                {ShuffleButton}
+                {TgogleCountInButton}
+                {ToggleMetronomeButton}
               </Box>
 
-              <Box mb={1}>
-                <TextField
-                  className={css({ maxWidth: '95px' })}
-                  label="Tempo"
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">BPM</InputAdornment>
-                    ),
-                    className: css({ fontSize: '1.3rem' }),
-                  }}
-                  id="bpm"
-                  type="number"
-                  // @ts-ignore
-                  step="1"
-                  min="0"
-                  max="400"
-                  value={`${bpm}`}
-                  onChange={this.handleBpmChange}
-                />
-
-                <TextField
-                  className={css({
-                    marginLeft: '15px',
-                    maxWidth: '50px',
-                  })}
-                  InputProps={{
-                    className: css({ fontSize: '1.3rem' }),
-                  }}
-                  label="Rests"
-                  id="rests"
-                  type="number"
-                  // @ts-ignore
-                  step="1"
-                  min="0"
-                  max="8"
-                  value={`${rests}`}
-                  onChange={this.handleRestsChange}
-                />
-
-                <TextField
-                  className={css({
-                    marginLeft: '15px',
-                    maxWidth: '65px',
-                  })}
-                  InputProps={{
-                    className: css({ fontSize: '1.3rem' }),
-                  }}
-                  label="Count in"
-                  id="countInCounts"
-                  disabled={!countInEnabled}
-                  type="number"
-                  // @ts-ignore
-                  step="1"
-                  min="0"
-                  max="16"
-                  value={`${countInCounts}`}
-                  onChange={this.handleCountInCountsChange}
-                />
-              </Box>
+              {SessionControls}
             </Flex>
 
             <Flex
@@ -1321,11 +1347,19 @@ class App extends React.Component<{}, AppState> {
                 <AddEntityButton
                   onAddSingleNoteClick={this.openNoteAddingModal}
                   onAddArpeggioClick={this.openArpeggioAddingModal}
+                  onAddScaleClick={this.openScalesModal}
                   onAddChromaticApproachesClick={
                     this.openChromaticApproachesModal
                   }
                   disableSingleNote={this.state.noteCards.length >= 12}
-                  disableChords={this.state.modifiers.chords.enabled}
+                  disableChords={
+                    this.state.modifiers.chords.enabled ||
+                    this.state.modifiers.scales.enabled
+                  }
+                  disableScales={
+                    this.state.modifiers.scales.enabled ||
+                    this.state.modifiers.chords.enabled
+                  }
                   disableChromaticApproaches={
                     this.state.modifiers.chromaticApproaches.enabled
                   }
@@ -1338,42 +1372,7 @@ class App extends React.Component<{}, AppState> {
                 />
 
                 <Flex flex-direction="row" flex={1} alignItems="center">
-                  {this.state.modifiers.chords.enabled && (
-                    <Tooltip
-                      title="Change chords settings"
-                      disableFocusListener
-                    >
-                      <Chip
-                        color="primary"
-                        label={`Chords: ${
-                          this.state.modifiers.chords.chordType
-                        }`}
-                        onClick={this.openArpeggioAddingModal}
-                        onDelete={this.handleRemoveArpeggioClick}
-                        classes={{
-                          root: css({ marginRight: '0.5rem' }),
-                        }}
-                      />
-                    </Tooltip>
-                  )}
-                  {this.state.modifiers.chromaticApproaches.enabled && (
-                    <Tooltip
-                      title="Change enclosures settings"
-                      disableFocusListener
-                    >
-                      <Chip
-                        color="primary"
-                        label={`Enclosure: ${
-                          this.state.modifiers.chromaticApproaches.type
-                        }`}
-                        onClick={this.openChromaticApproachesModal}
-                        onDelete={this.handleRemoveChromaticApproachesClick}
-                        classes={{
-                          root: css({ marginRight: '0.5rem' }),
-                        }}
-                      />
-                    </Tooltip>
-                  )}
+                  {ModifierChips}
                 </Flex>
               </Flex>
             </Flex>
@@ -1449,6 +1448,13 @@ class App extends React.Component<{}, AppState> {
               pattern: this.state.modifiers.chords.pattern,
               isMelodic: this.state.modifiers.chords.isMelodic,
             }}
+          />
+
+          <ScaleModifierModal
+            isOpen={this.state.scalesModalIsOpen}
+            onClose={this.closeScalesModal}
+            onSubmit={this.handleScaleModifierModalConfirm}
+            initialValues={this.state.modifiers.scales}
           />
 
           <ChromaticApproachesModifierModal

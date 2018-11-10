@@ -1,6 +1,16 @@
 import { mix } from 'polished'
 import * as tonal from 'tonal'
+import uuid from 'uuid/v4'
 import { arrayMove as reactHocArrayMove } from 'react-sortable-hoc'
+import { Session } from './types'
+import {
+  generateChordPatternFromPreset,
+  chordsByChordType,
+  generateScalePatternFromPreset,
+  scaleByScaleType,
+} from './musicUtils'
+
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
 /**
  * Returns a copy of the array shuffled randomly
@@ -63,4 +73,63 @@ baseNotes.forEach(baseNote => {
 export const getNoteCardColorByNoteName = (fullNoteName: string) => {
   const pitchName = tonal.Note.pc(fullNoteName)
   return NoteNameToColorMap[pitchName]
+}
+
+export const createDefaultSession = () => {
+  const defaultSession: Partial<Session> = {
+    name: 'default',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+
+    bpm: 120,
+    rests: 1,
+    countInCounts: 3,
+    countInEnabled: false,
+    modifiers: {
+      scales: {
+        enabled: false,
+        scaleType: 'major',
+        patternPreset: 'ascending',
+        pattern: generateScalePatternFromPreset({
+          scale: scaleByScaleType['major'],
+          patternPreset: 'ascending',
+        }),
+      },
+      chords: {
+        enabled: true,
+        isMelodic: true,
+        chordInversion: 0,
+        chordType: 'M',
+        patternPreset: 'ascending',
+        pattern: generateChordPatternFromPreset({
+          chord: chordsByChordType['M'],
+          patternPreset: 'ascending',
+        }),
+      },
+      chromaticApproaches: {
+        enabled: false,
+        type: 'above',
+      },
+    },
+    noteCards: [
+      {
+        id: uuid(),
+        noteName: 'C4',
+      },
+      {
+        id: uuid(),
+        noteName: 'G4',
+      },
+      {
+        id: uuid(),
+        noteName: 'F4',
+      },
+      {
+        id: uuid(),
+        noteName: 'D4',
+      },
+    ],
+  }
+
+  return defaultSession
 }
