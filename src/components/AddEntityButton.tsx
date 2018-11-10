@@ -120,8 +120,8 @@ export default class AddEntityButton extends React.Component<
             buttonRef={this.buttonRef}
             classes={{
               fab: css({
-                width: '40px !important',
-                height: '40px !important',
+                width: '50px !important',
+                height: '50px !important',
               }),
             }}
             variant="fab"

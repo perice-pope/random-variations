@@ -95,7 +95,11 @@ const SortablePatternElement = SortableElement(
           >
             <Button
               tabIndex={-1}
-              className={css({ minWidth: '30px', padding: '0.5rem 0' })}
+              className={css({
+                width: '100%',
+                minWidth: '30px',
+                padding: '0.5rem 0',
+              })}
               onClick={() => {
                 let value
                 if (item.note != null) {
@@ -127,7 +131,11 @@ const SortablePatternElement = SortableElement(
 
             <Button
               tabIndex={-1}
-              className={css({ minWidth: '30px', padding: '0.5rem 0' })}
+              className={css({
+                width: '100%',
+                minWidth: '30px',
+                padding: '0.5rem 0',
+              })}
               onClick={() => {
                 let value
                 if (item.note != null) {
@@ -262,6 +270,7 @@ class PatternEditor extends React.Component<PatternEditorProps> {
             <Button
               className={css({ minWidth: '40px', marginLeft: '1rem' })}
               variant="fab"
+              color="secondary"
               size="small"
               aria-label="Add"
               onClick={this.handleAddNoteToPattern}
