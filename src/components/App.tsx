@@ -25,6 +25,7 @@ import SettingsIcon from '@material-ui/icons/Settings'
 import PlayIcon from '@material-ui/icons/PlayArrow'
 import StopIcon from '@material-ui/icons/Stop'
 import ListIcon from '@material-ui/icons/List'
+import DeleteIcon from '@material-ui/icons/Close'
 import ShareIcon from '@material-ui/icons/Share'
 import SaveIcon from '@material-ui/icons/Save'
 import ArrowsIcon from '@material-ui/icons/Cached'
@@ -83,12 +84,7 @@ import { AudioEngineContext } from './withAudioEngine'
 import firebase, { FirebaseContext, base } from '../services/firebase'
 import SignInModal from './SignInModal'
 import Tooltip from './ui/Tooltip'
-import {
-  CircularProgress,
-  Avatar,
-  Fade,
-  Grow,
-} from '@material-ui/core'
+import { CircularProgress, Avatar, Fade, Grow } from '@material-ui/core'
 
 globalStyles()
 
@@ -1232,10 +1228,17 @@ class App extends React.Component<{}, AppState> {
         {this.state.modifiers.chords.enabled && (
           <Tooltip title="Change chords settings" disableFocusListener>
             <Chip
+              clickable
               color="primary"
+              variant="outlined"
               label={`Chords: ${this.state.modifiers.chords.chordType}`}
               onClick={this.openArpeggioAddingModal}
               onDelete={this.handleRemoveArpeggioClick}
+              deleteIcon={
+                <Tooltip title="Remove chords" placement="right">
+                  <DeleteIcon />
+                </Tooltip>
+              }
               classes={{
                 root: css({ marginRight: '0.5rem' }),
               }}
@@ -1246,6 +1249,7 @@ class App extends React.Component<{}, AppState> {
           <Tooltip title="Change scales settings" disableFocusListener>
             <Chip
               color="primary"
+              variant="outlined"
               label={`Scale: ${
                 (scaleByScaleType[
                   this.state.modifiers.scales.scaleType
@@ -1253,6 +1257,11 @@ class App extends React.Component<{}, AppState> {
               }`}
               onClick={this.openScalesModal}
               onDelete={this.handleRemoveScalesClick}
+              deleteIcon={
+                <Tooltip title="Remove scales" placement="right">
+                  <DeleteIcon />
+                </Tooltip>
+              }
               classes={{
                 root: css({ marginRight: '0.5rem' }),
               }}
@@ -1262,10 +1271,16 @@ class App extends React.Component<{}, AppState> {
         {this.state.modifiers.chromaticApproaches.enabled && (
           <Tooltip title="Change enclosures settings" disableFocusListener>
             <Chip
-              color="primary"
+              color="secondary"
+              variant="outlined"
               label={`Enclosure: ${
                 this.state.modifiers.chromaticApproaches.type
               }`}
+              deleteIcon={
+                <Tooltip title="Remove enclosures" placement="right">
+                  <DeleteIcon />
+                </Tooltip>
+              }
               onClick={this.openChromaticApproachesModal}
               onDelete={this.handleRemoveChromaticApproachesClick}
               classes={{
