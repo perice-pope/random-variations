@@ -323,6 +323,7 @@ class App extends React.Component<{}, AppState> {
       ),
       () => {
         this.onNotesUpdated()
+        audioEngine.setBpm(this.state.bpm)
         audioEngine.setMetronomeEnabled(this.state.metronomeEnabled)
         audioEngine.setCountIn(
           this.state.countInEnabled ? this.state.countInCounts : 0,
@@ -477,7 +478,6 @@ class App extends React.Component<{}, AppState> {
   }
 
   private initAudioEngine = async () => {
-    audioEngine.setBpm(this.state.bpm)
     audioEngine.setAnimationCallback(this.drawAnimation)
     await this.loadAndSetAudioFont(this.state.audioFontId)
   }
@@ -1378,7 +1378,13 @@ class App extends React.Component<{}, AppState> {
 
     const notesStaffLines =
       this.state.height >= 700
-        ? Math.max(1, Math.min(this.state.height >= 900 ? 3 : 2, Math.ceil(this.state.staffTicks.length / 10)))
+        ? Math.max(
+            1,
+            Math.min(
+              this.state.height >= 900 ? 3 : 2,
+              Math.ceil(this.state.staffTicks.length / 10),
+            ),
+          )
         : 1
 
     return (
