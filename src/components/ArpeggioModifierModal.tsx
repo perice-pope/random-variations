@@ -27,7 +27,7 @@ import {
   Chord,
 } from '../types'
 import { ChangeEvent } from 'react'
-import { Input, Switch, FormControlLabel } from '@material-ui/core'
+import { Input, FormControlLabel, RadioGroup, Radio } from '@material-ui/core'
 import { css } from 'react-emotion'
 import Tooltip from './ui/Tooltip'
 import {
@@ -127,9 +127,12 @@ class ArpeggioModifierModal extends React.Component<
     this.props.onSubmit(this.state.values)
   }
 
-  handleIsMelodicSwitchChange = event => {
+  handleBrokenStackedChange = (event: ChangeEvent<HTMLSelectElement>) => {
     this.setState({
-      values: { ...this.state.values, isMelodic: event.target.checked },
+      values: {
+        ...this.state.values,
+        isMelodic: event.target.value === 'broken',
+      },
     })
   }
 
@@ -322,22 +325,30 @@ class ArpeggioModifierModal extends React.Component<
           </Flex>
 
           <Flex>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={this.state.values.isMelodic}
-                  color="primary"
-                  onChange={this.handleIsMelodicSwitchChange}
+            <FormControl component="fieldset">
+              <RadioGroup
+                row
+                aria-label="Broken or stacked?"
+                name="broken-stacked"
+                value={this.state.values.isMelodic ? 'broken' : 'stacked'}
+                onChange={this.handleBrokenStackedChange}
+              >
+                <FormControlLabel
+                  value="broken"
+                  control={<Radio />}
+                  label="Broken chord"
                 />
-              }
-              label={
-                this.state.values.isMelodic ? 'Broken chord' : 'Stacked chord'
-              }
-            />
+                <FormControlLabel
+                  value="stacked"
+                  control={<Radio />}
+                  label="Stacked chord"
+                />
+              </RadioGroup>
+            </FormControl>
           </Flex>
 
-          <Flex mt={[1, 2, 4]} flexDirection="column">
-            <Flex flexWrap="wrap" flexDirection="row" mt={4}>
+          <Flex mt={1} flexDirection="column">
+            <Flex flexWrap="wrap" flexDirection="row" mt={2}>
               {isMelodic && (
                 <FormControl className={css({ flex: 1, marginRight: '1rem' })}>
                   <InputLabel htmlFor="arp-pattern-preset">Pattern</InputLabel>
