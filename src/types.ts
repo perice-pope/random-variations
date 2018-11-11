@@ -91,6 +91,7 @@ export interface ArpeggioPattern {
 export interface ChordModifier {
   enabled: boolean
   chordType: ChordType
+  // TODO: switch to "type: 'broken' | 'stacked'"
   isMelodic: boolean
   chordInversion: number
   patternPreset: ArpeggioPatternPreset
@@ -130,10 +131,25 @@ export interface ChromaticApproachesModifier {
   type: ChromaticApproachesType
 }
 
+export type IntervalType =
+  | '2m'
+  | '2M'
+  | '3m'
+  | '3M'
+  | '4P'
+  | '5d'
+  | '5P'
+  | '6m'
+  | '6M'
+  | '7m'
+  | '7M'
+  | '8P'
+
 export interface IntervalsModifier {
   enabled: boolean
   // See https://danigb.github.io/tonal/api/module-Distance.html#.interval
-  interval: string
+  interval: IntervalType
+  type: 'broken' | 'stacked'
   direction: 'ascending' | 'descending'
 }
 

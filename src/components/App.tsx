@@ -72,12 +72,19 @@ import ArpeggioModifierModal, {
 import ScaleModifierModal, {
   SubmitValuesType as ScaleModifierModalSubmitValues,
 } from './ScaleModifierModal'
+import IntervalModifierModal, {
+  SubmitValuesType as IntervalModifierModalSubmitValues,
+} from './IntervalModifierModal'
 import ChromaticApproachesModifierModal from './ChromaticApproachesModifierModal'
 import PianoKeyboard from './PianoKeyboard'
 
 import SettingsModal from './SettingsModal'
 import AddEntityButton from './AddEntityButton'
-import { generateStaffTicks, scaleByScaleType } from '../musicUtils'
+import {
+  generateStaffTicks,
+  scaleByScaleType,
+  SemitonesToIntervalShortNameMap,
+} from '../musicUtils'
 import AudioFontsConfig, { AudioFontId } from '../audioFontsConfig'
 import AudioEngine, { AnimationCallback } from '../services/audioEngine'
 import { AudioEngineContext } from './withAudioEngine'
@@ -132,9 +139,12 @@ type AppState = {
 
   signInModalIsOpen: boolean
   settingsModalIsOpen: boolean
+
+  // Modifier dialogs
   chromaticApproachesModalIsOpen: boolean
   chordsModalIsOpen: boolean
   scalesModalIsOpen: boolean
+  intervalsModalIsOpen: boolean
 
   noteAddingModalIsOpen: boolean
   noteEditingModalIsOpen: boolean
@@ -236,6 +246,7 @@ class App extends React.Component<{}, AppState> {
       chromaticApproachesModalIsOpen: false,
       chordsModalIsOpen: false,
       scalesModalIsOpen: false,
+      intervalsModalIsOpen: false,
       noteAddingModalIsOpen: false,
       noteEditingModalIsOpen: false,
       noteEditingModalNoteCard: undefined,
@@ -298,10 +309,18 @@ class App extends React.Component<{}, AppState> {
     }
 
     this.setState(
-      {
-        activeSessionId: sessionId,
-        ...unpackSessionState(session),
-      },
+      _.merge(
+        {
+          activeSessionId: sessionId,
+          modifiers: {
+            chords: {},
+            scales: {},
+            intervals: {},
+            enclosures: {},
+          },
+        },
+        unpackSessionState(session),
+      ),
       () => {
         this.onNotesUpdated()
         audioEngine.setMetronomeEnabled(this.state.metronomeEnabled)
@@ -845,6 +864,18 @@ class App extends React.Component<{}, AppState> {
     })
   }
 
+  private openIntervalsModal = () => {
+    this.setState({
+      intervalsModalIsOpen: true,
+    })
+  }
+
+  private closeIntervalsModal = () => {
+    this.setState({
+      intervalsModalIsOpen: false,
+    })
+  }
+
   private openChromaticApproachesModal = () => {
     this.setState({
       chromaticApproachesModalIsOpen: true,
@@ -927,6 +958,22 @@ class App extends React.Component<{}, AppState> {
     this.closeScalesModal()
   }
 
+  private handleIntervalsModifierModalConfirm = (
+    values: IntervalModifierModalSubmitValues,
+  ) => {
+    this.updateActiveSession({
+      modifiers: {
+        ...this.state.modifiers,
+        intervals: {
+          ...values,
+          enabled: true,
+        },
+      },
+    })
+
+    this.closeIntervalsModal()
+  }
+
   handleChromaticApproachModifierModalConfirm = ({
     type,
   }: {
@@ -963,6 +1010,18 @@ class App extends React.Component<{}, AppState> {
         ...this.state.modifiers,
         scales: {
           ...this.state.modifiers.scales,
+          enabled: false,
+        },
+      },
+    })
+  }
+
+  private handleRemoveIntervalsClick = () => {
+    this.updateActiveSession({
+      modifiers: {
+        ...this.state.modifiers,
+        intervals: {
+          ...this.state.modifiers.intervals,
           enabled: false,
         },
       },
@@ -1268,10 +1327,35 @@ class App extends React.Component<{}, AppState> {
             />
           </Tooltip>
         )}
+
+        {this.state.modifiers.intervals.enabled && (
+          <Tooltip title="Change intervals settings" disableFocusListener>
+            <Chip
+              color="primary"
+              variant="outlined"
+              label={`Intervals: ${
+                SemitonesToIntervalShortNameMap[
+                  this.state.modifiers.intervals.interval
+                ]
+              }`}
+              onClick={this.openIntervalsModal}
+              onDelete={this.handleRemoveIntervalsClick}
+              deleteIcon={
+                <Tooltip title="Remove intervals" placement="right">
+                  <DeleteIcon />
+                </Tooltip>
+              }
+              classes={{
+                root: css({ marginRight: '0.5rem' }),
+              }}
+            />
+          </Tooltip>
+        )}
+
         {this.state.modifiers.chromaticApproaches.enabled && (
           <Tooltip title="Change enclosures settings" disableFocusListener>
             <Chip
-              color="secondary"
+              color="primary"
               variant="outlined"
               label={`Enclosure: ${
                 this.state.modifiers.chromaticApproaches.type
@@ -1381,14 +1465,22 @@ class App extends React.Component<{}, AppState> {
                         onAddChromaticApproachesClick={
                           this.openChromaticApproachesModal
                         }
+                        onAddIntervalsClick={this.openIntervalsModal}
                         disableSingleNote={this.state.noteCards.length >= 12}
                         disableChords={
                           this.state.modifiers.chords.enabled ||
-                          this.state.modifiers.scales.enabled
+                          this.state.modifiers.scales.enabled ||
+                          this.state.modifiers.intervals.enabled
                         }
                         disableScales={
                           this.state.modifiers.scales.enabled ||
-                          this.state.modifiers.chords.enabled
+                          this.state.modifiers.chords.enabled ||
+                          this.state.modifiers.intervals.enabled
+                        }
+                        disableIntervals={
+                          this.state.modifiers.scales.enabled ||
+                          this.state.modifiers.chords.enabled ||
+                          this.state.modifiers.intervals.enabled
                         }
                         disableChromaticApproaches={
                           this.state.modifiers.chromaticApproaches.enabled
@@ -1475,13 +1567,14 @@ class App extends React.Component<{}, AppState> {
             isOpen={this.state.chordsModalIsOpen}
             onClose={this.closeArpeggioAddingModal}
             onSubmit={this.handleArpeggioModifierModalConfirm}
-            initialValues={{
-              chordInversion: this.state.modifiers.chords.chordInversion,
-              chordType: this.state.modifiers.chords.chordType,
-              patternPreset: this.state.modifiers.chords.patternPreset,
-              pattern: this.state.modifiers.chords.pattern,
-              isMelodic: this.state.modifiers.chords.isMelodic,
-            }}
+            initialValues={this.state.modifiers.chords}
+          />
+
+          <IntervalModifierModal
+            isOpen={this.state.intervalsModalIsOpen}
+            onClose={this.closeIntervalsModal}
+            onSubmit={this.handleIntervalsModifierModalConfirm}
+            initialValues={this.state.modifiers.intervals}
           />
 
           <ScaleModifierModal

@@ -9,6 +9,7 @@ import Tooltip from './ui/Tooltip'
 
 type AddEntityButtonProps = {
   onAddSingleNoteClick: () => any
+  onAddIntervalsClick: () => any
   onAddArpeggioClick: () => any
   onAddScaleClick: () => any
   onAddChromaticApproachesClick: () => any
@@ -18,6 +19,7 @@ type AddEntityButtonProps = {
   showHelpTooltip?: boolean
   disableChords?: boolean
   disableScales?: boolean
+  disableIntervals?: boolean
   disableChromaticApproaches?: boolean
 }
 
@@ -61,6 +63,13 @@ export default class AddEntityButton extends React.Component<
     }
   }
 
+  private handleIntervalsClick = () => {
+    this.closeMenu()
+    if (this.props.onAddIntervalsClick) {
+      this.props.onAddIntervalsClick()
+    }
+  }
+
   private handleScaleClick = () => {
     this.closeMenu()
     if (this.props.onAddScaleClick) {
@@ -78,6 +87,7 @@ export default class AddEntityButton extends React.Component<
   render() {
     const {
       enableOnlyNote,
+      disableIntervals,
       disableChords,
       disableScales,
       disableSingleNote,
@@ -89,7 +99,8 @@ export default class AddEntityButton extends React.Component<
       disableSingleNote &&
       disableChords &&
       disableChromaticApproaches &&
-      disableScales
+      disableScales &&
+      disableIntervals
     const buttonProps = this.props.buttonProps || {}
 
     return (
@@ -102,6 +113,14 @@ export default class AddEntityButton extends React.Component<
         >
           {!disableSingleNote && (
             <MenuItem onClick={this.handleSingleNoteClick}>Note</MenuItem>
+          )}
+          {!disableIntervals && (
+            <MenuItem
+              disabled={enableOnlyNote}
+              onClick={this.handleIntervalsClick}
+            >
+              Intervals
+            </MenuItem>
           )}
           {!disableChords && (
             <MenuItem

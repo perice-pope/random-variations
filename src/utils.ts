@@ -88,6 +88,7 @@ export const createDefaultSession = () => {
       intervals: {
         enabled: false,
         direction: 'ascending',
+        type: 'broken',
         interval: '5P',
       },
       scales: {

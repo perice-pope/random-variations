@@ -23,10 +23,11 @@ import {
   Scale,
   ScalePatternPreset,
   ScaleModifier,
+  IntervalType,
+  IntervalsModifier,
 } from './types'
 
-export const SemitonesToIntervalLongNameMap = {
-  '1P': 'Unison',
+export const SemitonesToIntervalLongNameMap: { [k in IntervalType]: string } = {
   '2m': 'Minor second',
   '2M': 'Major second',
   '3m': 'Minor third',
@@ -41,8 +42,7 @@ export const SemitonesToIntervalLongNameMap = {
   '8P': 'Perfect octave',
 }
 
-export const SemitonesToIntervalNameMap = {
-  '1P': 'Unison',
+export const SemitonesToIntervalNameMap: { [k in IntervalType]: string } = {
   '2m': 'Minor 2nd',
   '2M': 'Major 2nd',
   '3m': 'Minor 3rd',
@@ -57,8 +57,9 @@ export const SemitonesToIntervalNameMap = {
   '8P': 'Octave',
 }
 
-export const SemitonesToIntervalShortNameMap = {
-  '1P': 'Unison',
+export const SemitonesToIntervalShortNameMap: {
+  [k in IntervalType]: string
+} = {
   '2m': 'Mi2',
   '2M': 'Ma2',
   '3m': 'Mi3',
@@ -516,6 +517,96 @@ export const addScaleNotes = (
   return ticksUpdated
 }
 
+export const addIntervalNotes = (
+  ticks: StaffTick[],
+  intervals: IntervalsModifier,
+): StaffTick[] => {
+  const tickWithBaseNoteIndex = ticks.findIndex(
+    ({ notes }) => notes.find(n => n.isMainNote === true) != null,
+  )
+  if (tickWithBaseNoteIndex < 0) {
+    throw new Error(
+      '"ticks" must have exactly one tick with "tick.notes[i].isMainNote ==== true"',
+    )
+  }
+
+  const tickWithBaseNote = ticks[tickWithBaseNoteIndex]
+  const baseNoteIndex = tickWithBaseNote.notes.findIndex(
+    n => n.isMainNote === true,
+  )
+  const baseNote = tickWithBaseNote.notes[baseNoteIndex]
+
+  const { interval, type, direction } = intervals
+
+  const intervalNoteName = transpose(
+    baseNote.noteName,
+    `${direction === 'ascending' ? '' : '-'}${interval}`,
+  )
+
+  if (!intervalNoteName) {
+    return []
+  }
+
+  let ticksWithIntervals: StaffTick[]
+  if (type === 'stacked') {
+    ticksWithIntervals = [
+      {
+        noteCardId: tickWithBaseNote.noteCardId,
+        id: uuid(),
+        notes: [
+          {
+            color: 'red',
+            id: uuid(),
+            isMainNote: true,
+            midi: tonal.Note.midi(baseNote.noteName),
+            noteName: baseNote.noteName,
+          },
+          {
+            color: 'black',
+            id: uuid(),
+            isMainNote: false,
+            midi: tonal.Note.midi(intervalNoteName),
+            noteName: intervalNoteName,
+          },
+        ],
+      } as StaffTick,
+    ]
+  } else {
+    ticksWithIntervals = [
+      {
+        noteCardId: tickWithBaseNote.noteCardId,
+        id: uuid(),
+        notes: [
+          {
+            color: 'red',
+            id: uuid(),
+            isMainNote: true,
+            midi: tonal.Note.midi(baseNote.noteName),
+            noteName: baseNote.noteName,
+          },
+        ],
+      } as StaffTick,
+      {
+        noteCardId: tickWithBaseNote.noteCardId,
+        id: uuid(),
+        notes: [
+          {
+            color: 'black',
+            id: uuid(),
+            isMainNote: false,
+            midi: tonal.Note.midi(intervalNoteName),
+            noteName: intervalNoteName,
+          },
+        ],
+      } as StaffTick,
+    ]
+  }
+
+  const ticksUpdated = [...ticks]
+  ticksUpdated.splice(tickWithBaseNoteIndex, 1, ...ticksWithIntervals)
+  return ticksUpdated
+}
+
 /**
  * Generates a collection of staff notes for the session, given the note cards and session modifiers.
  *
@@ -556,6 +647,8 @@ export const generateStaffTicks = ({
       ticksForCard = addChordNotes(ticksForCard, modifiers.chords)
     } else if (modifiers.scales.enabled) {
       ticksForCard = addScaleNotes(ticksForCard, modifiers.scales)
+    } else if (modifiers.intervals.enabled) {
+      ticksForCard = addIntervalNotes(ticksForCard, modifiers.intervals)
     }
 
     if (modifiers.chromaticApproaches.enabled) {
