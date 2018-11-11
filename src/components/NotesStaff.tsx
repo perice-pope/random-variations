@@ -20,7 +20,9 @@ const activeNoteClasses = {
 
 type NotesStaffProps = {
   id: string
+  lines: number
   ticks: StaffTick[]
+  clef: string
   isPlaying: boolean
   showBreaks?: boolean
   showEnd?: boolean
@@ -34,6 +36,11 @@ type NotesStaffState = {
 }
 
 class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
+  static defaultProps: Partial<NotesStaffProps> = {
+    lines: 1,
+    clef: 'treble',
+  }
+
   state: NotesStaffState = {
     boxWidth: 0,
   }
@@ -48,7 +55,8 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
   private boxRef: React.RefObject<any> = React.createRef()
 
   private notesPerTick: Vex.Flow.Note[][] = []
-  private stave?: Vex.Flow.Stave
+  private tickToStave: { [k: number]: number } = {}
+  private staves: Vex.Flow.Stave[] = []
   private activeLineEl?: SVGElement
 
   componentDidMount() {
@@ -120,10 +128,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
   private drawActiveNoteLine = () => {
     console.log('NotesStaff -> drawActiveNoteLine')
-    const { stave } = this
-    if (!stave) {
-      return
-    }
+    const { staves } = this
 
     if (this.activeLineEl) {
       this.activeLineEl.remove()
@@ -140,13 +145,13 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     this.renderContext
       .beginPath()
       // @ts-ignore
-      .moveTo(0, this.stave.getBoundingBox().getY() + 20)
+      .moveTo(0, staves[0].getBoundingBox().getY() + 20)
       .lineTo(
         0,
         // @ts-ignore
-        stave.getBoundingBox().getY() +
+        staves[0].getBoundingBox().getY() +
           // @ts-ignore
-          stave.getBoundingBox().getH() -
+          staves[0].getBoundingBox().getH() -
           20,
       )
       .stroke()
@@ -186,24 +191,28 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     console.log('NotesStaff -> drawStaveAndClef')
     const width = this.state.boxWidth
 
-    // Create a stave of at position 10, 40 on the canvas.
-    const stave = new Vex.Flow.Stave(10, 0, width)
-    if (this.props.showEnd) {
-      stave.setEndBarType(Vex.Flow.Barline.type.DOUBLE)
+    // Create a stave of at position 0, 0 on the canvas.
+    this.staves = []
+    for (let i = 0; i < this.props.lines; ++i) {
+      this.staves[i] = new Vex.Flow.Stave(0, 100 * i, width)
+      if (i === 0) {
+        // Add a clef and time signature.
+        this.staves[i].addClef(this.props.clef)
+      }
+
+      if (this.props.showEnd && i === this.props.lines - 1) {
+        this.staves[i].setEndBarType(Vex.Flow.Barline.type.END)
+      }
+
+      // Connect it to the rendering context and draw!
+      this.staves[i].setContext(this.renderContext).draw()
     }
-    this.stave = stave
-
-    // Add a clef and time signature.
-    stave.addClef('treble')
-
-    // Connect it to the rendering context and draw!
-    stave.setContext(this.renderContext).draw()
   }
 
   private drawNotes = () => {
     console.log('NotesStaff -> drawNotes')
     const { ticks } = this.props
-    const { stave, renderContext } = this
+    const { staves, renderContext } = this
 
     // Clear the old notes
     renderContext.clear()
@@ -214,7 +223,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     // @ts-ignore
     // renderContext.svg.querySelectorAll('.rect').forEach(n => n.remove())
 
-    if (!stave || !ticks || ticks.length === 0) {
+    if (!staves || !ticks || ticks.length === 0) {
       return
     }
 
@@ -292,19 +301,30 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
       return notes
     })
 
-    Vex.Flow.Formatter.FormatAndDraw(
-      this.renderContext,
-      stave,
-      _.flatten(notesPerTick),
+    const ticksPerStave = _.chunk(
+      notesPerTick,
+      Math.ceil(notesPerTick.length / this.staves.length),
     )
+
+    this.tickToStave = {}
+    notesPerTick.forEach((tick, tickIndex) => {
+      this.tickToStave[tickIndex] = Math.floor(
+        tickIndex / ticksPerStave[0].length,
+      )
+    })
+
+    for (let i = 0; i < ticksPerStave.length; ++i) {
+      Vex.Flow.Formatter.FormatAndDraw(
+        this.renderContext,
+        staves[i],
+        _.flatten(ticksPerStave[i]),
+      )
+    }
+
     this.notesPerTick = notesPerTick
   }
 
   updateActiveNoteLine = () => {
-    if (!this.stave) {
-      return
-    }
-
     if (!this.activeLineEl) {
       this.drawActiveNoteLine()
     }
@@ -329,9 +349,10 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
           (activeNote.getNoteHeadEndX() - activeNote.getNoteHeadBeginX()) / 2
 
         const activeLineXNew = noteHeadX
+        const activeLineYNew = this.tickToStave[activeTickIndex] * 90
 
         // @ts-ignore
-        this.activeLineEl.style = `transform: translateX(${activeLineXNew}px);`
+        this.activeLineEl.style = `transform: translateX(${activeLineXNew}px) translateY(${activeLineYNew}px);`
 
         activeNote.draw()
       }

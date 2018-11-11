@@ -1376,6 +1376,11 @@ class App extends React.Component<{}, AppState> {
       </>
     )
 
+    const notesStaffLines =
+      this.state.height >= 700
+        ? Math.max(1, Math.min(this.state.height >= 900 ? 3 : 2, Math.ceil(this.state.staffTicks.length / 10)))
+        : 1
+
     return (
       <>
         <MeasureScreenSize onUpdate={this.handleScreenSizeUpdate} fireOnMount>
@@ -1502,12 +1507,13 @@ class App extends React.Component<{}, AppState> {
               </Flex>
 
               <NotesStaff
+                lines={notesStaffLines}
                 isPlaying={isPlaying}
                 showEnd
                 id="notation"
                 ticks={this.state.staffTicks}
                 activeTickIndex={isPlaying ? activeStaffTickIndex : undefined}
-                height={160}
+                height={20 + 100 * notesStaffLines}
               />
             </Flex>
           </Fade>
