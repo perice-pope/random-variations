@@ -130,10 +130,18 @@ export interface ChromaticApproachesModifier {
   type: ChromaticApproachesType
 }
 
+export interface IntervalsModifier {
+  enabled: boolean
+  // See https://danigb.github.io/tonal/api/module-Distance.html#.interval
+  interval: string
+  direction: 'ascending' | 'descending'
+}
+
 export interface NoteModifiers {
   chords: ChordModifier
   scales: ScaleModifier
   chromaticApproaches: ChromaticApproachesModifier
+  intervals: IntervalsModifier
 }
 
 export interface SessionNoteCard {

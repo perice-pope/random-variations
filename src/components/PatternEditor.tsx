@@ -12,8 +12,9 @@ import {
 } from 'react-sortable-hoc'
 
 import { ArpeggioPattern, ArpeggioPatternElement } from '../types'
-import { Button, Tooltip, Menu, MenuItem } from '@material-ui/core'
+import { Button, Menu, MenuItem } from '@material-ui/core'
 import { css } from 'react-emotion'
+import Tooltip from './ui/Tooltip'
 import { Flex } from './ui/Flex'
 import { withState, compose } from 'recompose'
 
@@ -266,7 +267,7 @@ class PatternEditor extends React.Component<PatternEditorProps> {
           getContainer={getSortableContainer}
         />
         {pattern.items.length < 16 && (
-          <Tooltip title="Add note" disableFocusListener={true}>
+          <Tooltip title="Add note">
             <Button
               className={css({ minWidth: '40px', marginLeft: '1rem' })}
               variant="fab"

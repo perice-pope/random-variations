@@ -85,6 +85,11 @@ export const createDefaultSession = () => {
     countInCounts: 3,
     countInEnabled: false,
     modifiers: {
+      intervals: {
+        enabled: false,
+        direction: 'ascending',
+        interval: '5P',
+      },
       scales: {
         enabled: false,
         scaleType: 'major',

@@ -4,8 +4,8 @@ import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import AddIcon from '@material-ui/icons/Add'
 import Button, { ButtonProps } from '@material-ui/core/Button'
-import Tooltip from '@material-ui/core/Tooltip'
 import { css } from 'emotion'
+import Tooltip from './ui/Tooltip'
 
 type AddEntityButtonProps = {
   onAddSingleNoteClick: () => any
@@ -13,6 +13,7 @@ type AddEntityButtonProps = {
   onAddScaleClick: () => any
   onAddChromaticApproachesClick: () => any
   buttonProps?: ButtonProps
+  enableOnlyNote?: boolean
   disableSingleNote?: boolean
   showHelpTooltip?: boolean
   disableChords?: boolean
@@ -76,6 +77,7 @@ export default class AddEntityButton extends React.Component<
 
   render() {
     const {
+      enableOnlyNote,
       disableChords,
       disableScales,
       disableSingleNote,
@@ -102,13 +104,23 @@ export default class AddEntityButton extends React.Component<
             <MenuItem onClick={this.handleSingleNoteClick}>Note</MenuItem>
           )}
           {!disableChords && (
-            <MenuItem onClick={this.handleArpeggioClick}>Chord</MenuItem>
+            <MenuItem
+              disabled={enableOnlyNote}
+              onClick={this.handleArpeggioClick}
+            >
+              Chord
+            </MenuItem>
           )}
           {!disableScales && (
-            <MenuItem onClick={this.handleScaleClick}>Scale</MenuItem>
+            <MenuItem disabled={enableOnlyNote} onClick={this.handleScaleClick}>
+              Scale
+            </MenuItem>
           )}
           {!disableChromaticApproaches && (
-            <MenuItem onClick={this.handleChromaticApproachesClick}>
+            <MenuItem
+              disabled={enableOnlyNote}
+              onClick={this.handleChromaticApproachesClick}
+            >
               Enclosure
             </MenuItem>
           )}
@@ -131,7 +143,7 @@ export default class AddEntityButton extends React.Component<
             }),
           }}
           placement={showHelpTooltip ? 'left' : undefined}
-          disableFocusListener={showHelpTooltip || false}
+          disableFocusListener
           disableHoverListener={showHelpTooltip || false}
           disableTouchListener={showHelpTooltip || false}
         >

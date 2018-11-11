@@ -1,10 +1,13 @@
 import * as tonal from 'tonal'
 import * as tonalChord from 'tonal-chord'
-import { transpose } from 'tonal-distance'
+import { transpose, interval } from 'tonal-distance'
 import { scale } from 'tonal-dictionary'
 import * as _ from 'lodash'
 import { memoize } from 'lodash/fp'
 import uuid from 'uuid/v4'
+
+// @ts-ignore
+window.interval = interval
 
 import {
   NoteModifiers,
@@ -21,6 +24,54 @@ import {
   ScalePatternPreset,
   ScaleModifier,
 } from './types'
+
+export const SemitonesToIntervalLongNameMap = {
+  '1P': 'Unison',
+  '2m': 'Minor second',
+  '2M': 'Major second',
+  '3m': 'Minor third',
+  '3M': 'Major third',
+  '4P': 'Perfect fourth',
+  '5d': 'Tritone',
+  '5P': 'Perfect fifth',
+  '6m': 'Minor sixth',
+  '6M': 'Major sixth',
+  '7m': 'Minor seventh',
+  '7M': 'Major seventh',
+  '8P': 'Perfect octave',
+}
+
+export const SemitonesToIntervalNameMap = {
+  '1P': 'Unison',
+  '2m': 'Minor 2nd',
+  '2M': 'Major 2nd',
+  '3m': 'Minor 3rd',
+  '3M': 'Major 3rd',
+  '4P': 'Perfect 4th',
+  '5d': 'Tritone',
+  '5P': 'Perfect 5th',
+  '6m': 'Minor 6th',
+  '6M': 'Major 6th',
+  '7m': 'Minor 7th',
+  '7M': 'Major 7th',
+  '8P': 'Octave',
+}
+
+export const SemitonesToIntervalShortNameMap = {
+  '1P': 'Unison',
+  '2m': 'Mi2',
+  '2M': 'Ma2',
+  '3m': 'Mi3',
+  '3M': 'Ma3',
+  '4P': 'P4',
+  '5d': 'tt',
+  '5P': 'P5',
+  '6m': 'Mi6',
+  '6M': 'Ma6',
+  '7m': 'Mi7',
+  '7M': 'Ma7',
+  '8P': 'P8',
+}
 
 const getAllChordOptions: () => Chord[] = memoize(() => {
   return _.uniqBy(

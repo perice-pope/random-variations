@@ -27,8 +27,9 @@ import {
   Chord,
 } from '../types'
 import { ChangeEvent } from 'react'
-import { Input, Tooltip, Switch, FormControlLabel } from '@material-ui/core'
+import { Input, Switch, FormControlLabel } from '@material-ui/core'
 import { css } from 'react-emotion'
+import Tooltip from './ui/Tooltip'
 import {
   generateChordPatternFromPreset,
   chordOptions,

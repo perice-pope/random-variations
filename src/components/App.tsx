@@ -82,10 +82,10 @@ import AudioEngine, { AnimationCallback } from '../services/audioEngine'
 import { AudioEngineContext } from './withAudioEngine'
 import firebase, { FirebaseContext, base } from '../services/firebase'
 import SignInModal from './SignInModal'
+import Tooltip from './ui/Tooltip'
 import {
   CircularProgress,
   Avatar,
-  Tooltip,
   Fade,
   Grow,
 } from '@material-ui/core'
@@ -1359,6 +1359,7 @@ class App extends React.Component<{}, AppState> {
                     <div>
                       <AddEntityButton
                         showHelpTooltip={noteCards.length === 0}
+                        enableOnlyNote={noteCards.length === 0}
                         onAddSingleNoteClick={this.openNoteAddingModal}
                         onAddArpeggioClick={this.openArpeggioAddingModal}
                         onAddScaleClick={this.openScalesModal}

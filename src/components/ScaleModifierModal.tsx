@@ -28,8 +28,9 @@ import {
   ScaleModifier,
 } from '../types'
 import { ChangeEvent } from 'react'
-import { Input, Tooltip } from '@material-ui/core'
+import { Input } from '@material-ui/core'
 import { css } from 'react-emotion'
+import Tooltip from './ui/Tooltip'
 import {
   scaleOptions,
   scaleByScaleType,
