@@ -289,11 +289,11 @@ class App extends React.Component<{}, AppState> {
       {
         sessionsById: _.keyBy(sessions, 'key'),
       },
-      () => this.loadSession(activeSessionId),
+      () => this.activateSession(activeSessionId),
     )
   }
 
-  private loadSession = (sessionId: string) => {
+  private activateSession = (sessionId: string) => {
     const session = this.state.sessionsById[sessionId]
     console.log('loadSession -> restoreSession: ', sessionId, session)
     if (!session) {
@@ -306,7 +306,13 @@ class App extends React.Component<{}, AppState> {
         activeSessionId: sessionId,
         ...unpackSessionState(session),
       },
-      this.onNotesUpdated,
+      () => {
+        this.onNotesUpdated()
+        audioEngine.setMetronomeEnabled(this.state.metronomeEnabled)
+        audioEngine.setCountIn(
+          this.state.countInEnabled ? this.state.countInCounts : 0,
+        )
+      },
     )
   }
 
@@ -380,7 +386,7 @@ class App extends React.Component<{}, AppState> {
         },
       },
       () => {
-        this.loadSession(defaultSessionId)
+        this.activateSession(defaultSessionId)
       },
     )
   }
@@ -458,11 +464,6 @@ class App extends React.Component<{}, AppState> {
   private initAudioEngine = async () => {
     audioEngine.setBpm(this.state.bpm)
     audioEngine.setAnimationCallback(this.drawAnimation)
-    audioEngine.setMetronomeEnabled(this.state.metronomeEnabled)
-    audioEngine.setCountIn(
-      this.state.countInEnabled ? this.state.countInCounts : 0,
-    )
-
     await this.loadAndSetAudioFont(this.state.audioFontId)
   }
 
