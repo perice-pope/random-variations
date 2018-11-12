@@ -27,6 +27,7 @@ type NotesStaffProps = {
   showBreaks?: boolean
   showEnd?: boolean
   activeTickIndex?: number
+  staveHeight: number
   height: number
   containerProps?: BoxProps
 }
@@ -38,6 +39,7 @@ type NotesStaffState = {
 class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
   static defaultProps: Partial<NotesStaffProps> = {
     lines: 1,
+    staveHeight: 100,
     clef: 'treble',
   }
 
@@ -55,7 +57,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
   private boxRef: React.RefObject<any> = React.createRef()
 
   private notesPerTick: Vex.Flow.Note[][] = []
-  private tickToStave: { [k: number]: number } = {}
+  private tickToLine: { [k: number]: number } = {}
   private staves: Vex.Flow.Stave[] = []
   private activeLineEl?: SVGElement
 
@@ -190,11 +192,12 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
   private drawStaveAndClef = () => {
     console.log('NotesStaff -> drawStaveAndClef')
     const width = this.state.boxWidth
+    const { staveHeight } = this.props
 
     // Create a stave of at position 0, 0 on the canvas.
     this.staves = []
     for (let i = 0; i < this.props.lines; ++i) {
-      this.staves[i] = new Vex.Flow.Stave(0, 100 * i, width)
+      this.staves[i] = new Vex.Flow.Stave(0, staveHeight * i, width)
       if (i === 0) {
         // Add a clef and time signature.
         this.staves[i].addClef(this.props.clef)
@@ -211,7 +214,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
   private drawNotes = () => {
     console.log('NotesStaff -> drawNotes')
-    const { ticks } = this.props
+    const { ticks, lines } = this.props
     const { staves, renderContext } = this
 
     // Clear the old notes
@@ -227,11 +230,14 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
       return
     }
 
-    let noteCardId = ticks[0].noteCardId
+    let tickIndexToCardId = {}
 
-    const notesPerTick = ticks.map((tick, index) => {
-      const shouldAddMeasureLine = tick.noteCardId !== noteCardId
-      noteCardId = tick.noteCardId
+    const tickToNotes = ticks.map((tick, index) => {
+      const shouldAddMeasureLine =
+        index < ticks.length - 1 &&
+        ticks[index + 1].noteCardId !== ticks[index].noteCardId
+
+      tickIndexToCardId[index] = ticks[index].noteCardId
 
       const tickNoteKeys = tick.notes.map(noteConfig => {
         const [letter, accidental, octave] = tonal.Note.tokenize(
@@ -293,35 +299,52 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         const measureLineNote = new Vex.Flow.BarNote().setType(
           Vex.Flow.Barline.type.SINGLE,
         )
-        // @ts-ignore
-        window.measureLineNote = measureLineNote
-        notes = [measureLineNote, ...notes]
+        notes = [...notes, measureLineNote]
       }
 
       return notes
     })
 
-    const ticksPerStave = _.chunk(
-      notesPerTick,
-      Math.ceil(notesPerTick.length / this.staves.length),
-    )
+    const tickIndexes = _.range(0, ticks.length)
+    const cardIdToTickIndexes = _.groupBy(tickIndexes, i => ticks[i].noteCardId)
 
-    this.tickToStave = {}
-    notesPerTick.forEach((tick, tickIndex) => {
-      this.tickToStave[tickIndex] = Math.floor(
-        tickIndex / ticksPerStave[0].length,
-      )
+    const cardIdToLine = {}
+    const cardIds = _.keys(cardIdToTickIndexes)
+    const cardsPerLine = Math.ceil(cardIds.length / lines)
+
+    cardIds.forEach((cardId, index) => {
+      cardIdToLine[cardId] = Math.floor(index / cardsPerLine)
+    })
+    const lineToCardIds = _.groupBy(cardIds, cardId => cardIdToLine[cardId])
+
+    this.tickToLine = {}
+    tickToNotes.forEach((tick, tickIndex) => {
+      this.tickToLine[tickIndex] = cardIdToLine[tickIndexToCardId[tickIndex]]
     })
 
-    for (let i = 0; i < ticksPerStave.length; ++i) {
+    const lineToTickNotes = {}
+    for (let i = 0; i < lines; ++i) {
+      lineToTickNotes[i] = []
+      lineToCardIds[i].forEach(cardId => {
+        // @ts-ignore
+        const tickIndexes = cardIdToTickIndexes[cardId]
+        tickIndexes.forEach(tickIndex => {
+          lineToTickNotes[i].push(tickToNotes[tickIndex])
+        })
+      })
+    }
+
+    console.log('lineToTickNotes', lineToTickNotes)
+
+    for (let i = 0; i < lines; ++i) {
       Vex.Flow.Formatter.FormatAndDraw(
         this.renderContext,
         staves[i],
-        _.flatten(ticksPerStave[i]),
+        _.flatten(lineToTickNotes[i]),
       )
     }
 
-    this.notesPerTick = notesPerTick
+    this.notesPerTick = tickToNotes
   }
 
   updateActiveNoteLine = () => {
@@ -330,7 +353,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     }
 
     const { activeTickIndex } = this.props
-    const { ticks } = this.props
+    const { ticks, staveHeight } = this.props
     const { notesPerTick } = this
 
     if (
@@ -349,7 +372,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
           (activeNote.getNoteHeadEndX() - activeNote.getNoteHeadBeginX()) / 2
 
         const activeLineXNew = noteHeadX
-        const activeLineYNew = this.tickToStave[activeTickIndex] * 90
+        const activeLineYNew = this.tickToLine[activeTickIndex] * staveHeight
 
         // @ts-ignore
         this.activeLineEl.style = `transform: translateX(${activeLineXNew}px) translateY(${activeLineYNew}px);`

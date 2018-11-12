@@ -1382,7 +1382,7 @@ class App extends React.Component<{}, AppState> {
             1,
             Math.min(
               this.state.height >= 900 ? 3 : 2,
-              Math.ceil(this.state.staffTicks.length / 10),
+              Math.ceil(this.state.staffTicks.length / 20),
             ),
           )
         : 1
