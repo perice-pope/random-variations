@@ -175,6 +175,7 @@ const SortableNotesContainer = SortableContainer(
         className={css(`
           width: 100%;
           border-radius: 15px;
+          padding: 15px 10px;
           transition: background-color 0.3s;
           background-color: ${backgroundColor}
       `)}

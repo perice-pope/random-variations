@@ -181,6 +181,9 @@ export default class AudioEngine {
 
   public setLoop = (loop: PlayableLoop) => {
     this.loop = loop
+    if (!this.loop.ticks) {
+      this.loop.ticks = []
+    }
     this.rescheduleLoopNotes()
   }
 

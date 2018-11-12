@@ -233,9 +233,13 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     let tickIndexToCardId = {}
 
     const tickToNotes = ticks.map((tick, index) => {
+      console.log(
+        index < ticks.length - 1 && ticks[index + 1].noteCardId,
+        tick.noteCardId,
+      )
       const shouldAddMeasureLine =
         index < ticks.length - 1 &&
-        ticks[index + 1].noteCardId !== ticks[index].noteCardId
+        ticks[index + 1].noteCardId !== tick.noteCardId
 
       tickIndexToCardId[index] = ticks[index].noteCardId
 
@@ -248,6 +252,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         return noteFullName
       })
 
+      console.log('TICK: ', tick.notes)
       let vexFlowTickConfig
       if (tick.notes.length === 0) {
         if (this.props.showBreaks) {
@@ -263,38 +268,41 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         }
       }
 
-      if (!vexFlowTickConfig) {
-        return []
-      }
+      let notes: Vex.Flow.Note[] = []
+      if (vexFlowTickConfig) {
+        const vexFlowNote = new Vex.Flow.StaveNote(vexFlowTickConfig)
 
-      const vexFlowNote = new Vex.Flow.StaveNote(vexFlowTickConfig)
+        tick.notes.forEach((noteConfig, index) => {
+          const [, accidental] = tonal.Note.tokenize(noteConfig.noteName)
 
-      tick.notes.forEach((noteConfig, index) => {
-        const [, accidental] = tonal.Note.tokenize(noteConfig.noteName)
+          if (accidental) {
+            vexFlowNote.addAccidental(
+              index,
+              new Vex.Flow.Accidental(accidental),
+            )
+          }
 
-        if (accidental) {
-          vexFlowNote.addAccidental(index, new Vex.Flow.Accidental(accidental))
-        }
+          const cardColorLuminance = getLuminance(noteConfig.color)
+          const noteColor =
+            cardColorLuminance > 0.6
+              ? darken(0.2, noteConfig.color)
+              : noteConfig.color
 
-        const cardColorLuminance = getLuminance(noteConfig.color)
-        const noteColor =
-          cardColorLuminance > 0.6
-            ? darken(0.2, noteConfig.color)
-            : noteConfig.color
+          vexFlowNote.setKeyStyle(index, {
+            fillStyle: noteColor,
+            strokeStyle: noteColor,
+          })
 
-        vexFlowNote.setKeyStyle(index, {
-          fillStyle: noteColor,
-          strokeStyle: noteColor,
+          // Hide the stems
+          vexFlowNote
+            .getStem()
+            .setStyle({ fillStyle: 'transparent', strokeStyle: 'transparent' })
         })
 
-        // Hide the stems
-        vexFlowNote
-          .getStem()
-          .setStyle({ fillStyle: 'transparent', strokeStyle: 'transparent' })
-      })
+        notes = [vexFlowNote]
+      }
 
-      let notes: Vex.Flow.Note[] = [vexFlowNote]
-
+      console.log('adding line: ', shouldAddMeasureLine)
       if (shouldAddMeasureLine) {
         const measureLineNote = new Vex.Flow.BarNote().setType(
           Vex.Flow.Barline.type.SINGLE,
@@ -325,16 +333,20 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     const lineToTickNotes = {}
     for (let i = 0; i < lines; ++i) {
       lineToTickNotes[i] = []
+      if (!lineToCardIds[i]) {
+        continue
+      }
       lineToCardIds[i].forEach(cardId => {
         // @ts-ignore
         const tickIndexes = cardIdToTickIndexes[cardId]
+        if (!tickIndexes) {
+          return
+        }
         tickIndexes.forEach(tickIndex => {
           lineToTickNotes[i].push(tickToNotes[tickIndex])
         })
       })
     }
-
-    console.log('lineToTickNotes', lineToTickNotes)
 
     for (let i = 0; i < lines; ++i) {
       Vex.Flow.Formatter.FormatAndDraw(

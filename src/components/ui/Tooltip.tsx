@@ -3,13 +3,16 @@ import { css } from 'emotion'
 
 import MuTooltip, { TooltipProps } from '@material-ui/core/Tooltip'
 
-const Tooltip: React.SFC<TooltipProps> = props => (
+const Tooltip: React.SFC<TooltipProps & { variant?: 'primary' | 'gray' }> = ({
+  variant,
+  ...props
+}) => (
   <MuTooltip
     {...props}
     classes={{
       tooltip: css({
         fontSize: '1rem',
-        background: '#3f51b5',
+        background: variant === 'gray' ? '#888' : '#3f51b5',
         userSelect: 'none',
       }),
     }}
