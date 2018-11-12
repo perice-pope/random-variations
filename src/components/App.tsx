@@ -1098,63 +1098,111 @@ class App extends React.Component<{}, AppState> {
 
     const currentUser = firebase.auth().currentUser
 
+    const ShuffleButton = (
+      <Tooltip title="Reshuffle cards">
+        <Button
+          variant="contained"
+          title="Shuffle notes"
+          m={[1, 2]}
+          onClick={this.handleShuffleClick}
+        >
+          <ArrowsIcon className={css({ margin: '0 0.5rem' })} />
+        </Button>
+      </Tooltip>
+    )
+    const ToggleCountInButton = (
+      <Tooltip title="Count in on/off">
+        <Button
+          color={countInEnabled ? 'primary' : 'default'}
+          title={
+            countInEnabled ? 'Turn off counting in' : 'Turn on counting in'
+          }
+          m={[1, 2]}
+          onClick={this.handleCountInToggle}
+        >
+          <TimerIcon className={css({ margin: '0 0.5rem' })} />
+        </Button>
+      </Tooltip>
+    )
+    const ToggleMetronomeButton = (
+      <Tooltip title="Metronome on/off">
+        <Button
+          color={metronomeEnabled ? 'primary' : 'default'}
+          title={metronomeEnabled ? 'Turn metronome off' : 'Turn metronome on'}
+          m={[1, 2]}
+          onClick={this.handleMetronomeToggle}
+        >
+          <MetronomeIcon className={css({ margin: '0 0.5rem' })} />
+        </Button>
+      </Tooltip>
+    )
+
+    const CountInTextInput = (
+      <TextField
+        className={css({
+          marginLeft: '15px',
+          maxWidth: '65px',
+        })}
+        InputProps={{
+          className: css({ fontSize: '1.3rem' }),
+        }}
+        label="Count in"
+        id="countInCounts"
+        disabled={!countInEnabled}
+        type="number"
+        // @ts-ignore
+        step="1"
+        min="0"
+        max="16"
+        value={`${countInCounts}`}
+        onChange={this.handleCountInCountsChange}
+      />
+    )
+    const RestsTextInput = (
+      <TextField
+        className={css({
+          marginLeft: '15px',
+          maxWidth: '50px',
+        })}
+        InputProps={{
+          className: css({ fontSize: '1.3rem' }),
+        }}
+        label="Rests"
+        id="rests"
+        type="number"
+        // @ts-ignore
+        step="1"
+        min="0"
+        max="8"
+        value={`${rests}`}
+        onChange={this.handleRestsChange}
+      />
+    )
+    const TempoTextInput = (
+      <TextField
+        className={css({ maxWidth: '95px' })}
+        label="Tempo"
+        InputProps={{
+          endAdornment: <InputAdornment position="end">BPM</InputAdornment>,
+          className: css({ fontSize: '1.3rem' }),
+        }}
+        id="bpm"
+        type="number"
+        // @ts-ignore
+        step="1"
+        min="0"
+        max="400"
+        value={`${bpm}`}
+        onChange={this.handleBpmChange}
+      />
+    )
     const SessionControls = (
       <Box mb={1}>
-        <TextField
-          className={css({ maxWidth: '95px' })}
-          label="Tempo"
-          InputProps={{
-            endAdornment: <InputAdornment position="end">BPM</InputAdornment>,
-            className: css({ fontSize: '1.3rem' }),
-          }}
-          id="bpm"
-          type="number"
-          // @ts-ignore
-          step="1"
-          min="0"
-          max="400"
-          value={`${bpm}`}
-          onChange={this.handleBpmChange}
-        />
-
-        <TextField
-          className={css({
-            marginLeft: '15px',
-            maxWidth: '50px',
-          })}
-          InputProps={{
-            className: css({ fontSize: '1.3rem' }),
-          }}
-          label="Rests"
-          id="rests"
-          type="number"
-          // @ts-ignore
-          step="1"
-          min="0"
-          max="8"
-          value={`${rests}`}
-          onChange={this.handleRestsChange}
-        />
-
-        <TextField
-          className={css({
-            marginLeft: '15px',
-            maxWidth: '65px',
-          })}
-          InputProps={{
-            className: css({ fontSize: '1.3rem' }),
-          }}
-          label="Count in"
-          id="countInCounts"
-          disabled={!countInEnabled}
-          type="number"
-          // @ts-ignore
-          step="1"
-          min="0"
-          max="16"
-          value={`${countInCounts}`}
-          onChange={this.handleCountInCountsChange}
-        />
+        {TempoTextInput}
+        {RestsTextInput}
+        {CountInTextInput}
+        {ToggleCountInButton}
+        {ToggleMetronomeButton}
       </Box>
     )
 
@@ -1175,42 +1223,6 @@ class App extends React.Component<{}, AppState> {
       </Button>
     )
 
-    const ShuffleButton = (
-      <Tooltip title="Reshuffle cards">
-      <Button
-        variant="contained"
-        title="Shuffle notes"
-        m={[1, 2]}
-        onClick={this.handleShuffleClick}
-      >
-        <ArrowsIcon className={css({ margin: '0 0.5rem' })} />
-      </Button>
-      </Tooltip>
-    )
-    const TgogleCountInButton = (
-      <Tooltip title="Count in on/off">
-      <Button
-        color={countInEnabled ? 'primary' : 'default'}
-        title={countInEnabled ? 'Turn off counting in' : 'Turn on counting in'}
-        m={[1, 2]}
-        onClick={this.handleCountInToggle}
-      >
-        <TimerIcon className={css({ margin: '0 0.5rem' })} />
-      </Button>
-      </Tooltip>
-    )
-    const ToggleMetronomeButton = (
-      <Tooltip title="Metronome on/off">
-      <Button
-        color={metronomeEnabled ? 'primary' : 'default'}
-        title={metronomeEnabled ? 'Turn metronome off' : 'Turn metronome on'}
-        m={[1, 2]}
-        onClick={this.handleMetronomeToggle}
-      >
-        <MetronomeIcon className={css({ margin: '0 0.5rem' })} />
-      </Button>
-      </Tooltip>
-    )
     const ToolbarContent = (
       <>
         <IconButton color="inherit" onClick={this.openSettingsModal}>
@@ -1424,8 +1436,6 @@ class App extends React.Component<{}, AppState> {
                 >
                   {TogglePlaybackButton}
                   {ShuffleButton}
-                  {TgogleCountInButton}
-                  {ToggleMetronomeButton}
                 </Box>
 
                 {SessionControls}
