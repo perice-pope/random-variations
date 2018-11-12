@@ -1176,6 +1176,7 @@ class App extends React.Component<{}, AppState> {
     )
 
     const ShuffleButton = (
+      <Tooltip title="Reshuffle cards">
       <Button
         variant="contained"
         title="Shuffle notes"
@@ -1183,10 +1184,11 @@ class App extends React.Component<{}, AppState> {
         onClick={this.handleShuffleClick}
       >
         <ArrowsIcon className={css({ margin: '0 0.5rem' })} />
-        <Hidden smDown>Shuffle</Hidden>
       </Button>
+      </Tooltip>
     )
     const TgogleCountInButton = (
+      <Tooltip title="Count in on/off">
       <Button
         color={countInEnabled ? 'primary' : 'default'}
         title={countInEnabled ? 'Turn off counting in' : 'Turn on counting in'}
@@ -1194,10 +1196,11 @@ class App extends React.Component<{}, AppState> {
         onClick={this.handleCountInToggle}
       >
         <TimerIcon className={css({ margin: '0 0.5rem' })} />
-        <Hidden smDown>Count in</Hidden>
       </Button>
+      </Tooltip>
     )
     const ToggleMetronomeButton = (
+      <Tooltip title="Metronome on/off">
       <Button
         color={metronomeEnabled ? 'primary' : 'default'}
         title={metronomeEnabled ? 'Turn metronome off' : 'Turn metronome on'}
@@ -1205,8 +1208,8 @@ class App extends React.Component<{}, AppState> {
         onClick={this.handleMetronomeToggle}
       >
         <MetronomeIcon className={css({ margin: '0 0.5rem' })} />
-        <Hidden smDown>Metronome</Hidden>
       </Button>
+      </Tooltip>
     )
     const ToolbarContent = (
       <>
