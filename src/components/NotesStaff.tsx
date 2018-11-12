@@ -233,10 +233,6 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     let tickIndexToCardId = {}
 
     const tickToNotes = ticks.map((tick, index) => {
-      console.log(
-        index < ticks.length - 1 && ticks[index + 1].noteCardId,
-        tick.noteCardId,
-      )
       const shouldAddMeasureLine =
         index < ticks.length - 1 &&
         ticks[index + 1].noteCardId !== tick.noteCardId
@@ -252,7 +248,6 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         return noteFullName
       })
 
-      console.log('TICK: ', tick.notes)
       let vexFlowTickConfig
       if (tick.notes.length === 0) {
         if (this.props.showBreaks) {
@@ -302,7 +297,6 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         notes = [vexFlowNote]
       }
 
-      console.log('adding line: ', shouldAddMeasureLine)
       if (shouldAddMeasureLine) {
         const measureLineNote = new Vex.Flow.BarNote().setType(
           Vex.Flow.Barline.type.SINGLE,

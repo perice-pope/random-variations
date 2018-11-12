@@ -253,6 +253,9 @@ const styles = theme => ({
     justifyContent: 'flex-end',
   },
   content: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
     flexGrow: 1,
     paddingTop: theme.spacing.unit * 6,
     transition: theme.transitions.create('margin', {
@@ -1571,11 +1574,6 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
                 id="app-content"
                 className={cx(
                   classes.content,
-                  css({
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                  }),
                   !isMobileMenu && classes.contentShifted,
                   !isMobileMenu &&
                     this.state.isMenuOpen &&
@@ -1962,4 +1960,5 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
   }
 }
 
+// @ts-ignore
 export default withStyles(styles, { withTheme: true })(withWidth()(App))
