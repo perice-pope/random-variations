@@ -22,6 +22,7 @@ type NotesStaffProps = {
   id: string
   lines: number
   ticks: StaffTick[]
+  tickLabels?: { [tickIndex: number]: string }
   clef: string
   isPlaying: boolean
   showBreaks?: boolean
@@ -60,6 +61,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
   private tickToLine: { [k: number]: number } = {}
   private staves: Vex.Flow.Stave[] = []
   private activeLineEl?: SVGElement
+  private tickLabelsGroup?: SVGElement
 
   componentDidMount() {
     this.initRenderer()
@@ -126,6 +128,60 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
     this.drawNotes()
     this.updateActiveNoteLine()
+  }
+
+  private drawTickLabels = () => {
+    console.log('NotesStaff -> drawTickLabels')
+    if (this.tickLabelsGroup) {
+      this.tickLabelsGroup.remove()
+      this.tickLabelsGroup = undefined
+    }
+
+    this.renderContext.save()
+    this.renderContext.setLineWidth(2)
+    this.renderContext.setFont('sans-serif', 14, 400)
+    this.renderContext.setStrokeStyle('salmon')
+
+    // @ts-ignore
+    this.tickLabelsGroup = this.renderContext.openGroup() as SVGElement
+
+    let currentLine = 0
+    for (let i = 0; i < this.notesPerTick.length; ++i) {
+      if (!this.props.tickLabels || !this.props.tickLabels[i]) {
+        continue
+      }
+      const label = this.props.tickLabels[i]
+      const notes = this.notesPerTick[i]
+      const line = this.tickToLine[i] || 0
+      if (notes.length < 1) {
+        continue
+      }
+      const note = notes.find(n => n instanceof Vex.Flow.StaveNote)
+      if (!note) {
+        continue
+      }
+
+      let x = note.getAbsoluteX()
+      if (i > 0 && line === currentLine) {
+        const notesForPreviousTick = this.notesPerTick[i - 1]
+        const measureLine = notesForPreviousTick.find(
+          n => n instanceof Vex.Flow.BarNote,
+        )
+        if (measureLine) {
+          x = measureLine.getAbsoluteX()
+        }
+      }
+
+      this.renderContext.fillText(label, x, 30 + line * this.props.staveHeight)
+
+      currentLine = line
+    }
+    this.renderContext.restore()
+
+    this.tickLabelsGroup.classList.add('vf-tick-labels')
+
+    // @ts-ignore
+    this.renderContext.closeGroup()
   }
 
   private drawActiveNoteLine = () => {
@@ -351,6 +407,8 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     }
 
     this.notesPerTick = tickToNotes
+
+    this.drawTickLabels()
   }
 
   updateActiveNoteLine = () => {

@@ -622,10 +622,12 @@ export const generateStaffTicks = ({
   modifiers: NoteModifiers
   // Number of rests to add after each note card
   rests: number
-}): StaffTick[] => {
+}): { ticks: StaffTick[]; tickLabels: { [tickIndex: number]: string } } => {
   console.log('generateStaffTicks')
   const ticksPerCard: StaffTick[][] = []
+  const tickLabels: { [tickIndex: number]: string } = {}
 
+  let currentTickIndex = 0
   noteCards.forEach(noteCard => {
     let ticksForCard: StaffTick[] = [
       {
@@ -679,9 +681,14 @@ export const generateStaffTicks = ({
       ticksForCard = [...ticksForCard, ...breakTicksForCard]
     }
 
+    tickLabels[currentTickIndex] = `${tonal.Note.pc(noteCard.noteName)}${
+      modifiers.chords.enabled ? modifiers.chords.chordType : ''
+    }`
+    currentTickIndex += ticksForCard.length
+
     ticksPerCard.push(ticksForCard)
   })
 
   const allTicks = _.flatten(ticksPerCard)
-  return allTicks
+  return { ticks: allTicks, tickLabels }
 }

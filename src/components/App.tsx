@@ -146,6 +146,7 @@ type AppState = {
   noteCards: NoteCardType[]
   noteCardsById: { [noteCardId: string]: NoteCardType }
   staffTicks: StaffTick[]
+  tickLabels: { [tickIndex: number]: string }
   staffTicksPerCard: { [noteCardId: string]: StaffTick[] }
   activeNoteCardIndex: number
   activeStaffTickIndex: number
@@ -313,6 +314,7 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
 
       isPlaying: false,
       staffTicks: [],
+      tickLabels: {},
       staffTicksPerCard: {},
       activeNoteCardIndex: 0,
       activeStaffTickIndex: 0,
@@ -583,11 +585,11 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
   private updateStaffNotes = async () => {
     const { noteCards, modifiers, rests } = this.state
 
-    const staffTicks = generateStaffTicks({ noteCards, modifiers, rests })
+    const { ticks: staffTicks, tickLabels } = generateStaffTicks({ noteCards, modifiers, rests })
     const staffTicksPerCard = _.groupBy(staffTicks, 'noteCardId')
 
     return new Promise(resolve => {
-      this.setState({ staffTicks, staffTicksPerCard }, () => {
+      this.setState({ staffTicks, tickLabels, staffTicksPerCard }, () => {
         resolve()
       })
     })
@@ -1189,7 +1191,7 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
       noteCardWithMouseOver,
     } = this.state
 
-    const isMobileMenu = this.props.width === 'xs' || this.props.width === 'sm'
+    const isMobile = this.props.width === 'xs' || this.props.width === 'sm'
 
     const activeNoteCard = isPlaying
       ? noteCards[activeNoteCardIndex]
@@ -1340,7 +1342,7 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
           onClick={this.state.isMenuOpen ? this.closeMenu : this.openMenu}
           className={cx(
             classes.menuButton,
-            !isMobileMenu && this.state.isMenuOpen && classes.hide,
+            !isMobile && this.state.isMenuOpen && classes.hide,
           )}
         >
           <MenuIcon />
@@ -1538,7 +1540,7 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
               <AppBar
                 position="fixed"
                 className={cx(
-                  !isMobileMenu && this.state.isMenuOpen && classes.appBarShift
+                  !isMobile && this.state.isMenuOpen && classes.appBarShift
                 )}
               >
                 <Toolbar variant="dense">{ToolbarContent}</Toolbar>
@@ -1580,8 +1582,8 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
                 id="app-content"
                 className={cx(
                   classes.content,
-                  !isMobileMenu && classes.contentShifted,
-                  !isMobileMenu &&
+                  !isMobile && classes.contentShifted,
+                  !isMobile &&
                     this.state.isMenuOpen &&
                     classes.contentShift,
                 )}
@@ -1660,7 +1662,7 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
                             showHelpTooltip={
                               noteCards.length === 0 &&
                               !this.state.disableStartTooltips &&
-                              !(isMobileMenu && this.state.isMenuOpen)
+                              !(isMobile && this.state.isMenuOpen)
                             }
                             enableOnlyNote={noteCards.length === 0}
                             onAddSingleNoteClick={this.openNoteAddingModal}
@@ -1714,6 +1716,7 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
                     showEnd
                     id="notation"
                     ticks={this.state.staffTicks}
+                    tickLabels={!isMobile ? this.state.tickLabels : undefined}
                     activeTickIndex={
                       isPlaying ? activeStaffTickIndex : undefined
                     }
@@ -1725,7 +1728,7 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
                   <PianoKeyboard
                     width={
                       this.state.width -
-                      (!isMobileMenu && this.state.isMenuOpen ? menuWidth : 0)
+                      (!isMobile && this.state.isMenuOpen ? menuWidth : 0)
                     }
                     height={this.getPianoHeight()}
                     secondaryNotesMidi={
