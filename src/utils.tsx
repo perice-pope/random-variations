@@ -1,3 +1,5 @@
+import * as React from 'react'
+
 import { mix } from 'polished'
 import * as tonal from 'tonal'
 import { arrayMove as reactHocArrayMove } from 'react-sortable-hoc'
@@ -9,7 +11,24 @@ import {
   scaleByScaleType,
 } from './musicUtils'
 
+import TimeAgo from 'react-time-ago'
+import TimeAgoNoTooltip from 'react-time-ago/no-tooltip'
+import 'react-time-ago/Tooltip.css'
+
+import JavascriptTimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
+
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
+
+JavascriptTimeAgo.locale(en)
+
+export function timeago(timestamp, { showTooltip } = { showTooltip: false }) {
+  if (!timestamp) {
+    return null
+  }
+  const Component = showTooltip ? TimeAgo : TimeAgoNoTooltip
+  return <Component>{new Date(timestamp)}</Component>
+}
 
 /**
  * Returns a copy of the array shuffled randomly

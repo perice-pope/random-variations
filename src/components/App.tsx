@@ -26,6 +26,8 @@ import StopIcon from '@material-ui/icons/Stop'
 import MenuIcon from '@material-ui/icons/Menu'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import DeleteIcon from '@material-ui/icons/Close'
+import PlusIcon from '@material-ui/icons/Add'
+import EditIcon from '@material-ui/icons/Edit'
 import SaveIcon from '@material-ui/icons/Save'
 import ArrowsIcon from '@material-ui/icons/Cached'
 import TimerIcon from '@material-ui/icons/Timer'
@@ -44,6 +46,7 @@ import {
   arrayMove,
   getNoteCardColorByNoteName,
   createDefaultSession,
+  timeago,
 } from '../utils'
 
 import theme from '../styles/theme'
@@ -106,6 +109,7 @@ import {
   ListSubheader,
   SwipeableDrawer,
   withWidth,
+  ListItemSecondaryAction,
 } from '@material-ui/core'
 import { WithWidth } from '@material-ui/core/withWidth'
 
@@ -212,7 +216,7 @@ const unpackSessionState = (session: Session) => {
   }
 }
 
-const menuWidth = 240
+const menuWidth = 280
 
 const styles = theme => ({
   root: {
@@ -585,7 +589,11 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
   private updateStaffNotes = async () => {
     const { noteCards, modifiers, rests } = this.state
 
-    const { ticks: staffTicks, tickLabels } = generateStaffTicks({ noteCards, modifiers, rests })
+    const { ticks: staffTicks, tickLabels } = generateStaffTicks({
+      noteCards,
+      modifiers,
+      rests,
+    })
     const staffTicksPerCard = _.groupBy(staffTicks, 'noteCardId')
 
     return new Promise(resolve => {
@@ -632,7 +640,12 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
       return
     }
     console.log('Save session: ', session)
-    base.update(`users/${user.uid}/sessions/${session.key}`, { data: session })
+    base.update(`users/${user.uid}/sessions/${session.key}`, {
+      data: {
+        ...session,
+        updatedAt: new Date().toISOString(),
+      },
+    })
   }
 
   private saveAppState = () => {
@@ -914,6 +927,7 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
 
   private signOut = () => {
     firebase.auth().signOut()
+
   }
 
   private openSignInModal = () => {
@@ -1151,6 +1165,37 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
     })
   }
 
+  private createNewSession = async ({ name }) => {
+    const user = firebase.auth().currentUser
+    if (!user) {
+      return
+    }
+    const ref = await base.push(`users/${user.uid}/sessions`, {
+      data: {
+        ...defaultSession,
+        name,
+        author: user.uid,
+      } as Session,
+    })
+
+    const sessions = await base.fetch(`users/${user.uid}/sessions`, {
+      asArray: true,
+    })
+    this.restoreSavedSessions(sessions, ref.key)
+  }
+
+  private handleCreateNewSessionClick = async () => {
+    const sessionName = prompt(
+      'Choose a name for the new session',
+      'New session',
+    )
+    if (!sessionName) {
+      return
+    }
+
+    await this.createNewSession({ name: sessionName })
+  }
+
   private handleEnharmonicMapToggle = (pitchName: ChromaticNoteSharps) => {
     this.setState({
       enharmonicFlatsMap: {
@@ -1171,6 +1216,50 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
 
     this.updateActiveSession({ noteCards: newNoteCards })
     this.closeNoteAddingModal()
+  }
+
+  private handleDeleteSession = async session => {
+    const user = firebase.auth().currentUser
+    if (!user) {
+      return
+    }
+    if (
+      !confirm(
+        `Do you really want to delete session${
+          session.name ? ` "${session.name}"` : ''
+        }?`,
+      )
+    ) {
+      return
+    }
+    await base.remove(`users/${user.uid}/sessions/${session.key}`)
+    const sessions = await base.fetch(`users/${user.uid}/sessions`, {
+      asArray: true,
+    })
+    if (sessions.length === 0) {
+      await this.createNewSession({ name: 'New session' })
+    } else {
+      this.restoreSavedSessions(sessions, sessions[0].key)
+    }
+  }
+
+  private handleRenameSession = async session => {
+    const newName = prompt('Rename the session', session.name)
+    if (!newName) {
+      return
+    }
+    const user = firebase.auth().currentUser
+    if (!user) {
+      return
+    }
+    await base.update(`users/${user.uid}/sessions/${session.key}`, {
+      data: { name: newName },
+    })
+    const sessions = await base.fetch(`users/${user.uid}/sessions`, {
+      asArray: true,
+    })
+
+    this.restoreSavedSessions(sessions, sessions[0].key)
   }
 
   private renderApp = () => {
@@ -1502,6 +1591,12 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
           )
         : 1
 
+    const sessionsSorted = _.reverse(
+      _.sortBy(_.values(this.state.sessionsById || {}), 'createdAt'),
+    ) as Session[]
+
+    const isLoggedIn = currentUser && !currentUser.isAnonymous
+
     const MenuContent = (
       <>
         <div className={classes.drawerHeader}>
@@ -1518,16 +1613,87 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
             <ListItemText primary="Settings" />
           </ListItem>
         </List>
+
         <Divider />
+
         <List dense>
-          <ListSubheader>Your sessions</ListSubheader>
-          {['My first session', 'Scales drill', 'Learning triads'].map(
-            (text, index) => (
-              <ListItem selected={index === 0} button key={text}>
-                <ListItemText primary={text} />
+          <ListSubheader
+            className={css({
+              display: 'flex',
+              alignItems: 'center',
+              fontSize: '1.2rem',
+              paddingBottom: '0.5rem',
+            })}
+          >
+            <span className={css({ flex: 1 })}>{'My sessions '}</span>
+            {isLoggedIn && (
+              <Tooltip title="Create a new session">
+                <Button
+                  variant="text"
+                  onClick={this.handleCreateNewSessionClick}
+                  color="secondary"
+                >
+                  <PlusIcon /> New
+                </Button>
+              </Tooltip>
+            )}
+          </ListSubheader>
+          {!isLoggedIn && (
+            <>
+              <ListItem>
+                Please sign in to be able to store your practice sessions:
               </ListItem>
-            ),
+              <ListItem>
+                <MuiButton
+                  // color="primary"
+                  color="secondary"
+                  onClick={this.openSignInModal}
+                  variant="raised"
+                >
+                  Sign in
+                </MuiButton>
+              </ListItem>
+            </>
           )}
+          {isLoggedIn &&
+            sessionsSorted.map(session => (
+              <ListItem
+                selected={session.key === this.state.activeSessionId}
+                button
+                key={session.key}
+                onClick={() => this.activateSession(session.key)}
+              >
+                <ListItemText
+                  primary={session.name || 'Unnamed session'}
+                  secondary={
+                    session.createdAt ? (
+                      <>
+                        {'Created '}
+                        {timeago(session.createdAt)}
+                      </>
+                    ) : (
+                      undefined
+                    )
+                  }
+                />
+                <ListItemSecondaryAction>
+                    <Tooltip title="Rename">
+                  <IconButton aria-label="Rename">
+                    <EditIcon
+                      onClick={() => this.handleRenameSession(session)}
+                    />
+                  </IconButton>
+                    </Tooltip>
+                  <Tooltip title="Remove" variant="gray">
+                  <IconButton aria-label="Delete">
+                    <DeleteIcon
+                      onClick={() => this.handleDeleteSession(session)}
+                    />
+                  </IconButton>
+                    </Tooltip>
+                </ListItemSecondaryAction>
+              </ListItem>
+            ))}
         </List>
       </>
     )
@@ -1540,7 +1706,7 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
               <AppBar
                 position="fixed"
                 className={cx(
-                  !isMobile && this.state.isMenuOpen && classes.appBarShift
+                  !isMobile && this.state.isMenuOpen && classes.appBarShift,
                 )}
               >
                 <Toolbar variant="dense">{ToolbarContent}</Toolbar>
@@ -1583,9 +1749,7 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
                 className={cx(
                   classes.content,
                   !isMobile && classes.contentShifted,
-                  !isMobile &&
-                    this.state.isMenuOpen &&
-                    classes.contentShift,
+                  !isMobile && this.state.isMenuOpen && classes.contentShift,
                 )}
               >
                 <Flex

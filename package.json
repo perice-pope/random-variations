@@ -13,6 +13,7 @@
     "emotion": "^9.2.12",
     "emotion-theming": "^9.2.9",
     "firebase": "^5.5.5",
+    "javascript-time-ago": "^1.0.32",
     "jss": "^9.8.7",
     "lodash": "^4.17.11",
     "mdi-material-ui": "^5.5.0",
@@ -30,6 +31,7 @@
     "react-piano": "^3.1.0",
     "react-scripts": "^2.1.1",
     "react-sortable-hoc": "^0.8.3",
+    "react-time-ago": "^3.0.3",
     "recompose": "^0.30.0",
     "styled-system": "^3.1.6",
     "tonal": "^2.0.0",
@@ -44,6 +46,7 @@
     "webaudiofont": "^2.5.26"
   },
   "scripts": {
+    "script": "node ./scripts/convertScales.js",
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test --env=jsdom",
