@@ -1,3 +1,5 @@
+const _ = require('lodash')
+
 const getRawData = () => {
   return `Power Chord	5	C G	1 5	DYAD
   Major Triad	maj	C E G	1 3 5	TRIADS
@@ -258,11 +260,11 @@ const getData = () => {
         return null
       }
       return {
-        name,
+        name: _.lowerCase(name),
         symbol,
         notes,
         semitones: convertChord(notes),
-        category,
+        category: _.lowerCase(category),
       }
     })
     .filter(x => x)

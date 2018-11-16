@@ -12,18 +12,18 @@ import AudioEngine from '../services/audioEngine'
 import { AudioFontId } from '../audioFontsConfig'
 
 const pianoNoteRangeWide: MidiNoteRange = {
-  first: tonal.Note.midi('C3'),
-  last: tonal.Note.midi('B5'),
+  first: tonal.Note.midi('C3') as number,
+  last: tonal.Note.midi('B5') as number,
 }
 
 const pianoNoteRangeMiddle: MidiNoteRange = {
-  first: tonal.Note.midi('G3'),
-  last: tonal.Note.midi('E5'),
+  first: tonal.Note.midi('G3') as number,
+  last: tonal.Note.midi('E5') as number,
 }
 
 const pianoNoteRangeNarrow: MidiNoteRange = {
-  first: tonal.Note.midi('C4'),
-  last: tonal.Note.midi('B4'),
+  first: tonal.Note.midi('C4') as number,
+  last: tonal.Note.midi('B4') as number,
 }
 
 const keyboardShortcuts = ReactPiano.KeyboardShortcuts.create({

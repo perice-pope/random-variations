@@ -33,7 +33,7 @@ import {
   generateChordPatternFromPreset,
   chordOptions,
   chordsByChordType,
-  getSemitonesUpTransposer,
+  getSemitonesTransposer,
 } from '../musicUtils'
 import { Flex } from './ui/Flex'
 import { Box } from './ui'
@@ -65,7 +65,7 @@ type ChordTypeOption = {
 
 const chordTypeOptions: ChordTypeOption[] = _.sortBy(
   chordOptions.map(({ type, title }) => ({
-    title,
+    title: _.capitalize(title),
     value: type,
     notesCount: chordsByChordType[type].notesCount,
   })),
@@ -102,6 +102,8 @@ const getChordInversionOptions = _.memoize((notesCount: number) => [
   })),
 ])
 
+const DEFAULT_CHORD_NAME = 'maj'
+
 // @ts-ignore
 class ArpeggioModifierModal extends React.Component<
   ArpeggioModifierModalProps & { fullScreen: boolean },
@@ -109,12 +111,12 @@ class ArpeggioModifierModal extends React.Component<
 > {
   static defaultProps: Partial<ArpeggioModifierModalProps> = {
     initialValues: {
-      chordType: 'maj',
+      chordType: DEFAULT_CHORD_NAME,
       isMelodic: true,
       chordInversion: 0,
       patternPreset: 'ascending',
       pattern: generateChordPatternFromPreset({
-        chord: chordsByChordType['maj'],
+        chord: chordsByChordType[DEFAULT_CHORD_NAME],
         patternPreset: 'ascending',
       }),
     },
@@ -215,7 +217,8 @@ class ArpeggioModifierModal extends React.Component<
 
   generateStaffTicks = () => {
     const { chordType, chordInversion } = this.state.values
-    const chord = chordsByChordType[chordType] || chordsByChordType['maj']
+    const chord =
+      chordsByChordType[chordType] || chordsByChordType[DEFAULT_CHORD_NAME]
     const { semitones } = chord
     const baseNote = 'C4'
 
@@ -226,7 +229,7 @@ class ArpeggioModifierModal extends React.Component<
       staffTicks = this.state.values.pattern.items.map((item, index) => {
         const note = item.muted
           ? undefined
-          : getSemitonesUpTransposer(semitones[item.note - 1])(baseNote)
+          : getSemitonesTransposer(semitones[item.note - 1])(baseNote)
 
         return {
           id: `${index}`,
@@ -250,7 +253,7 @@ class ArpeggioModifierModal extends React.Component<
           notes: _.sortBy(
             semitones
               .map((semitonesCount, index) => {
-                let resultNote = getSemitonesUpTransposer(semitonesCount)(
+                let resultNote = getSemitonesTransposer(semitonesCount)(
                   baseNote,
                 )
                 console.log('FISH: ', baseNote, semitonesCount, resultNote)
@@ -296,7 +299,8 @@ class ArpeggioModifierModal extends React.Component<
     }
 
     const chord =
-      chordsByChordType[this.state.values.chordType] || chordsByChordType['maj']
+      chordsByChordType[this.state.values.chordType] ||
+      chordsByChordType[DEFAULT_CHORD_NAME]
     const { isMelodic } = this.state.values
 
     return (

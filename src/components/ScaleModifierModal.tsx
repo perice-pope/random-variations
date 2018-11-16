@@ -1,8 +1,6 @@
 import * as React from 'react'
 import * as _ from 'lodash'
-import { transpose } from 'tonal-distance'
 import * as tonal from 'tonal'
-import * as tonalScale from 'tonal-scale'
 
 import { default as MuButton } from '@material-ui/core/Button'
 
@@ -28,13 +26,14 @@ import {
   ScaleModifier,
 } from '../types'
 import { ChangeEvent } from 'react'
-import { Input } from '@material-ui/core'
+import { Input, FormHelperText } from '@material-ui/core'
 import { css } from 'react-emotion'
 import Tooltip from './ui/Tooltip'
 import {
   scaleOptions,
   scaleByScaleType,
   generateScalePatternFromPreset,
+  getSemitonesTransposer,
 } from '../musicUtils'
 import { Flex } from './ui/Flex'
 import { Box } from './ui'
@@ -62,8 +61,10 @@ type ScaleTypeOption = {
 const scaleTypeOptions: ScaleTypeOption[] = _.sortBy(
   scaleOptions,
   'notesCount',
-).map(({ type, title }) => ({
-  title,
+).map(({ type, mode, title }) => ({
+  title: [_.capitalize(mode), _.capitalize(title)]
+    .filter(_.identity)
+    .join(' - '),
   value: type,
 }))
 
@@ -110,6 +111,8 @@ const patternPresetOptions: PatternPresetOption[] = [
 
 type Props = ScaleModifierModalProps & { fullScreen: boolean }
 
+const DEFAULT_SCALE_NAME = 'ionian'
+
 // @ts-ignore
 class ScaleModifierModal extends React.Component<
   Props,
@@ -117,10 +120,10 @@ class ScaleModifierModal extends React.Component<
 > {
   static defaultProps: Partial<ScaleModifierModalProps> = {
     initialValues: {
-      scaleType: 'major',
+      scaleType: DEFAULT_SCALE_NAME,
       patternPreset: 'up',
       pattern: generateScalePatternFromPreset({
-        scale: scaleByScaleType['major'],
+        scale: scaleByScaleType[DEFAULT_SCALE_NAME],
         patternPreset: 'up',
       }),
     },
@@ -129,7 +132,9 @@ class ScaleModifierModal extends React.Component<
   constructor(props: Props) {
     super(props)
 
-    const scale = scaleByScaleType[props.initialValues!.scaleType] as Scale
+    const scale =
+      scaleByScaleType[props.initialValues!.scaleType] ||
+      (scaleByScaleType[DEFAULT_SCALE_NAME] as Scale)
     this.state = {
       values: {
         ...props.initialValues!,
@@ -153,7 +158,9 @@ class ScaleModifierModal extends React.Component<
 
   handleScaleTypeSelected = (e: ChangeEvent<HTMLSelectElement>) => {
     const scaleType = e.target.value as ScaleType
-    const scale = scaleByScaleType[scaleType] as Scale
+    const scale =
+      scaleByScaleType[scaleType] ||
+      (scaleByScaleType[DEFAULT_SCALE_NAME] as Scale)
 
     this.setState({
       values: {
@@ -204,21 +211,25 @@ class ScaleModifierModal extends React.Component<
   generateStaffTicks = () => {
     const { scaleType } = this.state.values
     const scale = scaleByScaleType[scaleType]
-    const intervals = tonalScale.intervals(scale.type)
+    const { semitones = [] } = scale
     const baseNote = 'C4'
 
     let staffTicks: StaffTick[]
 
     staffTicks = this.state.values.pattern.items.map((item, index) => {
-      const note = item.muted
-        ? undefined
-        : transpose(baseNote, intervals[item.note - 1])
+      const semitonesCount =
+        item && !item.muted ? semitones[item.note - 1] || 0 : 0
+      const note = getSemitonesTransposer(semitonesCount)(baseNote)
+
       return {
         id: `${index}`,
         notes: note
           ? [
               {
-                color: item.note === 1 ? 'red' : 'black',
+                color:
+                  tonal.Note.pc(note) === tonal.Note.pc(baseNote)
+                    ? 'red'
+                    : 'black',
                 id: `${index}`,
                 isMainNote: false,
                 midi: tonal.Note.midi(note),
@@ -285,6 +296,14 @@ class ScaleModifierModal extends React.Component<
                   </option>
                 ))}
               </NativeSelect>
+              {scale.notes && (
+                <FormHelperText>
+                  {`Notes in key of C:  `}
+                  <span
+                    className={css({ fontSize: '0.8rem', fontWeight: 'bold' })}
+                  >{`${scale.notes.split(' ').join(', ')}`}</span>
+                </FormHelperText>
+              )}
             </FormControl>
           </Flex>
 

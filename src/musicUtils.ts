@@ -1,12 +1,12 @@
 import * as tonal from 'tonal'
 import { transpose, interval } from 'tonal-distance'
-import { scale } from 'tonal-dictionary'
 import { fromSemitones } from 'tonal-interval'
 import * as _ from 'lodash'
 import { memoize } from 'lodash/fp'
 import uuid from 'uuid/v4'
 
 import chordsData from './data/chords.json'
+import scalesData from './data/scales.json'
 
 // @ts-ignore
 window.interval = interval
@@ -76,7 +76,7 @@ export const SemitonesToIntervalShortNameMap: {
   '8P': 'P8',
 }
 
-export const getSemitonesUpTransposer = memoize((semitones: number) => {
+export const getSemitonesTransposer = memoize((semitones: number) => {
   const transposer = note => {
     return transpose(note, fromSemitones(semitones))
   }
@@ -89,7 +89,7 @@ window.transpose = transpose
 // @ts-ignore
 window.tonal = tonal
 // @ts-ignore
-window.getSemitonesUpTransposer = getSemitonesUpTransposer
+window.getSemitonesUpTransposer = getSemitonesTransposer
 
 const getAllChordOptions: () => Chord[] = memoize(() => {
   return _.uniqBy(
@@ -108,18 +108,16 @@ const getAllChordOptions: () => Chord[] = memoize(() => {
 
 const getAllScaleOptions: () => Scale[] = memoize(() => {
   return _.uniqBy(
-    [
-      // @ts-ignore
-      ...scale.names().map(name => ({ title: _.capitalize(name), type: name })),
-    ].map(({ type, title }) => {
-      const intervals = scale(type)
+    scalesData.map(({ name, notes, mode, semitones }) => {
       return {
-        type,
-        title,
-        intervals,
-        notesCount: intervals.length,
+        semitones,
+        mode,
+        notes,
+        type: name,
+        title: name,
+        notesCount: semitones.length,
       } as Scale
-    }) as Scale[],
+    }),
     'type',
   )
 })
@@ -366,6 +364,9 @@ export const addApproachNotes = (
   return updatedTicks
 }
 
+const DEFAULT_SCALE_NAME = 'ionian'
+const DEFAULT_CHORD_NAME = 'maj'
+
 export const addChordNotes = (
   ticks: StaffTick[],
   chordModifier: ChordModifier,
@@ -386,7 +387,8 @@ export const addChordNotes = (
   const baseNote = tickWithBaseNote.notes[baseNoteIndex]
 
   const chord =
-    chordsByChordType[chordModifier.chordType] || chordsByChordType['maj']
+    chordsByChordType[chordModifier.chordType] ||
+    chordsByChordType[DEFAULT_CHORD_NAME]
 
   if (!chordModifier.isMelodic) {
     // Add harmonic chord notes in a single staff tick
@@ -396,7 +398,7 @@ export const addChordNotes = (
       notes: _.sortBy(
         chord.semitones
           .map((semitonesCount, index) => {
-            let resultNote = getSemitonesUpTransposer(semitonesCount)(
+            let resultNote = getSemitonesTransposer(semitonesCount)(
               baseNote.noteName,
             )
             if (
@@ -432,7 +434,7 @@ export const addChordNotes = (
       return undefined
     }
     const semitonesCount = note ? chord.semitones[note - 1] || 0 : 0
-    return getSemitonesUpTransposer(semitonesCount)(baseNote.noteName)
+    return getSemitonesTransposer(semitonesCount)(baseNote.noteName)
   })
 
   const ticksWithArpeggioNotes = noteNamesWithArpeggio.map(
@@ -478,37 +480,43 @@ export const addScaleNotes = (
   )
   const baseNote = tickWithBaseNote.notes[baseNoteIndex]
 
-  const scale = scaleByScaleType[scaleModifier.scaleType]
-  const chordIntervals = scale.intervals
+  const scale =
+    scaleByScaleType[scaleModifier.scaleType] ||
+    scaleByScaleType[DEFAULT_SCALE_NAME]
+  const { semitones } = scale || []
 
   // Add melodic (arpeggio) scale notes, each in its own staff tick
   let noteNamesWithArpeggio
-  const { items: arpeggioNotes, mainNoteIndex } = scaleModifier.pattern
+  const { items: arpeggioNotes } = scaleModifier.pattern
   noteNamesWithArpeggio = arpeggioNotes.map(({ note, muted }) => {
     if (muted) {
       return undefined
     }
-    const interval = note ? chordIntervals[note - 1] || '1P' : '1P'
-    return transpose(baseNote.noteName, interval)
+    const semitonesCount = note ? semitones[note - 1] || 0 : 0
+    return getSemitonesTransposer(semitonesCount)(baseNote.noteName)
   })
 
   const ticksWithArpeggioNotes = noteNamesWithArpeggio.map(
-    (noteName, index) =>
-      ({
+    (noteName, index) => {
+      return {
         noteCardId: tickWithBaseNote.noteCardId,
         id: uuid(),
         notes: noteName
           ? [
               {
                 noteName,
+                isMainNote: false,
                 id: uuid(),
                 midi: tonal.Note.midi(noteName),
-                isMainNote: mainNoteIndex === index,
-                color: 'black',
+                color:
+                  tonal.Note.pc(noteName) === tonal.Note.pc(baseNote.noteName)
+                    ? baseNote.color
+                    : 'black',
               } as StaffNote,
             ]
           : [],
-      } as StaffTick),
+      } as StaffTick
+    },
   )
 
   const ticksUpdated = [...ticks]

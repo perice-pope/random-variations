@@ -1,16 +1,16 @@
 [
   {
-    "name": "Power Chord",
+    "name": "power chord",
     "symbol": "5",
     "notes": "C G",
     "semitones": [
       0,
       7
     ],
-    "category": "DYAD"
+    "category": "dyad"
   },
   {
-    "name": "Major Triad",
+    "name": "major triad",
     "symbol": "maj",
     "notes": "C E G",
     "semitones": [
@@ -18,10 +18,10 @@
       4,
       7
     ],
-    "category": "TRIADS"
+    "category": "triads"
   },
   {
-    "name": "Augmented Triad",
+    "name": "augmented triad",
     "symbol": "+",
     "notes": "C E G#",
     "semitones": [
@@ -29,10 +29,10 @@
       4,
       8
     ],
-    "category": "TRIADS"
+    "category": "triads"
   },
   {
-    "name": "Major (b5) Triad",
+    "name": "major b 5 triad",
     "symbol": "maj (b5)",
     "notes": "C E Gb",
     "semitones": [
@@ -40,10 +40,10 @@
       4,
       6
     ],
-    "category": "TRIADS"
+    "category": "triads"
   },
   {
-    "name": "Suspended 4 Triad",
+    "name": "suspended 4 triad",
     "symbol": "sus",
     "notes": "C F G",
     "semitones": [
@@ -51,10 +51,10 @@
       5,
       7
     ],
-    "category": "TRIADS"
+    "category": "triads"
   },
   {
-    "name": "Suspended 2 Triad",
+    "name": "suspended 2 triad",
     "symbol": "sus2",
     "notes": "C D G",
     "semitones": [
@@ -62,10 +62,10 @@
       2,
       7
     ],
-    "category": "TRIADS"
+    "category": "triads"
   },
   {
-    "name": "Minor Triad",
+    "name": "minor triad",
     "symbol": "-",
     "notes": "C Eb G",
     "semitones": [
@@ -73,10 +73,10 @@
       3,
       7
     ],
-    "category": "TRIADS"
+    "category": "triads"
   },
   {
-    "name": "Minor (#5) Triad",
+    "name": "minor 5 triad",
     "symbol": "- (#5)",
     "notes": "C Eb G#",
     "semitones": [
@@ -84,10 +84,10 @@
       3,
       8
     ],
-    "category": "TRIADS"
+    "category": "triads"
   },
   {
-    "name": "Diminished Triad",
+    "name": "diminished triad",
     "symbol": "°",
     "notes": "C Eb Gb",
     "semitones": [
@@ -95,10 +95,10 @@
       3,
       6
     ],
-    "category": "TRIADS"
+    "category": "triads"
   },
   {
-    "name": "Perfect Perfect Quartal Triad",
+    "name": "perfect perfect quartal triad",
     "symbol": "Q (P4,P4)",
     "notes": "C F Bb",
     "semitones": [
@@ -106,10 +106,10 @@
       5,
       10
     ],
-    "category": "TRIADS"
+    "category": "triads"
   },
   {
-    "name": "Perfect Augmented Quartal Triad",
+    "name": "perfect augmented quartal triad",
     "symbol": "Q (P4,A4)",
     "notes": "C F B",
     "semitones": [
@@ -117,10 +117,10 @@
       5,
       11
     ],
-    "category": "TRIADS"
+    "category": "triads"
   },
   {
-    "name": "Augmented Perfect Quartal Triad",
+    "name": "augmented perfect quartal triad",
     "symbol": "Q (A4,P4)",
     "notes": "C F# B",
     "semitones": [
@@ -128,10 +128,10 @@
       6,
       11
     ],
-    "category": "TRIADS"
+    "category": "triads"
   },
   {
-    "name": "Major Triad add 2",
+    "name": "major triad add 2",
     "symbol": "maj2",
     "notes": "C D E G",
     "semitones": [
@@ -140,10 +140,10 @@
       4,
       7
     ],
-    "category": "TRIAD ADD 2"
+    "category": "triad add 2"
   },
   {
-    "name": "Augemented Triad add 2",
+    "name": "augemented triad add 2",
     "symbol": "+2",
     "notes": "C D E G#",
     "semitones": [
@@ -152,10 +152,10 @@
       4,
       8
     ],
-    "category": "TRIAD ADD 2"
+    "category": "triad add 2"
   },
   {
-    "name": "Suspended 4 Triad add 2",
+    "name": "suspended 4 triad add 2",
     "symbol": "sus2/4",
     "notes": "C D F G",
     "semitones": [
@@ -164,10 +164,10 @@
       5,
       7
     ],
-    "category": "TRIAD ADD 2"
+    "category": "triad add 2"
   },
   {
-    "name": "Minor Triad add 2",
+    "name": "minor triad add 2",
     "symbol": "-2",
     "notes": "C D Eb G",
     "semitones": [
@@ -176,10 +176,10 @@
       3,
       7
     ],
-    "category": "TRIAD ADD 2"
+    "category": "triad add 2"
   },
   {
-    "name": "Diminished Triad add 2",
+    "name": "diminished triad add 2",
     "symbol": "°2",
     "notes": "C D Eb Gb",
     "semitones": [
@@ -188,10 +188,10 @@
       3,
       6
     ],
-    "category": "TRIAD ADD 2"
+    "category": "triad add 2"
   },
   {
-    "name": "Major (b5) Triad add 2",
+    "name": "major b 5 triad add 2",
     "symbol": "maj2 (b5)",
     "notes": "C D E Gb",
     "semitones": [
@@ -200,10 +200,10 @@
       4,
       6
     ],
-    "category": "TRIAD ADD 2"
+    "category": "triad add 2"
   },
   {
-    "name": "Major Triad add b2",
+    "name": "major triad add b 2",
     "symbol": "maj (b2)",
     "notes": "C Db E G",
     "semitones": [
@@ -212,10 +212,10 @@
       4,
       7
     ],
-    "category": "TRIAD ADD 2"
+    "category": "triad add 2"
   },
   {
-    "name": "Augemented add b2",
+    "name": "augemented add b 2",
     "symbol": "+ (b2)",
     "notes": "C Db E G#",
     "semitones": [
@@ -224,10 +224,10 @@
       4,
       8
     ],
-    "category": "TRIAD ADD 2"
+    "category": "triad add 2"
   },
   {
-    "name": "Suspended 4 Triad add b2",
+    "name": "suspended 4 triad add b 2",
     "symbol": "sus (b2)",
     "notes": "C Db F G",
     "semitones": [
@@ -236,10 +236,10 @@
       5,
       7
     ],
-    "category": "TRIAD ADD 2"
+    "category": "triad add 2"
   },
   {
-    "name": "Minor Triad add b2",
+    "name": "minor triad add b 2",
     "symbol": "- (b2)",
     "notes": "C Db Eb G",
     "semitones": [
@@ -248,10 +248,10 @@
       3,
       7
     ],
-    "category": "TRIAD ADD 2"
+    "category": "triad add 2"
   },
   {
-    "name": "Diminished Triad add b2",
+    "name": "diminished triad add b 2",
     "symbol": "° (b2)",
     "notes": "C Db Eb Gb",
     "semitones": [
@@ -260,10 +260,10 @@
       3,
       6
     ],
-    "category": "TRIAD ADD 2"
+    "category": "triad add 2"
   },
   {
-    "name": "Major (b5) Triad add b2",
+    "name": "major b 5 triad add b 2",
     "symbol": "maj (b5,b2)",
     "notes": "C Db E Gb",
     "semitones": [
@@ -272,10 +272,10 @@
       4,
       6
     ],
-    "category": "TRIAD ADD 2"
+    "category": "triad add 2"
   },
   {
-    "name": "Major Triad add #2",
+    "name": "major triad add 2",
     "symbol": "maj (#2)",
     "notes": "C D# E G",
     "semitones": [
@@ -284,10 +284,10 @@
       4,
       7
     ],
-    "category": "TRIAD ADD 2"
+    "category": "triad add 2"
   },
   {
-    "name": "Augemented Triad add #2",
+    "name": "augemented triad add 2",
     "symbol": "+ (#2)",
     "notes": "C D# E G#",
     "semitones": [
@@ -296,10 +296,10 @@
       4,
       8
     ],
-    "category": "TRIAD ADD 2"
+    "category": "triad add 2"
   },
   {
-    "name": "Major (b5) Triad add #2",
+    "name": "major b 5 triad add 2",
     "symbol": "maj (b5,#2)",
     "notes": "C D# E Gb",
     "semitones": [
@@ -308,10 +308,10 @@
       4,
       6
     ],
-    "category": "TRIAD ADD 2"
+    "category": "triad add 2"
   },
   {
-    "name": "Major 6",
+    "name": "major 6",
     "symbol": "6",
     "notes": "C E G A",
     "semitones": [
@@ -323,7 +323,7 @@
     "category": "7th"
   },
   {
-    "name": "Major 7",
+    "name": "major 7",
     "symbol": "∆7",
     "notes": "C E G B",
     "semitones": [
@@ -335,7 +335,7 @@
     "category": "7th"
   },
   {
-    "name": "Major 7 add 6",
+    "name": "major 7 add 6",
     "symbol": "∆6/7",
     "notes": "C E G A B",
     "semitones": [
@@ -348,7 +348,7 @@
     "category": "7th"
   },
   {
-    "name": "Major 7 #5",
+    "name": "major 7 5",
     "symbol": "∆7(#5)",
     "notes": "C E G# B",
     "semitones": [
@@ -360,7 +360,7 @@
     "category": "7th"
   },
   {
-    "name": "Major 7 b5",
+    "name": "major 7 b 5",
     "symbol": "∆7(b5)",
     "notes": "C E Gb B",
     "semitones": [
@@ -372,7 +372,7 @@
     "category": "7th"
   },
   {
-    "name": "Major 7 suspended 4",
+    "name": "major 7 suspended 4",
     "symbol": "∆7(sus4)",
     "notes": "C F G B",
     "semitones": [
@@ -384,7 +384,7 @@
     "category": "7th"
   },
   {
-    "name": "Dominant 7",
+    "name": "dominant 7",
     "symbol": "7",
     "notes": "C E G Bb",
     "semitones": [
@@ -396,7 +396,7 @@
     "category": "7th"
   },
   {
-    "name": "Dominant 7 add 6",
+    "name": "dominant 7 add 6",
     "symbol": "7/6",
     "notes": "C E G A Bb",
     "semitones": [
@@ -409,7 +409,7 @@
     "category": "7th"
   },
   {
-    "name": "Dominant 7(#5)",
+    "name": "dominant 7 5",
     "symbol": "+7 or 7(#5)",
     "notes": "C E G# Bb",
     "semitones": [
@@ -421,7 +421,7 @@
     "category": "7th"
   },
   {
-    "name": "Dominant 7(b5)",
+    "name": "dominant 7 b 5",
     "symbol": "7(b5)",
     "notes": "C E Gb Bb",
     "semitones": [
@@ -433,7 +433,7 @@
     "category": "7th"
   },
   {
-    "name": "Dominant 7 (#5,b5)",
+    "name": "dominant 7 5 b 5",
     "symbol": "7 (#5,b5)",
     "notes": "C E Gb G# Bb",
     "semitones": [
@@ -446,7 +446,7 @@
     "category": "7th"
   },
   {
-    "name": "Dominant 7 suspended 4",
+    "name": "dominant 7 suspended 4",
     "symbol": "7sus",
     "notes": "C F G Bb",
     "semitones": [
@@ -458,7 +458,7 @@
     "category": "7th"
   },
   {
-    "name": "Minor 6",
+    "name": "minor 6",
     "symbol": "-6",
     "notes": "C Eb G A",
     "semitones": [
@@ -470,7 +470,7 @@
     "category": "7th"
   },
   {
-    "name": "Minor 7",
+    "name": "minor 7",
     "symbol": "-7",
     "notes": "C Eb G Bb",
     "semitones": [
@@ -482,7 +482,7 @@
     "category": "7th"
   },
   {
-    "name": "Minor 7  add 6",
+    "name": "minor 7 add 6",
     "symbol": "-6/7",
     "notes": "C Eb G A Bb",
     "semitones": [
@@ -495,7 +495,7 @@
     "category": "7th"
   },
   {
-    "name": "Minor 7 (#5)",
+    "name": "minor 7 5",
     "symbol": "-7 (#5)",
     "notes": "C Eb G# Bb",
     "semitones": [
@@ -507,7 +507,7 @@
     "category": "7th"
   },
   {
-    "name": "Minor 7 (b5) or Half-Diminished",
+    "name": "minor 7 b 5 or half diminished",
     "symbol": "-7 (b5) or ø7",
     "notes": "C Eb Gb Bb",
     "semitones": [
@@ -519,7 +519,7 @@
     "category": "7th"
   },
   {
-    "name": "Minor (major7)",
+    "name": "minor major 7",
     "symbol": "- (∆7)",
     "notes": "C Eb G B",
     "semitones": [
@@ -531,7 +531,7 @@
     "category": "7th"
   },
   {
-    "name": "Minor  6 (major7)",
+    "name": "minor 6 major 7",
     "symbol": "- 6 (∆7)",
     "notes": "C Eb G A B",
     "semitones": [
@@ -544,7 +544,7 @@
     "category": "7th"
   },
   {
-    "name": "Minor (major7,#5)",
+    "name": "minor major 7 5",
     "symbol": "- (∆7,#5)",
     "notes": "C Eb G# B",
     "semitones": [
@@ -556,7 +556,7 @@
     "category": "7th"
   },
   {
-    "name": "Diminished (major7)",
+    "name": "diminished major 7",
     "symbol": "° (∆7)",
     "notes": "C Eb Gb B",
     "semitones": [
@@ -568,7 +568,7 @@
     "category": "7th"
   },
   {
-    "name": "Diminished 7",
+    "name": "diminished 7",
     "symbol": "°7",
     "notes": "C Eb Gb Bbb",
     "semitones": [
@@ -580,7 +580,7 @@
     "category": "7th"
   },
   {
-    "name": "Diminished  (major7,diminished7)",
+    "name": "diminished major 7 diminished 7",
     "symbol": "° (∆7,bb7)",
     "notes": "C Eb Gb Bbb B",
     "semitones": [
@@ -593,7 +593,7 @@
     "category": "7th"
   },
   {
-    "name": "Quartal up to b10",
+    "name": "quartal up to b 10",
     "symbol": "Q (P4,P4,P4)",
     "notes": "C F Bb Eb",
     "semitones": [
@@ -605,7 +605,7 @@
     "category": "7th"
   },
   {
-    "name": "Major 6 add 9",
+    "name": "major 6 add 9",
     "symbol": "6/9",
     "notes": "C E G A D",
     "semitones": [
@@ -618,7 +618,7 @@
     "category": "9th"
   },
   {
-    "name": "Major 6 (b9)",
+    "name": "major 6 b 9",
     "symbol": "6 (b9)",
     "notes": "C E G A Db",
     "semitones": [
@@ -631,7 +631,7 @@
     "category": "9th"
   },
   {
-    "name": "Major 6 (#9)",
+    "name": "major 6 9",
     "symbol": "6 (#9)",
     "notes": "C E G A D#",
     "semitones": [
@@ -644,7 +644,7 @@
     "category": "9th"
   },
   {
-    "name": "Major 9",
+    "name": "major 9",
     "symbol": "∆9",
     "notes": "C E G B D",
     "semitones": [
@@ -657,7 +657,7 @@
     "category": "9th"
   },
   {
-    "name": "Major 9 (#5)",
+    "name": "major 9 5",
     "symbol": "∆9 (#5)",
     "notes": "C E G# B D",
     "semitones": [
@@ -670,7 +670,7 @@
     "category": "9th"
   },
   {
-    "name": "Major 9 (b5)",
+    "name": "major 9 b 5",
     "symbol": "∆9 (b5)",
     "notes": "C E Gb B D",
     "semitones": [
@@ -683,7 +683,7 @@
     "category": "9th"
   },
   {
-    "name": "Major 7 (b9)",
+    "name": "major 7 b 9",
     "symbol": "∆7 (b9)",
     "notes": "C E G B Db",
     "semitones": [
@@ -696,7 +696,7 @@
     "category": "9th"
   },
   {
-    "name": "Major 7 (#9)",
+    "name": "major 7 9",
     "symbol": "∆7 (#9)",
     "notes": "C E G B D#",
     "semitones": [
@@ -709,7 +709,7 @@
     "category": "9th"
   },
   {
-    "name": "Major 7 (b9,#5)",
+    "name": "major 7 b 9 5",
     "symbol": "∆7 (b9,#5)",
     "notes": "C E G# B Db",
     "semitones": [
@@ -722,7 +722,7 @@
     "category": "9th"
   },
   {
-    "name": "Major 7 (b5,9)",
+    "name": "major 7 b 5 9",
     "symbol": "∆7 (b5,9)",
     "notes": "C E Gb B Db",
     "semitones": [
@@ -735,7 +735,7 @@
     "category": "9th"
   },
   {
-    "name": "Major 7 (#9,#5)",
+    "name": "major 7 9 5",
     "symbol": "∆7 (#9,#5)",
     "notes": "C E G# B D#",
     "semitones": [
@@ -748,7 +748,7 @@
     "category": "9th"
   },
   {
-    "name": "Major 7 (#9, b9)",
+    "name": "major 7 9 b 9",
     "symbol": "∆7 (#9, b9)",
     "notes": "C E Gb B D#",
     "semitones": [
@@ -761,7 +761,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 9",
+    "name": "dominant 9",
     "symbol": "9",
     "notes": "C E G Bb D",
     "semitones": [
@@ -774,7 +774,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 9 suspended 4",
+    "name": "dominant 9 suspended 4",
     "symbol": "9sus",
     "notes": "C F G Bb D",
     "semitones": [
@@ -787,7 +787,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 9 (#5)",
+    "name": "dominant 9 5",
     "symbol": "9 (#5)",
     "notes": "C E G# Bb D",
     "semitones": [
@@ -800,7 +800,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 9 (b5)",
+    "name": "dominant 9 b 5",
     "symbol": "9 (b5)",
     "notes": "C E Gb Bb D",
     "semitones": [
@@ -813,7 +813,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 9 (#5,b5)",
+    "name": "dominant 9 5 b 5",
     "symbol": "9 (#5,b5)",
     "notes": "C E Gb G# Bb D",
     "semitones": [
@@ -827,7 +827,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 7 (b9)",
+    "name": "dominant 7 b 9",
     "symbol": "7 (b9)",
     "notes": "C E G Bb Db",
     "semitones": [
@@ -840,7 +840,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 7 suspended 4 (b9)",
+    "name": "dominant 7 suspended 4 b 9",
     "symbol": "7sus (b9)",
     "notes": "C F G Bb Db",
     "semitones": [
@@ -853,7 +853,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 7 (b9,#5)",
+    "name": "dominant 7 b 9 5",
     "symbol": "7 (b9,#5)",
     "notes": "C E G# Bb Db",
     "semitones": [
@@ -866,7 +866,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 7 (b9,b5)",
+    "name": "dominant 7 b 9 b 5",
     "symbol": "7 (b9,b5)",
     "notes": "C E Gb Bb Db",
     "semitones": [
@@ -879,7 +879,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 7 (b9,#5,b9)",
+    "name": "dominant 7 b 9 5 b 9",
     "symbol": "7 (b9,#5,b9)",
     "notes": "C E Gb G# Bb Db",
     "semitones": [
@@ -893,7 +893,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 7 (#9)",
+    "name": "dominant 7 9",
     "symbol": "7 (#9)",
     "notes": "C E G Bb D#",
     "semitones": [
@@ -906,7 +906,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 7 (#9,#5)",
+    "name": "dominant 7 9 5",
     "symbol": "7 (#9,#5)",
     "notes": "C E G# Bb D#",
     "semitones": [
@@ -919,7 +919,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 7 (#9,b5)",
+    "name": "dominant 7 9 b 5",
     "symbol": "7 (#9,b5)",
     "notes": "C E Gb Bb D#",
     "semitones": [
@@ -932,7 +932,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 7 (#9,#5,b9)",
+    "name": "dominant 7 9 5 b 9",
     "symbol": "7 (#9,#5,b9)",
     "notes": "C E Gb G# Bb D#",
     "semitones": [
@@ -946,7 +946,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 7 (#9,b9)",
+    "name": "dominant 7 9 b 9",
     "symbol": "7 (#9,b9)",
     "notes": "C E G Bb Db D#",
     "semitones": [
@@ -960,7 +960,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 7 (#9,b9,#5)",
+    "name": "dominant 7 9 b 9 5",
     "symbol": "7 (#9,b9,#5)",
     "notes": "C E G# Bb Db D#",
     "semitones": [
@@ -974,7 +974,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 7 (#9,b9,b5)",
+    "name": "dominant 7 9 b 9 b 5",
     "symbol": "7 (#9,b9,b5)",
     "notes": "C E Gb Bb Db D#",
     "semitones": [
@@ -988,7 +988,7 @@
     "category": "9th"
   },
   {
-    "name": "Dominant 7 (#9,b9,#5,b5) or \"Dominant 7 altered\"",
+    "name": "dominant 7 9 b 9 5 b 5 or dominant 7 altered",
     "symbol": "7 (#9,b9,#5,b5) or \"7alt\"",
     "notes": "C E Gb G# Bb Db D#",
     "semitones": [
@@ -1003,7 +1003,7 @@
     "category": "9th"
   },
   {
-    "name": "Minor 6 add 9",
+    "name": "minor 6 add 9",
     "symbol": "-6/9",
     "notes": "C Eb G A D",
     "semitones": [
@@ -1016,7 +1016,7 @@
     "category": "9th"
   },
   {
-    "name": "Minor 9 (major7)",
+    "name": "minor 9 major 7",
     "symbol": "-9 (∆7)",
     "notes": "C Eb G B D",
     "semitones": [
@@ -1029,7 +1029,7 @@
     "category": "9th"
   },
   {
-    "name": "Minor 6 add 9 (major7)",
+    "name": "minor 6 add 9 major 7",
     "symbol": "-6/9 (∆7)",
     "notes": "C Eb G A B D",
     "semitones": [
@@ -1043,7 +1043,7 @@
     "category": "9th"
   },
   {
-    "name": "Minor 9 (major7,#5)",
+    "name": "minor 9 major 7 5",
     "symbol": "-9 (∆7,#5)",
     "notes": "C Eb G# B D",
     "semitones": [
@@ -1056,7 +1056,7 @@
     "category": "9th"
   },
   {
-    "name": "Minor 6 (b9)",
+    "name": "minor 6 b 9",
     "symbol": "-6 (b9)",
     "notes": "C Eb G A Db",
     "semitones": [
@@ -1069,7 +1069,7 @@
     "category": "9th"
   },
   {
-    "name": "Minor  (b9,major7)",
+    "name": "minor b 9 major 7",
     "symbol": "- (b9,∆7)",
     "notes": "C Eb G B Db",
     "semitones": [
@@ -1082,7 +1082,7 @@
     "category": "9th"
   },
   {
-    "name": "Minor (b9,major7,#5)",
+    "name": "minor b 9 major 7 5",
     "symbol": "- (b9,∆7,#5)",
     "notes": "C Eb G# B Db",
     "semitones": [
@@ -1095,7 +1095,7 @@
     "category": "9th"
   },
   {
-    "name": "Minor 9",
+    "name": "minor 9",
     "symbol": "-9",
     "notes": "C Eb G Bb D",
     "semitones": [
@@ -1108,7 +1108,7 @@
     "category": "9th"
   },
   {
-    "name": "Minor 9 (#5) or \"church\"",
+    "name": "minor 9 5 or church",
     "symbol": "-9 (#5) or \"church\"",
     "notes": "C Eb G# Bb D",
     "semitones": [
@@ -1121,7 +1121,7 @@
     "category": "9th"
   },
   {
-    "name": "Minor 9 (b5)",
+    "name": "minor 9 b 5",
     "symbol": "-9 (b5)",
     "notes": "C Eb Gb Bb D",
     "semitones": [
@@ -1134,7 +1134,7 @@
     "category": "9th"
   },
   {
-    "name": "Minor 7 (b9)",
+    "name": "minor 7 b 9",
     "symbol": "-7 (b9)",
     "notes": "C Eb G Bb Db",
     "semitones": [
@@ -1147,7 +1147,7 @@
     "category": "9th"
   },
   {
-    "name": "Minor 7 (b9,#5)",
+    "name": "minor 7 b 9 5",
     "symbol": "-7 (b9,#5)",
     "notes": "C Eb G# Bb Db",
     "semitones": [
@@ -1160,7 +1160,7 @@
     "category": "9th"
   },
   {
-    "name": "Minor 7 (b9,b5)",
+    "name": "minor 7 b 9 b 5",
     "symbol": "-7 (b9,b5)",
     "notes": "C Eb Gb Bb Db",
     "semitones": [
@@ -1173,7 +1173,7 @@
     "category": "9th"
   },
   {
-    "name": "Diminished 9",
+    "name": "diminished 9",
     "symbol": "°9",
     "notes": "C Eb Gb Bbb D",
     "semitones": [
@@ -1186,7 +1186,7 @@
     "category": "9th"
   },
   {
-    "name": "Diminished 9 (major7,diminished7)",
+    "name": "diminished 9 major 7 diminished 7",
     "symbol": "°9 (∆7,bb7)",
     "notes": "C Eb Gb Bbb B D",
     "semitones": [
@@ -1200,7 +1200,7 @@
     "category": "9th"
   },
   {
-    "name": "Diminished 9 (major7)",
+    "name": "diminished 9 major 7",
     "symbol": "°9 (∆7)",
     "notes": "C Eb Gb B D",
     "semitones": [
@@ -1213,7 +1213,7 @@
     "category": "9th"
   },
   {
-    "name": "Diminished 7 (b9)",
+    "name": "diminished 7 b 9",
     "symbol": "°7 (b9)",
     "notes": "C Eb Gb Bbb Db",
     "semitones": [
@@ -1226,7 +1226,7 @@
     "category": "9th"
   },
   {
-    "name": "Diminished (b9,major7)",
+    "name": "diminished b 9 major 7",
     "symbol": "° (b9,∆7)",
     "notes": "C Eb Gb B Db",
     "semitones": [
@@ -1239,7 +1239,7 @@
     "category": "9th"
   },
   {
-    "name": "Diminished  (b9,major7,diminished7)",
+    "name": "diminished b 9 major 7 diminished 7",
     "symbol": "° (b9,∆7,bb7)",
     "notes": "C Eb Gb Bbb B Db",
     "semitones": [
@@ -1253,7 +1253,7 @@
     "category": "9th"
   },
   {
-    "name": "Major 9 (#11)",
+    "name": "major 9 11",
     "symbol": "∆9 (#11)",
     "notes": "C E G B D F#",
     "semitones": [
@@ -1264,10 +1264,10 @@
       14,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Major 9 (#11,#5)",
+    "name": "major 9 11 5",
     "symbol": "∆9 (#11,#5)",
     "notes": "C E G# B D F#",
     "semitones": [
@@ -1278,10 +1278,10 @@
       14,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Major 7 (#11,b9)",
+    "name": "major 7 11 b 9",
     "symbol": "∆7 (#11,b9)",
     "notes": "C E G B Db F#",
     "semitones": [
@@ -1292,10 +1292,10 @@
       13,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Major 7 (#11,#9)",
+    "name": "major 7 11 9",
     "symbol": "∆7 (#11,#9)",
     "notes": "C E G B D# F#",
     "semitones": [
@@ -1306,10 +1306,10 @@
       15,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Major 7 (#11,#9,b9)",
+    "name": "major 7 11 9 b 9",
     "symbol": "∆7 (#11,#9,b9)",
     "notes": "C E G B Db D# F#",
     "semitones": [
@@ -1321,10 +1321,10 @@
       3,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Major 7 (#11,b9,#5)",
+    "name": "major 7 11 b 9 5",
     "symbol": "∆7 (#11,b9,#5)",
     "notes": "C E G# B Db F#",
     "semitones": [
@@ -1335,10 +1335,10 @@
       13,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Major 7 (#11,#9,#5)",
+    "name": "major 7 11 9 5",
     "symbol": "∆7 (#11,#9,#5)",
     "notes": "C E G# B D# F#",
     "semitones": [
@@ -1349,10 +1349,10 @@
       15,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Major 7 (#11,#9,b9,#5)",
+    "name": "major 7 11 9 b 9 5",
     "symbol": "∆7 (#11,#9,b9,#5)",
     "notes": "C E G# B Db D# F#",
     "semitones": [
@@ -1364,10 +1364,10 @@
       3,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 11",
+    "name": "dominant 11",
     "symbol": "11",
     "notes": "C E G Bb D F",
     "semitones": [
@@ -1378,10 +1378,10 @@
       14,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 11 (#5)",
+    "name": "dominant 11 5",
     "symbol": "11 (#5)",
     "notes": "C E G# Bb D F",
     "semitones": [
@@ -1392,10 +1392,10 @@
       14,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 11 (b5)",
+    "name": "dominant 11 b 5",
     "symbol": "11 (b5)",
     "notes": "C E Gb Bb D F",
     "semitones": [
@@ -1406,10 +1406,10 @@
       14,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 11 (#5,b5)",
+    "name": "dominant 11 5 b 5",
     "symbol": "11 (#5,b5)",
     "notes": "C E Gb G# Bb D F",
     "semitones": [
@@ -1421,10 +1421,10 @@
       14,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 11 (b9)",
+    "name": "dominant 11 b 9",
     "symbol": "11 (b9)",
     "notes": "C E G Bb Db F",
     "semitones": [
@@ -1435,10 +1435,10 @@
       13,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 11 (#9)",
+    "name": "dominant 11 9",
     "symbol": "11 (#9)",
     "notes": "C E G Bb D# F",
     "semitones": [
@@ -1449,10 +1449,10 @@
       15,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 11 (#9,b9)",
+    "name": "dominant 11 9 b 9",
     "symbol": "11 (#9,b9)",
     "notes": "C E G Bb Db D# F",
     "semitones": [
@@ -1464,10 +1464,10 @@
       3,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 11 (b9,b5)",
+    "name": "dominant 11 b 9 b 5",
     "symbol": "11 (b9,b5)",
     "notes": "C E Gb Bb Db F",
     "semitones": [
@@ -1478,10 +1478,10 @@
       13,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 11 (b9.#5)",
+    "name": "dominant 11 b 9 5",
     "symbol": "11 (b9.#5)",
     "notes": "C E G# Bb Db F",
     "semitones": [
@@ -1492,10 +1492,10 @@
       13,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 11 (#9,b5)",
+    "name": "dominant 11 9 b 5",
     "symbol": "11 (#9,b5)",
     "notes": "C E Gb Bb D# F",
     "semitones": [
@@ -1506,10 +1506,10 @@
       15,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 11 (#9,#5)",
+    "name": "dominant 11 9 5",
     "symbol": "11 (#9,#5)",
     "notes": "C E G# Bb D# F",
     "semitones": [
@@ -1520,10 +1520,10 @@
       15,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 11 (#9,b9,b5)",
+    "name": "dominant 11 9 b 9 b 5",
     "symbol": "11 (#9,b9,b5)",
     "notes": "C E Gb Bb Db D# F",
     "semitones": [
@@ -1535,10 +1535,10 @@
       3,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 11 (#9,b9,#5)",
+    "name": "dominant 11 9 b 9 5",
     "symbol": "11 (#9,b9,#5)",
     "notes": "C E G# Bb Db D# F",
     "semitones": [
@@ -1550,10 +1550,10 @@
       3,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 9 (#11)",
+    "name": "dominant 9 11",
     "symbol": "9 (#11)",
     "notes": "C E G Bb D F#",
     "semitones": [
@@ -1564,10 +1564,10 @@
       14,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 9 (#11,#5)",
+    "name": "dominant 9 11 5",
     "symbol": "9 (#11,#5)",
     "notes": "C E G# Bb D F#",
     "semitones": [
@@ -1578,10 +1578,10 @@
       14,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 7 (#11,b9)",
+    "name": "dominant 7 11 b 9",
     "symbol": "7 (#11,b9)",
     "notes": "C E G Bb Db F#",
     "semitones": [
@@ -1592,10 +1592,10 @@
       13,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 7 (#11,#9)",
+    "name": "dominant 7 11 9",
     "symbol": "7 (#11,#9)",
     "notes": "C E G Bb D# F#",
     "semitones": [
@@ -1606,10 +1606,10 @@
       15,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 7 (#11,#9,b9)",
+    "name": "dominant 7 11 9 b 9",
     "symbol": "7 (#11,#9,b9)",
     "notes": "C E G Bb Db D# F#",
     "semitones": [
@@ -1621,10 +1621,10 @@
       3,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 7 (#11,b9,#5)",
+    "name": "dominant 7 11 b 9 5",
     "symbol": "7 (#11,b9,#5)",
     "notes": "C E G# Bb Db F#",
     "semitones": [
@@ -1635,10 +1635,10 @@
       13,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 7 (#11,#9,#5)",
+    "name": "dominant 7 11 9 5",
     "symbol": "7 (#11,#9,#5)",
     "notes": "C E G# Bb D# F#",
     "semitones": [
@@ -1649,10 +1649,10 @@
       15,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Dominant 7 (#11,#9,b9,#5)",
+    "name": "dominant 7 11 9 b 9 5",
     "symbol": "7 (#11,#9,b9,#5)",
     "notes": "C E G# Bb Db D# F#",
     "semitones": [
@@ -1664,10 +1664,10 @@
       3,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor 11 (major7)",
+    "name": "minor 11 major 7",
     "symbol": "-11 (∆7)",
     "notes": "C Eb G B D F",
     "semitones": [
@@ -1678,10 +1678,10 @@
       14,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor 11 (major7,#5)",
+    "name": "minor 11 major 7 5",
     "symbol": "-11 (∆7,#5)",
     "notes": "C Eb G# B D F",
     "semitones": [
@@ -1692,10 +1692,10 @@
       14,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor 11 (b9,major7)",
+    "name": "minor 11 b 9 major 7",
     "symbol": "-11 (b9,∆7)",
     "notes": "C Eb G B Db F",
     "semitones": [
@@ -1706,10 +1706,10 @@
       13,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor 11 (b9,major7,#5)",
+    "name": "minor 11 b 9 major 7 5",
     "symbol": "-11 (b9,∆7,#5)",
     "notes": "C Eb G# B Db F",
     "semitones": [
@@ -1720,10 +1720,10 @@
       13,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor 9 (#11,major7)",
+    "name": "minor 9 11 major 7",
     "symbol": "-9 (#11,∆7)",
     "notes": "C Eb G B D F#",
     "semitones": [
@@ -1734,10 +1734,10 @@
       14,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor 9 (#11,major7,#5)",
+    "name": "minor 9 11 major 7 5",
     "symbol": "-9 (#11,∆7,#5)",
     "notes": "C Eb G# B D F#",
     "semitones": [
@@ -1748,10 +1748,10 @@
       14,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor  (#11,b9,major7)",
+    "name": "minor 11 b 9 major 7",
     "symbol": "- (#11,b9,∆7)",
     "notes": "C Eb G B Db F#",
     "semitones": [
@@ -1762,10 +1762,10 @@
       13,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor  (#11,b9,#5)",
+    "name": "minor 11 b 9 5",
     "symbol": "- (#11,b9,#5)",
     "notes": "C Eb G# B Db F#",
     "semitones": [
@@ -1776,10 +1776,10 @@
       13,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor 11",
+    "name": "minor 11",
     "symbol": "-11",
     "notes": "C Eb G Bb D F",
     "semitones": [
@@ -1790,10 +1790,10 @@
       14,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor 11 (#5)",
+    "name": "minor 11 5",
     "symbol": "-11 (#5)",
     "notes": "C Eb G# Bb D F",
     "semitones": [
@@ -1804,10 +1804,10 @@
       14,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor 11 (b5)",
+    "name": "minor 11 b 5",
     "symbol": "-11 (b5)",
     "notes": "C Eb Gb Bb D F",
     "semitones": [
@@ -1818,10 +1818,10 @@
       14,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor 11 (b9)",
+    "name": "minor 11 b 9",
     "symbol": "-11 (b9)",
     "notes": "C Eb G Bb Db F",
     "semitones": [
@@ -1832,10 +1832,10 @@
       13,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor 11 (b9,b5)",
+    "name": "minor 11 b 9 b 5",
     "symbol": "-11 (b9,b5)",
     "notes": "C Eb Gb Bb Db F",
     "semitones": [
@@ -1846,10 +1846,10 @@
       13,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor 11 (b9,#5)",
+    "name": "minor 11 b 9 5",
     "symbol": "-11 (b9,#5)",
     "notes": "C Eb G# Bb Db F",
     "semitones": [
@@ -1860,10 +1860,10 @@
       13,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor 9 (#11)",
+    "name": "minor 9 11",
     "symbol": "-9 (#11)",
     "notes": "C Eb G Bb D F#",
     "semitones": [
@@ -1874,10 +1874,10 @@
       14,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor 9 (#11,#5)",
+    "name": "minor 9 11 5",
     "symbol": "-9 (#11,#5)",
     "notes": "C Eb G# Bb D F#",
     "semitones": [
@@ -1888,10 +1888,10 @@
       14,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor 7 (#11,b9)",
+    "name": "minor 7 11 b 9",
     "symbol": "-7 (#11,b9)",
     "notes": "C Eb G Bb Db F#",
     "semitones": [
@@ -1902,10 +1902,10 @@
       13,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Minor 7 (#11,b9,#5)",
+    "name": "minor 7 11 b 9 5",
     "symbol": "-7 (#11,b9,#5)",
     "notes": "C Eb G# Bb Db F#",
     "semitones": [
@@ -1916,10 +1916,10 @@
       13,
       6
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Diminished 11",
+    "name": "diminished 11",
     "symbol": "°11",
     "notes": "C Eb Gb Bbb D F",
     "semitones": [
@@ -1930,10 +1930,10 @@
       14,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Diminished 11 (major7)",
+    "name": "diminished 11 major 7",
     "symbol": "°11 (∆7)",
     "notes": "C Eb Gb B D F",
     "semitones": [
@@ -1944,10 +1944,10 @@
       14,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Diminished 11 (b9,major7)",
+    "name": "diminished 11 b 9 major 7",
     "symbol": "°11 (b9,∆7)",
     "notes": "C Eb Gb B Db F",
     "semitones": [
@@ -1958,10 +1958,10 @@
       13,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Diminished 11 (major7,diminished7)",
+    "name": "diminished 11 major 7 diminished 7",
     "symbol": "°11 (∆7,bb7)",
     "notes": "C Eb Gb Bbb B D F",
     "semitones": [
@@ -1973,10 +1973,10 @@
       14,
       5
     ],
-    "category": "11th"
+    "category": "11 th"
   },
   {
-    "name": "Diminished 11 (b9)",
+    "name": "diminished 11 b 9",
     "symbol": "°11 (b9)",
     "notes": "C Eb Gb Bbb Db F",
     "semitones": [
@@ -1990,7 +1990,7 @@
     "category": ""
   },
   {
-    "name": "Diminished 11 (b9,major7,diminished7)",
+    "name": "diminished 11 b 9 major 7 diminished 7",
     "symbol": "°11 (b9,∆7,bb7)",
     "notes": "C Eb Gb Bbb B Db F",
     "semitones": [
@@ -2005,7 +2005,7 @@
     "category": ""
   },
   {
-    "name": "Major 13",
+    "name": "major 13",
     "symbol": "∆13",
     "notes": "C E G B D A",
     "semitones": [
@@ -2016,10 +2016,10 @@
       14,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Major 13 (b9)",
+    "name": "major 13 b 9",
     "symbol": "∆13 (b9)",
     "notes": "C E G B Db A",
     "semitones": [
@@ -2030,10 +2030,10 @@
       13,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Major 13 (#9)",
+    "name": "major 13 9",
     "symbol": "∆13 (#9)",
     "notes": "C E G B D# A",
     "semitones": [
@@ -2044,10 +2044,10 @@
       15,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Major 13 (#9,b9)",
+    "name": "major 13 9 b 9",
     "symbol": "∆13 (#9,b9)",
     "notes": "C E G B Db D# A",
     "semitones": [
@@ -2059,10 +2059,10 @@
       3,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Major 13 (#11)",
+    "name": "major 13 11",
     "symbol": "∆13 (#11)",
     "notes": "C E G B D F# A",
     "semitones": [
@@ -2074,10 +2074,10 @@
       6,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Major 13 (#11,b9)",
+    "name": "major 13 11 b 9",
     "symbol": "∆13 (#11,b9)",
     "notes": "C E G B Db F# A",
     "semitones": [
@@ -2089,10 +2089,10 @@
       6,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Major 13 (#11,#9)",
+    "name": "major 13 11 9",
     "symbol": "∆13 (#11,#9)",
     "notes": "C E G B D# F# A",
     "semitones": [
@@ -2104,10 +2104,10 @@
       6,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Major 13 (#11,#9,b9)",
+    "name": "major 13 11 9 b 9",
     "symbol": "∆13 (#11,#9,b9)",
     "notes": "C E G B Db D# F# A",
     "semitones": [
@@ -2120,10 +2120,10 @@
       6,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Major 9 (b13)",
+    "name": "major 9 b 13",
     "symbol": "∆9 (b13)",
     "notes": "C E G B D Ab",
     "semitones": [
@@ -2134,10 +2134,10 @@
       14,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Major 7 (b13,b9)",
+    "name": "major 7 b 13 b 9",
     "symbol": "∆7 (b13,b9)",
     "notes": "C E G B Db Ab",
     "semitones": [
@@ -2148,10 +2148,10 @@
       13,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Major 11 (b13,b9)",
+    "name": "major 11 b 13 b 9",
     "symbol": "∆11 (b13,b9)",
     "notes": "C E G B Db F Ab",
     "semitones": [
@@ -2166,7 +2166,7 @@
     "category": ""
   },
   {
-    "name": "Major 7 (b13,#9)",
+    "name": "major 7 b 13 9",
     "symbol": "∆7 (b13,#9)",
     "notes": "C E G B D# Ab",
     "semitones": [
@@ -2177,10 +2177,10 @@
       15,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Major 7 (b13,#9,b9)",
+    "name": "major 7 b 13 9 b 9",
     "symbol": "∆7 (b13,#9,b9)",
     "notes": "C E G B Db D# Ab",
     "semitones": [
@@ -2192,10 +2192,10 @@
       3,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Major 9 (b13,#11)",
+    "name": "major 9 b 13 11",
     "symbol": "∆9 (b13,#11)",
     "notes": "C E G B D F# Ab",
     "semitones": [
@@ -2207,10 +2207,10 @@
       6,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Major 7 (b13,#11,b9)",
+    "name": "major 7 b 13 11 b 9",
     "symbol": "∆7 (b13,#11,b9)",
     "notes": "C E G B Db F# Ab",
     "semitones": [
@@ -2222,10 +2222,10 @@
       6,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Major 7 (b13,#11,#9)",
+    "name": "major 7 b 13 11 9",
     "symbol": "∆7 (b13,#11,#9)",
     "notes": "C E G B D# F# Ab",
     "semitones": [
@@ -2237,10 +2237,10 @@
       6,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Major 7 (b13,#11,#9,b9)",
+    "name": "major 7 b 13 11 9 b 9",
     "symbol": "∆7 (b13,#11,#9,b9)",
     "notes": "C E G B Db D# F# Ab",
     "semitones": [
@@ -2253,10 +2253,10 @@
       6,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 13",
+    "name": "dominant 13",
     "symbol": "13",
     "notes": "C E G Bb D (F) A",
     "semitones": [
@@ -2268,10 +2268,10 @@
       12,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 13 (b9)",
+    "name": "dominant 13 b 9",
     "symbol": "13 (b9)",
     "notes": "C E G Bb Db (F) A",
     "semitones": [
@@ -2283,10 +2283,10 @@
       12,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 13 (#9)",
+    "name": "dominant 13 9",
     "symbol": "13 (#9)",
     "notes": "C E G Bb D# (F) A",
     "semitones": [
@@ -2298,10 +2298,10 @@
       12,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 13 (#9,b9)",
+    "name": "dominant 13 9 b 9",
     "symbol": "13 (#9,b9)",
     "notes": "C E G Bb Db D# (F) A",
     "semitones": [
@@ -2314,10 +2314,10 @@
       12,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 13 (#11)",
+    "name": "dominant 13 11",
     "symbol": "13 (#11)",
     "notes": "C E G Bb D F# A",
     "semitones": [
@@ -2329,10 +2329,10 @@
       6,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 13 (#11,b9)",
+    "name": "dominant 13 11 b 9",
     "symbol": "13 (#11,b9)",
     "notes": "C E G Bb Db F# A",
     "semitones": [
@@ -2344,10 +2344,10 @@
       6,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 13 (#11,#9)",
+    "name": "dominant 13 11 9",
     "symbol": "13 (#11,#9)",
     "notes": "C E G Bb D# F# A",
     "semitones": [
@@ -2359,10 +2359,10 @@
       6,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 13 (#11,#9,b9)",
+    "name": "dominant 13 11 9 b 9",
     "symbol": "13 (#11,#9,b9)",
     "notes": "C E G Bb Db D# F# A",
     "semitones": [
@@ -2375,10 +2375,10 @@
       6,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 13 suspended 4",
+    "name": "dominant 13 suspended 4",
     "symbol": "13sus",
     "notes": "C F G Bb D A",
     "semitones": [
@@ -2389,10 +2389,10 @@
       14,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 13 suspended 4 (b9)",
+    "name": "dominant 13 suspended 4 b 9",
     "symbol": "13sus (b9)",
     "notes": "C E F Bb Db A",
     "semitones": [
@@ -2403,10 +2403,10 @@
       13,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 9 (b13)",
+    "name": "dominant 9 b 13",
     "symbol": "9 (b13)",
     "notes": "C E G Bb D (F) Ab",
     "semitones": [
@@ -2418,10 +2418,10 @@
       12,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 9 (b13,b5)",
+    "name": "dominant 9 b 13 b 5",
     "symbol": "9 (b13,b5)",
     "notes": "C E Gb Bb D (F) Ab",
     "semitones": [
@@ -2433,10 +2433,10 @@
       12,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 7 (b13,b9)",
+    "name": "dominant 7 b 13 b 9",
     "symbol": "7 (b13,b9)",
     "notes": "C E G Bb Db (F) Ab",
     "semitones": [
@@ -2448,10 +2448,10 @@
       12,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 7 (b13,#9)",
+    "name": "dominant 7 b 13 9",
     "symbol": "7 (b13,#9)",
     "notes": "C E G Bb D# (F) Ab",
     "semitones": [
@@ -2463,10 +2463,10 @@
       12,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 7 (b13,#9,b9)",
+    "name": "dominant 7 b 13 9 b 9",
     "symbol": "7 (b13,#9,b9)",
     "notes": "C E G Bb Db D# (F) Ab",
     "semitones": [
@@ -2479,10 +2479,10 @@
       12,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 7 (b13,b9,b5)",
+    "name": "dominant 7 b 13 b 9 b 5",
     "symbol": "7 (b13,b9,b5)",
     "notes": "C E Gb Bb Db (F) Ab",
     "semitones": [
@@ -2494,10 +2494,10 @@
       12,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 7 (b13,#9,b5)",
+    "name": "dominant 7 b 13 9 b 5",
     "symbol": "7 (b13,#9,b5)",
     "notes": "C E Gb Bb D# (F) Ab",
     "semitones": [
@@ -2509,10 +2509,10 @@
       12,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 7 (b13,#9,b9,b5)",
+    "name": "dominant 7 b 13 9 b 9 b 5",
     "symbol": "7 (b13,#9,b9,b5)",
     "notes": "C E Gb Bb Db D# (F) Ab",
     "semitones": [
@@ -2525,10 +2525,10 @@
       12,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 9 (b13,#11)",
+    "name": "dominant 9 b 13 11",
     "symbol": "9 (b13,#11)",
     "notes": "C E G Bb D F# Ab",
     "semitones": [
@@ -2540,10 +2540,10 @@
       6,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 7 (b13,#11,b9)",
+    "name": "dominant 7 b 13 11 b 9",
     "symbol": "7 (b13,#11,b9)",
     "notes": "C E G Bb Db F# Ab",
     "semitones": [
@@ -2555,10 +2555,10 @@
       6,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 7 (b13,#11,#9)",
+    "name": "dominant 7 b 13 11 9",
     "symbol": "7 (b13,#11,#9)",
     "notes": "C E G Bb D# F# Ab",
     "semitones": [
@@ -2570,10 +2570,10 @@
       6,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Dominant 7 (b13,#11,#9,b9)",
+    "name": "dominant 7 b 13 11 9 b 9",
     "symbol": "7 (b13,#11,#9,b9)",
     "notes": "C E G Bb Db D# F# Ab",
     "semitones": [
@@ -2586,10 +2586,10 @@
       6,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 13 (major7)",
+    "name": "minor 13 major 7",
     "symbol": "-13 (∆7)",
     "notes": "C Eb G B D F A",
     "semitones": [
@@ -2601,10 +2601,10 @@
       5,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 13 (major7,b5)",
+    "name": "minor 13 major 7 b 5",
     "symbol": "-13 (∆7,b5)",
     "notes": "C Eb Gb B D F A",
     "semitones": [
@@ -2616,10 +2616,10 @@
       5,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 13 (b9,major7)",
+    "name": "minor 13 b 9 major 7",
     "symbol": "-13 (b9,∆7)",
     "notes": "C Eb G B Db F A",
     "semitones": [
@@ -2631,10 +2631,10 @@
       5,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 13 (b9,major7,b5)",
+    "name": "minor 13 b 9 major 7 b 5",
     "symbol": "-13 (b9,∆7,b5)",
     "notes": "C Eb Gb B Db F A",
     "semitones": [
@@ -2646,10 +2646,10 @@
       5,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 13 (#11,major7)",
+    "name": "minor 13 11 major 7",
     "symbol": "-13 (#11,∆7)",
     "notes": "C Eb G B D F# A",
     "semitones": [
@@ -2661,10 +2661,10 @@
       6,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 13 (#11,b9,major7)",
+    "name": "minor 13 11 b 9 major 7",
     "symbol": "-13 (#11,b9,∆7)",
     "notes": "C Eb G B Db F# A",
     "semitones": [
@@ -2676,10 +2676,10 @@
       6,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 13",
+    "name": "minor 13",
     "symbol": "-13",
     "notes": "C Eb G Bb D F A",
     "semitones": [
@@ -2691,10 +2691,10 @@
       5,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 13 (b5)",
+    "name": "minor 13 b 5",
     "symbol": "-13 (b5)",
     "notes": "C Eb Gb Bb D F A",
     "semitones": [
@@ -2706,10 +2706,10 @@
       5,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 13 (b9)",
+    "name": "minor 13 b 9",
     "symbol": "-13 (b9)",
     "notes": "C Eb G Bb Db F A",
     "semitones": [
@@ -2721,10 +2721,10 @@
       5,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 13 (b9,b5)",
+    "name": "minor 13 b 9 b 5",
     "symbol": "-13 (b9,b5)",
     "notes": "C Eb Gb Bb Db F A",
     "semitones": [
@@ -2736,10 +2736,10 @@
       5,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 13 (#11)",
+    "name": "minor 13 11",
     "symbol": "-13 (#11)",
     "notes": "C Eb G Bb D F# A",
     "semitones": [
@@ -2751,10 +2751,10 @@
       6,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 13 (#11,b9)",
+    "name": "minor 13 11 b 9",
     "symbol": "-13 (#11,b9)",
     "notes": "C Eb G Bb Db F# A",
     "semitones": [
@@ -2766,10 +2766,10 @@
       6,
       9
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 11 (b13,major7)",
+    "name": "minor 11 b 13 major 7",
     "symbol": "-11 (b13,∆7)",
     "notes": "C Eb G B D F Ab",
     "semitones": [
@@ -2781,10 +2781,10 @@
       5,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 11 (b13,b9,major7)",
+    "name": "minor 11 b 13 b 9 major 7",
     "symbol": "-11 (b13,b9,∆7)",
     "notes": "C Eb G B Db F Ab",
     "semitones": [
@@ -2796,10 +2796,10 @@
       5,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 11 (b13,b9,b5)",
+    "name": "minor 11 b 13 b 9 b 5",
     "symbol": "-11 (b13,b9,b5)",
     "notes": "C Eb Gb B Db F Ab",
     "semitones": [
@@ -2811,10 +2811,10 @@
       5,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 9 (b13,#11,major7)",
+    "name": "minor 9 b 13 11 major 7",
     "symbol": "-9 (b13,#11,∆7)",
     "notes": "C Eb G B D F# Ab",
     "semitones": [
@@ -2826,10 +2826,10 @@
       6,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor  (b13,#11,b9,major7)",
+    "name": "minor b 13 11 b 9 major 7",
     "symbol": "- (b13,#11,b9,∆7)",
     "notes": "C Eb G B Db F# Ab",
     "semitones": [
@@ -2841,10 +2841,10 @@
       6,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 11 (b13)",
+    "name": "minor 11 b 13",
     "symbol": "-11 (b13)",
     "notes": "C Eb G Bb D F Ab",
     "semitones": [
@@ -2856,10 +2856,10 @@
       5,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 11 (b13,b5)",
+    "name": "minor 11 b 13 b 5",
     "symbol": "-11 (b13,b5)",
     "notes": "C Eb Gb Bb D F Ab",
     "semitones": [
@@ -2871,10 +2871,10 @@
       5,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 11 (b13,b9)",
+    "name": "minor 11 b 13 b 9",
     "symbol": "-11 (b13,b9)",
     "notes": "C Eb G Bb Db F Ab",
     "semitones": [
@@ -2886,10 +2886,10 @@
       5,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 11 (b13,b9,b5)",
+    "name": "minor 11 b 13 b 9 b 5",
     "symbol": "-11 (b13,b9,b5)",
     "notes": "C Eb Gb Bb Db F Ab",
     "semitones": [
@@ -2901,10 +2901,10 @@
       5,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor 9 (b13,#11)",
+    "name": "minor 9 b 13 11",
     "symbol": "-9 (b13,#11)",
     "notes": "C Eb G Bb D F# Ab",
     "semitones": [
@@ -2916,10 +2916,10 @@
       6,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Minor  (b13,#11,b9)",
+    "name": "minor b 13 11 b 9",
     "symbol": "- (b13,#11,b9)",
     "notes": "C Eb G Bb Db F# Ab",
     "semitones": [
@@ -2931,10 +2931,10 @@
       6,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Diminished 11 (b13)",
+    "name": "diminished 11 b 13",
     "symbol": "°11 (b13)",
     "notes": "C Eb Gb Bbb D F Ab",
     "semitones": [
@@ -2946,10 +2946,10 @@
       5,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Diminished 11 (b13,b9)",
+    "name": "diminished 11 b 13 b 9",
     "symbol": "°11 (b13,b9)",
     "notes": "C Eb Gb Bbb Db F Ab",
     "semitones": [
@@ -2961,10 +2961,10 @@
       5,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Diminished 11 (b13,major7,bb7)",
+    "name": "diminished 11 b 13 major 7 bb 7",
     "symbol": "°11 (b13,∆7,bb7)",
     "notes": "C Eb Gb Bbb B D F Ab",
     "semitones": [
@@ -2977,10 +2977,10 @@
       5,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Diminished 11 (b13,major7)",
+    "name": "diminished 11 b 13 major 7",
     "symbol": "°11 (b13,∆7)",
     "notes": "C Eb Gb B D F Ab",
     "semitones": [
@@ -2992,10 +2992,10 @@
       5,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Diminished 11 (b13,b9,major7)",
+    "name": "diminished 11 b 13 b 9 major 7",
     "symbol": "°11 (b13,b9,∆7)",
     "notes": "C Eb Gb B Db F Ab",
     "semitones": [
@@ -3007,10 +3007,10 @@
       5,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Diminished 11 (b13,major7,bb7)",
+    "name": "diminished 11 b 13 major 7 bb 7",
     "symbol": "°11 (b13,∆7,bb7)",
     "notes": "C Eb Gb Bbb B D F Ab",
     "semitones": [
@@ -3023,10 +3023,10 @@
       5,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   },
   {
-    "name": "Diminished 11 (b13,b9,major7,bb7)",
+    "name": "diminished 11 b 13 b 9 major 7 bb 7",
     "symbol": "°11 (b13,b9,∆7,bb7)",
     "notes": "C Eb Gb Bbb B Db F Ab",
     "semitones": [
@@ -3039,6 +3039,6 @@
       5,
       8
     ],
-    "category": "13th"
+    "category": "13 th"
   }
 ]

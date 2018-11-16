@@ -1,3 +1,5 @@
+const _ = require('lodash')
+
 const getRawData = () => {
   return `CHROMATIC	C C# D D# E F F# G G# A A# B C	
   CHINESE TWELVE TONE SCALE	C G D A E B F# C# Ab Eb Bb F C	
@@ -371,10 +373,10 @@ const getData = () => {
         return null
       }
       return {
-        name,
+        name: _.lowerCase(name),
         notes,
-        semitones: convertScale(notes),
-        mode,
+        semitones: [...convertScale(notes), 12],
+        mode: _.lowerCase(mode),
       }
     })
     .filter(x => x)

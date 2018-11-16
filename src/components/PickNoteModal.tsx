@@ -73,15 +73,17 @@ class PickNoteModal extends React.Component<
     this.state = {
       range: this.getNoteRange(props.noteName),
       noteName: props.noteName,
-      octave: props.noteName ? tonal.Note.oct(props.noteName) : 4,
-      notePitchName: props.noteName ? tonal.Note.pc(props.noteName) : undefined,
+      octave: props.noteName ? tonal.Note.oct(props.noteName)! : 4,
+      notePitchName: props.noteName
+        ? tonal.Note.pc(props.noteName)!
+        : undefined,
       enharmonicFlatsMap: this.props.enharmonicFlatsMap,
     }
   }
 
   getNoteRange = noteName => {
     console.log('getNoteRange', noteName)
-    const octave = noteName ? tonal.Note.oct(noteName) : 4
+    const octave = noteName ? tonal.Note.oct(noteName)! : 4
     const firstNote = octave === 1 ? `C${octave}` : `A${octave - 1}`
     const lastNote = octave === 6 ? `B${octave}` : `D${octave + 1}`
     const noteRange = {
@@ -155,14 +157,14 @@ class PickNoteModal extends React.Component<
     }
 
     console.log('TCL: onNoteSelected -> noteName', noteName)
-    const noteEnharmonicName = tonal.Note.enharmonic(noteName)
+    const noteEnharmonicName = tonal.Note.enharmonic(noteName) as string
 
     setTimeout(() => this.setState({ range: this.getNoteRange(noteName) }), 100)
 
     if (!skipPlayingNote) {
       this.props.audioEngine.playNote(
         {
-          midi: tonal.Note.midi(noteName),
+          midi: tonal.Note.midi(noteName)!,
         },
         0,
         0.5,
@@ -172,15 +174,17 @@ class PickNoteModal extends React.Component<
     if (noteName !== noteEnharmonicName && this.state.noteName === noteName) {
       // This is a second click on a card with "enharmonic-capable" note...
       // this.props.onEnharmonicChange(noteNameWithSharp)
-      const noteNameWithSharp = noteName.includes('#')
+      const noteNameWithSharp = (noteName.includes('#')
         ? noteName
-        : noteEnharmonicName
-      const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)
+        : noteEnharmonicName) as string
+      const notePitchWithSharp = tonal.Note.pc(
+        noteNameWithSharp!,
+      ) as ChromaticNoteSharps
 
       this.setState({
-        noteName: noteEnharmonicName,
-        octave: tonal.Note.oct(noteEnharmonicName),
-        notePitchName: tonal.Note.pc(noteEnharmonicName),
+        noteName: noteEnharmonicName!,
+        octave: tonal.Note.oct(noteEnharmonicName)!,
+        notePitchName: tonal.Note.pc(noteEnharmonicName)!,
         enharmonicFlatsMap: {
           ...this.state.enharmonicFlatsMap,
           [notePitchWithSharp]: !Boolean(
@@ -198,8 +202,8 @@ class PickNoteModal extends React.Component<
 
     this.setState({
       noteName: noteName,
-      octave: tonal.Note.oct(noteName),
-      notePitchName: tonal.Note.pc(noteName),
+      octave: tonal.Note.oct(noteName)!,
+      notePitchName: tonal.Note.pc(noteName)!,
     })
   }
 
@@ -224,7 +228,7 @@ class PickNoteModal extends React.Component<
           <Flex flexDirection="column" alignItems="center" width={1} flex={1}>
             <Flex flexWrap="wrap" flex={1}>
               {noteNames.map(noteNameWithSharp => {
-                const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)
+                const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)!
 
                 const shouldUseFlat =
                   this.state.enharmonicFlatsMap[notePitchWithSharp] === true
@@ -312,11 +316,11 @@ class PickNoteModal extends React.Component<
                 noteRange={this.state.range}
                 onPlayNote={midiNote => {
                   const noteNameWithSharp = tonal.Note.fromMidi(midiNote, true)
-                  const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)
+                  const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)!
                   const noteName = this.state.enharmonicFlatsMap[
                     notePitchWithSharp
                   ]
-                    ? tonal.Note.enharmonic(noteNameWithSharp)
+                    ? tonal.Note.enharmonic(noteNameWithSharp)!
                     : noteNameWithSharp
 
                   this.onNoteSelected(noteName, true)

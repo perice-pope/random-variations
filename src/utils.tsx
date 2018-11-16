@@ -89,9 +89,12 @@ baseNotes.forEach(baseNote => {
  * @param fullNoteName Full note name, e.g. "C#4"
  */
 export const getNoteCardColorByNoteName = (fullNoteName: string) => {
-  const pitchName = tonal.Note.pc(fullNoteName)
+  const pitchName = tonal.Note.pc(fullNoteName) as string
   return NoteNameToColorMap[pitchName]
 }
+
+const DEFAULT_SCALE_NAME = 'ionian'
+const DEFAULT_CHORD_NAME = 'maj'
 
 export const createDefaultSession = () => {
   const defaultSession: Partial<Session> = {
@@ -112,10 +115,10 @@ export const createDefaultSession = () => {
       },
       scales: {
         enabled: false,
-        scaleType: 'major',
+        scaleType: DEFAULT_SCALE_NAME,
         patternPreset: 'up',
         pattern: generateScalePatternFromPreset({
-          scale: scaleByScaleType['major'],
+          scale: scaleByScaleType[DEFAULT_SCALE_NAME],
           patternPreset: 'up',
         }),
       },
@@ -123,10 +126,10 @@ export const createDefaultSession = () => {
         enabled: false,
         isMelodic: true,
         chordInversion: 0,
-        chordType: 'maj',
+        chordType: DEFAULT_CHORD_NAME,
         patternPreset: 'ascending',
         pattern: generateChordPatternFromPreset({
-          chord: chordsByChordType['maj'],
+          chord: chordsByChordType[DEFAULT_CHORD_NAME],
           patternPreset: 'ascending',
         }),
       },

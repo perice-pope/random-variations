@@ -67,12 +67,14 @@ export interface Chord {
 }
 
 // Add more
-export type ScaleType = 'major' | 'minor' | string
+export type ScaleType = 'CHROMATIC' | string
 
 export interface Scale {
   type: ScaleType
+  notes?: string
+  mode: string
   // Intervals of "tonal" JS library: "1P", "2M" and so on
-  intervals: string[]
+  semitones: number[]
   title: string
   notesCount: number
 }

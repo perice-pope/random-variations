@@ -124,7 +124,7 @@ const SortableNoteCard = SortableElement(
                   >
                     {'Change to '}
                     <Text ml={1} fontWeight="bold">
-                      {tonal.Note.pc(enharmonicNoteName)}
+                      {enharmonicNoteName && tonal.Note.pc(enharmonicNoteName)}
                     </Text>
                   </MenuItem>
                 )}

@@ -193,19 +193,19 @@ const jss = create({
 const audioEngine = new AudioEngine()
 
 const unpackSessionState = (session: Session) => {
-  const noteCards = (session.noteCards || []).map(nc => ({
+  const noteCards: NoteCardType[] = (session.noteCards || []).map(nc => ({
     id: nc.id || uuid(),
     noteName: nc.noteName,
-    text: tonal.Note.pc(nc.noteName),
-    midi: tonal.Note.midi(nc.noteName),
-    freq: tonal.Note.freq(nc.noteName),
+    text: tonal.Note.pc(nc.noteName) as string,
+    midi: tonal.Note.midi(nc.noteName) as number,
+    freq: tonal.Note.freq(nc.noteName) as number,
     color: getNoteCardColorByNoteName(nc.noteName),
   }))
 
   const noteCardsById = _.keyBy(noteCards, 'id')
 
   return {
-    noteCards,
+    noteCards: noteCards as NoteCardType[],
     noteCardsById,
     bpm: session.bpm,
     rests: session.rests,
@@ -518,7 +518,10 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
       if (snap) {
         // Ignore the first time this callback is called
         if (!this.state.hasInitializedOnlineStatus) {
-          this.setState({ hasInitializedOnlineStatus: true })
+          this.setState({
+            hasInitializedOnlineStatus: true,
+            isOnline: snap ? snap.val() : undefined,
+          })
           return
         }
 
@@ -539,6 +542,7 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
       }
     })
 
+    console.log('onAuthStateChanged calling')
     await new Promise(resolve => {
       const unregisterInitAuthObserver = firebase
         .auth()
@@ -550,9 +554,18 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
             },
             async () => {
               unregisterInitAuthObserver()
+              console.log('onAuthStateChanged: ', user, this.state.isOnline)
 
               if (user && this.state.isOnline !== false) {
-                await this.fetchAndRestoreSessions()
+                try {
+                  await this.fetchAndRestoreSessions()
+                } catch (e) {
+                  console.log(
+                    'Could not load sessions - falling back to default sessions',
+                    e,
+                  )
+                  await this.loadDefaultSession()
+                }
               } else {
                 await this.loadDefaultSession()
               }
@@ -565,8 +578,6 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
 
     await this.updateStaffNotes()
     await this.onNotesUpdated()
-
-    console.log('this: ', this)
 
     this.setState({ isInitialized: true }, () => {
       this.unregisterAuthObserver = firebase
@@ -859,7 +870,7 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
 
   private handleAudioFontChanged = async (audioFontId: AudioFontId) => {
     await this.loadAndSetAudioFont(audioFontId)
-    audioEngine.playNote({ midi: tonal.Note.midi('C4') }, 0, 0.5)
+    audioEngine.playNote({ midi: tonal.Note.midi('C4') as number }, 0, 0.5)
   }
 
   private handleMouseOverNoteCard = (noteCard: NoteCardType) => {
@@ -1301,6 +1312,7 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
     const ShuffleButton = (
       <Tooltip title="Reshuffle cards">
         <Button
+          disabled={noteCards.length < 3}
           variant="contained"
           m={[1, 2]}
           onClick={this.handleShuffleClick}
@@ -1407,6 +1419,7 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
 
     const TogglePlaybackButton = (
       <Button
+        disabled={noteCards.length < 1}
         title={isPlaying ? 'Stop' : 'Play'}
         bg={isPlaying ? 'red' : '#00c200'}
         m={[1, 2]}
