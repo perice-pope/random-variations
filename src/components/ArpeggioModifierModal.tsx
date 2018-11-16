@@ -332,7 +332,7 @@ class ArpeggioModifierModal extends React.Component<
                     {chordTypeOptionsByGroup[groupName].map(
                       ({ title, value }) => (
                         <option key={value} value={value}>
-                          {`${title} (C${value})`}
+                          {`${title}`}
                         </option>
                       ),
                     )}

@@ -40,7 +40,7 @@ type NotesStaffState = {
 class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
   static defaultProps: Partial<NotesStaffProps> = {
     lines: 1,
-    staveHeight: 100,
+    staveHeight: 120,
     clef: 'treble',
   }
 
