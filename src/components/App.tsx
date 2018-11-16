@@ -1592,23 +1592,22 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
       </>
     )
 
-    const notesStaffLines =
-      this.state.height >= 700
-        ? Math.max(
-            1,
-            Math.min(
-              this.state.height >= 900 ? 4 : 3,
-              Math.ceil(
-                this.state.staffTicks.length /
-                  (this.props.width === 'xs'
-                    ? 12
-                    : this.props.width === 'sm'
-                      ? 16
-                      : 20),
-              ),
-            ),
+    let notesStaffLines =
+      this.state.height >= 500
+        ? Math.ceil(
+            this.state.staffTicks.length /
+              (this.props.width === 'xs'
+                ? 12
+                : this.props.width === 'sm'
+                  ? 16
+                  : 20),
           )
         : 1
+
+    if (this.state.height >= 900) {
+      notesStaffLines = Math.min(notesStaffLines, 2)
+    }
+    console.log(this.state.staffTicks.length, notesStaffLines)
 
     let notesStaffScaleFactor = 1.0
     if (isMobile) {
