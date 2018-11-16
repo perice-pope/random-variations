@@ -1597,11 +1597,31 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
         ? Math.max(
             1,
             Math.min(
-              this.state.height >= 900 ? 3 : 2,
-              Math.ceil(this.state.staffTicks.length / 20),
+              this.state.height >= 900 ? 4 : 3,
+              Math.ceil(
+                this.state.staffTicks.length /
+                  (this.props.width === 'xs'
+                    ? 12
+                    : this.props.width === 'sm'
+                      ? 16
+                      : 20),
+              ),
             ),
           )
         : 1
+
+    let notesStaffScaleFactor = 1.0
+    if (isMobile) {
+      notesStaffScaleFactor = 0.6
+    } else if (this.props.width === 'md') {
+      notesStaffScaleFactor = 0.85
+    }
+
+    if (notesStaffLines > 1) {
+      notesStaffScaleFactor *= 1 - 0.05 * notesStaffLines
+    } else if (this.state.staffTicks.length > 10) {
+      notesStaffScaleFactor *= 0.95
+    }
 
     const sessionsSorted = _.reverse(
       _.sortBy(_.values(this.state.sessionsById || {}), 'createdAt'),
@@ -1886,6 +1906,7 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
                   </Flex>
 
                   <NotesStaff
+                    scale={notesStaffScaleFactor}
                     lines={notesStaffLines}
                     isPlaying={isPlaying}
                     key={this.state.contentWidth}

@@ -278,10 +278,9 @@ class ScaleModifierModal extends React.Component<
             maxWidth: '600px',
             margin: '0 auto',
             width: '100%',
-            marginTop: '2rem',
           })}
         >
-          <Flex flexDirection="row">
+          <Flex mt={[1, 3, 2]} flexDirection="row">
             <FormControl className={css({ flex: 1 })}>
               <InputLabel htmlFor="scale-type">Scale type</InputLabel>
               <NativeSelect
@@ -307,7 +306,7 @@ class ScaleModifierModal extends React.Component<
             </FormControl>
           </Flex>
 
-          <Flex mt={[1, 2, 4]} flexDirection="column">
+          <Flex mt={[1, 3, 2]} flexDirection="column">
             <Flex flexWrap="wrap" flexDirection="row" mt={4}>
               <FormControl className={css({ flex: 1, marginRight: '1rem' })}>
                 <InputLabel htmlFor="arp-pattern-preset">Pattern</InputLabel>

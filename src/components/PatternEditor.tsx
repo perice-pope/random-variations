@@ -13,7 +13,7 @@ import {
 
 import { ArpeggioPattern, ArpeggioPatternElement } from '../types'
 import { Button, Menu, MenuItem } from '@material-ui/core'
-import { css } from 'react-emotion'
+import { css, cx } from 'react-emotion'
 import Tooltip from './ui/Tooltip'
 import { Flex } from './ui/Flex'
 import { withState, compose } from 'recompose'
@@ -45,6 +45,7 @@ const SortablePatternElement = SortableElement(
       onItemNoteChange,
       onItemNoteMute,
       onItemNoteDelete,
+      itemsCount,
       item,
       itemIndex: index,
       min,
@@ -91,7 +92,7 @@ const SortablePatternElement = SortableElement(
             zIndex={5000}
             alignItems="center"
             mx={[1]}
-            my={[1, 2, 3]}
+            my={[1, 1, 1]}
             maxWidth={50}
           >
             <Button
@@ -120,23 +121,41 @@ const SortablePatternElement = SortableElement(
                 setMenuAnchorEl(event.target)
                 setMenuOpen(true)
               }}
-              className={css({
-                minWidth: '30px',
-                fontSize: '1.4rem',
-                lineHeight: '1.4rem',
-                padding: '1rem !important',
-              })}
+              className={cx(
+                css({
+                  minWidth: '30px',
+                  fontSize: '1.4rem',
+                  lineHeight: '1.4rem',
+                  padding: '1rem !important',
+                }),
+                itemsCount >= 6 &&
+                  css({
+                    minWidth: '24px',
+                    fontSize: '1.2rem',
+                    lineHeight: '1.2rem',
+                    padding: '0.7rem !important',
+                  }),
+                itemsCount >= 9 &&
+                  css({
+                    minWidth: '22px',
+                    fontSize: '1.1rem',
+                    lineHeight: '1.1rem',
+                    padding: '0.5rem !important',
+                  }),
+              )}
             >
               {buttonText}
             </Button>
 
             <Button
               tabIndex={-1}
-              className={css({
-                width: '100%',
-                minWidth: '30px',
-                padding: '0.5rem 0',
-              })}
+              className={cx(
+                css({
+                  width: '100%',
+                  minWidth: '24px',
+                  padding: '0.5rem 0',
+                }),
+              )}
               onClick={() => {
                 let value
                 if (item.note != null) {
@@ -165,6 +184,7 @@ const SortablePatternElements = SortableContainer(
           index={index}
           // @ts-ignore
           item={item}
+          itemsCount={items.length}
           {...other}
           itemIndex={index}
         />

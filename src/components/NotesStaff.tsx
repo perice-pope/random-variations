@@ -20,6 +20,7 @@ const activeNoteClasses = {
 
 type NotesStaffProps = {
   id: string
+  scale?: number
   lines: number
   ticks: StaffTick[]
   tickLabels?: { [tickIndex: number]: string }
@@ -40,7 +41,8 @@ type NotesStaffState = {
 class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
   static defaultProps: Partial<NotesStaffProps> = {
     lines: 1,
-    staveHeight: 120,
+    scale: 1,
+    staveHeight: 140,
     clef: 'treble',
   }
 
@@ -113,8 +115,10 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
     // Configure the rendering context
     this.renderer.resize(width, height)
-
     this.renderContext = this.renderer.getContext()
+    this.renderContext.scale(this.props.scale || 1, this.props.scale || 1)
+
+
     this.renderContext.clear()
     this.renderContext
       .setFont('Arial', 14)
@@ -247,8 +251,8 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
   private drawStaveAndClef = () => {
     console.log('NotesStaff -> drawStaveAndClef')
-    const width = this.state.boxWidth
-    const { staveHeight } = this.props
+    const { staveHeight, scale } = this.props
+    const width = this.state.boxWidth / (scale || 1.0)
 
     // Create a stave of at position 0, 0 on the canvas.
     this.staves = []
@@ -278,7 +282,9 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     this.drawStaveAndClef()
     this.drawActiveNoteLine()
     // @ts-ignore
-    renderContext.svg.querySelectorAll('.vf-stavenote').forEach(n => n.remove())
+    const svg = renderContext.svg as SVGElement
+
+    svg.querySelectorAll('.vf-stavenote').forEach(n => n.remove())
     // @ts-ignore
     // renderContext.svg.querySelectorAll('.rect').forEach(n => n.remove())
 

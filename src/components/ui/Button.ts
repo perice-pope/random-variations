@@ -67,6 +67,11 @@ const ButtonStyled = styled(MuiButton, {
       key: 'colors',
     })};
   }
+
+  @media screen and (max-width: 400) {
+    min-height: 30px;
+    min-width: 30px;
+  }
 `
 
 export const Button = recompose.compose(
