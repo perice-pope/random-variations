@@ -1592,7 +1592,8 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
       </>
     )
 
-    let notesStaffLines =
+    let notesStaffLines = Math.max(
+      1,
       this.state.height >= 500
         ? Math.ceil(
             this.state.staffTicks.length /
@@ -1602,7 +1603,8 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
                   ? 16
                   : 20),
           )
-        : 1
+        : 1,
+    )
 
     if (this.state.height >= 900) {
       notesStaffLines = Math.min(notesStaffLines, 2)
