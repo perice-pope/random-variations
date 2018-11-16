@@ -4,7 +4,7 @@ const getRawData = () => {
   Augmented Triad	+	C E G#	1 3 #5	TRIADS
   Major (b5) Triad	maj (b5)	C E Gb	1 3 b5	TRIADS
   Suspended 4 Triad	sus	C F G	1 4 5	TRIADS
-  Suspended 2 Triad	sus2	CDG	1 2 5	TRIADS
+  Suspended 2 Triad	sus2	C D G	1 2 5	TRIADS
   Minor Triad	-	C Eb G	1 b3 5	TRIADS
   Minor (#5) Triad	- (#5)	C Eb G#	1 b3 #5	TRIADS
   Diminished Triad	°	C Eb Gb	1 b3 b5	TRIADS
@@ -269,5 +269,5 @@ const getData = () => {
 }
 
 const data = getData()
-console.log(JSON.stringify(data))
+console.log(JSON.stringify(data, null, 2))
 // console.log(JSON.stringify([data[0], data[10], data[54]], null, 2))

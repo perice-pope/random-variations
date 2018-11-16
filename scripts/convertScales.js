@@ -381,5 +381,5 @@ const getData = () => {
 }
 
 const data = getData()
-console.log(JSON.stringify(data))
+console.log(JSON.stringify(data, null, 2))
 // console.log(JSON.stringify([data[0], data[10], data[54]], null, 2))
