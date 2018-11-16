@@ -2,7 +2,6 @@ import * as React from 'react'
 import * as _ from 'lodash'
 import { transpose } from 'tonal-distance'
 import * as tonal from 'tonal'
-import * as tonalChord from 'tonal-chord'
 
 import { default as MuButton } from '@material-ui/core/Button'
 
@@ -34,6 +33,7 @@ import {
   generateChordPatternFromPreset,
   chordOptions,
   chordsByChordType,
+  getSemitonesUpTransposer,
 } from '../musicUtils'
 import { Flex } from './ui/Flex'
 import { Box } from './ui'
@@ -72,6 +72,11 @@ const chordTypeOptions: ChordTypeOption[] = _.sortBy(
   'notesCount',
 )
 
+const chordTypeOptionsByGroup = _.groupBy(
+  chordTypeOptions,
+  to => chordsByChordType[to.value].category,
+)
+
 type PatternPresetOption = {
   title: string
   value: ArpeggioPatternPreset
@@ -104,12 +109,12 @@ class ArpeggioModifierModal extends React.Component<
 > {
   static defaultProps: Partial<ArpeggioModifierModalProps> = {
     initialValues: {
-      chordType: 'M',
+      chordType: 'maj',
       isMelodic: true,
       chordInversion: 0,
       patternPreset: 'ascending',
       pattern: generateChordPatternFromPreset({
-        chord: chordsByChordType['M'],
+        chord: chordsByChordType['maj'],
         patternPreset: 'ascending',
       }),
     },
@@ -210,16 +215,19 @@ class ArpeggioModifierModal extends React.Component<
 
   generateStaffTicks = () => {
     const { chordType, chordInversion } = this.state.values
-    const chord = chordsByChordType[chordType]
-    const intervals = tonalChord.intervals(chord.type)
+    const chord = chordsByChordType[chordType] || chordsByChordType['maj']
+    const { semitones } = chord
     const baseNote = 'C4'
 
     let staffTicks: StaffTick[]
+
+    // TODO: reuse similar logic from musicUtils module
     if (this.state.values.isMelodic) {
       staffTicks = this.state.values.pattern.items.map((item, index) => {
         const note = item.muted
           ? undefined
-          : transpose(baseNote, intervals[item.note - 1])
+          : getSemitonesUpTransposer(semitones[item.note - 1])(baseNote)
+
         return {
           id: `${index}`,
           notes: note
@@ -240,9 +248,12 @@ class ArpeggioModifierModal extends React.Component<
         {
           id: `tick-id`,
           notes: _.sortBy(
-            intervals
-              .map((interval, index) => {
-                let resultNote = transpose(baseNote, interval)
+            semitones
+              .map((semitonesCount, index) => {
+                let resultNote = getSemitonesUpTransposer(semitonesCount)(
+                  baseNote,
+                )
+                console.log('FISH: ', baseNote, semitonesCount, resultNote)
                 if (chordInversion > 0 && index >= chordInversion) {
                   resultNote = transpose(resultNote, '-8P')
                 }
@@ -284,7 +295,8 @@ class ArpeggioModifierModal extends React.Component<
       return null
     }
 
-    const chord = chordsByChordType[this.state.values.chordType]
+    const chord =
+      chordsByChordType[this.state.values.chordType] || chordsByChordType['maj']
     const { isMelodic } = this.state.values
 
     return (
@@ -315,10 +327,16 @@ class ArpeggioModifierModal extends React.Component<
                 name="chordType"
                 input={<Input id="chord-type" />}
               >
-                {chordTypeOptions.map(({ title, value }) => (
-                  <option key={value} value={value}>
-                    {title}
-                  </option>
+                {Object.keys(chordTypeOptionsByGroup).map(groupName => (
+                  <optgroup key={groupName} label={groupName}>
+                    {chordTypeOptionsByGroup[groupName].map(
+                      ({ title, value }) => (
+                        <option key={value} value={value}>
+                          {`${title} (C${value})`}
+                        </option>
+                      ),
+                    )}
+                  </optgroup>
                 ))}
               </NativeSelect>
             </FormControl>

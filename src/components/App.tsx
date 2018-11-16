@@ -927,7 +927,6 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
 
   private signOut = () => {
     firebase.auth().signOut()
-
   }
 
   private openSignInModal = () => {
@@ -1677,20 +1676,20 @@ class App extends React.Component<WithStyles & WithWidth, AppState> {
                   }
                 />
                 <ListItemSecondaryAction>
-                    <Tooltip title="Rename">
-                  <IconButton aria-label="Rename">
-                    <EditIcon
-                      onClick={() => this.handleRenameSession(session)}
-                    />
-                  </IconButton>
-                    </Tooltip>
+                  <Tooltip title="Rename">
+                    <IconButton aria-label="Rename">
+                      <EditIcon
+                        onClick={() => this.handleRenameSession(session)}
+                      />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip title="Remove" variant="gray">
-                  <IconButton aria-label="Delete">
-                    <DeleteIcon
-                      onClick={() => this.handleDeleteSession(session)}
-                    />
-                  </IconButton>
-                    </Tooltip>
+                    <IconButton aria-label="Delete">
+                      <DeleteIcon
+                        onClick={() => this.handleDeleteSession(session)}
+                      />
+                    </IconButton>
+                  </Tooltip>
                 </ListItemSecondaryAction>
               </ListItem>
             ))}

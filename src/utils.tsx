@@ -123,10 +123,10 @@ export const createDefaultSession = () => {
         enabled: false,
         isMelodic: true,
         chordInversion: 0,
-        chordType: 'M',
+        chordType: 'maj',
         patternPreset: 'ascending',
         pattern: generateChordPatternFromPreset({
-          chord: chordsByChordType['M'],
+          chord: chordsByChordType['maj'],
           patternPreset: 'ascending',
         }),
       },

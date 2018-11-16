@@ -1,10 +1,12 @@
 import * as tonal from 'tonal'
-import * as tonalChord from 'tonal-chord'
 import { transpose, interval } from 'tonal-distance'
 import { scale } from 'tonal-dictionary'
+import { fromSemitones } from 'tonal-interval'
 import * as _ from 'lodash'
 import { memoize } from 'lodash/fp'
 import uuid from 'uuid/v4'
+
+import chordsData from './data/chords.json'
 
 // @ts-ignore
 window.interval = interval
@@ -74,37 +76,30 @@ export const SemitonesToIntervalShortNameMap: {
   '8P': 'P8',
 }
 
+export const getSemitonesUpTransposer = memoize((semitones: number) => {
+  const transposer = note => {
+    return transpose(note, fromSemitones(semitones))
+  }
+
+  return transposer
+})
+
+// @ts-ignore
+window.transpose = transpose
+// @ts-ignore
+window.tonal = tonal
+// @ts-ignore
+window.getSemitonesUpTransposer = getSemitonesUpTransposer
+
 const getAllChordOptions: () => Chord[] = memoize(() => {
   return _.uniqBy(
-    [
-      {
-        type: 'm',
-        title: 'Minor triad',
-      },
-      {
-        type: 'M',
-        title: 'Major triad',
-      },
-      {
-        type: 'maj7',
-        title: 'Major 7th',
-      },
-      {
-        type: 'm7',
-        title: 'Minor 7th',
-      },
-      {
-        type: 'M69#11',
-        title: 'M69#11',
-      },
-      // TODO: provide better names for chords
-      ...tonalChord.names().map(name => ({ title: name, type: name })),
-    ].map(({ type, title }) => {
-      const intervals = tonalChord.intervals(type)
+    chordsData.map(({ name, symbol, semitones, category }) => {
       return {
-        type,
-        title,
-        notesCount: intervals.length,
+        semitones,
+        category,
+        type: symbol,
+        title: name,
+        notesCount: semitones.length,
       } as Chord
     }) as Chord[],
     'type',
@@ -144,6 +139,7 @@ export const generateChordPatternFromPreset = ({
 }) => {
   let items: ArpeggioPatternElement[]
   let mainNoteIndex
+
   switch (patternPreset) {
     case 'ascending': {
       items = _.range(1, chord.notesCount + 1, 1).map(note => ({ note }))
@@ -357,7 +353,7 @@ export const addApproachNotes = (
         notes: [
           {
             noteName,
-            midi: tonal.Note.midi(noteName),
+            midi: tonal.Note.midi(noteName!),
             isMainNote: false,
             color: approachNotesColor,
             id: uuid(),
@@ -389,7 +385,8 @@ export const addChordNotes = (
   )
   const baseNote = tickWithBaseNote.notes[baseNoteIndex]
 
-  const chordIntervals = tonalChord.intervals(chordModifier.chordType)
+  const chord =
+    chordsByChordType[chordModifier.chordType] || chordsByChordType['maj']
 
   if (!chordModifier.isMelodic) {
     // Add harmonic chord notes in a single staff tick
@@ -397,9 +394,11 @@ export const addChordNotes = (
     ticksUpdated.splice(tickWithBaseNoteIndex, 1, {
       ...tickWithBaseNote,
       notes: _.sortBy(
-        chordIntervals
-          .map((interval, index) => {
-            let resultNote = transpose(baseNote.noteName, interval)
+        chord.semitones
+          .map((semitonesCount, index) => {
+            let resultNote = getSemitonesUpTransposer(semitonesCount)(
+              baseNote.noteName,
+            )
             if (
               chordModifier.chordInversion > 0 &&
               index >= chordModifier.chordInversion
@@ -432,8 +431,8 @@ export const addChordNotes = (
     if (muted) {
       return undefined
     }
-    const interval = note ? chordIntervals[note - 1] || '1P' : '1P'
-    return transpose(baseNote.noteName, interval)
+    const semitonesCount = note ? chord.semitones[note - 1] || 0 : 0
+    return getSemitonesUpTransposer(semitonesCount)(baseNote.noteName)
   })
 
   const ticksWithArpeggioNotes = noteNamesWithArpeggio.map(
@@ -637,7 +636,7 @@ export const generateStaffTicks = ({
           {
             id: uuid(),
             noteName: noteCard.noteName,
-            midi: tonal.Note.midi(noteCard.noteName),
+            midi: tonal.Note.midi(noteCard.noteName) as number,
             color: noteCard.color,
             isMainNote: true,
           },

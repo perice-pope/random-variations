@@ -56,11 +56,13 @@ export interface NoteCardType extends PlayableNote {
 }
 
 // Add more
-export type ChordType = 'M' | 'm' | 'maj7' | 'm7' | 'M69#11' | string
+export type ChordType = string
 
 export interface Chord {
   type: ChordType
+  category: string
   title: string
+  semitones: number[]
   notesCount: number
 }
 
@@ -75,7 +77,6 @@ export interface Scale {
   notesCount: number
 }
 
-export type ArpeggioType = 'M' | 'm' | 'maj7' | 'm7' | 'M69#11'
 export type ArpeggioPatternPreset = 'custom' | 'ascending' | 'descending'
 
 export interface ArpeggioPatternElement {
