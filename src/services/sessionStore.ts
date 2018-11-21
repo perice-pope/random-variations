@@ -146,25 +146,25 @@ class SessionStore {
       )
     }
 
+    const session = (await base.fetch(
+      userSessionKey(userKey, sessionKey),
+      {},
+    )) as Session
+
+    if (!session || _.isEmpty(session)) {
+      throw new Error(
+        `Could not find shared session under "${userSessionKey(
+          userKey,
+          sessionKey,
+        )}"`,
+      )
+    }
+
     const user = this.getCurrentUser()
-    if (userKey && user && userKey === user.uid) {
+    if (user && session.author === user.uid) {
       // The shared session is in fact my session
       this._sharedSession = this._mySessionsByKey[sessionKey]
     } else {
-      const session = (await base.fetch(
-        userSessionKey(userKey, sessionKey),
-        {},
-      )) as Session
-
-      if (!session || _.isEmpty(session)) {
-        throw new Error(
-          `Could not find shared session under "${userSessionKey(
-            userKey,
-            sessionKey,
-          )}"`,
-        )
-      }
-
       this._sharedSession = {
         noteCards: [],
         ...session,
@@ -189,7 +189,7 @@ class SessionStore {
     const ref = await base.push(userSessionsKey(user.uid), {
       data: {
         ...createDefaultSession(),
-        ...values,
+        ..._.omit(values, ['author', 'key']),
         author: user.uid,
       } as Session,
     })
@@ -198,8 +198,8 @@ class SessionStore {
     const session = await base.fetch(userSessionKey(user.uid, sessionKey), {})
     this._mySessionsByKey[sessionKey] = {
       noteCards: [],
-      key: sessionKey,
       ...session,
+      key: sessionKey,
     }
 
     this._myActiveSessionKey = sessionKey

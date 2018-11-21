@@ -18,8 +18,6 @@ import MuiButton from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import IconButton from '@material-ui/core/IconButton'
 import Hidden from '@material-ui/core/Hidden'
-import Snackbar from '@material-ui/core/Snackbar'
-import CloseIcon from '@material-ui/icons/Close'
 
 import SettingsIcon from '@material-ui/icons/Settings'
 import PlayIcon from '@material-ui/icons/PlayArrow'
@@ -118,8 +116,12 @@ import {
 } from '@material-ui/core'
 import { WithWidth } from '@material-ui/core/withWidth'
 import memoize from 'memoize-one'
+import ToastNotifications, { notificationsStore } from './ToastNotifications'
 
 globalStyles()
+
+// @ts-ignore
+window.notificationsStore = notificationsStore
 
 console.log('All supported audio fonts: ', _.map(AudioFontsConfig, 'title'))
 console.log('All supported chord names: ', Chord.names())
@@ -340,7 +342,7 @@ class App extends React.Component<
         sessionStore.activeSession ? sessionStore.activeSession.bpm : undefined,
       (bpm?: number) => {
         if (bpm != null) {
-          audioEngine.setBpm(bpm)
+          audioEngine.setBpm(Math.max(1, bpm))
         }
       },
       {
@@ -351,27 +353,26 @@ class App extends React.Component<
     reaction(
       () =>
         sessionStore.activeSession
-          ? sessionStore.activeSession.countInCounts
-          : undefined,
-      (countInCounts?: number) => {
-        if (countInCounts != null) {
+          ? toJS({
+              countInCounts: sessionStore.activeSession.countInCounts,
+              countInEnabled: sessionStore.activeSession.countInEnabled,
+            })
+          : {},
+      ({
+        countInCounts,
+        countInEnabled,
+      }: {
+        countInCounts?: number
+        countInEnabled?: boolean
+      }) => {
+        if (countInCounts != null && countInEnabled === true) {
           audioEngine.setCountIn(countInCounts)
-        }
-      },
-      {
-        delay: 500,
-      },
-    )
-
-    reaction(
-      () =>
-        sessionStore.activeSession
-          ? sessionStore.activeSession.countInEnabled
-          : undefined,
-      (countInEnabled?: boolean) => {
-        if (countInEnabled === false) {
+        } else {
           audioEngine.setCountIn(0)
         }
+      },
+      {
+        delay: 500,
       },
     )
 
@@ -448,11 +449,19 @@ class App extends React.Component<
             await sessionStore.loadAndActivateSharedSession(
               this.props.match.params.sharedSessionKey,
             )
+            notificationsStore.showNotification({
+              message: `This practice session belongs to another user - any changes you make won't be saved. But feel free to click on "Save" button to create your own copy of this session.`,
+              level: 'info',
+              autohide: 15000,
+            })
           } catch (error) {
             console.error(error)
-            alert(
-              'Could not load session - link is invalid, or the session has been removed by its author',
-            )
+            notificationsStore.showNotification({
+              message:
+                'Could not load session - link is invalid, or the session has been removed by its author',
+              level: 'warning',
+              autohide: 15000,
+            })
             if (shouldLoadUserSessions) {
               this.activateMySession(this.props.match.params.sessionKey)
             } else {
@@ -698,7 +707,7 @@ class App extends React.Component<
   }
 
   private handleBpmChange = e => {
-    const value = parseIntEnsureInBounds(e.target.value, 1, 400)
+    const value = parseIntEnsureInBounds(e.target.value, 0, 400)
     if (sessionStore.activeSession) {
       sessionStore.activeSession.bpm = value
     }
@@ -1016,6 +1025,35 @@ class App extends React.Component<
     await sessionStore.createAndActivateNewSession({
       name: sessionName,
     })
+    notificationsStore.showNotification({
+      message: `Created new session "${sessionName}"`,
+      level: 'success',
+      autohide: 3000,
+    })
+  }
+
+  private saveSharedSessionToMySessions = async () => {
+    const originalSession = sessionStore.activeSession!
+    const sessionName = prompt(
+      'Choose a name for your copy of this shared session',
+      `Copy of "${originalSession.name}"`,
+    )
+    if (!sessionName) {
+      return
+    }
+
+    const newSession = await sessionStore.createAndActivateNewSession({
+      ...sessionStore.activeSession,
+      name: sessionName,
+    })
+    this.props.history.replace(`/s/${newSession.key}`)
+    notificationsStore.showNotification({
+      message: `Saved "${
+        originalSession.name
+      }" in your sessions as "${sessionName}"`,
+      level: 'success',
+      autohide: 3000,
+    })
   }
 
   private handleEnharmonicMapToggle = (pitchName: ChromaticNoteSharps) => {
@@ -1052,6 +1090,12 @@ class App extends React.Component<
     }
 
     await sessionStore.deleteMySessionByKey(session.key)
+    sessionStore.activateMySessionByKey(sessionStore.mySessionsSorted[0].key)
+    notificationsStore.showNotification({
+      message: `Deleted your session "${session.name}"`,
+      level: 'success',
+      autohide: 3000,
+    })
   }
 
   private handleRenameSession = async (session: Session) => {
@@ -1060,6 +1104,11 @@ class App extends React.Component<
       return
     }
     session.name = newName
+    notificationsStore.showNotification({
+      message: `Renamed your session "${session.name}" to "${newName}"`,
+      level: 'success',
+      autohide: 3000,
+    })
   }
 
   private handleShareSession = async () => {
@@ -1246,7 +1295,9 @@ class App extends React.Component<
     )
 
     const ShareSessionButton =
-      currentUser && !currentUser.isAnonymous ? (
+      currentUser &&
+      !currentUser.isAnonymous &&
+      sessionStore.activeSessionType === 'my' ? (
         <Button m={[1, 2]} onClick={this.handleShareSession}>
           Share
         </Button>
@@ -1276,6 +1327,21 @@ class App extends React.Component<
             <Hidden xsDown>Save</Hidden>
           </MuiButton>
         )}
+
+        {isSignedIn &&
+          sessionStore.activeSessionType === 'shared' && (
+            <MuiButton
+              color="secondary"
+              variant="raised"
+              onClick={this.saveSharedSessionToMySessions}
+            >
+              <SaveIcon />
+              <Hidden xsDown mdUp>
+                Save
+              </Hidden>
+              <Hidden smDown>Save to my sessions</Hidden>
+            </MuiButton>
+          )}
 
         {isSignedIn && sessionStore.activeSession.author === currentUser!.uid
           ? ShareSessionButton
@@ -1462,7 +1528,7 @@ class App extends React.Component<
 
         <Divider />
 
-        <List dense>
+        <List dense className={css({ backgroundColor: 'white' })}>
           <ListSubheader
             className={css({
               display: 'flex',
@@ -1866,86 +1932,6 @@ class App extends React.Component<
     )
   }
 
-  private closeOfflineNotification = () => {
-    this.setState({ isOfflineNotificationShown: false })
-  }
-
-  private closeOnlineNotification = () => {
-    this.setState({ isOnlineNotificationShown: false })
-  }
-
-  private renderOfflineNotification = () => {
-    if (!this.state.isOfflineNotificationShown) {
-      return null
-    }
-
-    return (
-      <Snackbar
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        open={this.state.isOfflineNotificationShown}
-        onClose={this.closeOfflineNotification}
-        ContentProps={{
-          className: css({ backgroundColor: '#FF7E79' }),
-          'aria-describedby': 'offline-notification-message',
-        }}
-        message={
-          <span id="offline-notification-message">
-            You're offline - you won't be able to use your saved sessions and a
-            few other features
-          </span>
-        }
-        action={[
-          <IconButton
-            key="close"
-            aria-label="Close"
-            color="inherit"
-            onClick={this.closeOfflineNotification}
-          >
-            <CloseIcon />
-          </IconButton>,
-        ]}
-      />
-    )
-  }
-
-  private renderOnlineNotification = () => {
-    if (!this.state.isOnlineNotificationShown) {
-      return null
-    }
-
-    return (
-      <Snackbar
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        autoHideDuration={5000}
-        open={this.state.isOnlineNotificationShown}
-        onClose={this.closeOnlineNotification}
-        ContentProps={{
-          className: css({ backgroundColor: '#4BCB7C' }),
-          'aria-describedby': 'online-notification-message',
-        }}
-        message={
-          <span id="online-notification-message">You're back online!</span>
-        }
-        action={[
-          <IconButton
-            key="close"
-            aria-label="Close"
-            color="inherit"
-            onClick={this.closeOnlineNotification}
-          >
-            <CloseIcon />
-          </IconButton>,
-        ]}
-      />
-    )
-  }
-
   public render() {
     return (
       <ThemeProvider theme={theme}>
@@ -1957,9 +1943,7 @@ class App extends React.Component<
               <>
                 <CssBaseline />
                 <MobxDevTools />
-
-                {this.renderOfflineNotification()}
-                {this.renderOnlineNotification()}
+                <ToastNotifications />
 
                 <Flex
                   height="100vh"
