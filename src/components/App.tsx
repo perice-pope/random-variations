@@ -37,7 +37,7 @@ import InputAdornment from '@material-ui/core/InputAdornment'
 
 import Chip from '@material-ui/core/Chip'
 
-import { Flex, Box, Button, Text } from './ui'
+import { Flex, Box, Button } from './ui'
 import NotesStaff from './NotesStaff'
 import MeasureScreenSize from './MeasureScreenSize'
 
@@ -116,6 +116,7 @@ import {
   ListItemSecondaryAction,
   Menu,
   MenuItem,
+  ListItemAvatar,
 } from '@material-ui/core'
 import { WithWidth } from '@material-ui/core/withWidth'
 import memoize from 'memoize-one'
@@ -1349,26 +1350,7 @@ class App extends React.Component<
           >
             Sign in
           </MuiButton>
-        ) : (
-          <MuiButton color="inherit" onClick={this.signOut} variant="flat">
-            <Avatar
-              className={css({
-                height: 30,
-                width: 30,
-              })}
-              src={
-                currentUser && currentUser.photoURL
-                  ? currentUser.photoURL
-                  : undefined
-              }
-            >
-              {currentUser && currentUser.displayName
-                ? currentUser.displayName
-                : null}
-            </Avatar>
-            <Text ml={2}>Log out</Text>
-          </MuiButton>
-        )}
+        ) : null}
       </>
     )
 
@@ -1509,6 +1491,41 @@ class App extends React.Component<
         </div>
         <Divider />
         <List>
+          {isSignedIn ? (
+            <ButtonWithMenu
+              renderButton={props => (
+                <ListItem button {...props}>
+                  <ListItemAvatar>
+                    <Avatar
+                      className={css({
+                        height: 30,
+                        width: 30,
+                      })}
+                      src={
+                        currentUser && currentUser.photoURL
+                          ? currentUser.photoURL
+                          : undefined
+                      }
+                    />
+                  </ListItemAvatar>
+                  <ListItemText>
+                    {currentUser && currentUser.displayName}
+                  </ListItemText>
+                </ListItem>
+              )}
+              renderMenu={props => (
+                <Menu id="account-menu" {...props}>
+                  <MenuItem
+                    onClick={() => {
+                      this.signOut()
+                    }}
+                  >
+                    Log out
+                  </MenuItem>
+                </Menu>
+              )}
+            />
+          ) : null}
           <ListItem button onClick={this.openSettingsModal}>
             <ListItemIcon>
               <SettingsIcon />
