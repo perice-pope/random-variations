@@ -1,0 +1,27 @@
+{
+  "root": "build/",
+  "routes": {
+    "/css/*": "/css/",
+    "/js/*": "/js/",
+    "/img/*": "/img/",
+    "/**": "index.html"
+  },
+  "headers": {
+    "/**": {
+      "Strict-Transport-Security": "max-age=7776000"
+    },
+    "/js/*": {
+      "Cache-Control": "public, max-age=7776000"
+    },
+    "/**.woff": {
+      "Cache-Control": "public, max-age=7776000"
+    },
+    "/**.woff2": {
+      "Cache-Control": "public, max-age=7776000"
+    },
+    "/**.ttf": {
+      "Cache-Control": "public, max-age=7776000"
+    }
+  },
+  "https_only": true
+}
