@@ -5,7 +5,7 @@ import * as Vex from 'vexflow'
 import { css } from 'react-emotion'
 import { darken, getLuminance } from 'polished'
 
-import { Box, BoxProps } from './ui'
+import { Box } from './ui'
 import { StaffTick } from '../types'
 import MeasureScreenSize from './MeasureScreenSize'
 
@@ -21,7 +21,7 @@ const activeNoteClasses = {
 type NotesStaffProps = {
   id: string
   scale?: number
-  lines: number
+  maxLines: number
   ticks: StaffTick[]
   tickLabels?: { [tickIndex: number]: string }
   clef: string
@@ -30,8 +30,7 @@ type NotesStaffProps = {
   showEnd?: boolean
   activeTickIndex?: number
   staveHeight: number
-  height: number
-  containerProps?: BoxProps
+  containerProps?: any
 }
 
 type NotesStaffState = {
@@ -40,7 +39,7 @@ type NotesStaffState = {
 
 class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
   static defaultProps: Partial<NotesStaffProps> = {
-    lines: 1,
+    maxLines: 1,
     scale: 1,
     staveHeight: 140,
     clef: 'treble',
@@ -70,11 +69,6 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.height !== this.props.height) {
-      this.redraw()
-      return
-    }
-
     if (prevProps.ticks.length !== this.props.ticks.length) {
       this.redraw()
       return
@@ -108,16 +102,26 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     this.redraw()
   }
 
+  private getLinesCount = () => {
+    const cardsToLines = this.getCardsToLinesMapping()
+    return Math.max(1, _.uniq(_.values(cardsToLines)).length)
+  }
+
+  private getHeight = () => {
+    return (
+      (20 + this.getLinesCount() * this.props.staveHeight) * this.props.scale!
+    )
+  }
+
   private redraw = () => {
     console.log('NotesStaff -> redraw')
-    const { height } = this.props
+    const height = this.getHeight()
     const width = this.state.boxWidth
 
     // Configure the rendering context
     this.renderer.resize(width, height)
     this.renderContext = this.renderer.getContext()
     this.renderContext.scale(this.props.scale || 1, this.props.scale || 1)
-
 
     this.renderContext.clear()
     this.renderContext
@@ -165,7 +169,13 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         continue
       }
 
-      let x = note.getAbsoluteX()
+      let x
+      try {
+        x = note.getAbsoluteX()
+      } catch (error) {
+        console.error(error)
+        continue
+      }
       if (i > 0 && line === currentLine) {
         const notesForPreviousTick = this.notesPerTick[i - 1]
         const measureLine = notesForPreviousTick.find(
@@ -252,18 +262,19 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
   private drawStaveAndClef = () => {
     console.log('NotesStaff -> drawStaveAndClef')
     const { staveHeight, scale } = this.props
+    const linesCount = this.getLinesCount()
     const width = this.state.boxWidth / (scale || 1.0)
 
     // Create a stave of at position 0, 0 on the canvas.
     this.staves = []
-    for (let i = 0; i < this.props.lines; ++i) {
+    for (let i = 0; i < linesCount; ++i) {
       this.staves[i] = new Vex.Flow.Stave(0, staveHeight * i, width)
       if (i === 0) {
         // Add a clef and time signature.
         this.staves[i].addClef(this.props.clef)
       }
 
-      if (this.props.showEnd && i === this.props.lines - 1) {
+      if (this.props.showEnd && i === linesCount - 1) {
         this.staves[i].setEndBarType(Vex.Flow.Barline.type.END)
       }
 
@@ -274,8 +285,9 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
   private drawNotes = () => {
     console.log('NotesStaff -> drawNotes')
-    const { ticks, lines } = this.props
+    const { ticks } = this.props
     const { staves, renderContext } = this
+    const linesCount = this.getLinesCount()
 
     // Clear the old notes
     renderContext.clear()
@@ -371,14 +383,9 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
     const tickIndexes = _.range(0, ticks.length)
     const cardIdToTickIndexes = _.groupBy(tickIndexes, i => ticks[i].noteCardId)
-
-    const cardIdToLine = {}
     const cardIds = _.keys(cardIdToTickIndexes)
-    const cardsPerLine = Math.ceil(cardIds.length / lines)
 
-    cardIds.forEach((cardId, index) => {
-      cardIdToLine[cardId] = Math.floor(index / cardsPerLine)
-    })
+    const cardIdToLine = this.getCardsToLinesMapping()
     const lineToCardIds = _.groupBy(cardIds, cardId => cardIdToLine[cardId])
 
     this.tickToLine = {}
@@ -387,7 +394,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     })
 
     const lineToTickNotes = {}
-    for (let i = 0; i < lines; ++i) {
+    for (let i = 0; i < linesCount; ++i) {
       lineToTickNotes[i] = []
       if (!lineToCardIds[i]) {
         continue
@@ -404,7 +411,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
       })
     }
 
-    for (let i = 0; i < lines; ++i) {
+    for (let i = 0; i < linesCount; ++i) {
       Vex.Flow.Formatter.FormatAndDraw(
         this.renderContext,
         staves[i],
@@ -459,19 +466,53 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     }
   }
 
+  // TODO: memoize this function
+  private getCardsToLinesMapping = () => {
+    const { ticks, maxLines } = this.props
+    const tickIndexes = _.range(0, ticks.length)
+    const cardIdToTickIndexes = _.groupBy(tickIndexes, i => ticks[i].noteCardId)
+    const cardIds = _.keys(cardIdToTickIndexes)
+
+    let cardIdToLine = {}
+    for (let lines = 1; lines <= maxLines; ++lines) {
+      let cardsPerLine = Math.ceil(cardIds.length / lines)
+
+      const lineToCardIds = _.chunk(cardIds, cardsPerLine)
+      cardIdToLine = {}
+      let maxLineNotesCount = 0
+      for (let line = 0; line < lineToCardIds.length; ++line) {
+        let lineNotesCount = 0
+        lineToCardIds[line].forEach(cardId => {
+          cardIdToLine[cardId] = line
+          lineNotesCount += cardIdToTickIndexes[cardId].length - 1
+        })
+
+        maxLineNotesCount = Math.max(lineNotesCount, maxLineNotesCount)
+      }
+
+      console.log('LINES: ', lines, maxLineNotesCount)
+      if (maxLineNotesCount < 16) {
+        break
+      }
+    }
+
+    return cardIdToLine
+  }
+
   public render() {
-    const { id, height, containerProps } = this.props
+    const { id, containerProps } = this.props
+    const height = this.getHeight()
 
     const content = (
       // @ts-ignore
-      <Box
-        width={1}
+      <div
+        className={css(`width: 100%`)}
         {...containerProps}
         // @ts-ignore
-        innerRef={this.boxRef}
+        ref={this.boxRef}
       >
         <Box height={height} width={1} id={id} />
-      </Box>
+      </div>
     )
 
     return (

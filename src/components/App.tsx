@@ -29,6 +29,8 @@ import PlusIcon from '@material-ui/icons/Add'
 import EditIcon from '@material-ui/icons/Edit'
 import ShareIcon from '@material-ui/icons/Share'
 import SaveIcon from '@material-ui/icons/Save'
+import FullscreenIcon from '@material-ui/icons/Fullscreen'
+import FullscreenExitIcon from '@material-ui/icons/FullscreenExit'
 import ArrowsIcon from '@material-ui/icons/Cached'
 import TimerIcon from '@material-ui/icons/Timer'
 import MetronomeIcon from 'mdi-material-ui/Metronome'
@@ -82,7 +84,7 @@ import PianoKeyboard from './PianoKeyboard'
 
 import SettingsModal from './SettingsModal'
 import AddEntityButton from './AddEntityButton'
-import { reaction, toJS } from 'mobx'
+import { reaction, toJS, observable } from 'mobx'
 import { observer } from 'mobx-react'
 import MobxDevTools from 'mobx-react-devtools'
 import {
@@ -130,6 +132,11 @@ window.notificationsStore = notificationsStore
 
 console.log('All supported audio fonts: ', _.map(AudioFontsConfig, 'title'))
 console.log('All supported chord names: ', Chord.names())
+
+const state = observable({
+  isFullScreen: false,
+  isControlsShown: false,
+})
 
 type AppState = {
   isMenuOpen: boolean
@@ -277,6 +284,39 @@ const styles = theme => ({
     marginLeft: 0,
   },
 })
+
+function toggleFullScreen() {
+  var doc = window.document as any
+  var docEl = doc.documentElement as any
+
+  if (!docEl) {
+    return
+  }
+
+  var requestFullScreen =
+    docEl.requestFullscreen ||
+    docEl.mozRequestFullScreen ||
+    docEl.webkitRequestFullScreen ||
+    docEl.msRequestFullscreen
+  var cancelFullScreen =
+    doc.exitFullscreen ||
+    doc.mozCancelFullScreen ||
+    doc.webkitExitFullscreen ||
+    doc.msExitFullscreen
+
+  if (
+    !doc.fullscreenElement &&
+    !doc.mozFullScreenElement &&
+    !doc.webkitFullscreenElement &&
+    !doc.msFullscreenElement
+  ) {
+    requestFullScreen.call(docEl)
+    state.isFullScreen = true
+  } else {
+    cancelFullScreen.call(doc)
+    state.isFullScreen = false
+  }
+}
 
 @observer
 class App extends React.Component<
@@ -584,11 +624,17 @@ class App extends React.Component<
 
   private getPianoHeight = () => {
     const { height } = this.state
-    if (height > 600) {
+    if (height > 800) {
       return 130
     }
-    if (height > 300) {
+    if (height > 600) {
       return 80
+    }
+    if (height > 400) {
+      return 60
+    }
+    if (height > 300) {
+      return 50
     }
     return 40
   }
@@ -1313,6 +1359,8 @@ class App extends React.Component<
           <MenuIcon />
         </IconButton>
 
+        {TogglePlaybackButton}
+
         {!isSignedIn && (
           <MuiButton
             color="secondary"
@@ -1340,6 +1388,21 @@ class App extends React.Component<
           )}
 
         <Box className={css({ flexGrow: 1 })} />
+
+        <IconButton
+          color="inherit"
+          aria-label={
+            state.isControlsShown
+              ? 'Hide session controls'
+              : 'Show session controls'
+          }
+          onClick={() => {
+            state.isControlsShown = !state.isControlsShown
+          }}
+          className={cx(classes.menuButton)}
+        >
+          <SettingsIcon />
+        </IconButton>
 
         {!isSignedIn ? (
           <MuiButton
@@ -1446,37 +1509,8 @@ class App extends React.Component<
       </>
     )
 
-    let notesStaffLines = Math.max(
-      1,
-      this.state.height >= 500
-        ? Math.ceil(
-            this.state.staffTicks.length /
-              (this.props.width === 'xs'
-                ? 12
-                : this.props.width === 'sm'
-                  ? 16
-                  : 20),
-          )
-        : 1,
-    )
-
-    if (this.state.height >= 900) {
-      notesStaffLines = Math.min(notesStaffLines, 2)
-    }
-    console.log(this.state.staffTicks.length, notesStaffLines)
-
-    let notesStaffScaleFactor = 1.0
-    if (isMobile) {
-      notesStaffScaleFactor = 0.6
-    } else if (this.props.width === 'md') {
-      notesStaffScaleFactor = 0.85
-    }
-
-    if (notesStaffLines > 1) {
-      notesStaffScaleFactor *= 1 - 0.05 * notesStaffLines
-    } else if (this.state.staffTicks.length > 10) {
-      notesStaffScaleFactor *= 0.95
-    }
+    const notesStaffMaxLines = this.getMaxNotesStaffLines()
+    const notesStaffScaleFactor = this.getNotesStaffScaleFactor(isMobile)
 
     const sessionsSorted = sessionStore.mySessionsSorted
 
@@ -1526,6 +1560,18 @@ class App extends React.Component<
               )}
             />
           ) : null}
+
+          <ListItem button onClick={toggleFullScreen}>
+            <ListItemIcon>
+              {state.isFullScreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                state.isFullScreen ? 'Exit full-screen' : 'Enter full-screen'
+              }
+            />
+          </ListItem>
+
           <ListItem button onClick={this.openSettingsModal}>
             <ListItemIcon>
               <SettingsIcon />
@@ -1693,36 +1739,34 @@ class App extends React.Component<
                   !isMobile && this.state.isMenuOpen && classes.contentShift,
                 )}
               >
-                <Flex
+                <Box
                   pt={[3, 3, 4]}
                   flex={1}
                   px={[3, 4, 4]}
                   maxWidth={960}
                   width={1}
-                  justifyContent="center"
-                  alignItems="center"
-                  flexDirection="column"
                 >
-                  <Flex
-                    alignItems="center"
-                    flexDirection="row"
-                    mb={3}
-                    width={1}
-                    flexWrap="wrap"
-                    justifyContent="center"
-                  >
-                    <Box
-                      flex="1"
-                      className={css({ whiteSpace: 'nowrap' })}
-                      mb={1}
-                      mr={2}
+                  {state.isControlsShown ? (
+                    <Flex
+                      alignItems="center"
+                      flexDirection="row"
+                      mb={3}
+                      width={1}
+                      flexWrap="wrap"
+                      justifyContent="center"
                     >
-                      {TogglePlaybackButton}
-                      {ShuffleButton}
-                    </Box>
+                      <Box
+                        flex="1"
+                        className={css({ whiteSpace: 'nowrap' })}
+                        mb={1}
+                        mr={2}
+                      >
+                        {ShuffleButton}
+                      </Box>
 
-                    {SessionControls}
-                  </Flex>
+                      {SessionControls}
+                    </Flex>
+                  ) : null}
 
                   <Flex
                     flex={2}
@@ -1731,7 +1775,6 @@ class App extends React.Component<
                     flexDirection="column"
                     maxHeight={400}
                     width={1}
-                    maxWidth={700}
                   >
                     <Grow
                       in={this.state.isInitialized}
@@ -1814,7 +1857,7 @@ class App extends React.Component<
 
                   <NotesStaff
                     scale={notesStaffScaleFactor}
-                    lines={notesStaffLines}
+                    maxLines={notesStaffMaxLines}
                     isPlaying={isPlaying}
                     key={this.state.contentWidth}
                     showEnd
@@ -1824,9 +1867,8 @@ class App extends React.Component<
                     activeTickIndex={
                       isPlaying ? activeStaffTickIndex : undefined
                     }
-                    height={20 + 100 * notesStaffLines}
                   />
-                </Flex>
+                </Box>
 
                 <Box mt={[1, 2, 3]}>
                   <PianoKeyboard
@@ -1956,6 +1998,33 @@ class App extends React.Component<
         </Box>
       </Flex>
     )
+  }
+
+  private getMaxNotesStaffLines() {
+    let maxLines = this.state.height >= 400 ? 4 : 1
+
+    return maxLines
+  }
+
+  private getNotesStaffScaleFactor(isMobile: boolean) {
+    let scale = 1.0
+    if (isMobile) {
+      scale = 0.6
+    } else if (this.props.width === 'md') {
+      scale = 0.85
+    }
+
+    if (this.state.staffTicks.length > 96) {
+      scale *= 0.7
+    } else if (this.state.staffTicks.length > 64) {
+      scale *= 0.75
+    } else if (this.state.staffTicks.length > 32) {
+      scale *= 0.8
+    } else if (this.state.staffTicks.length > 16) {
+      scale *= 0.9
+    }
+
+    return scale
   }
 
   public render() {

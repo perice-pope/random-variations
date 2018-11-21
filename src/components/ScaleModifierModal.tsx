@@ -365,7 +365,7 @@ class ScaleModifierModal extends React.Component<
               isPlaying={false}
               showBreaks
               activeTickIndex={undefined}
-              height={160}
+              maxLines={1}
             />
           </Box>
         </DialogContent>
