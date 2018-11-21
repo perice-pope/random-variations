@@ -27,6 +27,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import DeleteIcon from '@material-ui/icons/Close'
 import PlusIcon from '@material-ui/icons/Add'
 import EditIcon from '@material-ui/icons/Edit'
+import ShareIcon from '@material-ui/icons/Share'
 import SaveIcon from '@material-ui/icons/Save'
 import ArrowsIcon from '@material-ui/icons/Cached'
 import TimerIcon from '@material-ui/icons/Timer'
@@ -113,10 +114,13 @@ import {
   SwipeableDrawer,
   withWidth,
   ListItemSecondaryAction,
+  Menu,
+  MenuItem,
 } from '@material-ui/core'
 import { WithWidth } from '@material-ui/core/withWidth'
 import memoize from 'memoize-one'
 import ToastNotifications, { notificationsStore } from './ToastNotifications'
+import ButtonWithMenu from './ButtonWithMenu'
 
 globalStyles()
 
@@ -1116,13 +1120,8 @@ class App extends React.Component<
     })
   }
 
-  private handleShareSession = async () => {
-    if (!sessionStore.activeSession) {
-      return
-    }
-    const sharedKey = await sessionStore.shareMySessionByKey(
-      sessionStore.activeSession.key,
-    )
+  private handleShareSession = async session => {
+    const sharedKey = await sessionStore.shareMySessionByKey(session.key)
     alert(`Sharable link: ${window.location.origin}/shared/${sharedKey}`)
   }
 
@@ -1299,15 +1298,6 @@ class App extends React.Component<
       </Button>
     )
 
-    const ShareSessionButton =
-      currentUser &&
-      !currentUser.isAnonymous &&
-      sessionStore.activeSessionType === 'my' ? (
-        <Button m={[1, 2]} onClick={this.handleShareSession}>
-          Share
-        </Button>
-      ) : null
-
     const ToolbarContent = (
       <>
         <IconButton
@@ -1347,10 +1337,6 @@ class App extends React.Component<
               <Hidden smDown>Save to my sessions</Hidden>
             </MuiButton>
           )}
-
-        {isSignedIn && sessionStore.activeSession.author === currentUser!.uid
-          ? ShareSessionButton
-          : null}
 
         <Box className={css({ flexGrow: 1 })} />
 
@@ -1597,20 +1583,38 @@ class App extends React.Component<
                   }
                 />
                 <ListItemSecondaryAction>
-                  <Tooltip title="Rename">
-                    <IconButton aria-label="Rename">
-                      <EditIcon
-                        onClick={() => this.handleRenameSession(session)}
-                      />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Remove" variant="gray">
-                    <IconButton aria-label="Delete">
-                      <DeleteIcon
-                        onClick={() => this.handleDeleteSession(session)}
-                      />
-                    </IconButton>
-                  </Tooltip>
+                  <ButtonWithMenu
+                    renderButton={props => (
+                      <IconButton aria-label="Open session menu" {...props}>
+                        <MenuIcon />
+                      </IconButton>
+                    )}
+                    renderMenu={props => (
+                      <Menu id={`session-menu-${session.key}`} {...props}>
+                        <MenuItem
+                          onClick={() => {
+                            this.handleShareSession(session)
+                          }}
+                        >
+                          <ShareIcon color="action" /> Share
+                        </MenuItem>
+                        <MenuItem
+                          onClick={() => {
+                            this.handleRenameSession(session)
+                          }}
+                        >
+                          <EditIcon color="action" /> Rename
+                        </MenuItem>
+                        <MenuItem
+                          onClick={() => {
+                            this.handleDeleteSession(session)
+                          }}
+                        >
+                          <DeleteIcon  color="action" /> Delete
+                        </MenuItem>
+                      </Menu>
+                    )}
+                  />
                 </ListItemSecondaryAction>
               </ListItem>
             ))}
