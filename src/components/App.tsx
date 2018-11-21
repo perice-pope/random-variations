@@ -124,6 +124,7 @@ import { WithWidth } from '@material-ui/core/withWidth'
 import memoize from 'memoize-one'
 import ToastNotifications, { notificationsStore } from './ToastNotifications'
 import ButtonWithMenu from './ButtonWithMenu'
+import ShareSessionModal from './ShareSessionModal'
 
 globalStyles()
 
@@ -173,6 +174,8 @@ type AppState = {
 
   signInModalIsOpen: boolean
   settingsModalIsOpen: boolean
+  shareSessionModalIsOpen: boolean
+  shareSessionModalSession?: Session
 
   // Modifier dialogs
   chromaticApproachesModalIsOpen: boolean
@@ -367,6 +370,7 @@ class App extends React.Component<
       noteEditingModalNoteCard: undefined,
 
       settingsModalIsOpen: false,
+      shareSessionModalIsOpen: false,
     })
 
     reaction(
@@ -895,6 +899,13 @@ class App extends React.Component<
     this.setState({ settingsModalIsOpen: false })
   }
 
+  private closeShareSessionModal = () => {
+    this.setState({
+      shareSessionModalIsOpen: false,
+      shareSessionModalSession: undefined,
+    })
+  }
+
   private closeNoteEditingModal = () => {
     this.setState({
       noteEditingModalIsOpen: false,
@@ -1084,7 +1095,7 @@ class App extends React.Component<
     notificationsStore.showNotification({
       message: `Created new session "${sessionName}"`,
       level: 'success',
-      autohide: 3000,
+      autohide: 6000,
     })
   }
 
@@ -1108,7 +1119,7 @@ class App extends React.Component<
         originalSession.name
       }" in your sessions as "${sessionName}"`,
       level: 'success',
-      autohide: 3000,
+      autohide: 6000,
     })
   }
 
@@ -1150,7 +1161,7 @@ class App extends React.Component<
     notificationsStore.showNotification({
       message: `Deleted your session "${session.name}"`,
       level: 'success',
-      autohide: 3000,
+      autohide: 6000,
     })
   }
 
@@ -1163,13 +1174,16 @@ class App extends React.Component<
     notificationsStore.showNotification({
       message: `Renamed your session "${session.name}" to "${newName}"`,
       level: 'success',
-      autohide: 3000,
+      autohide: 6000,
     })
   }
 
   private handleShareSession = async session => {
-    const sharedKey = await sessionStore.shareMySessionByKey(session.key)
-    alert(`Sharable link: ${window.location.origin}/shared/${sharedKey}`)
+    await sessionStore.shareMySessionByKey(session.key)
+    this.setState({
+      shareSessionModalIsOpen: true,
+      shareSessionModalSession: session,
+    })
   }
 
   private renderApp = () => {
@@ -1352,6 +1366,7 @@ class App extends React.Component<
           aria-label={this.state.isMenuOpen ? 'Close menu' : 'Open menu'}
           onClick={this.state.isMenuOpen ? this.closeMenu : this.openMenu}
           className={cx(
+            css(`margin-left: 0 !important; margin-right: 10px !important;`),
             classes.menuButton,
             !isMobile && this.state.isMenuOpen && classes.hide,
           )}
@@ -1389,20 +1404,22 @@ class App extends React.Component<
 
         <Box className={css({ flexGrow: 1 })} />
 
-        <IconButton
-          color="inherit"
-          aria-label={
-            state.isControlsShown
-              ? 'Hide session controls'
-              : 'Show session controls'
-          }
-          onClick={() => {
-            state.isControlsShown = !state.isControlsShown
-          }}
-          className={cx(classes.menuButton)}
-        >
-          <SettingsIcon />
-        </IconButton>
+        {isMobile ? (
+          <IconButton
+            color="inherit"
+            aria-label={
+              state.isControlsShown
+                ? 'Hide session controls'
+                : 'Show session controls'
+            }
+            onClick={() => {
+              state.isControlsShown = !state.isControlsShown
+            }}
+            className={cx(classes.menuButton)}
+          >
+            <SettingsIcon />
+          </IconButton>
+        ) : null}
 
         {!isSignedIn ? (
           <MuiButton
@@ -1746,7 +1763,7 @@ class App extends React.Component<
                   maxWidth={960}
                   width={1}
                 >
-                  {state.isControlsShown ? (
+                  {state.isControlsShown || !isMobile ? (
                     <Flex
                       alignItems="center"
                       flexDirection="row"
@@ -1925,6 +1942,12 @@ class App extends React.Component<
             }}
             onSubmit={this.closeSettingsModal}
             onAudioFontChanged={this.handleAudioFontChanged}
+          />
+
+          <ShareSessionModal
+            isOpen={this.state.shareSessionModalIsOpen}
+            session={this.state.shareSessionModalSession!}
+            onClose={this.closeShareSessionModal}
           />
 
           <ArpeggioModifierModal

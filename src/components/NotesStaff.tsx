@@ -57,12 +57,12 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
   private renderContext: Vex.IRenderContext
 
   private boxRef: React.RefObject<any> = React.createRef()
+  private labelAnnotations: Vex.Flow.Modifier[] = []
 
   private notesPerTick: Vex.Flow.Note[][] = []
   private tickToLine: { [k: number]: number } = {}
   private staves: Vex.Flow.Stave[] = []
   private activeLineEl?: SVGElement
-  private tickLabelsGroup?: SVGElement
 
   componentDidMount() {
     this.initRenderer()
@@ -138,66 +138,6 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     this.updateActiveNoteLine()
   }
 
-  private drawTickLabels = () => {
-    console.log('NotesStaff -> drawTickLabels')
-    if (this.tickLabelsGroup) {
-      this.tickLabelsGroup.remove()
-      this.tickLabelsGroup = undefined
-    }
-
-    this.renderContext.save()
-    this.renderContext.setLineWidth(2)
-    this.renderContext.setFont('sans-serif', 14, 400)
-    this.renderContext.setStrokeStyle('salmon')
-
-    // @ts-ignore
-    this.tickLabelsGroup = this.renderContext.openGroup() as SVGElement
-
-    let currentLine = 0
-    for (let i = 0; i < this.notesPerTick.length; ++i) {
-      if (!this.props.tickLabels || !this.props.tickLabels[i]) {
-        continue
-      }
-      const label = this.props.tickLabels[i]
-      const notes = this.notesPerTick[i]
-      const line = this.tickToLine[i] || 0
-      if (notes.length < 1) {
-        continue
-      }
-      const note = notes.find(n => n instanceof Vex.Flow.StaveNote)
-      if (!note) {
-        continue
-      }
-
-      let x
-      try {
-        x = note.getAbsoluteX()
-      } catch (error) {
-        console.error(error)
-        continue
-      }
-      if (i > 0 && line === currentLine) {
-        const notesForPreviousTick = this.notesPerTick[i - 1]
-        const measureLine = notesForPreviousTick.find(
-          n => n instanceof Vex.Flow.BarNote,
-        )
-        if (measureLine) {
-          x = measureLine.getAbsoluteX()
-        }
-      }
-
-      this.renderContext.fillText(label, x, 30 + line * this.props.staveHeight)
-
-      currentLine = line
-    }
-    this.renderContext.restore()
-
-    this.tickLabelsGroup.classList.add('vf-tick-labels')
-
-    // @ts-ignore
-    this.renderContext.closeGroup()
-  }
-
   private drawActiveNoteLine = () => {
     console.log('NotesStaff -> drawActiveNoteLine')
     const { staves } = this
@@ -268,7 +208,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     // Create a stave of at position 0, 0 on the canvas.
     this.staves = []
     for (let i = 0; i < linesCount; ++i) {
-      this.staves[i] = new Vex.Flow.Stave(0, staveHeight * i, width)
+      this.staves[i] = new Vex.Flow.Stave(0, 40 + staveHeight * i, width)
       if (i === 0) {
         // Add a clef and time signature.
         this.staves[i].addClef(this.props.clef)
@@ -306,6 +246,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
     let tickIndexToCardId = {}
 
+    this.labelAnnotations = []
     const tickToNotes = ticks.map((tick, index) => {
       const shouldAddMeasureLine =
         index < ticks.length - 1 &&
@@ -369,6 +310,18 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         })
 
         notes = [vexFlowNote]
+
+        if (this.props.tickLabels && this.props.tickLabels[index]) {
+          const annotation = new Vex.Flow.Annotation(
+            this.props.tickLabels[index],
+          )
+            .setFont('Sans-serif', 17, 'bold')
+            .setVerticalJustification(Vex.Flow.Annotation.VerticalJustify.TOP)
+            .setYShift(40)
+          this.labelAnnotations.push(annotation)
+
+          vexFlowNote.addModifier(0, annotation)
+        }
       }
 
       if (shouldAddMeasureLine) {
@@ -419,9 +372,13 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
       )
     }
 
-    this.notesPerTick = tickToNotes
+    this.renderContext.setStrokeStyle('black')
+    this.renderContext.setFillStyle('black')
+    this.labelAnnotations.forEach(modifier => {
+      modifier.draw()
+    })
 
-    this.drawTickLabels()
+    this.notesPerTick = tickToNotes
   }
 
   updateActiveNoteLine = () => {
@@ -455,6 +412,13 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         this.activeLineEl.style = `transform: translateX(${activeLineXNew}px) translateY(${activeLineYNew}px);`
 
         activeNote.draw()
+        // if (tickLabels && tickLabels[activeTickIndex]) {
+        this.renderContext.setStrokeStyle('black')
+        this.renderContext.setFillStyle('black')
+        this.labelAnnotations.forEach(modifier => {
+          modifier.draw()
+        })
+        // }
       }
     }
   }
@@ -490,7 +454,6 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         maxLineNotesCount = Math.max(lineNotesCount, maxLineNotesCount)
       }
 
-      console.log('LINES: ', lines, maxLineNotesCount)
       if (maxLineNotesCount < 16) {
         break
       }
