@@ -1610,7 +1610,7 @@ class App extends React.Component<
                             this.handleDeleteSession(session)
                           }}
                         >
-                          <DeleteIcon  color="action" /> Delete
+                          <DeleteIcon color="action" /> Delete
                         </MenuItem>
                       </Menu>
                     )}
@@ -1951,7 +1951,9 @@ class App extends React.Component<
             <JssProvider jss={jss} generateClassName={generateClassName}>
               <>
                 <CssBaseline />
-                <MobxDevTools />
+                {process.env.NODE_ENV !== 'production' ? (
+                  <MobxDevTools />
+                ) : null}
                 <ToastNotifications />
 
                 <Flex
