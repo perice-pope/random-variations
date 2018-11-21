@@ -441,6 +441,11 @@ class App extends React.Component<
             this.activateMySession(this.props.match.params.sessionKey)
           }
         } else if (!isSharedSession) {
+          notificationsStore.showNotification({
+            message: `This is a demo mode - your practice session won't be saved. Please sign in to be able to save your sessions.`,
+            level: 'info',
+            autohide: 15000,
+          })
           await loadAndActivateOfflineSession()
         }
 
