@@ -161,7 +161,7 @@ export default class AddEntityButton extends React.Component<
               userSelect: 'none',
             }),
           }}
-          placement={showHelpTooltip ? 'left' : undefined}
+          placement="left"
           disableFocusListener
           disableHoverListener={showHelpTooltip || false}
           disableTouchListener={showHelpTooltip || false}

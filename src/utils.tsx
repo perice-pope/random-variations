@@ -96,9 +96,23 @@ export const getNoteCardColorByNoteName = (fullNoteName: string) => {
 const DEFAULT_SCALE_NAME = 'ionian'
 const DEFAULT_CHORD_NAME = 'maj'
 
+export const parseIntEnsureInBounds = (value, min, max) => {
+  let parsedValue = parseInt(value, 10)
+  if (isNaN(parsedValue)) {
+    parsedValue = 0
+  }
+
+  if (parsedValue > max) {
+    parsedValue = max
+  } else if (parsedValue < min) {
+    parsedValue = min
+  }
+  return parsedValue
+}
+
 export const createDefaultSession = () => {
   const defaultSession: Partial<Session> = {
-    name: 'default',
+    name: 'Default session',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
 

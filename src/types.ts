@@ -168,11 +168,17 @@ export interface SessionNoteCard {
   noteName: string
 }
 
+export interface SharedSessionInfo {
+  user: string
+  session: string
+}
+
 /**
  * Persisted sharable session
  */
 export interface Session {
   key: string
+  sharedKey?: string
   author?: string
   name: string
 

@@ -219,7 +219,9 @@ class ScaleModifierModal extends React.Component<
     staffTicks = this.state.values.pattern.items.map((item, index) => {
       const semitonesCount =
         item && !item.muted ? semitones[item.note - 1] || 0 : 0
-      const note = getSemitonesTransposer(semitonesCount)(baseNote)
+      const note = item.muted
+        ? undefined
+        : getSemitonesTransposer(semitonesCount)(baseNote)
 
       return {
         id: `${index}`,
