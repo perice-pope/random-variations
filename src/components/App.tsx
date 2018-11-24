@@ -1443,30 +1443,19 @@ class App extends React.Component<
           <Flex maxWidth={MAX_LAYOUT_WIDTH} width={1}>
             {TogglePlaybackButton}
 
-            {!isSignedIn && (
-              <MuiButton
-                color="secondary"
-                variant="raised"
-                onClick={!isSignedIn ? this.openSignInModal : undefined}
-              >
-                <SaveIcon />
-                <Hidden xsDown>Save</Hidden>
-              </MuiButton>
-            )}
-
             {isSignedIn &&
               sessionStore.activeSessionType === 'shared' && (
-                <MuiButton
-                  color="secondary"
-                  variant="raised"
+                <Button
+                  m={[1, 2]}
+                  bg="#f50057"
                   onClick={this.saveSharedSessionToMySessions}
                 >
-                  <SaveIcon />
+                  <SaveIcon className={css({ margin: '0 0.5rem' })} />
                   <Hidden xsDown mdUp>
                     Save
                   </Hidden>
                   <Hidden smDown>Save to my sessions</Hidden>
-                </MuiButton>
+                </Button>
               )}
 
             <Box className={css({ flexGrow: 1 })} />
@@ -1489,14 +1478,13 @@ class App extends React.Component<
             ) : null}
 
             {!isSignedIn ? (
-              <MuiButton
-                // color="primary"
-                color="secondary"
+              <Button
+                m={[1, 2]}
+                bg="#f50057"
                 onClick={this.openSignInModal}
-                variant="raised"
               >
-                Sign in
-              </MuiButton>
+                <span className={css(`white-space: nowrap;`)}>Sign in</span>
+              </Button>
             ) : null}
           </Flex>
         </Flex>
