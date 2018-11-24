@@ -233,6 +233,10 @@ class ToneRowModal extends React.Component<
             alignItems: 'flex-start',
             flexDirection: 'column',
             justifyContent: 'flex-start',
+            maxWidth: '600px',
+            width: '100%',
+            margin: '0 auto',
+            marginTop: '2rem',
           })}
         >
           <Flex

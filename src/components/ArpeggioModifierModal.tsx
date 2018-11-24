@@ -318,8 +318,8 @@ class ArpeggioModifierModal extends React.Component<
           id="arpeggio-modifier-dialog-content"
           className={css({
             maxWidth: '600px',
-            margin: '0 auto',
             width: '100%',
+            margin: '0 auto',
             marginTop: '2rem',
           })}
         >
