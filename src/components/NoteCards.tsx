@@ -101,7 +101,7 @@ const SortableNoteCard = SortableElement(
             className={css(`
           width: 25%;
           position: relative;
-          z-index: ${active ? 2 : 1};
+          z-index: ${active ? 10000002 : 10000001};
         `)}
           >
             <Flex p={[1, 2, 2]}>
