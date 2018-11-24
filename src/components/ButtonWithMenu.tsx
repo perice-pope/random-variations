@@ -1,36 +1,36 @@
 import * as React from 'react'
+import { MenuProps } from '@material-ui/core/Menu'
+import { ButtonProps } from '@material-ui/core/Button'
 
 type Props = {
-  renderMenu: (
-    args: {
-      open: boolean
-      onClose: () => any
-      onClick: () => any
-      anchorEl: HTMLElement | null
-    },
-  ) => React.ReactNode
-  renderButton: (
-    args: { onClick: () => any; buttonRef: React.RefObject<HTMLElement> },
-  ) => React.ReactNode
+  renderMenu: (props: MenuProps) => React.ReactNode
+  renderButton: (props: ButtonProps) => React.ReactNode
 }
+
+type Position = { left: number; top: number }
 
 type State = {
   isMenuOpen: boolean
+  menuPosition?: Position
 }
 
 export default class ButtonWithMenu extends React.Component<Props, State> {
   buttonRef = React.createRef<HTMLElement>()
 
-  state = {
+  state: State = {
     isMenuOpen: false,
+    menuPosition: undefined,
   }
 
   static defaultProps = {
     buttonProps: {},
   }
 
-  private openMenu = () => {
-    this.setState({ isMenuOpen: true })
+  private openMenu = event => {
+    this.setState({
+      isMenuOpen: true,
+      menuPosition: { left: event.clientX, top: event.clientY },
+    })
   }
 
   private closeMenu = () => {
@@ -43,7 +43,8 @@ export default class ButtonWithMenu extends React.Component<Props, State> {
           open: this.state.isMenuOpen,
           onClick: this.closeMenu,
           onClose: this.closeMenu,
-          anchorEl: this.buttonRef.current,
+          anchorReference: 'anchorPosition',
+          anchorPosition: this.state.menuPosition,
         })}
         {this.props.renderButton({
           buttonRef: this.buttonRef,

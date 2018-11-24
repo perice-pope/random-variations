@@ -29,6 +29,21 @@ import {
   IntervalsModifier,
 } from './types'
 
+export const NoteNamesWithSharps = [
+  'A',
+  'A#',
+  'B',
+  'C',
+  'C#',
+  'D',
+  'D#',
+  'E',
+  'F',
+  'F#',
+  'G',
+  'G#',
+]
+
 export const SemitonesToIntervalLongNameMap: { [k in IntervalType]: string } = {
   '2m': 'Minor second',
   '2M': 'Major second',

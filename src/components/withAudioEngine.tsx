@@ -2,11 +2,14 @@ import * as React from 'react'
 import AudioEngine from '../services/audioEngine'
 import { AudioFontId } from '../audioFontsConfig'
 
-type ContextType = {
-  audioEngine?: AudioEngine
-  audioFontId?: AudioFontId
+export type WithAudioEngineInjectedProps = {
+  audioEngine: AudioEngine
+  audioFontId: AudioFontId
 }
-export const AudioEngineContext = React.createContext<ContextType>({})
+
+export const AudioEngineContext = React.createContext<
+  Partial<WithAudioEngineInjectedProps>
+>({})
 
 // This function takes a component...
 export function withAudioEngine(Component) {

@@ -132,6 +132,7 @@ import ToastNotifications, { notificationsStore } from './ToastNotifications'
 import ButtonWithMenu from './ButtonWithMenu'
 import ShareSessionModal from './ShareSessionModal'
 import settingsStore from '../services/settingsStore'
+import ToneRowModal from './ToneRowModal';
 
 globalStyles()
 
@@ -168,7 +169,7 @@ type AppState = {
   staffTicks: StaffTick[]
   tickLabels: { [tickIndex: number]: string }
   staffTicksPerCard: { [noteCardId: string]: StaffTick[] }
-  activeNoteCardIndex: number
+  activeNoteCardId?: string
   activeStaffTickIndex: number
 
   height: number
@@ -189,6 +190,7 @@ type AppState = {
   intervalsModalIsOpen: boolean
 
   noteAddingModalIsOpen: boolean
+  toneRowAddingModalIsOpen: boolean
   noteEditingModalIsOpen: boolean
   noteEditingModalNoteCard?: NoteCardType
 }
@@ -227,9 +229,9 @@ const getNoteCardsFromSessionCards = memoize(
   },
 )
 
-const MAX_LAYOUT_WIDTH = 1100
-
-const menuWidth = 280
+const MaxNoteCards = 12
+const MaxLayoutWidth = 1100
+const MenuWidth = 280
 
 const styles = theme => ({
   root: {
@@ -244,8 +246,8 @@ const styles = theme => ({
     }),
   },
   appBarShift: {
-    width: `calc(100% - ${menuWidth}px)`,
-    marginLeft: menuWidth,
+    width: `calc(100% - ${MenuWidth}px)`,
+    marginLeft: MenuWidth,
     transition: theme.transitions.create(['margin', 'width'], {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
@@ -259,11 +261,11 @@ const styles = theme => ({
     display: 'none',
   },
   drawer: {
-    width: menuWidth,
+    width: MenuWidth,
     flexShrink: 0,
   },
   drawerPaper: {
-    width: menuWidth,
+    width: MenuWidth,
   },
   drawerHeader: {
     display: 'flex',
@@ -284,7 +286,7 @@ const styles = theme => ({
     }),
   },
   contentShifted: {
-    marginLeft: -menuWidth,
+    marginLeft: -MenuWidth,
   },
   contentShift: {
     transition: theme.transitions.create('margin', {
@@ -361,7 +363,6 @@ class App extends React.Component<
       staffTicks: [],
       tickLabels: {},
       staffTicksPerCard: {},
-      activeNoteCardIndex: 0,
       activeStaffTickIndex: 0,
 
       signInModalIsOpen: false,
@@ -374,6 +375,7 @@ class App extends React.Component<
       noteAddingModalIsOpen: false,
       noteEditingModalIsOpen: false,
       noteEditingModalNoteCard: undefined,
+      toneRowAddingModalIsOpen: false,
 
       settingsModalIsOpen: false,
       shareSessionModalIsOpen: false,
@@ -528,6 +530,8 @@ class App extends React.Component<
             }
           }
         }
+
+        this.setState({ isInitialized: true })
       },
     )
 
@@ -566,11 +570,9 @@ class App extends React.Component<
       return
     }
 
-    this.setState({ isInitialized: true }, () => {
-      this.unregisterAuthObserver = firebase
-        .auth()
-        .onAuthStateChanged(this.onAuthStateChanged)
-    })
+    this.unregisterAuthObserver = firebase
+      .auth()
+      .onAuthStateChanged(this.onAuthStateChanged)
   }
 
   private initAudioEngine = async () => {
@@ -685,6 +687,14 @@ class App extends React.Component<
     }
   }
 
+  private handleRemoveAllNotes = () => {
+    if (confirm('Do you really want to remove all notes from the session?')) {
+      if (sessionStore.activeSession) {
+        sessionStore.activeSession.noteCards = []
+      }
+    }
+  }
+
   private saveAppState = () => {
     console.log('saveAppState')
     settingsStore.saveSettingsLocally()
@@ -727,7 +737,6 @@ class App extends React.Component<
       }
 
       const nextStaffTickIndex = tick.meta.staffTickIndex
-      console.log('nextStaffNoteIndex: ', nextStaffTickIndex)
       if (nextStaffTickIndex == null) {
         return null
       }
@@ -736,15 +745,10 @@ class App extends React.Component<
       if (!nextStaffTick) {
         return null
       }
-
-      const { noteCards } = this.getNoteCards()
-      // TODO: optimize this serial search code to a hash lookup
-      const nextNoteCardIndex = noteCards.findIndex(
-        nc => nc.id === nextStaffTick.noteCardId,
-      )
+     
       return {
         activeStaffTickIndex: nextStaffTickIndex,
-        activeNoteCardIndex: nextNoteCardIndex,
+        activeNoteCardId: nextStaffTick.noteCardId,
       }
     })
   }
@@ -760,7 +764,7 @@ class App extends React.Component<
     console.log('stopPlaying')
 
     this.setState(
-      { isPlaying: false, activeNoteCardIndex: 0, activeStaffTickIndex: 0 },
+      { isPlaying: false, activeNoteCardId: undefined, activeStaffTickIndex: 0 },
       async () => {
         audioEngine.stopLoop()
 
@@ -912,21 +916,11 @@ class App extends React.Component<
     firebase.auth().signOut()
   }
 
-  private openSignInModal = () => {
-    this.setState({ signInModalIsOpen: true })
-  }
+  private openSignInModal = () => this.setState({ signInModalIsOpen: true })
+  private closeSignInModal = () => this.setState({ signInModalIsOpen: false })
 
-  private closeSignInModal = () => {
-    this.setState({ signInModalIsOpen: false })
-  }
-
-  private openSettingsModal = () => {
-    this.setState({ settingsModalIsOpen: true })
-  }
-
-  private closeSettingsModal = () => {
-    this.setState({ settingsModalIsOpen: false })
-  }
+  private openSettingsModal = () => this.setState({ settingsModalIsOpen: true })
+  private closeSettingsModal = () => this.setState({ settingsModalIsOpen: false })
 
   private submitSettingsModal = ({
     values,
@@ -962,65 +956,23 @@ class App extends React.Component<
     })
   }
 
-  private closeNoteAddingModal = () => {
-    this.setState({
-      noteAddingModalIsOpen: false,
-    })
-  }
+  private closeNoteAddingModal = () => this.setState({ noteAddingModalIsOpen: false })
+  private openNoteAddingModal = () => this.setState({ noteAddingModalIsOpen: true })
 
-  private openNoteAddingModal = () => {
-    this.setState({
-      noteAddingModalIsOpen: true,
-    })
-  }
+  private closeToneRowAddingModal = () => this.setState({ toneRowAddingModalIsOpen: false })
+  private openToneRowAddingModal = () => this.setState({ toneRowAddingModalIsOpen: true })
 
-  private openArpeggioAddingModal = () => {
-    this.setState({
-      chordsModalIsOpen: true,
-    })
-  }
+  private openArpeggioAddingModal = () => this.setState({ chordsModalIsOpen: true })
+  private closeArpeggioAddingModal = () => this.setState({ chordsModalIsOpen: false })
 
-  private closeArpeggioAddingModal = () => {
-    this.setState({
-      chordsModalIsOpen: false,
-    })
-  }
+  private openScalesModal = () => this.setState({ scalesModalIsOpen: true})
+  private closeScalesModal = () => this.setState({ scalesModalIsOpen: false})
 
-  private openScalesModal = () => {
-    this.setState({
-      scalesModalIsOpen: true,
-    })
-  }
+  private openIntervalsModal = () =>  this.setState({intervalsModalIsOpen: true})
+  private closeIntervalsModal = () =>  this.setState({intervalsModalIsOpen: false})
 
-  private closeScalesModal = () => {
-    this.setState({
-      scalesModalIsOpen: false,
-    })
-  }
-
-  private openIntervalsModal = () => {
-    this.setState({
-      intervalsModalIsOpen: true,
-    })
-  }
-
-  private closeIntervalsModal = () => {
-    this.setState({
-      intervalsModalIsOpen: false,
-    })
-  }
-
-  private openChromaticApproachesModal = () => {
-    this.setState({
-      chromaticApproachesModalIsOpen: true,
-    })
-  }
-
-  private closeChromaticApproachesModal = () => {
-    this.setState({
-      chromaticApproachesModalIsOpen: false,
-    })
-  }
+  private openChromaticApproachesModal = () => this.setState({ chromaticApproachesModalIsOpen: true})
+  private closeChromaticApproachesModal = () => this.setState({ chromaticApproachesModalIsOpen: false})
 
   private updateNoteCard = ({ noteCardId, noteName }) => {
     if (sessionStore.activeSession) {
@@ -1179,7 +1131,7 @@ class App extends React.Component<
     }
   }
 
-  private handleNoteClickInNoteCardAddingModal = ({ noteName }) => {
+  private handleAddNoteModalSubmit = ({ noteName }) => {
     if (sessionStore.activeSession) {
       sessionStore.activeSession.noteCards = [
         ...sessionStore.activeSession.noteCards,
@@ -1187,6 +1139,19 @@ class App extends React.Component<
           noteName,
           id: uuid(),
         } as SessionNoteCard,
+      ]
+    }
+    this.closeNoteAddingModal()
+  }
+
+  private handleAddToneRowModalSubmit = ({ noteNames }) => {
+    if (sessionStore.activeSession) {
+      sessionStore.activeSession.noteCards = [
+        ...sessionStore.activeSession.noteCards,
+        ...noteNames.map(noteName => ({
+          noteName,
+          id: uuid(),
+        } as SessionNoteCard)),
       ]
     }
     this.closeNoteAddingModal()
@@ -1252,7 +1217,6 @@ class App extends React.Component<
   }
 
   private renderApp = () => {
-    console.log('renderApp', sessionStore.activeSession)
     if (!sessionStore.activeSession) {
       return
     }
@@ -1263,8 +1227,8 @@ class App extends React.Component<
       staffTicks,
       staffTicksPerCard,
       isPlaying,
-      activeNoteCardIndex,
       activeStaffTickIndex,
+      activeNoteCardId,
       noteCardWithMouseOver,
     } = this.state
 
@@ -1277,12 +1241,12 @@ class App extends React.Component<
       modifiers,
     } = sessionStore.activeSession
 
-    const { noteCards } = this.getNoteCards()
+    const { noteCards, noteCardsById } = this.getNoteCards()
 
     const isMobile = this.props.width === 'xs' || this.props.width === 'sm'
 
-    const activeNoteCard = isPlaying
-      ? noteCards[activeNoteCardIndex]
+    const activeNoteCard = isPlaying && activeNoteCardId != null
+      ? noteCardsById[activeNoteCardId]
       : undefined
     const activeStaffTick = isPlaying
       ? staffTicks[activeStaffTickIndex]
@@ -1310,6 +1274,21 @@ class App extends React.Component<
         </Button>
       </Tooltip>
     )
+
+    const ClearAllButton = (
+      <Tooltip title="Clear all notes" disableFocusListener>
+        <Button
+          disabled={noteCards.length === 0}
+          variant="contained"
+          m={[1, 2]}
+          onClick={this.handleRemoveAllNotes}
+        >
+          <DeleteIcon className={css({ margin: '0 0.5rem' })} />
+          <Hidden smDown>Clear all</Hidden>
+        </Button>
+      </Tooltip>
+    )
+
     const ToggleCountInButton = (
       <Tooltip
         title={countInEnabled ? 'Turn off count in' : 'Turn on count in'}
@@ -1440,7 +1419,7 @@ class App extends React.Component<
         </IconButton>
 
         <Flex flex={1} justifyContent="center">
-          <Flex maxWidth={MAX_LAYOUT_WIDTH} width={1}>
+          <Flex maxWidth={MaxLayoutWidth} width={1}>
             {TogglePlaybackButton}
 
             {isSignedIn &&
@@ -1820,7 +1799,7 @@ class App extends React.Component<
                   pt={[3, 3, 4]}
                   flex={1}
                   px={[3, 4, 4]}
-                  maxWidth={MAX_LAYOUT_WIDTH}
+                  maxWidth={MaxLayoutWidth}
                   width={1}
                   id="app-content"
                 >
@@ -1840,6 +1819,7 @@ class App extends React.Component<
                         mr={2}
                       >
                         {ShuffleButton}
+                        {ClearAllButton}
                       </Box>
 
                       {SessionControls}
@@ -1894,13 +1874,15 @@ class App extends React.Component<
                             }
                             enableOnlyNote={noteCards.length === 0}
                             onAddSingleNoteClick={this.openNoteAddingModal}
+                            onAddToneRowClick={this.openToneRowAddingModal}
                             onAddArpeggioClick={this.openArpeggioAddingModal}
                             onAddScaleClick={this.openScalesModal}
                             onAddChromaticApproachesClick={
                               this.openChromaticApproachesModal
                             }
                             onAddIntervalsClick={this.openIntervalsModal}
-                            disableSingleNote={noteCards.length >= 12}
+                            disableSingleNote={noteCards.length >= MaxNoteCards}
+                            disableToneRow={noteCards.length >= MaxNoteCards}
                             disableChords={
                               modifiers.chords.enabled ||
                               modifiers.scales.enabled ||
@@ -1940,9 +1922,13 @@ class App extends React.Component<
                   <div
                     className={css(`
                     text-align: right;
-                    color: #bbb;
+                    color: #aaa;
                     font-size: 13px;
                     user-select: none;
+
+                    @media screen and (min-width: 768px) {
+                      font-size: 15px;
+                    }
                   `)}
                   >
                     <span>{`x ${settingsStore.scaleZoomFactor}`}</span>
@@ -2005,7 +1991,7 @@ class App extends React.Component<
                   <PianoKeyboard
                     width={
                       this.state.width -
-                      (!isMobile && this.state.isMenuOpen ? menuWidth : 0)
+                      (!isMobile && this.state.isMenuOpen ? MenuWidth : 0)
                     }
                     noteRange={this.getPianoNoteRange()}
                     height={this.getPianoHeight()}
@@ -2104,10 +2090,20 @@ class App extends React.Component<
             defaultType={modifiers.chromaticApproaches.type}
           />
 
+          <ToneRowModal
+            defaultNotesCount={Math.min(4, MaxNoteCards - noteCards.length)}
+            maxNotesCount={MaxNoteCards - noteCards.length}
+            isOpen={this.state.toneRowAddingModalIsOpen}
+            onClose={this.closeToneRowAddingModal}
+            onSubmit={this.handleAddToneRowModalSubmit}
+            enharmonicFlatsMap={settingsStore.enharmonicFlatsMap}
+            onEnharmonicFlatsMapToggle={this.handleEnharmonicMapToggle}
+          />
+
           <PickNoteModal
             isOpen={this.state.noteAddingModalIsOpen}
             onClose={this.closeNoteAddingModal}
-            onSubmit={this.handleNoteClickInNoteCardAddingModal}
+            onSubmit={this.handleAddNoteModalSubmit}
             enharmonicFlatsMap={settingsStore.enharmonicFlatsMap}
             onEnharmonicFlatsMapToggle={this.handleEnharmonicMapToggle}
           />

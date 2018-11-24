@@ -258,7 +258,6 @@ class ArpeggioModifierModal extends React.Component<
                 let resultNote = getSemitonesTransposer(semitonesCount)(
                   baseNote,
                 )
-                console.log('FISH: ', baseNote, semitonesCount, resultNote)
                 if (chordInversion > 0 && index >= chordInversion) {
                   resultNote = transpose(resultNote, '-8P')
                 }
