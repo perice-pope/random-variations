@@ -16,26 +16,26 @@ import MinusIcon from '@material-ui/icons/Remove'
 import withMobileDialog, {
   InjectedProps,
 } from '@material-ui/core/withMobileDialog'
+import { observer } from 'mobx-react'
 
 import { Flex, Box, BaseButton, Paper, BaseButtonProps } from './ui'
 
 import { getNoteCardColorByNoteName } from '../utils'
-import { EnharmonicFlatsMap, ChromaticNoteSharps } from '../types'
+import { ChromaticNoteSharps } from '../types'
 import { css } from 'emotion'
 import { lighten } from 'polished'
 import { withAudioEngine } from './withAudioEngine'
 import AudioEngine from '../services/audioEngine'
 import styled from 'react-emotion'
 import { AudioFontId } from '../audioFontsConfig'
+import settingsStore from '../services/settingsStore'
 
 type PickNoteModalProps = {
   audioEngine: AudioEngine
   audioFontId: AudioFontId
   isOpen: boolean
-  enharmonicFlatsMap: EnharmonicFlatsMap
   onClose: () => any
   onSubmit: (args: { noteName: string }) => any
-  onEnharmonicFlatsMapToggle?: (notePitch: ChromaticNoteSharps) => any
   noteName?: string
 }
 
@@ -44,7 +44,6 @@ type PickNoteModalState = {
   noteName?: string
   notePitchName?: string
   octave?: number
-  enharmonicFlatsMap: EnharmonicFlatsMap
 
   noteNameMouseOver?: string
 }
@@ -64,6 +63,7 @@ const NoteButton = styled(BaseButton)<NoteButtonProps>`
 `
 
 // @ts-ignore
+@observer
 class PickNoteModal extends React.Component<
   PickNoteModalProps & InjectedProps,
   PickNoteModalState
@@ -77,7 +77,6 @@ class PickNoteModal extends React.Component<
       notePitchName: props.noteName
         ? tonal.Note.pc(props.noteName)!
         : undefined,
-      enharmonicFlatsMap: this.props.enharmonicFlatsMap,
     }
   }
 
@@ -181,21 +180,18 @@ class PickNoteModal extends React.Component<
         noteNameWithSharp!,
       ) as ChromaticNoteSharps
 
+      settingsStore.enharmonicFlatsMap = {
+        ...settingsStore.enharmonicFlatsMap,
+        [notePitchWithSharp]: !Boolean(
+          settingsStore.enharmonicFlatsMap[notePitchWithSharp],
+        ),
+      }
+
       this.setState({
         noteName: noteEnharmonicName!,
         octave: tonal.Note.oct(noteEnharmonicName)!,
         notePitchName: tonal.Note.pc(noteEnharmonicName)!,
-        enharmonicFlatsMap: {
-          ...this.state.enharmonicFlatsMap,
-          [notePitchWithSharp]: !Boolean(
-            this.state.enharmonicFlatsMap[notePitchWithSharp],
-          ),
-        },
       })
-
-      if (this.props.onEnharmonicFlatsMapToggle) {
-        this.props.onEnharmonicFlatsMapToggle(notePitchWithSharp)
-      }
 
       return
     }
@@ -231,7 +227,7 @@ class PickNoteModal extends React.Component<
                 const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)!
 
                 const shouldUseFlat =
-                  this.state.enharmonicFlatsMap[notePitchWithSharp] === true
+                  settingsStore.enharmonicFlatsMap[notePitchWithSharp] === true
 
                 const noteName = shouldUseFlat
                   ? tonal.Note.enharmonic(noteNameWithSharp)
@@ -255,7 +251,6 @@ class PickNoteModal extends React.Component<
                       onMouseOver={() => this.setNoteNameMouseOver(noteName)}
                       onMouseLeave={() => this.setNoteNameMouseOver(undefined)}
                       hoverBg={isSelected ? bgColor : undefined}
-                      borderRadius={15}
                       width={1}
                       onClick={() => {
                         this.onNoteSelected(noteName)
@@ -317,7 +312,7 @@ class PickNoteModal extends React.Component<
                 onPlayNote={midiNote => {
                   const noteNameWithSharp = tonal.Note.fromMidi(midiNote, true)
                   const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)!
-                  const noteName = this.state.enharmonicFlatsMap[
+                  const noteName = settingsStore.enharmonicFlatsMap[
                     notePitchWithSharp
                   ]
                     ? tonal.Note.enharmonic(noteNameWithSharp)!

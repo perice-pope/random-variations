@@ -10,10 +10,9 @@ import MenuItem from '@material-ui/core/MenuItem'
 
 import { Flex, Text } from './ui'
 import NoteCard from './NoteCard'
+import { getNoteCardColorByNoteName } from '../utils'
+import PickNoteModal from './PickNoteModal'
 
-import { NoteCardType } from '../types'
-
-// @ts-ignore
 const FlipperStyled = styled(Flipper)`
   width: 100%;
   height: 100%;
@@ -83,7 +82,7 @@ const SortableNoteCard = SortableElement(
 
     render() {
       const {
-        noteCard,
+        noteName,
         id,
         active,
         bgColor,
@@ -93,9 +92,8 @@ const SortableNoteCard = SortableElement(
       } = this.props
       const menuId = `note-card-menu-${id}`
 
-      const enharmonicNoteName = tonal.Note.enharmonic(noteCard.noteName)
-      const shouldShowChangeToEnharmonic =
-        enharmonicNoteName !== noteCard.noteName
+      const enharmonicNoteName = tonal.Note.enharmonic(noteName)
+      const shouldShowChangeToEnharmonic = enharmonicNoteName !== noteName
 
       return (
         <Flipped flipId={id} shouldFlip={shouldFlip}>
@@ -115,7 +113,7 @@ const SortableNoteCard = SortableElement(
                 onClose={this.closeMenu}
               >
                 <MenuItem autoFocus onClick={this.handleEditClick}>
-                  Edit
+                  Change note...
                 </MenuItem>
                 {shouldShowChangeToEnharmonic && (
                   <MenuItem
@@ -154,7 +152,7 @@ const SortableNotesContainer = SortableContainer(
     isDraggingOutOfContainer,
     innerRef,
     children,
-    activeNoteCard,
+    activeNoteCardIndex,
     shouldFlip,
     onChangeToEnharmonicClick,
     onEditClick,
@@ -181,36 +179,34 @@ const SortableNotesContainer = SortableContainer(
       `)}
       >
         <FlipperStyled flipKey={items}>
-          {items.map((noteCard, index) => (
+          {items.map(({ noteName, id }, index) => (
             <SortableNoteCard
-              noteCard={noteCard}
+              noteName={noteName}
               // @ts-ignore
               shouldFlip={shouldFlip}
-              id={noteCard.id}
-              key={noteCard.id}
+              id={id}
+              key={id}
               index={index}
               // @ts-ignore
-              bgColor={noteCard.color}
+              bgColor={getNoteCardColorByNoteName(noteName)}
               tabIndex={-1}
               width={1}
-              active={activeNoteCard === noteCard}
-              onEditClick={() => onEditClick(noteCard)}
-              onChangeToEnharmonicClick={() =>
-                onChangeToEnharmonicClick(noteCard)
-              }
-              onDeleteClick={() => onDeleteClick(noteCard)}
+              active={activeNoteCardIndex === index}
+              onEditClick={() => onEditClick(index)}
+              onChangeToEnharmonicClick={() => onChangeToEnharmonicClick(index)}
+              onDeleteClick={() => onDeleteClick(index)}
               onMouseOver={() => {
                 if (onMouseOver) {
-                  onMouseOver(noteCard)
+                  onMouseOver(index)
                 }
               }}
               onMouseLeave={() => {
                 if (onMouseLeave) {
-                  onMouseLeave(noteCard)
+                  onMouseLeave(index)
                 }
               }}
             >
-              {noteCard.text}
+              {noteName}
             </SortableNoteCard>
           ))}
           {children}
@@ -222,36 +218,37 @@ const SortableNotesContainer = SortableContainer(
 
 const DRAG_AND_DROP_TRANSITION_DURATION_MS = 300
 
+export interface NoteCardNote {
+  noteName: string
+  id: string
+}
+
 type NoteCardsProps = {
-  noteCards: NoteCardType[]
-  activeNoteCard?: NoteCardType
-  buttonProps?: any
-  onMouseOver?: (noteCard: NoteCardType) => any
-  onMouseLeave?: (noteCard: NoteCardType) => any
+  notes: NoteCardNote[]
+  activeNoteCardIndex?: number
+  onMouseOver?: (index: number) => any
+  onMouseLeave?: (index: number) => any
   onCardsReorder: (arg: { oldIndex: number; newIndex: number }) => any
-  onChangeToEnharmonicClick: (noteCard: NoteCardType) => any
-  onEditClick: (noteCard: NoteCardType) => any
-  onDeleteClick: (noteCard: NoteCardType) => any
-  onCardDraggedOut: (noteCard: NoteCardType) => any
+  onChangeToEnharmonicClick: (index: number) => any
+  onDeleteClick: (index: number) => any
+  onCardDraggedOut: (index: number) => any
+  onEditNote?: (index: number, data: { noteName: string }) => any
 }
 
 type NoteCardsState = {
   noteCardDraggedIndex?: number
   isDragging: boolean
   isDraggingOutOfContainer?: boolean
+
+  noteEditingModalIsOpen?: boolean
+  noteEditingModalNoteIndex?: number
 }
 
 class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
-  containerRef: React.RefObject<React.ReactNode>
-
-  constructor(props: NoteCardsProps) {
-    super(props)
-    this.containerRef = React.createRef()
-    this.state = {
-      noteCardDraggedIndex: undefined,
-      isDragging: false,
-      isDraggingOutOfContainer: false,
-    }
+  containerRef: React.RefObject<React.ReactNode> = React.createRef()
+  state: NoteCardsState = {
+    isDragging: false,
+    isDraggingOutOfContainer: false,
   }
 
   private shouldFlip = () => {
@@ -267,10 +264,7 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
       this.state.isDraggingOutOfContainer &&
       typeof this.state.noteCardDraggedIndex !== 'undefined'
     ) {
-      const noteCardDragged = this.props.noteCards[
-        this.state.noteCardDraggedIndex
-      ]
-      this.props.onCardDraggedOut(noteCardDragged)
+      this.props.onCardDraggedOut(this.state.noteCardDraggedIndex)
     } else if (this.props.onCardsReorder && oldIndex !== newIndex) {
       this.props.onCardsReorder({ oldIndex, newIndex })
     }
@@ -293,39 +287,74 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
     this.setState({ isDraggingOutOfContainer: !container.contains(movingOver) })
   }
 
+  private closeNoteEditingModal = () => {
+    this.setState({
+      noteEditingModalIsOpen: false,
+      noteEditingModalNoteIndex: undefined,
+    })
+  }
+
+  private handleEditNoteClick = (index: number) => {
+    this.setState({
+      noteEditingModalIsOpen: true,
+      noteEditingModalNoteIndex: index,
+    })
+  }
+
+  private handleEditNoteSubmit = ({ noteName }) => {
+    if (this.props.onEditNote) {
+      this.props.onEditNote(this.state.noteEditingModalNoteIndex!, { noteName })
+    }
+    this.closeNoteEditingModal()
+  }
+
   public render() {
     const {
       children,
-      onEditClick,
       onDeleteClick,
       onChangeToEnharmonicClick,
-      noteCards,
-      activeNoteCard,
+      notes,
+      activeNoteCardIndex,
       onMouseOver,
       onMouseLeave,
     } = this.props
 
     return (
-      <SortableNotesContainer
-        // @ts-ignore
-        isDragging={this.state.isDragging}
-        isDraggingOutOfContainer={this.state.isDraggingOutOfContainer}
-        innerRef={this.containerRef}
-        shouldFlip={this.shouldFlip}
-        transitionDuration={DRAG_AND_DROP_TRANSITION_DURATION_MS}
-        activeNoteCard={activeNoteCard}
-        items={noteCards}
-        onMouseOver={onMouseOver}
-        onMouseLeave={onMouseLeave}
-        onSortEnd={this.handleSortEnd}
-        onSortMove={this.handleSortMove}
-        onSortStart={this.handleSortStart}
-        onEditClick={onEditClick}
-        onDeleteClick={onDeleteClick}
-        onChangeToEnharmonicClick={onChangeToEnharmonicClick}
-        axis="xy"
-        children={children}
-      />
+      <>
+        <SortableNotesContainer
+          // @ts-ignore
+          isDragging={this.state.isDragging}
+          isDraggingOutOfContainer={this.state.isDraggingOutOfContainer}
+          innerRef={this.containerRef}
+          shouldFlip={this.shouldFlip}
+          transitionDuration={DRAG_AND_DROP_TRANSITION_DURATION_MS}
+          activeNoteCardIndex={activeNoteCardIndex}
+          items={notes}
+          onMouseOver={onMouseOver}
+          onMouseLeave={onMouseLeave}
+          onSortEnd={this.handleSortEnd}
+          onSortMove={this.handleSortMove}
+          onSortStart={this.handleSortStart}
+          onEditClick={this.handleEditNoteClick}
+          onDeleteClick={onDeleteClick}
+          onChangeToEnharmonicClick={onChangeToEnharmonicClick}
+          axis="xy"
+          children={children}
+        />
+        {this.state.noteEditingModalIsOpen && (
+          <PickNoteModal
+            isOpen
+            noteName={
+              this.state.noteEditingModalNoteIndex
+                ? this.props.notes[this.state.noteEditingModalNoteIndex]
+                    .noteName
+                : undefined
+            }
+            onClose={this.closeNoteEditingModal}
+            onSubmit={this.handleEditNoteSubmit}
+          />
+        )}
+      </>
     )
   }
 }

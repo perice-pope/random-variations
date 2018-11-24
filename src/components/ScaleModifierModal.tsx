@@ -330,10 +330,10 @@ class ScaleModifierModal extends React.Component<
 
               <Tooltip title="Randomize pattern" disableFocusListener={true}>
                 <MuButton
-                  color="primary"
                   className={css({ minWidth: '40px' })}
                   size="small"
-                  variant="outlined"
+                  color="primary"
+                  variant="extendedFab"
                   aria-label="Randomize pattern"
                   disabled={this.state.values.pattern.items.length < 1}
                   onClick={this.handleRandomizePattern}

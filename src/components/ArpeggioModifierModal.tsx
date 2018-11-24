@@ -416,9 +416,9 @@ class ArpeggioModifierModal extends React.Component<
                 <Tooltip title="Randomize pattern" disableFocusListener={true}>
                   <MuButton
                     color="primary"
+                    variant="extendedFab"
                     className={css({ minWidth: '40px' })}
                     size="small"
-                    variant="outlined"
                     aria-label="Randomize pattern"
                     disabled={this.state.values.pattern.items.length < 1}
                     onClick={this.handleRandomizePattern}

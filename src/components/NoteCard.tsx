@@ -51,7 +51,7 @@ const NoteCard = styled(BoxWithTouchRipple)<NoteCardProps>`
   align-items: center;
   justify-content: center;
 
-  max-height: 160px;
+  max-height: 120px;
   padding: 3px 3px;
   border-radius: 15px;
   font-size: 18px;

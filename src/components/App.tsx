@@ -64,7 +64,6 @@ import {
   ChromaticApproachesType,
   PlayableLoopTick,
   PlayableLoop,
-  ChromaticNoteSharps,
   User,
   Session,
   Scale,
@@ -132,7 +131,7 @@ import ToastNotifications, { notificationsStore } from './ToastNotifications'
 import ButtonWithMenu from './ButtonWithMenu'
 import ShareSessionModal from './ShareSessionModal'
 import settingsStore from '../services/settingsStore'
-import ToneRowModal from './ToneRowModal';
+import ToneRowModal from './ToneRowModal'
 
 globalStyles()
 
@@ -191,8 +190,6 @@ type AppState = {
 
   noteAddingModalIsOpen: boolean
   toneRowAddingModalIsOpen: boolean
-  noteEditingModalIsOpen: boolean
-  noteEditingModalNoteCard?: NoteCardType
 }
 
 // This is needed to ensure the right CSS script tags insertion order to ensure
@@ -373,8 +370,6 @@ class App extends React.Component<
       scalesModalIsOpen: false,
       intervalsModalIsOpen: false,
       noteAddingModalIsOpen: false,
-      noteEditingModalIsOpen: false,
-      noteEditingModalNoteCard: undefined,
       toneRowAddingModalIsOpen: false,
 
       settingsModalIsOpen: false,
@@ -644,10 +639,10 @@ class App extends React.Component<
         if (allMidiNotes.length > 0) {
           const maxMidiNote = _.max(allMidiNotes) as number
           const minMidiNote = _.min(allMidiNotes) as number
-          if (maxMidiNote! > noteRange.last) {
+          if (maxMidiNote! > noteRange.last - 3) {
             noteRange.last = maxMidiNote! + 3
           }
-          if (noteRange.first > minMidiNote!) {
+          if (noteRange.first + 3 > minMidiNote!) {
             noteRange.first = Math.max(1, minMidiNote! - 3)
           }
         }
@@ -745,7 +740,7 @@ class App extends React.Component<
       if (!nextStaffTick) {
         return null
       }
-     
+
       return {
         activeStaffTickIndex: nextStaffTickIndex,
         activeNoteCardId: nextStaffTick.noteCardId,
@@ -764,7 +759,11 @@ class App extends React.Component<
     console.log('stopPlaying')
 
     this.setState(
-      { isPlaying: false, activeNoteCardId: undefined, activeStaffTickIndex: 0 },
+      {
+        isPlaying: false,
+        activeNoteCardId: undefined,
+        activeStaffTickIndex: 0,
+      },
       async () => {
         audioEngine.stopLoop()
 
@@ -835,7 +834,9 @@ class App extends React.Component<
     audioEngine.playNote({ midi: tonal.Note.midi('C4') as number }, 0, 0.5)
   }
 
-  private handleMouseOverNoteCard = (noteCard: NoteCardType) => {
+  private handleMouseOverNoteCard = (index: number) => {
+    const { noteCards } = this.getNoteCards()
+    const noteCard = noteCards[index]
     this.setState({ noteCardWithMouseOver: noteCard })
   }
 
@@ -843,30 +844,21 @@ class App extends React.Component<
     this.setState({ noteCardWithMouseOver: undefined })
   }
 
-  private handleEditCardClick = (noteCard: NoteCardType) => {
-    this.setState({
-      noteEditingModalIsOpen: true,
-      noteEditingModalNoteCard: noteCard,
-    })
-  }
-
-  private handleChangeNoteCardToEnharmonicClick = (noteCard: NoteCardType) => {
+  private handleChangeNoteCardToEnharmonicClick = (index: number) => {
+    const { noteCards } = this.getNoteCards()
+    const noteCard = noteCards[index]
     this.updateNoteCard({
       noteCardId: noteCard.id,
       noteName: tonal.Note.enharmonic(noteCard.noteName),
     })
   }
 
-  private handleDeleteCardClick = (noteCard: NoteCardType) =>
-    this.deleteNoteCard(noteCard)
+  private handleDeleteCard = (index: number) => this.deleteNoteCard(index)
 
-  private handleNoteCardDraggedOut = (noteCard: NoteCardType) =>
-    this.deleteNoteCard(noteCard)
-
-  private deleteNoteCard = (noteCard: NoteCardType) => {
+  private deleteNoteCard = (index: number) => {
     if (sessionStore.activeSession) {
       sessionStore.activeSession.noteCards = sessionStore.activeSession.noteCards.filter(
-        nc => nc.id !== noteCard.id,
+        (nc, i) => i !== index,
       )
     }
   }
@@ -920,7 +912,8 @@ class App extends React.Component<
   private closeSignInModal = () => this.setState({ signInModalIsOpen: false })
 
   private openSettingsModal = () => this.setState({ settingsModalIsOpen: true })
-  private closeSettingsModal = () => this.setState({ settingsModalIsOpen: false })
+  private closeSettingsModal = () =>
+    this.setState({ settingsModalIsOpen: false })
 
   private submitSettingsModal = ({
     values,
@@ -949,30 +942,33 @@ class App extends React.Component<
     })
   }
 
-  private closeNoteEditingModal = () => {
-    this.setState({
-      noteEditingModalIsOpen: false,
-      noteEditingModalNoteCard: undefined,
-    })
-  }
+  private closeNoteAddingModal = () =>
+    this.setState({ noteAddingModalIsOpen: false })
+  private openNoteAddingModal = () =>
+    this.setState({ noteAddingModalIsOpen: true })
 
-  private closeNoteAddingModal = () => this.setState({ noteAddingModalIsOpen: false })
-  private openNoteAddingModal = () => this.setState({ noteAddingModalIsOpen: true })
+  private closeToneRowAddingModal = () =>
+    this.setState({ toneRowAddingModalIsOpen: false })
+  private openToneRowAddingModal = () =>
+    this.setState({ toneRowAddingModalIsOpen: true })
 
-  private closeToneRowAddingModal = () => this.setState({ toneRowAddingModalIsOpen: false })
-  private openToneRowAddingModal = () => this.setState({ toneRowAddingModalIsOpen: true })
+  private openArpeggioAddingModal = () =>
+    this.setState({ chordsModalIsOpen: true })
+  private closeArpeggioAddingModal = () =>
+    this.setState({ chordsModalIsOpen: false })
 
-  private openArpeggioAddingModal = () => this.setState({ chordsModalIsOpen: true })
-  private closeArpeggioAddingModal = () => this.setState({ chordsModalIsOpen: false })
+  private openScalesModal = () => this.setState({ scalesModalIsOpen: true })
+  private closeScalesModal = () => this.setState({ scalesModalIsOpen: false })
 
-  private openScalesModal = () => this.setState({ scalesModalIsOpen: true})
-  private closeScalesModal = () => this.setState({ scalesModalIsOpen: false})
+  private openIntervalsModal = () =>
+    this.setState({ intervalsModalIsOpen: true })
+  private closeIntervalsModal = () =>
+    this.setState({ intervalsModalIsOpen: false })
 
-  private openIntervalsModal = () =>  this.setState({intervalsModalIsOpen: true})
-  private closeIntervalsModal = () =>  this.setState({intervalsModalIsOpen: false})
-
-  private openChromaticApproachesModal = () => this.setState({ chromaticApproachesModalIsOpen: true})
-  private closeChromaticApproachesModal = () => this.setState({ chromaticApproachesModalIsOpen: false})
+  private openChromaticApproachesModal = () =>
+    this.setState({ chromaticApproachesModalIsOpen: true })
+  private closeChromaticApproachesModal = () =>
+    this.setState({ chromaticApproachesModalIsOpen: false })
 
   private updateNoteCard = ({ noteCardId, noteName }) => {
     if (sessionStore.activeSession) {
@@ -990,19 +986,13 @@ class App extends React.Component<
     }
   }
 
-  private handleNoteClickInNoteCardEditingModal = ({ noteName }) => {
-    if (!this.state.noteEditingModalNoteCard) {
-      return
-    }
+  private handleEditNote = (index: number, { noteName }) => {
+    const { noteCards } = this.getNoteCards()
+    const noteCard = noteCards[index]
 
     this.updateNoteCard({
-      noteCardId: this.state.noteEditingModalNoteCard.id,
+      noteCardId: noteCard.id,
       noteName,
-    })
-
-    this.setState({
-      noteEditingModalIsOpen: false,
-      noteEditingModalNoteCard: undefined,
     })
   }
 
@@ -1124,13 +1114,6 @@ class App extends React.Component<
     })
   }
 
-  private handleEnharmonicMapToggle = (pitchName: ChromaticNoteSharps) => {
-    settingsStore.enharmonicFlatsMap = {
-      ...settingsStore.enharmonicFlatsMap,
-      [pitchName]: !Boolean(settingsStore.enharmonicFlatsMap[pitchName]),
-    }
-  }
-
   private handleAddNoteModalSubmit = ({ noteName }) => {
     if (sessionStore.activeSession) {
       sessionStore.activeSession.noteCards = [
@@ -1148,10 +1131,13 @@ class App extends React.Component<
     if (sessionStore.activeSession) {
       sessionStore.activeSession.noteCards = [
         ...sessionStore.activeSession.noteCards,
-        ...noteNames.map(noteName => ({
-          noteName,
-          id: uuid(),
-        } as SessionNoteCard)),
+        ...noteNames.map(
+          noteName =>
+            ({
+              noteName,
+              id: uuid(),
+            } as SessionNoteCard),
+        ),
       ]
     }
     this.closeNoteAddingModal()
@@ -1245,9 +1231,10 @@ class App extends React.Component<
 
     const isMobile = this.props.width === 'xs' || this.props.width === 'sm'
 
-    const activeNoteCard = isPlaying && activeNoteCardId != null
-      ? noteCardsById[activeNoteCardId]
-      : undefined
+    const activeNoteCard =
+      isPlaying && activeNoteCardId != null
+        ? noteCardsById[activeNoteCardId]
+        : undefined
     const activeStaffTick = isPlaying
       ? staffTicks[activeStaffTickIndex]
       : undefined
@@ -1263,29 +1250,38 @@ class App extends React.Component<
     const currentUser = firebase.auth().currentUser
 
     const ShuffleButton = (
-      <Tooltip title="Reshuffle cards">
+      <Tooltip
+        title="Reshuffle cards"
+        open={noteCards.length < 3 ? false : undefined}
+      >
         <Button
           disabled={noteCards.length < 3}
-          variant="contained"
           m={[1, 2]}
+          color="primary"
+          variant="extendedFab"
           onClick={this.handleShuffleClick}
         >
           <ArrowsIcon className={css({ margin: '0 0.5rem' })} />
+          <Hidden mdDown>Randomize</Hidden>
         </Button>
       </Tooltip>
     )
 
     const ClearAllButton = (
-      <Tooltip title="Clear all notes" disableFocusListener>
-        <Button
+      <Tooltip
+        title="Clear all notes"
+        variant="gray"
+        open={noteCards.length === 0 ? false : undefined}
+      >
+        <MuiButton
           disabled={noteCards.length === 0}
-          variant="contained"
-          m={[1, 2]}
+          color="default"
+          className={css(`margin: 0.5rem;`)}
           onClick={this.handleRemoveAllNotes}
         >
           <DeleteIcon className={css({ margin: '0 0.5rem' })} />
-          <Hidden smDown>Clear all</Hidden>
-        </Button>
+          <Hidden xsDown>Clear all</Hidden>
+        </MuiButton>
       </Tooltip>
     )
 
@@ -1293,26 +1289,26 @@ class App extends React.Component<
       <Tooltip
         title={countInEnabled ? 'Turn off count in' : 'Turn on count in'}
       >
-        <Button
+        <IconButton
           color={countInEnabled ? 'primary' : 'default'}
-          m={[1, 2]}
+          className={css(`margin: 0.5rem; margin-right: 0;`)}
           onClick={this.handleCountInToggle}
         >
-          <TimerIcon className={css({ margin: '0 0.5rem' })} />
-        </Button>
+          <TimerIcon />
+        </IconButton>
       </Tooltip>
     )
     const ToggleMetronomeButton = (
       <Tooltip
         title={metronomeEnabled ? 'Turn metronome off' : 'Turn metronome on'}
       >
-        <Button
+        <IconButton
           color={metronomeEnabled ? 'primary' : 'default'}
-          m={[1, 2]}
+          className={css(`margin: 0.5rem; margin-left: 1rem;`)}
           onClick={this.handleMetronomeToggle}
         >
-          <MetronomeIcon className={css({ margin: '0 0.5rem' })} />
-        </Button>
+          <MetronomeIcon />
+        </IconButton>
       </Tooltip>
     )
 
@@ -1377,11 +1373,11 @@ class App extends React.Component<
     )
     const SessionControls = (
       <Box mb={1}>
-        {TempoTextInput}
+        {ToggleCountInButton}
         {RestsTextInput}
         {CountInTextInput}
-        {ToggleCountInButton}
         {ToggleMetronomeButton}
+        {TempoTextInput}
       </Box>
     )
 
@@ -1457,11 +1453,7 @@ class App extends React.Component<
             ) : null}
 
             {!isSignedIn ? (
-              <Button
-                m={[1, 2]}
-                bg="#f50057"
-                onClick={this.openSignInModal}
-              >
+              <Button m={[1, 2]} bg="#f50057" onClick={this.openSignInModal}>
                 <span className={css(`white-space: nowrap;`)}>Sign in</span>
               </Button>
             ) : null}
@@ -1476,7 +1468,7 @@ class App extends React.Component<
           <Tooltip title="Change chords settings" disableFocusListener>
             <Chip
               clickable
-              color="primary"
+              color="secondary"
               variant="outlined"
               label={`Chords: ${modifiers.chords.chordType}`}
               onClick={this.openArpeggioAddingModal}
@@ -1495,7 +1487,7 @@ class App extends React.Component<
         {modifiers.scales.enabled && (
           <Tooltip title="Change scales settings" disableFocusListener>
             <Chip
-              color="primary"
+              color="secondary"
               variant="outlined"
               label={`Scale: ${
                 (scaleByScaleType[modifiers.scales.scaleType] as Scale).title
@@ -1517,7 +1509,7 @@ class App extends React.Component<
         {modifiers.intervals.enabled && (
           <Tooltip title="Change intervals settings" disableFocusListener>
             <Chip
-              color="primary"
+              color="secondary"
               variant="outlined"
               label={`Intervals: ${
                 SemitonesToIntervalShortNameMap[modifiers.intervals.interval]
@@ -1543,11 +1535,15 @@ class App extends React.Component<
         {modifiers.chromaticApproaches.enabled && (
           <Tooltip title="Change enclosures settings" disableFocusListener>
             <Chip
-              color="primary"
+              color="secondary"
               variant="outlined"
               label={`Enclosure: ${modifiers.chromaticApproaches.type}`}
               deleteIcon={
-                <Tooltip title="Remove enclosures" variant="gray" placement="right">
+                <Tooltip
+                  title="Remove enclosures"
+                  variant="gray"
+                  placement="right"
+                >
                   <DeleteIcon />
                 </Tooltip>
               }
@@ -1742,6 +1738,10 @@ class App extends React.Component<
       </>
     )
 
+    const activeNoteCardIndex = noteCards.findIndex(
+      nc => nc.id === this.state.activeNoteCardId,
+    )
+
     return (
       <>
         <MeasureScreenSize onUpdate={this.handleScreenSizeUpdate} fireOnMount>
@@ -1840,83 +1840,85 @@ class App extends React.Component<
                       appear
                     >
                       <NoteCards
-                        noteCards={noteCards}
-                        activeNoteCard={activeNoteCard}
+                        notes={noteCards}
+                        activeNoteCardIndex={activeNoteCardIndex}
                         onChangeToEnharmonicClick={
                           this.handleChangeNoteCardToEnharmonicClick
                         }
                         onMouseOver={this.handleMouseOverNoteCard}
                         onMouseLeave={this.handleMouseLeaveNoteCard}
-                        onEditClick={this.handleEditCardClick}
-                        onDeleteClick={this.handleDeleteCardClick}
+                        onEditNote={this.handleEditNote}
+                        onDeleteClick={this.handleDeleteCard}
                         onCardsReorder={this.handleCardsReorder}
-                        onCardDraggedOut={this.handleNoteCardDraggedOut}
+                        onCardDraggedOut={this.handleDeleteCard}
                       />
                     </Grow>
 
                     <Box px={[1, 2, 2]} width={1}>
-                    <Flex
-                      id="modifiers-container" 
-                      flexDirection="row"
-                      alignItems="center"
-                      justifyContent="center"
-                      width={1}
-                      mt={[4, 2, 3]}
-                      mb={[2, 2, 3]}
-                    >
-                      <Fade in={this.state.isInitialized} appear>
-                        <div>
-                          <AddEntityButton
-                            showHelpTooltip={
-                              noteCards.length === 0 &&
-                              !this.state.disableStartTooltips &&
-                              !(isMobile && this.state.isMenuOpen)
-                            }
-                            enableOnlyNote={noteCards.length === 0}
-                            onAddSingleNoteClick={this.openNoteAddingModal}
-                            onAddToneRowClick={this.openToneRowAddingModal}
-                            onAddArpeggioClick={this.openArpeggioAddingModal}
-                            onAddScaleClick={this.openScalesModal}
-                            onAddChromaticApproachesClick={
-                              this.openChromaticApproachesModal
-                            }
-                            onAddIntervalsClick={this.openIntervalsModal}
-                            disableSingleNote={noteCards.length >= MaxNoteCards}
-                            disableToneRow={noteCards.length >= MaxNoteCards}
-                            disableChords={
-                              modifiers.chords.enabled ||
-                              modifiers.scales.enabled ||
-                              modifiers.intervals.enabled
-                            }
-                            disableScales={
-                              modifiers.scales.enabled ||
-                              modifiers.chords.enabled ||
-                              modifiers.intervals.enabled
-                            }
-                            disableIntervals={
-                              modifiers.scales.enabled ||
-                              modifiers.chords.enabled ||
-                              modifiers.intervals.enabled
-                            }
-                            disableChromaticApproaches={
-                              modifiers.chromaticApproaches.enabled
-                            }
-                            buttonProps={{
-                              disabled: isPlaying,
-                              className: cx(
-                                css({
-                                  marginRight: '10px',
-                                }),
-                              ),
-                            }}
-                          />
-                        </div>
-                      </Fade>
-                      <Flex flex-direction="row" alignItems="center">
-                        {ModifierChips}
+                      <Flex
+                        id="modifiers-container"
+                        flexDirection="row"
+                        alignItems="center"
+                        justifyContent="center"
+                        width={1}
+                        mt={[4, 2, 3]}
+                        mb={[2, 2, 3]}
+                      >
+                        <Fade in={this.state.isInitialized} appear>
+                          <div>
+                            <AddEntityButton
+                              showHelpTooltip={
+                                noteCards.length === 0 &&
+                                !this.state.disableStartTooltips &&
+                                !(isMobile && this.state.isMenuOpen)
+                              }
+                              enableOnlyNote={noteCards.length === 0}
+                              onAddSingleNoteClick={this.openNoteAddingModal}
+                              onAddToneRowClick={this.openToneRowAddingModal}
+                              onAddArpeggioClick={this.openArpeggioAddingModal}
+                              onAddScaleClick={this.openScalesModal}
+                              onAddChromaticApproachesClick={
+                                this.openChromaticApproachesModal
+                              }
+                              onAddIntervalsClick={this.openIntervalsModal}
+                              disableSingleNote={
+                                noteCards.length >= MaxNoteCards
+                              }
+                              disableToneRow={noteCards.length >= MaxNoteCards}
+                              disableChords={
+                                modifiers.chords.enabled ||
+                                modifiers.scales.enabled ||
+                                modifiers.intervals.enabled
+                              }
+                              disableScales={
+                                modifiers.scales.enabled ||
+                                modifiers.chords.enabled ||
+                                modifiers.intervals.enabled
+                              }
+                              disableIntervals={
+                                modifiers.scales.enabled ||
+                                modifiers.chords.enabled ||
+                                modifiers.intervals.enabled
+                              }
+                              disableChromaticApproaches={
+                                modifiers.chromaticApproaches.enabled
+                              }
+                              buttonProps={{
+                                disabled: isPlaying,
+                                className: cx(
+                                  css({
+                                    marginRight: '10px',
+                                  }),
+                                ),
+                              }}
+                            />
+                          </div>
+                        </Fade>
+                        <Flex flex-direction="row" alignItems="center">
+                          {ModifierChips}
+                        </Flex>
                       </Flex>
-                    </Flex>
-                      </Box>
+                    </Box>
                   </Flex>
 
                   <div
@@ -2096,32 +2098,13 @@ class App extends React.Component<
             isOpen={this.state.toneRowAddingModalIsOpen}
             onClose={this.closeToneRowAddingModal}
             onSubmit={this.handleAddToneRowModalSubmit}
-            enharmonicFlatsMap={settingsStore.enharmonicFlatsMap}
-            onEnharmonicFlatsMapToggle={this.handleEnharmonicMapToggle}
           />
 
           <PickNoteModal
             isOpen={this.state.noteAddingModalIsOpen}
             onClose={this.closeNoteAddingModal}
             onSubmit={this.handleAddNoteModalSubmit}
-            enharmonicFlatsMap={settingsStore.enharmonicFlatsMap}
-            onEnharmonicFlatsMapToggle={this.handleEnharmonicMapToggle}
           />
-
-          {this.state.noteEditingModalIsOpen && (
-            <PickNoteModal
-              isOpen
-              noteName={
-                this.state.noteEditingModalNoteCard
-                  ? this.state.noteEditingModalNoteCard.noteName
-                  : undefined
-              }
-              onClose={this.closeNoteEditingModal}
-              onSubmit={this.handleNoteClickInNoteCardEditingModal}
-              enharmonicFlatsMap={settingsStore.enharmonicFlatsMap}
-              onEnharmonicFlatsMapToggle={this.handleEnharmonicMapToggle}
-            />
-          )}
         </MeasureScreenSize>
       </>
     )

@@ -434,7 +434,8 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
   // TODO: memoize this function
   private getCardsToLinesMapping = () => {
-    const { ticks, maxLines } = this.props
+    const { ticks, maxLines, scale } = this.props
+    const { boxWidth } = this.state
     const tickIndexes = _.range(0, ticks.length)
     const cardIdToTickIndexes = _.groupBy(tickIndexes, i => ticks[i].noteCardId)
     const cardIds = _.keys(cardIdToTickIndexes)
@@ -456,7 +457,8 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         maxLineNotesCount = Math.max(lineNotesCount, maxLineNotesCount)
       }
 
-      if (maxLineNotesCount < 16) {
+      const minWidthPerNote = boxWidth / maxLineNotesCount / (scale || 1)
+      if (minWidthPerNote > 40 && maxLineNotesCount < 32) {
         break
       }
     }
