@@ -560,12 +560,11 @@ class App extends React.Component<
   }
 
   private init = async () => {
+    settingsStore.loadSettingsLocally()
     await this.initAudioEngine()
     if (this.state.isInitialized) {
       return
     }
-
-    settingsStore.loadSettingsLocally()
 
     this.setState({ isInitialized: true }, () => {
       this.unregisterAuthObserver = firebase
@@ -589,6 +588,7 @@ class App extends React.Component<
         sessionStore.activeSession.metronomeEnabled,
       )
     }
+
     await this.loadAndSetAudioFont(settingsStore.audioFontId)
   }
 

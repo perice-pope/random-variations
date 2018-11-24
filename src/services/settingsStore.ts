@@ -12,7 +12,7 @@ interface SettingsStoreData {
 
 class SettingsStore {
   @observable
-  public audioFontId: AudioFontId = AudioFontsConfig[0].id
+  public audioFontId: AudioFontId = AudioFontsConfig[1].id
   @observable
   public clefType: ClefType = 'treble'
   @observable
