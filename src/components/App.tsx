@@ -81,7 +81,7 @@ import IntervalModifierModal, {
   SubmitValuesType as IntervalModifierModalSubmitValues,
 } from './IntervalModifierModal'
 import ChromaticApproachesModifierModal from './ChromaticApproachesModifierModal'
-import PianoKeyboard from './PianoKeyboard'
+import PianoKeyboard, { pianoNoteRangeWide, pianoNoteRangeNarrow, pianoNoteRangeMiddle } from './PianoKeyboard'
 
 import SettingsModal, { SettingsFormValues } from './SettingsModal'
 import AddEntityButton from './AddEntityButton'
@@ -221,6 +221,8 @@ const getNoteCardsFromSessionCards = memoize(
     }
   },
 )
+
+const MAX_LAYOUT_WIDTH = 1100
 
 const menuWidth = 280
 
@@ -612,12 +614,48 @@ class App extends React.Component<
     })
   }
 
-  private getPianoHeight = () => {
-    const { height } = this.state
-    if (height > 800) {
-      return 130
+  private getPianoNoteRange = () => this._getPianoNoteRange(this.state.width, this.state.staffTicks)
+
+  private _getPianoNoteRange = memoize((width: number, staffTicks: StaffTick[]) => {
+    let baseNoteRange = pianoNoteRangeNarrow
+
+    if (width > 1000) {
+      baseNoteRange = pianoNoteRangeWide
     }
-    if (height > 600) {
+    else if (width > 400) {
+      baseNoteRange = pianoNoteRangeMiddle
+    }
+
+    const noteRange = { ...baseNoteRange }
+    if (staffTicks && staffTicks.length > 0) {
+      const allMidiNotes: number[] = _.flatten(
+        staffTicks.map(st => st.notes.map(n => n.midi)),
+      )
+      if (allMidiNotes.length > 0) {
+        const maxMidiNote = _.max(allMidiNotes) as number
+        const minMidiNote = _.min(allMidiNotes) as number
+        if (maxMidiNote! > noteRange.last) {
+          noteRange.last = maxMidiNote! + 3
+        }
+        if (noteRange.first > minMidiNote!) {
+          noteRange.first = Math.max(1, minMidiNote! - 3)
+        }
+      }
+    }
+    return noteRange
+  })
+
+  private getPianoHeight = () => {
+    const { height, width } = this.state
+    const pianoNoteRange = this.getPianoNoteRange()
+    const keysCount = pianoNoteRange.last - pianoNoteRange.first + 1
+
+    const keyWidth = width / keysCount
+
+    if (keyWidth > 20) {
+      return 120
+    }
+    if (keyWidth > 15) {
       return 80
     }
     if (height > 400) {
@@ -881,9 +919,9 @@ class App extends React.Component<
     values: SettingsFormValues
   }) => {
     Object.keys(values).forEach(key => {
-      settingsStore[key] = values[key]  
+      settingsStore[key] = values[key]
     })
-    
+
     this.onNotesUpdated()
     this.saveAppState()
 
@@ -1386,63 +1424,67 @@ class App extends React.Component<
           <MenuIcon />
         </IconButton>
 
-        {TogglePlaybackButton}
+        <Flex flex={1} justifyContent="center">
+          <Flex maxWidth={MAX_LAYOUT_WIDTH} width={1}>
+            {TogglePlaybackButton}
 
-        {!isSignedIn && (
-          <MuiButton
-            color="secondary"
-            variant="raised"
-            onClick={!isSignedIn ? this.openSignInModal : undefined}
-          >
-            <SaveIcon />
-            <Hidden xsDown>Save</Hidden>
-          </MuiButton>
-        )}
+            {!isSignedIn && (
+              <MuiButton
+                color="secondary"
+                variant="raised"
+                onClick={!isSignedIn ? this.openSignInModal : undefined}
+              >
+                <SaveIcon />
+                <Hidden xsDown>Save</Hidden>
+              </MuiButton>
+            )}
 
-        {isSignedIn &&
-          sessionStore.activeSessionType === 'shared' && (
-            <MuiButton
-              color="secondary"
-              variant="raised"
-              onClick={this.saveSharedSessionToMySessions}
-            >
-              <SaveIcon />
-              <Hidden xsDown mdUp>
-                Save
-              </Hidden>
-              <Hidden smDown>Save to my sessions</Hidden>
-            </MuiButton>
-          )}
+            {isSignedIn &&
+              sessionStore.activeSessionType === 'shared' && (
+                <MuiButton
+                  color="secondary"
+                  variant="raised"
+                  onClick={this.saveSharedSessionToMySessions}
+                >
+                  <SaveIcon />
+                  <Hidden xsDown mdUp>
+                    Save
+                  </Hidden>
+                  <Hidden smDown>Save to my sessions</Hidden>
+                </MuiButton>
+              )}
 
-        <Box className={css({ flexGrow: 1 })} />
+            <Box className={css({ flexGrow: 1 })} />
 
-        {isMobile ? (
-          <IconButton
-            color="inherit"
-            aria-label={
-              uiState.isControlsShown
-                ? 'Hide session controls'
-                : 'Show session controls'
-            }
-            onClick={() => {
-              uiState.isControlsShown = !uiState.isControlsShown
-            }}
-            className={cx(classes.menuButton)}
-          >
-            <SettingsIcon />
-          </IconButton>
-        ) : null}
+            {isMobile ? (
+              <IconButton
+                color="inherit"
+                aria-label={
+                  uiState.isControlsShown
+                    ? 'Hide session controls'
+                    : 'Show session controls'
+                }
+                onClick={() => {
+                  uiState.isControlsShown = !uiState.isControlsShown
+                }}
+                className={cx(classes.menuButton)}
+              >
+                <SettingsIcon />
+              </IconButton>
+            ) : null}
 
-        {!isSignedIn ? (
-          <MuiButton
-            // color="primary"
-            color="secondary"
-            onClick={this.openSignInModal}
-            variant="raised"
-          >
-            Sign in
-          </MuiButton>
-        ) : null}
+            {!isSignedIn ? (
+              <MuiButton
+                // color="primary"
+                color="secondary"
+                onClick={this.openSignInModal}
+                variant="raised"
+              >
+                Sign in
+              </MuiButton>
+            ) : null}
+          </Flex>
+        </Flex>
       </>
     )
 
@@ -1776,7 +1818,7 @@ class App extends React.Component<
                   pt={[3, 3, 4]}
                   flex={1}
                   px={[3, 4, 4]}
-                  maxWidth={960}
+                  maxWidth={MAX_LAYOUT_WIDTH}
                   width={1}
                 >
                   {uiState.isControlsShown || !isMobile ? (
@@ -1957,6 +1999,7 @@ class App extends React.Component<
                       this.state.width -
                       (!isMobile && this.state.isMenuOpen ? menuWidth : 0)
                     }
+                    noteRange={this.getPianoNoteRange()}
                     height={this.getPianoHeight()}
                     secondaryNotesMidi={
                       activeNoteCardStaffTicks

@@ -11,17 +11,17 @@ import { withAudioEngine } from './withAudioEngine'
 import AudioEngine from '../services/audioEngine'
 import { AudioFontId } from '../audioFontsConfig'
 
-const pianoNoteRangeWide: MidiNoteRange = {
+export const pianoNoteRangeWide: MidiNoteRange = {
   first: tonal.Note.midi('C3') as number,
   last: tonal.Note.midi('B5') as number,
 }
 
-const pianoNoteRangeMiddle: MidiNoteRange = {
+export const pianoNoteRangeMiddle: MidiNoteRange = {
   first: tonal.Note.midi('G3') as number,
   last: tonal.Note.midi('E5') as number,
 }
 
-const pianoNoteRangeNarrow: MidiNoteRange = {
+export const pianoNoteRangeNarrow: MidiNoteRange = {
   first: tonal.Note.midi('C4') as number,
   last: tonal.Note.midi('B4') as number,
 }
@@ -129,7 +129,9 @@ class PianoKeyboard extends React.Component<
   private renderNoteLabel = ({ midiNumber }) => {
     const range = this.getNoteRange()
     const widthPerNote = this.props.width / (range.last - range.first + 1)
-    const size = widthPerNote > 40 ? '35px' : '20px'
+    const shouldRenderCircles = this.props.width != null
+    const circleSize =
+      this.props.width != null ? `${widthPerNote - 4}px` : '25px'
 
     const isPrimary = this.props.primaryNotesMidi
       ? this.props.primaryNotesMidi.findIndex(n => n === midiNumber) >= 0
@@ -155,22 +157,24 @@ class PianoKeyboard extends React.Component<
             `),
           )}
         />
-        <span
-          className={cx(
-            isPrimary ? '--primary' : undefined,
-            !isPrimary && isSecondary ? '--secondary' : undefined,
-            'vf-note-label',
-            css({
-              transition: '0.3s background-color',
-              display: 'inline-block',
-              padding: '3px',
-              width: size,
-              height: size,
-              borderRadius: '100%',
-              marginBottom: '10px',
-            }),
-          )}
-        />
+        {shouldRenderCircles ? (
+          <span
+            className={cx(
+              isPrimary ? '--primary' : undefined,
+              !isPrimary && isSecondary ? '--secondary' : undefined,
+              'vf-note-label',
+              css({
+                transition: '0.3s background-color',
+                display: 'inline-block',
+                padding: '3px',
+                width: circleSize,
+                height: circleSize,
+                borderRadius: '100%',
+                marginBottom: '10px',
+              }),
+            )}
+          />
+        ) : null}
       </>
     )
   }
