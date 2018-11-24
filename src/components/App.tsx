@@ -880,9 +880,10 @@ class App extends React.Component<
   }: {
     values: SettingsFormValues
   }) => {
-    settingsStore.audioFontId = values.audioFontId
-    settingsStore.clefType = values.clefType
-
+    Object.keys(values).forEach(key => {
+      settingsStore[key] = values[key]  
+    })
+    
     this.onNotesUpdated()
     this.saveAppState()
 
@@ -1939,7 +1940,11 @@ class App extends React.Component<
                     showEnd
                     id="notation"
                     ticks={this.state.staffTicks}
-                    tickLabels={!isMobile ? this.state.tickLabels : undefined}
+                    tickLabels={
+                      settingsStore.showNoteNamesAboveStaff
+                        ? this.state.tickLabels
+                        : undefined
+                    }
                     activeTickIndex={
                       isPlaying ? activeStaffTickIndex : undefined
                     }
@@ -1999,6 +2004,7 @@ class App extends React.Component<
             defaultValues={{
               audioFontId: settingsStore.audioFontId,
               clefType: settingsStore.clefType,
+              showNoteNamesAboveStaff: settingsStore.showNoteNamesAboveStaff,
             }}
             onSubmit={this.submitSettingsModal}
             onAudioFontChanged={this.handleAudioFontChanged}

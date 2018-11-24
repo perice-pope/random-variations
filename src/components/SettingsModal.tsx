@@ -12,11 +12,19 @@ import withMobileDialog from '@material-ui/core/withMobileDialog'
 
 import AudioFontConfig, { AudioFontId } from '../audioFontsConfig'
 import { ClefType } from '../types'
-import { FormControl, InputLabel, NativeSelect, Input } from '@material-ui/core'
+import {
+  FormControl,
+  InputLabel,
+  NativeSelect,
+  Input,
+  Switch,
+  FormControlLabel,
+} from '@material-ui/core'
 
 export type SettingsFormValues = {
   audioFontId: AudioFontId
   clefType: ClefType
+  showNoteNamesAboveStaff: boolean
 }
 
 type SubmitArgsType = {
@@ -100,6 +108,13 @@ class SettingsModal extends React.Component<
     this.setState({ values: { ...this.state.values, clefType } })
   }
 
+  handleChangeShownNoteNamesAboveStaff = event => {
+    const value = event.target.checked
+    this.setState({
+      values: { ...this.state.values, showNoteNamesAboveStaff: value },
+    })
+  }
+
   render() {
     return (
       <Dialog
@@ -112,37 +127,55 @@ class SettingsModal extends React.Component<
         <DialogTitle id="settings-dialog">Settings</DialogTitle>
 
         <DialogContent>
-          <FormControl className={css({ margin: '1rem' })}>
-            <InputLabel htmlFor="instrument-sound">Instrument sound</InputLabel>
-            <NativeSelect
-              value={this.state.values.audioFontId}
-              onChange={this.handleAudioFontSelected}
-              name="audioFontId"
-              input={<Input id="instrument-sound" />}
-            >
-              {AudioFontOptions.map(({ title, value }) => (
-                <option key={value} value={value}>
-                  {title}
-                </option>
-              ))}
-            </NativeSelect>
-          </FormControl>
+          <div>
+            <FormControl className={css({ marginBottom: '1rem' })}>
+              <InputLabel htmlFor="instrument-sound">
+                Instrument sound
+              </InputLabel>
+              <NativeSelect
+                value={this.state.values.audioFontId}
+                onChange={this.handleAudioFontSelected}
+                name="audioFontId"
+                input={<Input id="instrument-sound" />}
+              >
+                {AudioFontOptions.map(({ title, value }) => (
+                  <option key={value} value={value}>
+                    {title}
+                  </option>
+                ))}
+              </NativeSelect>
+            </FormControl>
+          </div>
 
-          <FormControl className={css({ margin: '1rem' })}>
-            <InputLabel htmlFor="clef-type">Clef type</InputLabel>
-            <NativeSelect
-              value={this.state.values.clefType}
-              onChange={this.handleClefSelected}
-              name="clefType"
-              input={<Input id="clef-type" />}
-            >
-              {ClefTypeOptions.map(({ title, value }) => (
-                <option key={value} value={value}>
-                  {title}
-                </option>
-              ))}
-            </NativeSelect>
-          </FormControl>
+          <div>
+            <FormControl className={css({ marginBottom: '1rem' })}>
+              <InputLabel htmlFor="clef-type">Clef type</InputLabel>
+              <NativeSelect
+                value={this.state.values.clefType}
+                onChange={this.handleClefSelected}
+                name="clefType"
+                input={<Input id="clef-type" />}
+              >
+                {ClefTypeOptions.map(({ title, value }) => (
+                  <option key={value} value={value}>
+                    {title}
+                  </option>
+                ))}
+              </NativeSelect>
+            </FormControl>
+          </div>
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={this.state.values.showNoteNamesAboveStaff}
+                onChange={this.handleChangeShownNoteNamesAboveStaff}
+                value={this.state.values.showNoteNamesAboveStaff}
+                color="primary"
+              />
+            }
+            label="Show note names above staff?"
+          />
         </DialogContent>
 
         <DialogActions>
