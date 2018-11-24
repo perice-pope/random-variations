@@ -38,6 +38,7 @@ import {
 import { Flex } from './ui/Flex'
 import { Box } from './ui'
 import NotesStaff from './NotesStaff'
+import settingsStore from '../services/settingsStore'
 
 export type SubmitValuesType = {
   chordType: ChordType
@@ -52,6 +53,7 @@ type ArpeggioModifierModalProps = {
   onClose: () => any
   onSubmit: (args: SubmitValuesType) => any
   initialValues?: SubmitValuesType
+  baseNote?: string
 }
 
 type ArpeggioModifierModalState = {
@@ -220,7 +222,7 @@ class ArpeggioModifierModal extends React.Component<
     const chord =
       chordsByChordType[chordType] || chordsByChordType[DEFAULT_CHORD_NAME]
     const { semitones } = chord
-    const baseNote = 'C4'
+    const baseNote = this.props.baseNote || 'C4'
 
     let staffTicks: StaffTick[]
 
@@ -451,6 +453,7 @@ class ArpeggioModifierModal extends React.Component<
           <Box>
             <NotesStaff
               id="chord-preview"
+              clef={settingsStore.clefType}
               ticks={this.generateStaffTicks()}
               isPlaying={false}
               showBreaks

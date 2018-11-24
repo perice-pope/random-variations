@@ -62,7 +62,6 @@ import {
   ChromaticApproachesType,
   PlayableLoopTick,
   PlayableLoop,
-  EnharmonicFlatsMap,
   ChromaticNoteSharps,
   User,
   Session,
@@ -82,9 +81,9 @@ import IntervalModifierModal, {
 import ChromaticApproachesModifierModal from './ChromaticApproachesModifierModal'
 import PianoKeyboard from './PianoKeyboard'
 
-import SettingsModal from './SettingsModal'
+import SettingsModal, { SettingsFormValues } from './SettingsModal'
 import AddEntityButton from './AddEntityButton'
-import { reaction, toJS, observable } from 'mobx'
+import { reaction, toJS } from 'mobx'
 import { observer } from 'mobx-react'
 import MobxDevTools from 'mobx-react-devtools'
 import {
@@ -122,9 +121,11 @@ import {
 } from '@material-ui/core'
 import { WithWidth } from '@material-ui/core/withWidth'
 import memoize from 'memoize-one'
+import { observable } from 'mobx'
 import ToastNotifications, { notificationsStore } from './ToastNotifications'
 import ButtonWithMenu from './ButtonWithMenu'
 import ShareSessionModal from './ShareSessionModal'
+import settingsStore from '../services/settingsStore'
 
 globalStyles()
 
@@ -134,7 +135,7 @@ window.notificationsStore = notificationsStore
 console.log('All supported audio fonts: ', _.map(AudioFontsConfig, 'title'))
 console.log('All supported chord names: ', Chord.names())
 
-const state = observable({
+const uiState = observable({
   isFullScreen: false,
   isControlsShown: false,
 })
@@ -155,9 +156,6 @@ type AppState = {
   isLoadingAudioFont: boolean
 
   isPlaying: boolean
-
-  audioFontId: AudioFontId
-  enharmonicFlatsMap: EnharmonicFlatsMap
 
   noteCardWithMouseOver?: NoteCardType
 
@@ -314,10 +312,10 @@ function toggleFullScreen() {
     !doc.msFullscreenElement
   ) {
     requestFullScreen.call(docEl)
-    state.isFullScreen = true
+    uiState.isFullScreen = true
   } else {
     cancelFullScreen.call(doc)
-    state.isFullScreen = false
+    uiState.isFullScreen = false
   }
 }
 
@@ -342,9 +340,6 @@ class App extends React.Component<
       isOfflineNotificationShown: false,
       isOnlineNotificationShown: false,
       isLoadingAudioFont: false,
-      audioFontId: AudioFontsConfig[1].id,
-
-      enharmonicFlatsMap: {},
 
       // Screen size
       height: 0,
@@ -444,7 +439,6 @@ class App extends React.Component<
 
   componentWillUnmount() {
     audioEngine.cleanUp()
-
     if (this.unregisterAuthObserver) {
       this.unregisterAuthObserver()
     }
@@ -554,37 +548,13 @@ class App extends React.Component<
     }
   }
 
-  private restoreLocalState = () => {
-    console.log('restoreLocalState')
-    let restoredState: Partial<AppState> = {}
-
-    const savedState = window.localStorage.getItem('appState')
-    if (savedState) {
-      try {
-        restoredState = JSON.parse(savedState) as Partial<AppState>
-        console.log('restoredState = ', restoredState)
-      } catch (error) {
-        console.error(error)
-        window.localStorage.removeItem('appState')
-      }
-    }
-
-    if (restoredState) {
-      this.setState({
-        enharmonicFlatsMap: restoredState.enharmonicFlatsMap
-          ? restoredState.enharmonicFlatsMap
-          : this.state.enharmonicFlatsMap,
-      })
-    }
-  }
-
   private init = async () => {
     await this.initAudioEngine()
     if (this.state.isInitialized) {
       return
     }
 
-    this.restoreLocalState()
+    settingsStore.loadSettingsLocally()
 
     this.setState({ isInitialized: true }, () => {
       this.unregisterAuthObserver = firebase
@@ -595,13 +565,25 @@ class App extends React.Component<
 
   private initAudioEngine = async () => {
     audioEngine.setAnimationCallback(this.drawAnimation)
-    await this.loadAndSetAudioFont(this.state.audioFontId)
+    if (sessionStore.activeSession) {
+      audioEngine.setBpm(sessionStore.activeSession.bpm)
+      audioEngine.setCountIn(
+        sessionStore.activeSession.countInEnabled
+          ? sessionStore.activeSession.countInCounts
+          : 0,
+      )
+      audioEngine.setMetronomeEnabled(
+        sessionStore.activeSession.metronomeEnabled,
+      )
+    }
+    await this.loadAndSetAudioFont(settingsStore.audioFontId)
   }
 
   private loadAndSetAudioFont = async (audioFontId: AudioFontId) => {
     this.setState({ isLoadingAudioFont: true })
     await audioEngine.setAudioFont(audioFontId)
-    this.setState({ audioFontId, isLoadingAudioFont: false }, this.saveAppState)
+    settingsStore.audioFontId = audioFontId
+    this.setState({ isLoadingAudioFont: false })
   }
 
   private updateStaffNotes = async () => {
@@ -652,19 +634,9 @@ class App extends React.Component<
     }
   }
 
-  private saveLocalAppState = () => {
-    window.localStorage.setItem(
-      'appState',
-      JSON.stringify({
-        audioFontId: this.state.audioFontId,
-        enharmonicFlatsMap: this.state.enharmonicFlatsMap,
-      }),
-    )
-  }
-
   private saveAppState = () => {
     console.log('saveAppState')
-    this.saveLocalAppState()
+    settingsStore.saveSettingsLocally()
   }
 
   private generateLoop = () => {
@@ -899,6 +871,25 @@ class App extends React.Component<
     this.setState({ settingsModalIsOpen: false })
   }
 
+  private submitSettingsModal = ({
+    values,
+  }: {
+    values: SettingsFormValues
+  }) => {
+    settingsStore.audioFontId = values.audioFontId
+    settingsStore.clefType = values.clefType
+
+    this.onNotesUpdated()
+    this.saveAppState()
+
+    this.closeSettingsModal()
+    notificationsStore.showNotification({
+      autohide: 5000,
+      level: 'success',
+      message: 'Settings saved',
+    })
+  }
+
   private closeShareSessionModal = () => {
     this.setState({
       shareSessionModalIsOpen: false,
@@ -1124,12 +1115,10 @@ class App extends React.Component<
   }
 
   private handleEnharmonicMapToggle = (pitchName: ChromaticNoteSharps) => {
-    this.setState({
-      enharmonicFlatsMap: {
-        ...this.state.enharmonicFlatsMap,
-        [pitchName]: !Boolean(this.state.enharmonicFlatsMap[pitchName]),
-      },
-    })
+    settingsStore.enharmonicFlatsMap = {
+      ...settingsStore.enharmonicFlatsMap,
+      [pitchName]: !Boolean(settingsStore.enharmonicFlatsMap[pitchName]),
+    }
   }
 
   private handleNoteClickInNoteCardAddingModal = ({ noteName }) => {
@@ -1408,12 +1397,12 @@ class App extends React.Component<
           <IconButton
             color="inherit"
             aria-label={
-              state.isControlsShown
+              uiState.isControlsShown
                 ? 'Hide session controls'
                 : 'Show session controls'
             }
             onClick={() => {
-              state.isControlsShown = !state.isControlsShown
+              uiState.isControlsShown = !uiState.isControlsShown
             }}
             className={cx(classes.menuButton)}
           >
@@ -1580,11 +1569,15 @@ class App extends React.Component<
 
           <ListItem button onClick={toggleFullScreen}>
             <ListItemIcon>
-              {state.isFullScreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+              {uiState.isFullScreen ? (
+                <FullscreenExitIcon />
+              ) : (
+                <FullscreenIcon />
+              )}
             </ListItemIcon>
             <ListItemText
               primary={
-                state.isFullScreen ? 'Exit full-screen' : 'Enter full-screen'
+                uiState.isFullScreen ? 'Exit full-screen' : 'Enter full-screen'
               }
             />
           </ListItem>
@@ -1763,7 +1756,7 @@ class App extends React.Component<
                   maxWidth={960}
                   width={1}
                 >
-                  {state.isControlsShown || !isMobile ? (
+                  {uiState.isControlsShown || !isMobile ? (
                     <Flex
                       alignItems="center"
                       flexDirection="row"
@@ -1874,6 +1867,7 @@ class App extends React.Component<
 
                   <NotesStaff
                     scale={notesStaffScaleFactor}
+                    clef={settingsStore.clefType}
                     maxLines={notesStaffMaxLines}
                     isPlaying={isPlaying}
                     key={this.state.contentWidth}
@@ -1887,7 +1881,7 @@ class App extends React.Component<
                   />
                 </Box>
 
-                <Box mt={[1, 2, 3]}>
+                <Box mt={[1, 2, 4]}>
                   <PianoKeyboard
                     width={
                       this.state.width -
@@ -1938,9 +1932,10 @@ class App extends React.Component<
             isOpen={this.state.settingsModalIsOpen}
             onClose={this.closeSettingsModal}
             defaultValues={{
-              audioFontId: this.state.audioFontId,
+              audioFontId: settingsStore.audioFontId,
+              clefType: settingsStore.clefType,
             }}
-            onSubmit={this.closeSettingsModal}
+            onSubmit={this.submitSettingsModal}
             onAudioFontChanged={this.handleAudioFontChanged}
           />
 
@@ -1955,6 +1950,9 @@ class App extends React.Component<
             onClose={this.closeArpeggioAddingModal}
             onSubmit={this.handleArpeggioModifierModalConfirm}
             initialValues={modifiers.chords}
+            baseNote={
+              noteCards && noteCards[0] ? noteCards[0].noteName : undefined
+            }
           />
 
           <IntervalModifierModal
@@ -1962,6 +1960,9 @@ class App extends React.Component<
             onClose={this.closeIntervalsModal}
             onSubmit={this.handleIntervalsModifierModalConfirm}
             initialValues={modifiers.intervals}
+            baseNote={
+              noteCards && noteCards[0] ? noteCards[0].noteName : undefined
+            }
           />
 
           <ScaleModifierModal
@@ -1969,6 +1970,9 @@ class App extends React.Component<
             onClose={this.closeScalesModal}
             onSubmit={this.handleScaleModifierModalConfirm}
             initialValues={modifiers.scales}
+            baseNote={
+              noteCards && noteCards[0] ? noteCards[0].noteName : undefined
+            }
           />
 
           <ChromaticApproachesModifierModal
@@ -1982,7 +1986,7 @@ class App extends React.Component<
             isOpen={this.state.noteAddingModalIsOpen}
             onClose={this.closeNoteAddingModal}
             onSubmit={this.handleNoteClickInNoteCardAddingModal}
-            enharmonicFlatsMap={this.state.enharmonicFlatsMap}
+            enharmonicFlatsMap={settingsStore.enharmonicFlatsMap}
             onEnharmonicFlatsMapToggle={this.handleEnharmonicMapToggle}
           />
 
@@ -1996,7 +2000,7 @@ class App extends React.Component<
               }
               onClose={this.closeNoteEditingModal}
               onSubmit={this.handleNoteClickInNoteCardEditingModal}
-              enharmonicFlatsMap={this.state.enharmonicFlatsMap}
+              enharmonicFlatsMap={settingsStore.enharmonicFlatsMap}
               onEnharmonicFlatsMapToggle={this.handleEnharmonicMapToggle}
             />
           )}
@@ -2054,7 +2058,7 @@ class App extends React.Component<
     return (
       <ThemeProvider theme={theme}>
         <AudioEngineContext.Provider
-          value={{ audioEngine, audioFontId: this.state.audioFontId }}
+          value={{ audioEngine, audioFontId: settingsStore.audioFontId }}
         >
           <FirebaseContext.Provider value={firebase}>
             <JssProvider jss={jss} generateClassName={generateClassName}>

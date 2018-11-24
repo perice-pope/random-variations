@@ -4,11 +4,6 @@ import { css } from 'react-emotion'
 
 import { default as MuButton } from '@material-ui/core/Button'
 
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListSubheader from '@material-ui/core/ListSubheader'
-import ListItemText from '@material-ui/core/ListItemText'
-
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
@@ -16,13 +11,16 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 
 import AudioFontConfig, { AudioFontId } from '../audioFontsConfig'
+import { ClefType } from '../types'
+import { FormControl, InputLabel, NativeSelect, Input } from '@material-ui/core'
 
-type FormValues = {
+export type SettingsFormValues = {
   audioFontId: AudioFontId
+  clefType: ClefType
 }
 
 type SubmitArgsType = {
-  values: FormValues
+  values: SettingsFormValues
 }
 
 type SettingsModalProps = {
@@ -30,11 +28,11 @@ type SettingsModalProps = {
   onClose: () => any
   onSubmit?: (args: SubmitArgsType) => any
   onAudioFontChanged?: (audioFontId: AudioFontId) => any
-  defaultValues?: FormValues
+  defaultValues?: SettingsFormValues
 }
 
 type SettingsModalState = {
-  values: FormValues
+  values: SettingsFormValues
 }
 
 type AudioFontOption = {
@@ -47,6 +45,27 @@ const AudioFontOptions: AudioFontOption[] = AudioFontConfig.filter(
 ).map(afc => ({
   title: afc.title,
   value: afc.id,
+}))
+
+type ClefTypeOption = {
+  title: string
+  value: ClefType
+}
+
+const ClefTypeOptions: ClefTypeOption[] = ([
+  'treble',
+  'bass',
+  'alto',
+  'tenor',
+  'soprano',
+  'mezzo-soprano',
+  'baritone-c',
+  'baritone-f',
+  'subbass',
+  'french',
+] as ClefType[]).map(clef => ({
+  title: _.capitalize(clef),
+  value: clef,
 }))
 
 // @ts-ignore
@@ -68,11 +87,17 @@ class SettingsModal extends React.Component<
     }
   }
 
-  handleAudioFontSelected = (audioFontId: AudioFontId) => {
+  handleAudioFontSelected = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const audioFontId = event.target.value as AudioFontId
     this.setState({ values: { ...this.state.values, audioFontId } })
     if (this.props.onAudioFontChanged) {
       this.props.onAudioFontChanged(audioFontId)
     }
+  }
+
+  handleClefSelected = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const clefType = event.target.value as ClefType
+    this.setState({ values: { ...this.state.values, clefType } })
   }
 
   render() {
@@ -87,26 +112,37 @@ class SettingsModal extends React.Component<
         <DialogTitle id="settings-dialog">Settings</DialogTitle>
 
         <DialogContent>
-          <List
-            dense={true}
-            className={css({
-              maxHeight: '300px',
-              overflow: 'auto',
-            })}
-          >
-            <ListSubheader>Instrument sound</ListSubheader>
-            {AudioFontOptions.map(({ title, value }) => (
-              <ListItem
-                selected={value === this.state.values.audioFontId}
-                button
-                // @ts-ignore
-                onClick={() => this.handleAudioFontSelected(value)}
-                key={value}
-              >
-                <ListItemText primary={title} />
-              </ListItem>
-            ))}
-          </List>
+          <FormControl className={css({ margin: '1rem' })}>
+            <InputLabel htmlFor="instrument-sound">Instrument sound</InputLabel>
+            <NativeSelect
+              value={this.state.values.audioFontId}
+              onChange={this.handleAudioFontSelected}
+              name="audioFontId"
+              input={<Input id="instrument-sound" />}
+            >
+              {AudioFontOptions.map(({ title, value }) => (
+                <option key={value} value={value}>
+                  {title}
+                </option>
+              ))}
+            </NativeSelect>
+          </FormControl>
+
+          <FormControl className={css({ margin: '1rem' })}>
+            <InputLabel htmlFor="clef-type">Clef type</InputLabel>
+            <NativeSelect
+              value={this.state.values.clefType}
+              onChange={this.handleClefSelected}
+              name="clefType"
+              input={<Input id="clef-type" />}
+            >
+              {ClefTypeOptions.map(({ title, value }) => (
+                <option key={value} value={value}>
+                  {title}
+                </option>
+              ))}
+            </NativeSelect>
+          </FormControl>
         </DialogContent>
 
         <DialogActions>

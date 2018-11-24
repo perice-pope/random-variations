@@ -27,6 +27,7 @@ import { Flex } from './ui/Flex'
 import { Box } from './ui'
 import NotesStaff from './NotesStaff'
 import { Omit } from '../utils'
+import settingsStore from '../services/settingsStore'
 
 export type SubmitValuesType = Omit<IntervalsModifier, 'enabled'>
 
@@ -35,6 +36,7 @@ type IntervalModifierModalProps = {
   onClose: () => any
   onSubmit: (args: SubmitValuesType) => any
   initialValues?: SubmitValuesType
+  baseNote?: string
 }
 
 type IntervalModifierModalState = {
@@ -117,7 +119,7 @@ class IntervalModifierModal extends React.Component<
   generateStaffTicks = () => {
     const { interval, type, direction } = this.state.values
 
-    const baseNote = 'C4'
+    const baseNote = this.props.baseNote || 'C4'
     const intervalNote = transpose(
       baseNote,
       `${direction === 'ascending' ? '' : '-'}${interval}`,
@@ -274,7 +276,8 @@ class IntervalModifierModal extends React.Component<
 
           <Box>
             <NotesStaff
-              id="chord-preview"
+              id="interval-preview"
+              clef={settingsStore.clefType}
               ticks={this.generateStaffTicks()}
               isPlaying={false}
               showBreaks

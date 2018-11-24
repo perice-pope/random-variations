@@ -39,6 +39,7 @@ import { Flex } from './ui/Flex'
 import { Box } from './ui'
 import NotesStaff from './NotesStaff'
 import { Omit } from '../utils'
+import settingsStore from '../services/settingsStore'
 
 export type SubmitValuesType = Omit<ScaleModifier, 'enabled'>
 
@@ -47,6 +48,7 @@ type ScaleModifierModalProps = {
   onClose: () => any
   onSubmit: (args: SubmitValuesType) => any
   initialValues?: SubmitValuesType
+  baseNote?: string
 }
 
 type ScaleModifierModalState = {
@@ -212,7 +214,7 @@ class ScaleModifierModal extends React.Component<
     const { scaleType } = this.state.values
     const scale = scaleByScaleType[scaleType]
     const { semitones = [] } = scale
-    const baseNote = 'C4'
+    const baseNote = this.props.baseNote || 'C4'
 
     let staffTicks: StaffTick[]
 
@@ -361,6 +363,7 @@ class ScaleModifierModal extends React.Component<
           <Box>
             <NotesStaff
               id="scale-preview"
+              clef={settingsStore.clefType}
               ticks={this.generateStaffTicks()}
               isPlaying={false}
               showBreaks

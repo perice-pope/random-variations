@@ -6,7 +6,7 @@ import { css } from 'react-emotion'
 import { darken, getLuminance } from 'polished'
 
 import { Box } from './ui'
-import { StaffTick } from '../types'
+import { StaffTick, ClefType } from '../types'
 import MeasureScreenSize from './MeasureScreenSize'
 
 const activeNoteClasses = {
@@ -24,7 +24,7 @@ type NotesStaffProps = {
   maxLines: number
   ticks: StaffTick[]
   tickLabels?: { [tickIndex: number]: string }
-  clef: string
+  clef: ClefType
   isPlaying: boolean
   showBreaks?: boolean
   showEnd?: boolean
@@ -267,12 +267,14 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
       if (tick.notes.length === 0) {
         if (this.props.showBreaks) {
           vexFlowTickConfig = {
+            clef: this.props.clef,
             keys: ['b/4'],
             duration: 'qr',
           }
         }
       } else {
         vexFlowTickConfig = {
+          clef: this.props.clef,
           keys: tickNoteKeys,
           duration: 'q',
         }
