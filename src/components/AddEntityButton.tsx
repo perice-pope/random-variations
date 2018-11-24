@@ -6,6 +6,7 @@ import AddIcon from '@material-ui/icons/Add'
 import Button, { ButtonProps } from '@material-ui/core/Button'
 import { css } from 'emotion'
 import Tooltip from './ui/Tooltip'
+import { Hidden } from '@material-ui/core'
 
 type AddEntityButtonProps = {
   onAddSingleNoteClick: () => any
@@ -170,11 +171,10 @@ export default class AddEntityButton extends React.Component<
             buttonRef={this.buttonRef}
             classes={{
               fab: css({
-                width: '50px !important',
                 height: '50px !important',
               }),
             }}
-            variant="fab"
+            variant="extendedFab"
             color="secondary"
             aria-label="Add"
             aria-owns={this.state.isMenuOpen ? 'add-entity-menu' : undefined}
@@ -183,6 +183,7 @@ export default class AddEntityButton extends React.Component<
             disabled={buttonProps.disabled || allOptionsAreDisabled}
           >
             <AddIcon />
+            <Hidden smDown>Add items</Hidden>
           </Button>
         </Tooltip>
       </>

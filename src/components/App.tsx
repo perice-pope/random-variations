@@ -81,7 +81,11 @@ import IntervalModifierModal, {
   SubmitValuesType as IntervalModifierModalSubmitValues,
 } from './IntervalModifierModal'
 import ChromaticApproachesModifierModal from './ChromaticApproachesModifierModal'
-import PianoKeyboard, { pianoNoteRangeWide, pianoNoteRangeNarrow, pianoNoteRangeMiddle } from './PianoKeyboard'
+import PianoKeyboard, {
+  pianoNoteRangeWide,
+  pianoNoteRangeNarrow,
+  pianoNoteRangeMiddle,
+} from './PianoKeyboard'
 
 import SettingsModal, { SettingsFormValues } from './SettingsModal'
 import AddEntityButton from './AddEntityButton'
@@ -170,6 +174,7 @@ type AppState = {
   height: number
   width: number
   contentWidth: number
+  modifersContentWidth: number
   notesStaffWidth: number
 
   signInModalIsOpen: boolean
@@ -349,6 +354,8 @@ class App extends React.Component<
       height: 0,
       width: 0,
       notesStaffWidth: 0,
+      contentWidth: 0,
+      modifersContentWidth: 0,
 
       isPlaying: false,
       staffTicks: [],
@@ -614,36 +621,38 @@ class App extends React.Component<
     })
   }
 
-  private getPianoNoteRange = () => this._getPianoNoteRange(this.state.width, this.state.staffTicks)
+  private getPianoNoteRange = () =>
+    this._getPianoNoteRange(this.state.width, this.state.staffTicks)
 
-  private _getPianoNoteRange = memoize((width: number, staffTicks: StaffTick[]) => {
-    let baseNoteRange = pianoNoteRangeNarrow
+  private _getPianoNoteRange = memoize(
+    (width: number, staffTicks: StaffTick[]) => {
+      let baseNoteRange = pianoNoteRangeNarrow
 
-    if (width > 1000) {
-      baseNoteRange = pianoNoteRangeWide
-    }
-    else if (width > 400) {
-      baseNoteRange = pianoNoteRangeMiddle
-    }
+      if (width > 1000) {
+        baseNoteRange = pianoNoteRangeWide
+      } else if (width > 400) {
+        baseNoteRange = pianoNoteRangeMiddle
+      }
 
-    const noteRange = { ...baseNoteRange }
-    if (staffTicks && staffTicks.length > 0) {
-      const allMidiNotes: number[] = _.flatten(
-        staffTicks.map(st => st.notes.map(n => n.midi)),
-      )
-      if (allMidiNotes.length > 0) {
-        const maxMidiNote = _.max(allMidiNotes) as number
-        const minMidiNote = _.min(allMidiNotes) as number
-        if (maxMidiNote! > noteRange.last) {
-          noteRange.last = maxMidiNote! + 3
-        }
-        if (noteRange.first > minMidiNote!) {
-          noteRange.first = Math.max(1, minMidiNote! - 3)
+      const noteRange = { ...baseNoteRange }
+      if (staffTicks && staffTicks.length > 0) {
+        const allMidiNotes: number[] = _.flatten(
+          staffTicks.map(st => st.notes.map(n => n.midi)),
+        )
+        if (allMidiNotes.length > 0) {
+          const maxMidiNote = _.max(allMidiNotes) as number
+          const minMidiNote = _.min(allMidiNotes) as number
+          if (maxMidiNote! > noteRange.last) {
+            noteRange.last = maxMidiNote! + 3
+          }
+          if (noteRange.first > minMidiNote!) {
+            noteRange.first = Math.max(1, minMidiNote! - 3)
+          }
         }
       }
-    }
-    return noteRange
-  })
+      return noteRange
+    },
+  )
 
   private getPianoHeight = () => {
     const { height, width } = this.state
@@ -870,14 +879,20 @@ class App extends React.Component<
 
   private handleContentWidthUpdate = () => {
     const contentElement = document.getElementById('app-content') as HTMLElement
-    if (!contentElement) {
-      return
+    if (contentElement) {
+      const contentWidth = (contentElement as HTMLElement).getBoundingClientRect()
+        .width
+      this.setState({ contentWidth })
     }
 
-    const contentWidth = (contentElement as HTMLElement).getBoundingClientRect()
-      .width
-
-    this.setState({ contentWidth })
+    const modifiersContentElement = document.getElementById(
+      'modifiers-container',
+    ) as HTMLElement
+    if (modifiersContentElement) {
+      const modifersContentWidth = (modifiersContentElement as HTMLElement).getBoundingClientRect()
+        .width
+      this.setState({ modifersContentWidth })
+    }
   }
 
   private toggleTooltipVisibility = () => {
@@ -1565,7 +1580,7 @@ class App extends React.Component<
               variant="outlined"
               label={`Enclosure: ${modifiers.chromaticApproaches.type}`}
               deleteIcon={
-                <Tooltip title="Remove enclosures" placement="right">
+                <Tooltip title="Remove enclosures" variant="gray" placement="right">
                   <DeleteIcon />
                 </Tooltip>
               }
@@ -1807,7 +1822,6 @@ class App extends React.Component<
               </Hidden>
 
               <div
-                id="app-content"
                 className={cx(
                   classes.content,
                   !isMobile && classes.contentShifted,
@@ -1820,6 +1834,7 @@ class App extends React.Component<
                   px={[3, 4, 4]}
                   maxWidth={MAX_LAYOUT_WIDTH}
                   width={1}
+                  id="app-content"
                 >
                   {uiState.isControlsShown || !isMobile ? (
                     <Flex
@@ -1871,16 +1886,18 @@ class App extends React.Component<
                       />
                     </Grow>
 
+                    <Box px={[1, 2, 2]} width={1}>
                     <Flex
+                      id="modifiers-container" 
                       flexDirection="row"
                       alignItems="center"
+                      justifyContent="center"
                       width={1}
-                      px={[1, 2, 2]}
                       mt={[4, 2, 3]}
                       mb={[2, 2, 3]}
                     >
                       <Fade in={this.state.isInitialized} appear>
-                        <Box mr={[2, 3, 3]}>
+                        <div>
                           <AddEntityButton
                             showHelpTooltip={
                               noteCards.length === 0 &&
@@ -1916,17 +1933,20 @@ class App extends React.Component<
                             }
                             buttonProps={{
                               disabled: isPlaying,
-                              className: css({
-                                marginLeft: '1rem',
-                              }),
+                              className: cx(
+                                css({
+                                  marginRight: '10px',
+                                }),
+                              ),
                             }}
                           />
-                        </Box>
+                        </div>
                       </Fade>
-                      <Flex flex-direction="row" flex={1} alignItems="center">
+                      <Flex flex-direction="row" alignItems="center">
                         {ModifierChips}
                       </Flex>
                     </Flex>
+                      </Box>
                   </Flex>
 
                   <div
