@@ -19,6 +19,8 @@ import Typography from '@material-ui/core/Typography'
 import IconButton from '@material-ui/core/IconButton'
 import Hidden from '@material-ui/core/Hidden'
 
+import ZoomInIcon from '@material-ui/icons/ZoomIn'
+import ZoomOutIcon from '@material-ui/icons/ZoomOut'
 import SettingsIcon from '@material-ui/icons/Settings'
 import PlayIcon from '@material-ui/icons/PlayArrow'
 import StopIcon from '@material-ui/icons/Stop'
@@ -564,7 +566,9 @@ class App extends React.Component<
   }
 
   private initAudioEngine = async () => {
+    console.log('initAudioEngine', sessionStore.activeSession)
     audioEngine.setAnimationCallback(this.drawAnimation)
+
     if (sessionStore.activeSession) {
       audioEngine.setBpm(sessionStore.activeSession.bpm)
       audioEngine.setCountIn(
@@ -1173,6 +1177,24 @@ class App extends React.Component<
       shareSessionModalIsOpen: true,
       shareSessionModalSession: session,
     })
+  }
+
+  private handleDecreaseZoomFactor = () => {
+    settingsStore.scaleZoomFactor = Math.max(
+      settingsStore.scaleZoomFactor - 0.25,
+      0.25,
+    )
+    settingsStore.saveSettingsLocally()
+    window.dispatchEvent(new Event('resize'))
+  }
+
+  private handleIncreaseZoomFactor = () => {
+    settingsStore.scaleZoomFactor = Math.min(
+      settingsStore.scaleZoomFactor + 0.25,
+      3,
+    )
+    settingsStore.saveSettingsLocally()
+    window.dispatchEvent(new Event('resize'))
   }
 
   private renderApp = () => {
@@ -1807,7 +1829,7 @@ class App extends React.Component<
                     </Grow>
 
                     <Flex
-                      flexDirection="row-reverse"
+                      flexDirection="row"
                       alignItems="center"
                       width={1}
                       px={[1, 2, 2]}
@@ -1815,7 +1837,7 @@ class App extends React.Component<
                       mb={[2, 2, 3]}
                     >
                       <Fade in={this.state.isInitialized} appear>
-                        <div>
+                        <Box mr={[2, 3, 3]}>
                           <AddEntityButton
                             showHelpTooltip={
                               noteCards.length === 0 &&
@@ -1856,14 +1878,57 @@ class App extends React.Component<
                               }),
                             }}
                           />
-                        </div>
+                        </Box>
                       </Fade>
-
                       <Flex flex-direction="row" flex={1} alignItems="center">
                         {ModifierChips}
                       </Flex>
                     </Flex>
                   </Flex>
+
+                  <div
+                    className={css(`
+                    text-align: right;
+                    color: #bbb;
+                    font-size: 13px;
+                    user-select: none;
+                  `)}
+                  >
+                    <span>{`x ${settingsStore.scaleZoomFactor}`}</span>
+                    <Tooltip title="Smaller font">
+                      <IconButton
+                        color="inherit"
+                        aria-label="Decrease font size"
+                        onClick={this.handleDecreaseZoomFactor}
+                      >
+                        <ZoomOutIcon />
+                      </IconButton>
+                    </Tooltip>
+
+                    <Tooltip title="Larger font">
+                      <IconButton
+                        color="inherit"
+                        aria-label="Increase font size"
+                        onClick={this.handleIncreaseZoomFactor}
+                      >
+                        <ZoomInIcon />
+                      </IconButton>
+                    </Tooltip>
+
+                    <span>{'|'}</span>
+
+                    <Tooltip title="Notes staff settings">
+                      <IconButton
+                        color="inherit"
+                        aria-label="Change notes staff settings"
+                        onClick={() => {
+                          this.openSettingsModal()
+                        }}
+                      >
+                        <SettingsIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </div>
 
                   <NotesStaff
                     scale={notesStaffScaleFactor}
@@ -1881,7 +1946,7 @@ class App extends React.Component<
                   />
                 </Box>
 
-                <Box mt={[1, 2, 4]}>
+                <Box mt={[2, 3, 4]}>
                   <PianoKeyboard
                     width={
                       this.state.width -
@@ -2036,7 +2101,7 @@ class App extends React.Component<
   private getNotesStaffScaleFactor(isMobile: boolean) {
     let scale = 1.0
     if (isMobile) {
-      scale = 0.6
+      scale = 0.7
     } else if (this.props.width === 'md') {
       scale = 0.85
     }
@@ -2051,7 +2116,7 @@ class App extends React.Component<
       scale *= 0.9
     }
 
-    return scale
+    return scale * settingsStore.scaleZoomFactor
   }
 
   public render() {

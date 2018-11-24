@@ -6,6 +6,7 @@ interface SettingsStoreData {
   audioFontId: AudioFontId
   clefType: ClefType
   enharmonicFlatsMap: EnharmonicFlatsMap
+  scaleZoomFactor: number
 }
 
 class SettingsStore {
@@ -16,11 +17,15 @@ class SettingsStore {
   @observable
   public enharmonicFlatsMap: EnharmonicFlatsMap = {}
 
+  @observable
+  public scaleZoomFactor = 1.0
+
   public saveSettingsLocally = () => {
     const savedState: SettingsStoreData = {
       audioFontId: this.audioFontId,
       enharmonicFlatsMap: this.enharmonicFlatsMap,
       clefType: this.clefType,
+      scaleZoomFactor: this.scaleZoomFactor,
     }
     console.log('SettingsStore > saveSettingsLocally: ', savedState)
     window.localStorage.setItem('appState', JSON.stringify(savedState))
@@ -41,15 +46,9 @@ class SettingsStore {
     }
 
     if (restoredState) {
-      if (restoredState.enharmonicFlatsMap) {
-        this.enharmonicFlatsMap = restoredState.enharmonicFlatsMap
-      }
-      if (restoredState.audioFontId) {
-        this.audioFontId = restoredState.audioFontId
-      }
-      if (restoredState.clefType) {
-        this.clefType = restoredState.clefType
-      }
+      Object.keys(restoredState).forEach(key => {
+        this[key] = restoredState[key]
+      })
     }
   }
 }
