@@ -1275,7 +1275,7 @@ class App extends React.Component<
       >
         <MuiButton
           disabled={noteCards.length === 0}
-          color="default"
+          color="secondary"
           className={css(`margin: 0.5rem;`)}
           onClick={this.handleRemoveAllNotes}
         >
@@ -2175,7 +2175,7 @@ class App extends React.Component<
                   width="100vw"
                   alignItems="center"
                   justifyContent="center"
-                  css="overflow: hidden;"
+                  css="overflowX: hidden;"
                   flexDirection="column"
                 >
                   {this.state.isInitialized

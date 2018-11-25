@@ -53,26 +53,26 @@ const NoteCard = styled(BoxWithTouchRipple)<NoteCardProps>`
 
   max-height: 120px;
   padding: 3px 3px;
-  border-radius: 15px;
+  border-radius: 5px;
   font-size: 18px;
   font-weight: bold;
   user-select: none;
 
   @media screen and (min-height: 600px) and (min-width: 300px) {
     font-size: 20px;
-    border-radius: 15px;
+    border-radius: 8px;
     padding: 5px 5px;
   }
 
   @media screen and (min-height: 700px) and (min-width: 400px) {
     font-size: 26px;
-    border-radius: 15px;
+    border-radius: 10px;
     padding: 5px 5px;
   }
 
   @media screen and (min-height: 800px) and (min-width: 700px) {
     font-size: 32px;
-    border-radius: 15px;
+    border-radius: 13px;
     padding: 8px 10px;
   }
 

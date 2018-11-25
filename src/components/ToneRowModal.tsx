@@ -31,9 +31,10 @@ import {
   WithAudioEngineInjectedProps,
 } from './withAudioEngine'
 import { NoteNamesWithSharps } from '../musicUtils'
-import { Typography } from '@material-ui/core'
+import { Typography, IconButton } from '@material-ui/core'
 import settingsStore from '../services/settingsStore'
 import NoteCards, { NoteCardNote } from './NoteCards'
+import { ChromaticNoteSharps } from '../types'
 
 type ToneRowModalProps = {
   isOpen: boolean
@@ -84,7 +85,7 @@ class ToneRowModal extends React.Component<
 
     const octave: number = props.noteName ? tonal.Note.oct(props.noteName)! : 4
     this.state = {
-      range: this.getNoteRange(props.noteName),
+      range: this.getNoteRange(octave),
       noteName: props.noteName,
       octave: octave,
 
@@ -98,8 +99,7 @@ class ToneRowModal extends React.Component<
     }
   }
 
-  getNoteRange = noteName => {
-    const octave = noteName ? tonal.Note.oct(noteName)! : 4
+  getNoteRange = octave => {
     const firstNote = octave === 1 ? `C${octave}` : `A${octave - 1}`
     const lastNote = octave === 6 ? `B${octave}` : `D${octave + 1}`
     const noteRange = {
@@ -165,15 +165,76 @@ class ToneRowModal extends React.Component<
     const octaveValue =
       octave != null ? Math.max(1, Math.min(octave, 6)) : undefined
 
-    if (octaveValue != null && this.state.noteName != null) {
-      const newNoteName = `${tonal.Note.pc(this.state.noteName)}${octaveValue}`
-      console.log(newNoteName)
-      // this.onNoteSelected(newNoteName)
-    } else {
+    this.setState({
+      octave: octaveValue,
+      range: this.getNoteRange(octaveValue),
+    })
+  }
+
+  onNoteSelected = (noteName?: string, skipPlayingNote?: boolean) => {
+    if (!noteName) {
       this.setState({
-        octave: octaveValue,
+        noteName: undefined,
+        octave: undefined,
       })
+      return
     }
+
+    console.log('TCL: onNoteSelected -> noteName', noteName)
+    const noteEnharmonicName = tonal.Note.enharmonic(noteName) as string
+
+    setTimeout(
+      () =>
+        this.setState({ range: this.getNoteRange(tonal.Note.oct(noteName)) }),
+      100,
+    )
+
+    if (!skipPlayingNote) {
+      this.props.audioEngine.playNote(
+        {
+          midi: tonal.Note.midi(noteName)!,
+        },
+        0,
+        0.5,
+      )
+    }
+
+    if (noteName !== noteEnharmonicName && this.state.noteName === noteName) {
+      // This is a second click on a card with "enharmonic-capable" note...
+      // this.props.onEnharmonicChange(noteNameWithSharp)
+      const noteNameWithSharp = (noteName.includes('#')
+        ? noteName
+        : noteEnharmonicName) as string
+      const notePitchWithSharp = tonal.Note.pc(
+        noteNameWithSharp!,
+      ) as ChromaticNoteSharps
+
+      settingsStore.enharmonicFlatsMap = {
+        ...settingsStore.enharmonicFlatsMap,
+        [notePitchWithSharp]: !Boolean(
+          settingsStore.enharmonicFlatsMap[notePitchWithSharp],
+        ),
+      }
+
+      this.setState({
+        noteName: noteEnharmonicName!,
+        octave: tonal.Note.oct(noteEnharmonicName)!,
+      })
+
+      return
+    }
+
+    this.setState(
+      {
+        noteName: noteName,
+        octave: tonal.Note.oct(noteName)!,
+      },
+      () => {
+        if (this.state.notes.length < this.props.maxNotesCount) {
+          this.addNote(noteName)
+        }
+      },
+    )
   }
 
   private handleNotesCountChange = (event, count) =>
@@ -216,6 +277,9 @@ class ToneRowModal extends React.Component<
 
   render() {
     const { notes } = this.state
+    if (!this.props.isOpen) {
+      return null
+    }
 
     return (
       <Dialog
@@ -234,9 +298,9 @@ class ToneRowModal extends React.Component<
             flexDirection: 'column',
             justifyContent: 'flex-start',
             maxWidth: '600px',
+            overflowX: 'hidden',
             width: '100%',
             margin: '0 auto',
-            marginTop: '2rem',
           })}
         >
           <Flex
@@ -289,7 +353,7 @@ class ToneRowModal extends React.Component<
               >
                 <Button
                   disabled={this.state.notes.length === 0}
-                  color="default"
+                  color="secondary"
                   onClick={this.clearAllNotes}
                 >
                   <DeleteIcon
@@ -314,14 +378,13 @@ class ToneRowModal extends React.Component<
             </Flex>
 
             <Flex alignItems="center" justifyContent="center">
-              <Button
-                variant="fab"
+              <IconButton
                 color="default"
                 onClick={this.handleDecreaseOctave}
                 disabled={this.state.octave == null || this.state.octave === 1}
               >
-                <MinusIcon />
-              </Button>
+                <MinusIcon fontSize="large" />
+              </IconButton>
               <TextField
                 className={css({
                   maxWidth: '80px',
@@ -333,7 +396,7 @@ class ToneRowModal extends React.Component<
                   className: css({ fontSize: '1.2rem' }),
                 }}
                 InputProps={{
-                  className: css({ fontSize: '2rem' }),
+                  className: css({ fontSize: '1.8rem' }),
                 }}
                 label="Octave"
                 id="bpm"
@@ -345,19 +408,18 @@ class ToneRowModal extends React.Component<
                 value={`${this.state.octave}`}
                 onChange={this.handleOctaveChange}
               />
-              <Button
-                variant="fab"
+              <IconButton
                 color="default"
                 onClick={this.handleIncreaseOctave}
                 disabled={this.state.octave == null || this.state.octave === 6}
               >
-                <PlusIcon />
-              </Button>
+                <PlusIcon fontSize="large" />
+              </IconButton>
             </Flex>
 
-            <Box mt={4} width={1}>
+            <Box mt={3} width={1}>
               <PianoKeyboard
-                height={100}
+                height={70}
                 noteRange={this.state.range}
                 onPlayNote={midiNote => {
                   const noteNameWithSharp = tonal.Note.fromMidi(midiNote, true)
@@ -368,9 +430,7 @@ class ToneRowModal extends React.Component<
                     ? tonal.Note.enharmonic(noteNameWithSharp)!
                     : noteNameWithSharp
 
-                  if (this.state.notes.length < this.props.maxNotesCount) {
-                    this.addNote(noteName)
-                  }
+                  this.onNoteSelected(noteName, true)
                 }}
                 primaryNotesMidi={
                   this.state.noteName

@@ -29,6 +29,7 @@ import AudioEngine from '../services/audioEngine'
 import styled from 'react-emotion'
 import { AudioFontId } from '../audioFontsConfig'
 import settingsStore from '../services/settingsStore'
+import { IconButton } from '@material-ui/core'
 
 type PickNoteModalProps = {
   audioEngine: AudioEngine
@@ -264,14 +265,13 @@ class PickNoteModal extends React.Component<
             </Flex>
 
             <Flex alignItems="center">
-              <Button
-                variant="fab"
+              <IconButton
                 color="default"
                 onClick={this.handleDecreaseOctave}
                 disabled={this.state.octave == null || this.state.octave === 1}
               >
-                <MinusIcon />
-              </Button>
+                <MinusIcon fontSize="large" />
+              </IconButton>
               <TextField
                 className={css({
                   maxWidth: '80px',
@@ -295,19 +295,18 @@ class PickNoteModal extends React.Component<
                 value={`${this.state.octave}`}
                 onChange={this.handleOctaveChange}
               />
-              <Button
-                variant="fab"
+              <IconButton
                 color="default"
                 onClick={this.handleIncreaseOctave}
                 disabled={this.state.octave == null || this.state.octave === 6}
               >
-                <PlusIcon />
-              </Button>
+                <PlusIcon fontSize="large" />
+              </IconButton>
             </Flex>
 
             <Box mt={4} width={1}>
               <PianoKeyboard
-                height={100}
+                height={70}
                 noteRange={this.state.range}
                 onPlayNote={midiNote => {
                   const noteNameWithSharp = tonal.Note.fromMidi(midiNote, true)
