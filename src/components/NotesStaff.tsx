@@ -318,21 +318,22 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
           const label = this.props.tickLabels[index]
           let fontSize = 17
           if (label.length > 2) {
-            fontSize = 15
+            fontSize = 16
           }
           if (label.length > 4) {
-            fontSize = 13
+            fontSize = 15
           }
           if (label.length > 6) {
-            fontSize = 11
+            fontSize = 14
           }
           if (label.length > 8) {
-            fontSize = 7
+            fontSize = 12
           }
           const annotation = new Vex.Flow.Annotation(label)
             .setFont('Sans-serif', fontSize, 'bold')
             .setVerticalJustification(Vex.Flow.Annotation.VerticalJustify.TOP)
-            .setYShift(40)
+            .setYShift(30)
+            .setWidth(1)
           this.labelAnnotations.push(annotation)
 
           vexFlowNote.addModifier(0, annotation)
