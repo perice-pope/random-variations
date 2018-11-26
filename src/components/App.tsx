@@ -1181,6 +1181,22 @@ class App extends React.Component<
     })
   }
 
+  private handleSaveSessionAs = async (session: Session) => {
+    const newName = prompt('Save current session as a new session:', '')
+    if (!newName) {
+      return
+    }
+    await sessionStore.createAndActivateNewSession({
+      ...sessionStore.activeSession,
+      name: newName,
+    })
+    notificationsStore.showNotification({
+      message: `Session saved as "${newName}"`,
+      level: 'success',
+      autohide: 6000,
+    })
+  }
+
   private handleShareSession = async session => {
     await sessionStore.shareMySessionByKey(session.key)
     this.setState({
@@ -1661,7 +1677,8 @@ class App extends React.Component<
                   onClick={this.handleCreateNewSessionClick}
                   color="secondary"
                 >
-                  <PlusIcon /> New
+                  <PlusIcon />
+                  {' New'}
                 </Button>
               </Tooltip>
             )}
@@ -1721,21 +1738,32 @@ class App extends React.Component<
                             this.handleShareSession(session)
                           }}
                         >
-                          <ShareIcon color="action" /> Share
+                          <ShareIcon color="action" />
+                          {' Share'}
+                        </MenuItem>
+                        <MenuItem
+                          onClick={() => {
+                            this.handleSaveSessionAs(session)
+                          }}
+                        >
+                          <SaveIcon color="action" />
+                          {' Save as...'}
                         </MenuItem>
                         <MenuItem
                           onClick={() => {
                             this.handleRenameSession(session)
                           }}
                         >
-                          <EditIcon color="action" /> Rename
+                          <EditIcon color="action" />
+                          {' Rename'}
                         </MenuItem>
                         <MenuItem
                           onClick={() => {
                             this.handleDeleteSession(session)
                           }}
                         >
-                          <DeleteIcon color="action" /> Delete
+                          <DeleteIcon color="action" />
+                          {' Delete'}
                         </MenuItem>
                       </Menu>
                     )}
