@@ -79,7 +79,8 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     }
     if (
       prevProps.activeTickIndex !== this.props.activeTickIndex &&
-      this.props.activeTickIndex != null
+      this.props.activeTickIndex != null &&
+      this.props.isPlaying
     ) {
       this.updateActiveNoteLine()
     }
@@ -154,6 +155,25 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     // @ts-ignore
     this.activeLineEl = this.renderContext.openGroup() as SVGElement
 
+    const { activeTickIndex, ticks } = this.props
+    const { notesPerTick } = this
+    let noteHeadX = 0
+    if (
+      activeTickIndex != null &&
+      activeTickIndex >= 0 &&
+      activeTickIndex < ticks.length
+    ) {
+      const notesPerActiveTick = notesPerTick[activeTickIndex]
+      const activeNote = notesPerActiveTick.find(
+        n => n instanceof Vex.Flow.StaveNote,
+      ) as Vex.Flow.StaveNote | undefined
+      if (activeNote) {
+        noteHeadX =
+          activeNote.getNoteHeadBeginX() +
+          (activeNote.getNoteHeadEndX() - activeNote.getNoteHeadBeginX()) / 2
+      }
+    }
+
     this.renderContext
       .beginPath()
       // @ts-ignore
@@ -170,6 +190,8 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     this.renderContext.restore()
 
     this.activeLineEl.classList.add('vf-active-line', activeNoteClasses.base)
+    // @ts-ignore
+    this.activeLineEl.style = `transform: translateX(${noteHeadX}px) translateY(${0}px);`
 
     if (!this.props.isPlaying) {
       this.activeLineEl.classList.add(activeNoteClasses.hidden)
@@ -186,8 +208,22 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
       // Reset the transition transform
       setTimeout(() => {
         if (this.activeLineEl) {
+          const { notesPerTick } = this
+          const notesPerActiveTick =
+            notesPerTick.length > 0 ? notesPerTick[0] : []
+          let noteHeadX = 0
+          const activeNote = notesPerActiveTick.find(
+            n => n instanceof Vex.Flow.StaveNote,
+          ) as Vex.Flow.StaveNote | undefined
+          if (activeNote) {
+            noteHeadX =
+              activeNote.getNoteHeadBeginX() +
+              (activeNote.getNoteHeadEndX() - activeNote.getNoteHeadBeginX()) /
+                2
+          }
+
           // @ts-ignore
-          this.activeLineEl.style = ''
+          this.activeLineEl.style = `transform: translateX(${noteHeadX}px) translateY(${0}px);`
         }
       }, 400)
     }
@@ -232,8 +268,6 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     // Clear the old notes
     renderContext.clear()
     this.drawStaveAndClef()
-    this.drawActiveNoteLine()
-    this.updateActiveNoteLine()
     // @ts-ignore
     const svg = renderContext.svg as SVGElement
 
@@ -343,8 +377,9 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
           const annotation = new Vex.Flow.Annotation(label)
             .setFont('Sans-serif', fontSize, 'bold')
             .setVerticalJustification(Vex.Flow.Annotation.VerticalJustify.TOP)
-            .setYShift(30)
+            .setYShift(0)
             .setWidth(1)
+          annotation.setXShift(index === 0 ? 40 : 10)
           this.labelAnnotations.push(annotation)
 
           vexFlowNote.addModifier(0, annotation)
@@ -406,6 +441,9 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     })
 
     this.notesPerTick = tickToNotes
+
+    this.drawActiveNoteLine()
+    this.updateActiveNoteLine()
   }
 
   updateActiveNoteLine = () => {
@@ -414,7 +452,10 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
       this.drawActiveNoteLine()
     }
 
-    const { activeTickIndex } = this.props
+    const { activeTickIndex, isPlaying } = this.props
+    if (!isPlaying) {
+      return
+    }
     const { ticks, staveHeight } = this.props
     const { notesPerTick } = this
 
@@ -443,6 +484,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
           })
         }
 
+        console.log('update: ', activeLineXNew)
         // @ts-ignore
         this.activeLineEl.style = `transform: translateX(${activeLineXNew}px) translateY(${activeLineYNew}px);`
 

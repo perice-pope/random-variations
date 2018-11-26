@@ -1053,6 +1053,7 @@ class App extends React.Component<
         ...values,
         enabled: true,
       }
+      audioEngine.setBpm(sessionStore.activeSession.bpm)
     }
     this.closeArpeggioAddingModal()
   }
@@ -1065,6 +1066,7 @@ class App extends React.Component<
         ...values,
         enabled: true,
       }
+      audioEngine.setBpm(sessionStore.activeSession.bpm)
     }
     this.closeScalesModal()
   }
@@ -1077,6 +1079,7 @@ class App extends React.Component<
         ...values,
         enabled: true,
       }
+      audioEngine.setBpm(sessionStore.activeSession.bpm)
     }
 
     this.closeIntervalsModal()
@@ -1092,6 +1095,7 @@ class App extends React.Component<
         type,
         enabled: true,
       }
+      audioEngine.setBpm(sessionStore.activeSession.bpm)
     }
     this.closeChromaticApproachesModal()
   }

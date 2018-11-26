@@ -665,7 +665,7 @@ export const generateStaffTicks = ({
   // Number of rests to add after each note card
   rests: number
 }): { ticks: StaffTick[]; tickLabels: { [tickIndex: number]: string } } => {
-  console.log('generateStaffTicks')
+  console.log('generateStaffTicks', rests)
   const ticksPerCard: StaffTick[][] = []
   const tickLabels: { [tickIndex: number]: string } = {}
 

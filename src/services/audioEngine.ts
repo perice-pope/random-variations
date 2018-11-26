@@ -142,7 +142,7 @@ export default class AudioEngine {
     Tone.Master.volume.rampTo(1, 100)
   }
 
-  public stopLoop = () => {
+  public stopLoop = (callback?: () => any) => {
     const rampTimeMs = 100
     Tone.Master.volume.rampTo(0, rampTimeMs)
     this.isPlayingLoop = false
@@ -154,6 +154,9 @@ export default class AudioEngine {
       }
       if (this.loopSequence) {
         this.loopSequence.stop()
+      }
+      if (callback) {
+        callback()
       }
     }, rampTimeMs)
   }

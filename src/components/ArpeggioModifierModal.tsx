@@ -248,7 +248,21 @@ class ArpeggioModifierModal extends React.Component<
           patternPreset: 'custom',
         },
       },
-      this.setPlaybackLoop,
+      () => {
+        if (this.state.isPlaying) {
+          this.setState({ isPlaying: false, activeTickIndex: 0 }, () => {
+            audioEngine.stopLoop(() => {
+              this.setPlaybackLoop()
+              setTimeout(() => {
+                this.setState({ isPlaying: true, activeTickIndex: 0 })
+                audioEngine.playLoop()
+              }, 100)
+            })
+          })
+        } else {
+          this.setPlaybackLoop()
+        }
+      },
     )
   }
 
