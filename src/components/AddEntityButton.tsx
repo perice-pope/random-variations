@@ -63,7 +63,7 @@ export default class AddEntityButton extends React.Component<
             open={showHelpTooltip || undefined}
             title={
               showHelpTooltip
-                ? 'Start with adding a note!'
+                ? 'Start here!'
                 : 'Add items to your practice session'
             }
             PopperProps={{ className: css({ zIndex: 100 }) }}
