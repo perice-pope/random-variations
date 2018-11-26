@@ -195,95 +195,90 @@ class IntervalModifierModal extends React.Component<
       <Dialog
         fullWidth={true}
         fullScreen={this.props.fullScreen}
+        scroll="paper"
         open={this.props.isOpen}
         onClose={this.handleSubmit}
         aria-labelledby="interval-modifier-dialog"
       >
         <DialogTitle id="interval-modifier-dialog">Intervals</DialogTitle>
 
-        <DialogContent
-          id="interval-modifier-dialog-content"
-          className={css({
-            maxWidth: '600px',
-            margin: '0 auto',
-            width: '100%',
-            marginTop: '2rem',
-          })}
-        >
-          <Flex flexDirection="row">
-            <FormControl className={css({ flex: 1 })}>
-              <InputLabel htmlFor="interval-type">Interval type</InputLabel>
-              <NativeSelect
-                value={interval}
-                onChange={this.handleIntervalTypeSelected}
-                name="interval"
-                input={<Input id="interval-type" />}
-              >
-                {intervalOptions.map(({ title, value }) => (
-                  <option key={value} value={value}>
-                    {title}
-                  </option>
-                ))}
-              </NativeSelect>
-            </FormControl>
-          </Flex>
+        <DialogContent id="interval-modifier-dialog-content">
+          <Box maxWidth={600} width={1} mx="auto">
+            <Flex flexDirection="row">
+              <FormControl className={css({ flex: 1 })}>
+                <InputLabel htmlFor="interval-type">Interval type</InputLabel>
+                <NativeSelect
+                  value={interval}
+                  onChange={this.handleIntervalTypeSelected}
+                  name="interval"
+                  input={<Input id="interval-type" />}
+                >
+                  {intervalOptions.map(({ title, value }) => (
+                    <option key={value} value={value}>
+                      {title}
+                    </option>
+                  ))}
+                </NativeSelect>
+              </FormControl>
+            </Flex>
 
-          <Flex>
-            <FormControl component="fieldset">
-              <RadioGroup
-                row
-                aria-label="Broken or stacked?"
-                name="broken-stacked"
-                value={type}
-                onChange={this.handleBrokenStackedChange}
-              >
-                <FormControlLabel
-                  value="broken"
-                  control={<Radio />}
-                  label="Broken interval"
-                />
-                <FormControlLabel
-                  value="stacked"
-                  control={<Radio />}
-                  label="Stacked interval"
-                />
-              </RadioGroup>
-            </FormControl>
-          </Flex>
+            <Flex>
+              <FormControl component="fieldset">
+                <RadioGroup
+                  row
+                  aria-label="Broken or stacked?"
+                  name="broken-stacked"
+                  value={type}
+                  onChange={this.handleBrokenStackedChange}
+                >
+                  <FormControlLabel
+                    value="broken"
+                    control={<Radio />}
+                    label="Broken interval"
+                  />
+                  <FormControlLabel
+                    value="stacked"
+                    control={<Radio />}
+                    label="Stacked interval"
+                  />
+                </RadioGroup>
+              </FormControl>
+            </Flex>
 
-          <Flex>
-            <FormControl component="fieldset">
-              <RadioGroup
-                row
-                aria-label="Direction"
-                name="direction"
-                value={direction}
-                onChange={this.handleDirectionChange}
-              >
-                <FormControlLabel
-                  value="ascending"
-                  control={<Radio />}
-                  label="Ascending"
-                />
-                <FormControlLabel
-                  value="descending"
-                  control={<Radio />}
-                  label="Descending"
-                />
-              </RadioGroup>
-            </FormControl>
-          </Flex>
+            <Flex>
+              <FormControl component="fieldset">
+                <RadioGroup
+                  row
+                  aria-label="Direction"
+                  name="direction"
+                  value={direction}
+                  onChange={this.handleDirectionChange}
+                >
+                  <FormControlLabel
+                    value="ascending"
+                    control={<Radio />}
+                    label="Ascending"
+                  />
+                  <FormControlLabel
+                    value="descending"
+                    control={<Radio />}
+                    label="Descending"
+                  />
+                </RadioGroup>
+              </FormControl>
+            </Flex>
 
-          <Box>
-            <NotesStaff
-              id="interval-preview"
-              clef={settingsStore.clefType}
-              ticks={this.generateStaffTicks()}
-              isPlaying={false}
-              showBreaks
-              activeTickIndex={undefined}
-              maxLines={1}
-            />
+            <Box>
+              <NotesStaff
+                id="interval-preview"
+                clef={settingsStore.clefType}
+                ticks={this.generateStaffTicks()}
+                isPlaying={false}
+                showBreaks
+                activeTickIndex={undefined}
+                maxLines={1}
+              />
+            </Box>
           </Box>
         </DialogContent>
 

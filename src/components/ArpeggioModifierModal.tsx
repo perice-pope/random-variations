@@ -308,157 +308,163 @@ class ArpeggioModifierModal extends React.Component<
       <Dialog
         fullWidth={true}
         fullScreen={this.props.fullScreen}
+        scroll="paper"
         open={this.props.isOpen}
         onClose={this.handleSubmit}
         aria-labelledby="arpeggio-modifier-dialog"
       >
         <DialogTitle id="arpeggio-modifier-dialog">Chords</DialogTitle>
 
-        <DialogContent
-          id="arpeggio-modifier-dialog-content"
-          className={css({
-            maxWidth: '600px',
-            width: '100%',
-            margin: '0 auto',
-            marginTop: '2rem',
-          })}
-        >
-          <Flex flexDirection="row">
-            <FormControl className={css({ flex: 1 })}>
-              <InputLabel htmlFor="chord-type">Chord type</InputLabel>
-              <NativeSelect
-                value={this.state.values.chordType}
-                onChange={this.handleChordTypeSelected}
-                name="chordType"
-                input={<Input id="chord-type" />}
-              >
-                {Object.keys(chordTypeOptionsByGroup).map(groupName => (
-                  <optgroup key={groupName} label={groupName}>
-                    {chordTypeOptionsByGroup[groupName].map(
-                      ({ title, value }) => (
-                        <option key={value} value={value}>
-                          {`${title}`}
-                        </option>
-                      ),
-                    )}
-                  </optgroup>
-                ))}
-              </NativeSelect>
-            </FormControl>
-          </Flex>
+        <DialogContent id="arpeggio-modifier-dialog-content">
+          <Box maxWidth={600} width={1} mx="auto">
+            <Flex flexDirection="row">
+              <FormControl className={css({ flex: 1 })}>
+                <InputLabel htmlFor="chord-type">Chord type</InputLabel>
+                <NativeSelect
+                  value={this.state.values.chordType}
+                  onChange={this.handleChordTypeSelected}
+                  name="chordType"
+                  input={<Input id="chord-type" />}
+                >
+                  {Object.keys(chordTypeOptionsByGroup).map(groupName => (
+                    <optgroup key={groupName} label={groupName}>
+                      {chordTypeOptionsByGroup[groupName].map(
+                        ({ title, value }) => (
+                          <option key={value} value={value}>
+                            {`${title}`}
+                          </option>
+                        ),
+                      )}
+                    </optgroup>
+                  ))}
+                </NativeSelect>
+              </FormControl>
+            </Flex>
 
-          <Flex>
-            <FormControl component="fieldset">
-              <RadioGroup
-                row
-                aria-label="Broken or stacked?"
-                name="broken-stacked"
-                value={this.state.values.isMelodic ? 'broken' : 'stacked'}
-                onChange={this.handleBrokenStackedChange}
-              >
-                <FormControlLabel
-                  value="broken"
-                  control={<Radio />}
-                  label="Broken chord"
-                />
-                <FormControlLabel
-                  value="stacked"
-                  control={<Radio />}
-                  label="Stacked chord"
-                />
-              </RadioGroup>
-            </FormControl>
-          </Flex>
+            <Flex>
+              <FormControl component="fieldset">
+                <RadioGroup
+                  row
+                  aria-label="Broken or stacked?"
+                  name="broken-stacked"
+                  value={this.state.values.isMelodic ? 'broken' : 'stacked'}
+                  onChange={this.handleBrokenStackedChange}
+                >
+                  <FormControlLabel
+                    value="broken"
+                    control={<Radio />}
+                    label="Broken chord"
+                  />
+                  <FormControlLabel
+                    value="stacked"
+                    control={<Radio />}
+                    label="Stacked chord"
+                  />
+                </RadioGroup>
+              </FormControl>
+            </Flex>
 
-          <Flex mt={1} flexDirection="column">
-            <Flex flexWrap="wrap" flexDirection="row" mt={2}>
-              {isMelodic && (
-                <FormControl className={css({ flex: 1, marginRight: '1rem' })}>
-                  <InputLabel htmlFor="arp-pattern-preset">Pattern</InputLabel>
-                  <NativeSelect
-                    value={this.state.values.patternPreset}
-                    onChange={this.handlePatternPresetSelected}
-                    name="patternPreset"
-                    input={<Input id="arp-pattern-preset" />}
+            <Flex mt={1} flexDirection="column">
+              <Flex flexWrap="wrap" flexDirection="row" mt={2}>
+                {isMelodic && (
+                  <FormControl
+                    className={css({ flex: 1, marginRight: '1rem' })}
                   >
-                    {patternPresetOptions.map(({ title, value }) => (
-                      <option key={value} value={value}>
-                        {title}
-                      </option>
-                    ))}
-                  </NativeSelect>
-                </FormControl>
-              )}
-
-              {!isMelodic && (
-                <FormControl className={css({ flex: 1, marginRight: '1rem' })}>
-                  <InputLabel htmlFor="arp-chord-inversion">
-                    Inversion
-                  </InputLabel>
-                  <NativeSelect
-                    value={this.state.values.chordInversion}
-                    onChange={this.handleChordInversionChange}
-                    name="chordInversion"
-                    input={<Input id="arp-chord-inversion" />}
-                  >
-                    {getChordInversionOptions(chord.notesCount).map(
-                      ({ title, value }) => (
+                    <InputLabel htmlFor="arp-pattern-preset">
+                      Pattern
+                    </InputLabel>
+                    <NativeSelect
+                      value={this.state.values.patternPreset}
+                      onChange={this.handlePatternPresetSelected}
+                      name="patternPreset"
+                      input={<Input id="arp-pattern-preset" />}
+                    >
+                      {patternPresetOptions.map(({ title, value }) => (
                         <option key={value} value={value}>
                           {title}
                         </option>
-                      ),
-                    )}
-                  </NativeSelect>
-                </FormControl>
-              )}
+                      ))}
+                    </NativeSelect>
+                  </FormControl>
+                )}
+
+                {!isMelodic && (
+                  <FormControl
+                    className={css({ flex: 1, marginRight: '1rem' })}
+                  >
+                    <InputLabel htmlFor="arp-chord-inversion">
+                      Inversion
+                    </InputLabel>
+                    <NativeSelect
+                      value={this.state.values.chordInversion}
+                      onChange={this.handleChordInversionChange}
+                      name="chordInversion"
+                      input={<Input id="arp-chord-inversion" />}
+                    >
+                      {getChordInversionOptions(chord.notesCount).map(
+                        ({ title, value }) => (
+                          <option key={value} value={value}>
+                            {title}
+                          </option>
+                        ),
+                      )}
+                    </NativeSelect>
+                  </FormControl>
+                )}
+
+                {isMelodic && (
+                  <Tooltip
+                    title="Randomize pattern"
+                    disableFocusListener={true}
+                  >
+                    <MuButton
+                      color="primary"
+                      variant="extendedFab"
+                      className={css({ minWidth: '40px' })}
+                      size="small"
+                      aria-label="Randomize pattern"
+                      disabled={this.state.values.pattern.items.length < 1}
+                      onClick={this.handleRandomizePattern}
+                    >
+                      <ArrowsIcon
+                        fontSize="small"
+                        className={css({ marginRight: '0.5rem' })}
+                      />{' '}
+                      Randomize
+                    </MuButton>
+                  </Tooltip>
+                )}
+              </Flex>
 
               {isMelodic && (
-                <Tooltip title="Randomize pattern" disableFocusListener={true}>
-                  <MuButton
-                    color="primary"
-                    variant="extendedFab"
-                    className={css({ minWidth: '40px' })}
-                    size="small"
-                    aria-label="Randomize pattern"
-                    disabled={this.state.values.pattern.items.length < 1}
-                    onClick={this.handleRandomizePattern}
-                  >
-                    <ArrowsIcon
-                      fontSize="small"
-                      className={css({ marginRight: '0.5rem' })}
-                    />{' '}
-                    Randomize
-                  </MuButton>
-                </Tooltip>
+                <Box width={1} mt={3}>
+                  <PatternEditor
+                    useLetters
+                    value={this.state.values.pattern}
+                    onChange={this.handlePatternChange}
+                    min={1}
+                    max={chord.notesCount}
+                    getSortableContainer={() =>
+                      document.getElementById(
+                        'arpeggio-modifier-dialog-content',
+                      )
+                    }
+                  />
+                </Box>
               )}
             </Flex>
 
-            {isMelodic && (
-              <Box width={1} mt={3}>
-                <PatternEditor
-                  useLetters
-                  value={this.state.values.pattern}
-                  onChange={this.handlePatternChange}
-                  min={1}
-                  max={chord.notesCount}
-                  getSortableContainer={() =>
-                    document.getElementById('arpeggio-modifier-dialog-content')
-                  }
-                />
-              </Box>
-            )}
-          </Flex>
-
-          <Box>
-            <NotesStaff
-              id="chord-preview"
-              clef={settingsStore.clefType}
-              ticks={this.generateStaffTicks()}
-              isPlaying={false}
-              showBreaks
-              activeTickIndex={undefined}
-              maxLines={1}
-            />
+            <Box>
+              <NotesStaff
+                id="chord-preview"
+                clef={settingsStore.clefType}
+                ticks={this.generateStaffTicks()}
+                isPlaying={false}
+                showBreaks
+                activeTickIndex={undefined}
+                maxLines={1}
+              />
+            </Box>
           </Box>
         </DialogContent>
 

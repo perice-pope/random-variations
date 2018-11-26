@@ -1462,14 +1462,27 @@ class App extends React.Component<
       </>
     )
 
+    const chipsStyles = css(`
+    margin-right: 0.5rem;
+    margin-bottom: 0.25rem;
+    margin-top: 0.25rem;
+    @media screen and (max-width: 768px) {
+      font-size: 0.8rem;
+      height: 24px;
+    }
+  `)
+    const chipsProps = {
+      clickable: true,
+      color: 'secondary' as "inherit" | "primary" | "secondary" | "default" | undefined,
+      variant: 'outlined' as "outlined",
+      classes: { root: chipsStyles },
+    }
     const ModifierChips = (
       <>
         {modifiers.chords.enabled && (
           <Tooltip title="Change chords settings" disableFocusListener>
             <Chip
-              clickable
-              color="secondary"
-              variant="outlined"
+              {...chipsProps}
               label={`Chords: ${modifiers.chords.chordType}`}
               onClick={this.openArpeggioAddingModal}
               onDelete={this.handleRemoveArpeggioClick}
@@ -1478,17 +1491,13 @@ class App extends React.Component<
                   <DeleteIcon />
                 </Tooltip>
               }
-              classes={{
-                root: css({ marginRight: '0.5rem' }),
-              }}
             />
           </Tooltip>
         )}
         {modifiers.scales.enabled && (
           <Tooltip title="Change scales settings" disableFocusListener>
             <Chip
-              color="secondary"
-              variant="outlined"
+              {...chipsProps}
               label={`Scale: ${
                 (scaleByScaleType[modifiers.scales.scaleType] as Scale).title
               }`}
@@ -1499,9 +1508,6 @@ class App extends React.Component<
                   <DeleteIcon />
                 </Tooltip>
               }
-              classes={{
-                root: css({ marginRight: '0.5rem' }),
-              }}
             />
           </Tooltip>
         )}
@@ -1509,8 +1515,7 @@ class App extends React.Component<
         {modifiers.intervals.enabled && (
           <Tooltip title="Change intervals settings" disableFocusListener>
             <Chip
-              color="secondary"
-              variant="outlined"
+              {...chipsProps}
               label={`Intervals: ${
                 SemitonesToIntervalShortNameMap[modifiers.intervals.interval]
               }`}
@@ -1525,9 +1530,6 @@ class App extends React.Component<
                   <DeleteIcon />
                 </Tooltip>
               }
-              classes={{
-                root: css({ marginRight: '0.5rem' }),
-              }}
             />
           </Tooltip>
         )}
@@ -1535,8 +1537,7 @@ class App extends React.Component<
         {modifiers.chromaticApproaches.enabled && (
           <Tooltip title="Change enclosures settings" disableFocusListener>
             <Chip
-              color="secondary"
-              variant="outlined"
+              {...chipsProps}
               label={`Enclosure: ${modifiers.chromaticApproaches.type}`}
               deleteIcon={
                 <Tooltip
@@ -1549,9 +1550,6 @@ class App extends React.Component<
               }
               onClick={this.openChromaticApproachesModal}
               onDelete={this.handleRemoveChromaticApproachesClick}
-              classes={{
-                root: css({ marginRight: '0.5rem' }),
-              }}
             />
           </Tooltip>
         )}
@@ -1914,7 +1912,11 @@ class App extends React.Component<
                             />
                           </div>
                         </Fade>
-                        <Flex flex-direction="row" alignItems="center">
+                        <Flex
+                          flex-direction="row"
+                          alignItems="center"
+                          flexWrap="wrap"
+                        >
                           {ModifierChips}
                         </Flex>
                       </Flex>

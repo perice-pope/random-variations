@@ -88,6 +88,7 @@ const SortableNoteCard = SortableElement(
         bgColor,
         shouldFlip,
         onClick,
+        zIndex,
         ...props
       } = this.props
       const menuId = `note-card-menu-${id}`
@@ -101,7 +102,7 @@ const SortableNoteCard = SortableElement(
             className={css(`
           width: 25%;
           position: relative;
-          z-index: ${active ? 10000002 : 10000001};
+          z-index: ${active ? zIndex + 2 : zIndex + 1};
         `)}
           >
             <Flex p={[1, 2, 2]}>
@@ -149,6 +150,7 @@ const SortableNotesContainer = SortableContainer(
   ({
     items,
     isDragging,
+    zIndex,
     isDraggingOutOfContainer,
     innerRef,
     children,
@@ -191,6 +193,7 @@ const SortableNotesContainer = SortableContainer(
               bgColor={getNoteCardColorByNoteName(noteName)}
               tabIndex={-1}
               width={1}
+              zIndex={zIndex}
               active={activeNoteCardIndex === index}
               onEditClick={() => onEditClick(index)}
               onChangeToEnharmonicClick={() => onChangeToEnharmonicClick(index)}
@@ -225,6 +228,7 @@ export interface NoteCardNote {
 
 type NoteCardsProps = {
   notes: NoteCardNote[]
+  zIndex?: number
   activeNoteCardIndex?: number
   onMouseOver?: (index: number) => any
   onMouseLeave?: (index: number) => any
@@ -317,6 +321,7 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
       activeNoteCardIndex,
       onMouseOver,
       onMouseLeave,
+      zIndex,
     } = this.props
 
     return (
@@ -330,6 +335,7 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
           transitionDuration={DRAG_AND_DROP_TRANSITION_DURATION_MS}
           activeNoteCardIndex={activeNoteCardIndex}
           items={notes}
+          zIndex={zIndex || 1000}
           onMouseOver={onMouseOver}
           onMouseLeave={onMouseLeave}
           onSortEnd={this.handleSortEnd}

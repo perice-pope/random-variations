@@ -215,14 +215,13 @@ class PickNoteModal extends React.Component<
       <Dialog
         fullScreen={this.props.fullScreen}
         open={this.props.isOpen}
+        scroll="paper"
         onClose={this.props.onClose}
         aria-labelledby="pick-note-dialog"
       >
         <DialogTitle id="pick-note-dialog">Pick a note</DialogTitle>
-        <DialogContent
-          className={css({ display: 'flex', alignItems: 'center' })}
-        >
-          <Flex flexDirection="column" alignItems="center" width={1} flex={1}>
+        <DialogContent>
+          <Box width={1} flex={1}>
             <Flex flexWrap="wrap" flex={1}>
               {noteNames.map(noteNameWithSharp => {
                 const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)!
@@ -264,7 +263,7 @@ class PickNoteModal extends React.Component<
               })}
             </Flex>
 
-            <Flex alignItems="center">
+            <Flex alignItems="center" width={1} justifyContent="center">
               <IconButton
                 color="default"
                 onClick={this.handleDecreaseOctave}
@@ -339,8 +338,9 @@ class PickNoteModal extends React.Component<
                 }
               />
             </Box>
-          </Flex>
+          </Box>
         </DialogContent>
+
         <DialogActions>
           <Button onClick={this.props.onClose} color="secondary">
             Cancel

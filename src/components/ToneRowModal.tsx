@@ -285,31 +285,15 @@ class ToneRowModal extends React.Component<
       <Dialog
         fullScreen={this.props.fullScreen}
         fullWidth={true}
+        scroll="paper"
         open={this.props.isOpen}
         onClose={this.submit}
         aria-labelledby="pick-note-dialog"
       >
         <DialogTitle id="pick-note-dialog">Add a tone row</DialogTitle>
 
-        <DialogContent
-          className={css({
-            display: 'flex',
-            alignItems: 'flex-start',
-            flexDirection: 'column',
-            justifyContent: 'flex-start',
-            maxWidth: '600px',
-            overflowX: 'hidden',
-            width: '100%',
-            margin: '0 auto',
-          })}
-        >
-          <Flex
-            flexDirection="column"
-            alignItems="stretch"
-            width={1}
-            flex={1}
-            mt={2}
-          >
+        <DialogContent className={css(`overflow-x: hidden;`)}>
+          <Box width={1} maxWidth={600} mx="auto" flex={1} mt={2}>
             <Box mb={2} width={1}>
               <Typography id="slider-label" className={css(`font-size: 20px;`)}>
                 Notes count: {notes.length}
@@ -367,6 +351,7 @@ class ToneRowModal extends React.Component<
 
             <Flex flexWrap="wrap" flex={1} mt={2}>
               <NoteCards
+                zIndex={10000000}
                 notes={this.state.notes}
                 onCardsReorder={this.handleCardsReorder}
                 onCardDraggedOut={this.deleteNoteCard}
@@ -452,8 +437,9 @@ class ToneRowModal extends React.Component<
                 }
               />
             </Box>
-          </Flex>
+          </Box>
         </DialogContent>
+
         <DialogActions>
           <Button onClick={this.props.onClose} color="secondary">
             Cancel

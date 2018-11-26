@@ -270,106 +270,105 @@ class ScaleModifierModal extends React.Component<
       <Dialog
         fullWidth={true}
         fullScreen={this.props.fullScreen}
+        scroll="paper"
         open={this.props.isOpen}
         onClose={this.handleSubmit}
         aria-labelledby="scale-modifier-dialog"
       >
         <DialogTitle id="scale-modifier-dialog">Scales</DialogTitle>
 
-        <DialogContent
-          id="scale-modifier-dialog-content"
-          className={css({
-            maxWidth: '600px',
-            margin: '0 auto',
-            width: '100%',
-          })}
-        >
-          <Flex mt={[1, 3, 2]} flexDirection="row">
-            <FormControl className={css({ flex: 1 })}>
-              <InputLabel htmlFor="scale-type">Scale type</InputLabel>
-              <NativeSelect
-                value={this.state.values.scaleType}
-                onChange={this.handleScaleTypeSelected}
-                name="ScaleType"
-                input={<Input id="scale-type" />}
-              >
-                {scaleTypeOptions.map(({ title, value }) => (
-                  <option key={value} value={value}>
-                    {title}
-                  </option>
-                ))}
-              </NativeSelect>
-              {scale.notes && (
-                <FormHelperText>
-                  {`Notes in key of C:  `}
-                  <span
-                    className={css({ fontSize: '0.8rem', fontWeight: 'bold' })}
-                  >{`${scale.notes.split(' ').join(', ')}`}</span>
-                </FormHelperText>
-              )}
-            </FormControl>
-          </Flex>
-
-          <Flex mt={[1, 3, 2]} flexDirection="column">
-            <Flex flexWrap="wrap" flexDirection="row" mt={4}>
-              <FormControl className={css({ flex: 1, marginRight: '1rem' })}>
-                <InputLabel htmlFor="arp-pattern-preset">Pattern</InputLabel>
+        <DialogContent id="scale-modifier-dialog-content">
+          <Box maxWidth={600} width={1} mx="auto">
+            <Flex mt={[1, 3, 2]} flexDirection="row">
+              <FormControl className={css({ flex: 1 })}>
+                <InputLabel htmlFor="scale-type">Scale type</InputLabel>
                 <NativeSelect
-                  value={this.state.values.patternPreset}
-                  onChange={this.handlePatternPresetSelected}
-                  name="patternPreset"
-                  input={<Input id="arp-pattern-preset" />}
+                  value={this.state.values.scaleType}
+                  onChange={this.handleScaleTypeSelected}
+                  name="ScaleType"
+                  input={<Input id="scale-type" />}
                 >
-                  {patternPresetOptions.map(({ title, value }) => (
+                  {scaleTypeOptions.map(({ title, value }) => (
                     <option key={value} value={value}>
                       {title}
                     </option>
                   ))}
                 </NativeSelect>
+                {scale.notes && (
+                  <FormHelperText>
+                    {`Notes in key of C:  `}
+                    <span
+                      className={css({
+                        fontSize: '0.8rem',
+                        fontWeight: 'bold',
+                      })}
+                    >{`${scale.notes.split(' ').join(', ')}`}</span>
+                  </FormHelperText>
+                )}
               </FormControl>
-
-              <Tooltip title="Randomize pattern" disableFocusListener={true}>
-                <MuButton
-                  className={css({ minWidth: '40px' })}
-                  size="small"
-                  color="primary"
-                  variant="extendedFab"
-                  aria-label="Randomize pattern"
-                  disabled={this.state.values.pattern.items.length < 1}
-                  onClick={this.handleRandomizePattern}
-                >
-                  <ArrowsIcon
-                    fontSize="small"
-                    className={css({ marginRight: '0.5rem' })}
-                  />{' '}
-                  Randomize
-                </MuButton>
-              </Tooltip>
             </Flex>
 
-            <Box width={1} mt={3}>
-              <PatternEditor
-                value={this.state.values.pattern}
-                onChange={this.handlePatternChange}
-                min={1}
-                max={scale.notesCount}
-                getSortableContainer={() =>
-                  document.getElementById('scale-modifier-dialog-content')
-                }
+            <Flex mt={[1, 3, 2]} flexDirection="column">
+              <Flex flexWrap="wrap" flexDirection="row" mt={4}>
+                <FormControl className={css({ flex: 1, marginRight: '1rem' })}>
+                  <InputLabel htmlFor="arp-pattern-preset">Pattern</InputLabel>
+                  <NativeSelect
+                    value={this.state.values.patternPreset}
+                    onChange={this.handlePatternPresetSelected}
+                    name="patternPreset"
+                    input={<Input id="arp-pattern-preset" />}
+                  >
+                    {patternPresetOptions.map(({ title, value }) => (
+                      <option key={value} value={value}>
+                        {title}
+                      </option>
+                    ))}
+                  </NativeSelect>
+                </FormControl>
+
+                <Tooltip title="Randomize pattern" disableFocusListener={true}>
+                  <MuButton
+                    className={css({ minWidth: '40px' })}
+                    size="small"
+                    color="primary"
+                    variant="extendedFab"
+                    aria-label="Randomize pattern"
+                    disabled={this.state.values.pattern.items.length < 1}
+                    onClick={this.handleRandomizePattern}
+                  >
+                    <ArrowsIcon
+                      fontSize="small"
+                      className={css({ marginRight: '0.5rem' })}
+                    />{' '}
+                    Randomize
+                  </MuButton>
+                </Tooltip>
+              </Flex>
+
+              <Box width={1} mt={3}>
+                <PatternEditor
+                  value={this.state.values.pattern}
+                  onChange={this.handlePatternChange}
+                  min={1}
+                  max={scale.notesCount}
+                  getSortableContainer={() =>
+                    document.getElementById('scale-modifier-dialog-content')
+                  }
+                />
+              </Box>
+            </Flex>
+
+            <Box>
+              <NotesStaff
+                id="scale-preview"
+                clef={settingsStore.clefType}
+                ticks={this.generateStaffTicks()}
+                isPlaying={false}
+                showBreaks
+                activeTickIndex={undefined}
+                maxLines={1}
               />
             </Box>
-          </Flex>
-
-          <Box>
-            <NotesStaff
-              id="scale-preview"
-              clef={settingsStore.clefType}
-              ticks={this.generateStaffTicks()}
-              isPlaying={false}
-              showBreaks
-              activeTickIndex={undefined}
-              maxLines={1}
-            />
           </Box>
         </DialogContent>
 
