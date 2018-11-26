@@ -302,19 +302,27 @@ export const addApproachNotes = (
   ticks: StaffTick[],
   approach: ChromaticApproachesModifier,
 ): StaffTick[] => {
-  const tickWithBaseNoteIndex = ticks.findIndex(
+  if (!ticks || ticks.length === 0) {
+    return ticks
+  }
+  let tickWithBaseNoteIndex = ticks.findIndex(
     ({ notes }) => notes.find(n => n.isMainNote === true) != null,
   )
   if (tickWithBaseNoteIndex < 0) {
-    throw new Error(
+    tickWithBaseNoteIndex = 0
+    console.error(
       '"ticks" must have exactly one tick with "tick.notes[i].isMainNote ==== true"',
     )
   }
 
   const tickWithBaseNote = ticks[tickWithBaseNoteIndex]
-  const baseNoteIndex = tickWithBaseNote.notes.findIndex(
+  let baseNoteIndex = tickWithBaseNote.notes.findIndex(
     n => n.isMainNote === true,
   )
+
+  if (baseNoteIndex < 0) {
+    baseNoteIndex = 0
+  }
   const baseNote = tickWithBaseNote.notes[baseNoteIndex]
 
   let approachNotes: Partial<StaffNote>[] = []
@@ -386,19 +394,23 @@ export const addChordNotes = (
   ticks: StaffTick[],
   chordModifier: ChordModifier,
 ): StaffTick[] => {
-  const tickWithBaseNoteIndex = ticks.findIndex(
+  let tickWithBaseNoteIndex = ticks.findIndex(
     ({ notes }) => notes.find(n => n.isMainNote === true) != null,
   )
   if (tickWithBaseNoteIndex < 0) {
-    throw new Error(
+    tickWithBaseNoteIndex = 0
+    console.error(
       '"ticks" must have exactly one tick with "tick.notes[i].isMainNote ==== true"',
     )
   }
 
   const tickWithBaseNote = ticks[tickWithBaseNoteIndex]
-  const baseNoteIndex = tickWithBaseNote.notes.findIndex(
+  let baseNoteIndex = tickWithBaseNote.notes.findIndex(
     n => n.isMainNote === true,
   )
+  if (baseNoteIndex < 0) {
+    baseNoteIndex = 0
+  }
   const baseNote = tickWithBaseNote.notes[baseNoteIndex]
 
   const chord =
@@ -480,19 +492,23 @@ export const addScaleNotes = (
   ticks: StaffTick[],
   scaleModifier: ScaleModifier,
 ): StaffTick[] => {
-  const tickWithBaseNoteIndex = ticks.findIndex(
+  let tickWithBaseNoteIndex = ticks.findIndex(
     ({ notes }) => notes.find(n => n.isMainNote === true) != null,
   )
   if (tickWithBaseNoteIndex < 0) {
-    throw new Error(
+    tickWithBaseNoteIndex = 0
+    console.error(
       '"ticks" must have exactly one tick with "tick.notes[i].isMainNote ==== true"',
     )
   }
 
   const tickWithBaseNote = ticks[tickWithBaseNoteIndex]
-  const baseNoteIndex = tickWithBaseNote.notes.findIndex(
+  let baseNoteIndex = tickWithBaseNote.notes.findIndex(
     n => n.isMainNote === true,
   )
+  if (baseNoteIndex < 0) {
+    baseNoteIndex = 0
+  }
   const baseNote = tickWithBaseNote.notes[baseNoteIndex]
 
   const scale =
@@ -543,19 +559,23 @@ export const addIntervalNotes = (
   ticks: StaffTick[],
   intervals: IntervalsModifier,
 ): StaffTick[] => {
-  const tickWithBaseNoteIndex = ticks.findIndex(
+  let tickWithBaseNoteIndex = ticks.findIndex(
     ({ notes }) => notes.find(n => n.isMainNote === true) != null,
   )
   if (tickWithBaseNoteIndex < 0) {
-    throw new Error(
+    tickWithBaseNoteIndex = 0
+    console.error(
       '"ticks" must have exactly one tick with "tick.notes[i].isMainNote ==== true"',
     )
   }
 
   const tickWithBaseNote = ticks[tickWithBaseNoteIndex]
-  const baseNoteIndex = tickWithBaseNote.notes.findIndex(
+  let baseNoteIndex = tickWithBaseNote.notes.findIndex(
     n => n.isMainNote === true,
   )
+  if (baseNoteIndex < 0) {
+    baseNoteIndex = 0
+  }
   const baseNote = tickWithBaseNote.notes[baseNoteIndex]
 
   const { interval, type, direction } = intervals
