@@ -162,7 +162,8 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
       notesPerTick &&
       activeTickIndex != null &&
       activeTickIndex >= 0 &&
-      activeTickIndex < ticks.length && notesPerTick[activeTickIndex]
+      activeTickIndex < ticks.length &&
+      notesPerTick[activeTickIndex]
     ) {
       const notesPerActiveTick = notesPerTick[activeTickIndex]
       const activeNote = notesPerActiveTick.find(
@@ -364,13 +365,13 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
           const label = this.props.tickLabels[index]
           let fontSize = 17
           if (label.length > 2) {
-            fontSize = 16
-          }
-          if (label.length > 4) {
             fontSize = 15
           }
-          if (label.length > 6) {
+          if (label.length > 4) {
             fontSize = 14
+          }
+          if (label.length > 6) {
+            fontSize = 13
           }
           if (label.length > 8) {
             fontSize = 12
@@ -378,9 +379,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
           const annotation = new Vex.Flow.Annotation(label)
             .setFont('Sans-serif', fontSize, 'bold')
             .setVerticalJustification(Vex.Flow.Annotation.VerticalJustify.TOP)
-            .setYShift(0)
-            .setWidth(1)
-          annotation.setXShift(index === 0 ? 40 : 10)
+
           this.labelAnnotations.push(annotation)
 
           vexFlowNote.addModifier(0, annotation)
