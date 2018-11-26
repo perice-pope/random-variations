@@ -283,7 +283,13 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
       let notes: Vex.Flow.Note[] = []
       if (vexFlowTickConfig) {
-        const vexFlowNote = new Vex.Flow.StaveNote(vexFlowTickConfig)
+        let vexFlowNote
+        try {
+          vexFlowNote = new Vex.Flow.StaveNote(vexFlowTickConfig)
+        } catch (error) {
+          console.error(error)
+          return notes
+        }
 
         tick.notes.forEach((noteConfig, index) => {
           const [, accidental] = tonal.Note.tokenize(noteConfig.noteName)
@@ -295,11 +301,16 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
             )
           }
 
-          const cardColorLuminance = getLuminance(noteConfig.color)
-          const noteColor =
-            cardColorLuminance > 0.6
-              ? darken(0.2, noteConfig.color)
-              : noteConfig.color
+          let noteColor = 'gray'
+          try {
+            const cardColorLuminance = getLuminance(noteConfig.color)
+            noteColor =
+              cardColorLuminance > 0.6
+                ? darken(0.2, noteConfig.color)
+                : noteConfig.color
+          } catch (error) {
+            console.error(error)
+          }
 
           vexFlowNote.setKeyStyle(index, {
             fillStyle: noteColor,

@@ -261,6 +261,19 @@ class ToneRowModal extends React.Component<
       ),
     })
 
+  handleEditNote = (index: number, { noteName }) =>
+    this.setState({
+      notes: this.state.notes.map(
+        (n, i) =>
+          i === index
+            ? {
+                ...n,
+                noteName,
+              }
+            : n,
+      ),
+    })
+
   private deleteNoteCard = (index: number) =>
     this.setState({ notes: this.state.notes.filter((n, i) => i !== index) })
 
@@ -357,6 +370,7 @@ class ToneRowModal extends React.Component<
                 notes={this.state.notes}
                 onCardsReorder={this.handleCardsReorder}
                 onCardDraggedOut={this.deleteNoteCard}
+                onEditNote={this.handleEditNote}
                 onChangeToEnharmonicClick={
                   this.handleChangeNoteCardToEnharmonicClick
                 }

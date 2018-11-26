@@ -1738,7 +1738,9 @@ class App extends React.Component<
                             this.handleShareSession(session)
                           }}
                         >
+                        <ListItemIcon>
                           <ShareIcon color="action" />
+                          </ListItemIcon>
                           {' Share'}
                         </MenuItem>
                         <MenuItem
@@ -1746,7 +1748,9 @@ class App extends React.Component<
                             this.handleSaveSessionAs(session)
                           }}
                         >
+                        <ListItemIcon>
                           <SaveIcon color="action" />
+                          </ListItemIcon>
                           {' Save as...'}
                         </MenuItem>
                         <MenuItem
@@ -1754,7 +1758,9 @@ class App extends React.Component<
                             this.handleRenameSession(session)
                           }}
                         >
-                          <EditIcon color="action" />
+                          <ListItemIcon>
+                            <EditIcon color="action" />
+                          </ListItemIcon>
                           {' Rename'}
                         </MenuItem>
                         <MenuItem
@@ -1762,7 +1768,9 @@ class App extends React.Component<
                             this.handleDeleteSession(session)
                           }}
                         >
+                        <ListItemIcon>
                           <DeleteIcon color="action" />
+                          </ListItemIcon>
                           {' Delete'}
                         </MenuItem>
                       </Menu>

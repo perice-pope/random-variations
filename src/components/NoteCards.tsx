@@ -2,11 +2,20 @@ import * as React from 'react'
 import { Flipper, Flipped } from 'react-flip-toolkit'
 import styled, { css } from 'react-emotion'
 import * as tonal from 'tonal'
+import { transpose } from 'tonal-distance'
 import * as _ from 'lodash'
 import { SortableContainer, SortableElement } from 'react-sortable-hoc'
 
+import ListItemIcon from '@material-ui/core/ListItemIcon'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
+import PlusIcon from '@material-ui/icons/Add'
+import MinusIcon from '@material-ui/icons/Remove'
+import Plus1Icon from '@material-ui/icons/ExposurePlus1'
+import CompareArrowsIcon from '@material-ui/icons/CompareArrows'
+import Minus1Icon from '@material-ui/icons/ExposureNeg1'
+import EditIcon from '@material-ui/icons/Edit'
+import RemoveIcon from '@material-ui/icons/Close'
 
 import { Flex, Text } from './ui'
 import NoteCard from './NoteCard'
@@ -66,6 +75,32 @@ const SortableNoteCard = SortableElement(
       }
     }
 
+    private handleOctaveUpClick = () =>
+      this.props.onNoteEdited(
+        transpose(this.props.noteName, tonal.Interval.fromSemitones(12)),
+      )
+
+    private handleOctaveDownClick = () =>
+      this.props.onNoteEdited(
+        transpose(this.props.noteName, tonal.Interval.fromSemitones(-12)),
+      )
+
+    private handleSemitoneUpClick = () =>
+      this.props.onNoteEdited(
+        tonal.Note.fromMidi(
+          (tonal.Note.midi(this.props.noteName) as number) + 1,
+          true,
+        ),
+      )
+
+    private handleSemitoneDownClick = () =>
+      this.props.onNoteEdited(
+        tonal.Note.fromMidi(
+          (tonal.Note.midi(this.props.noteName) as number) - 1,
+          true,
+        ),
+      )
+
     private handleEditClick = () => {
       this.closeMenu()
       if (this.props.onEditClick) {
@@ -94,6 +129,8 @@ const SortableNoteCard = SortableElement(
       } = this.props
       const menuId = `note-card-menu-${id}`
 
+      const midi = tonal.Note.midi(noteName) as number
+      const octave = tonal.Note.oct(noteName) as number
       const enharmonicNoteName = tonal.Note.enharmonic(noteName)
       const shouldShowChangeToEnharmonic = enharmonicNoteName !== noteName
 
@@ -114,21 +151,68 @@ const SortableNoteCard = SortableElement(
                 open={this.state.menuOpen}
                 onClose={this.closeMenu}
               >
-                <MenuItem autoFocus onClick={this.handleEditClick}>
-                  Change note...
+                <MenuItem
+                  disabled={octave >= 6}
+                  onClick={this.handleOctaveUpClick}
+                >
+                  <ListItemIcon>
+                    <PlusIcon />
+                  </ListItemIcon>
+                  Octave up
                 </MenuItem>
+                <MenuItem
+                  disabled={midi >= 95} // "B6"
+                  onClick={this.handleSemitoneUpClick}
+                >
+                  <ListItemIcon>
+                    <Plus1Icon />
+                  </ListItemIcon>
+                  Half-step up
+                </MenuItem>
+                <MenuItem
+                  disabled={midi <= 24} // "C1"
+                  onClick={this.handleSemitoneDownClick}
+                >
+                  <ListItemIcon>
+                    <Minus1Icon />
+                  </ListItemIcon>
+                  Half-step down
+                </MenuItem>
+                <MenuItem
+                  disabled={octave < 2}
+                  onClick={this.handleOctaveDownClick}
+                >
+                  <ListItemIcon>
+                    <MinusIcon />
+                  </ListItemIcon>
+                  Octave down
+                </MenuItem>
+
                 {shouldShowChangeToEnharmonic && (
-                  <MenuItem
-                    autoFocus
-                    onClick={this.handleChangeToEnharmonicClick}
-                  >
+                  <MenuItem onClick={this.handleChangeToEnharmonicClick}>
+                    <ListItemIcon>
+                      <CompareArrowsIcon />
+                    </ListItemIcon>
                     {'Change to '}
                     <Text ml={1} fontWeight="bold">
                       {enharmonicNoteName && tonal.Note.pc(enharmonicNoteName)}
                     </Text>
                   </MenuItem>
                 )}
-                <MenuItem onClick={this.handleDeleteClick}>Remove</MenuItem>
+
+                <MenuItem autoFocus onClick={this.handleEditClick}>
+                  <ListItemIcon>
+                    <EditIcon color="action" />
+                  </ListItemIcon>
+                  Change note...
+                </MenuItem>
+
+                <MenuItem onClick={this.handleDeleteClick} color="secondary">
+                  <ListItemIcon>
+                    <RemoveIcon />
+                  </ListItemIcon>
+                  Remove
+                </MenuItem>
               </Menu>
               <NoteCard
                 flex={1}
@@ -161,6 +245,7 @@ const SortableNotesContainer = SortableContainer(
     onEditClick,
     perLineCount,
     onDeleteClick,
+    onEditNote,
     onMouseOver,
     onMouseLeave,
   }) => {
@@ -198,6 +283,7 @@ const SortableNotesContainer = SortableContainer(
               zIndex={zIndex}
               active={activeNoteCardIndex === index}
               onEditClick={() => onEditClick(index)}
+              onNoteEdited={noteName => onEditNote(index, noteName)}
               onChangeToEnharmonicClick={() => onChangeToEnharmonicClick(index)}
               onDeleteClick={() => onDeleteClick(index)}
               onMouseOver={() => {
@@ -315,6 +401,12 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
     this.closeNoteEditingModal()
   }
 
+  private handleEditNote = (index, noteName) => {
+    if (this.props.onEditNote) {
+      this.props.onEditNote(index, { noteName })
+    }
+  }
+
   public render() {
     const {
       children,
@@ -342,6 +434,7 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
           perLineCount={perLineCount || 4}
           zIndex={zIndex || 1000}
           onMouseOver={onMouseOver}
+          onEditNote={this.handleEditNote}
           onMouseLeave={onMouseLeave}
           onSortEnd={this.handleSortEnd}
           onSortMove={this.handleSortMove}
