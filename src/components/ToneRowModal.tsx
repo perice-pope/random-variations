@@ -242,7 +242,9 @@ class ToneRowModal extends React.Component<
       notes: generateRandomNotes(
         count,
         this.state.octave,
-        this.state.notes.length > 0 ? this.state.notes[0].noteName : undefined,
+        this.state.notes.length > 0 && count > 0
+          ? this.state.notes[0].noteName
+          : undefined,
       ),
     })
 

@@ -1260,7 +1260,7 @@ class App extends React.Component<
 
     const currentUser = firebase.auth().currentUser
 
-    const ShuffleButton = (
+    const ShuffleButton =  noteCards.length > 0 && (
       <Tooltip
         title="Reshuffle cards"
         open={noteCards.length < 3 ? false : undefined}
@@ -1273,12 +1273,12 @@ class App extends React.Component<
           onClick={this.handleShuffleClick}
         >
           <ArrowsIcon className={css({ margin: '0 0.5rem' })} />
-          <Hidden mdDown>Randomize</Hidden>
+          <Hidden smDown>Randomize</Hidden>
         </Button>
       </Tooltip>
     )
 
-    const ClearAllButton = (
+    const ClearAllButton = noteCards.length > 0 && (
       <Tooltip
         title="Clear all notes"
         variant="gray"
@@ -1392,12 +1392,11 @@ class App extends React.Component<
       </Box>
     )
 
-    const TogglePlaybackButton = (
+    const TogglePlaybackButton =  noteCards.length > 0 && (
       <Button
         disabled={noteCards.length < 1}
         title={isPlaying ? 'Stop' : 'Play'}
         bg={isPlaying ? 'red' : '#00c200'}
-        m={[1, 2]}
         className={css({ maxWidth: '100px' })}
         onClick={this.togglePlayback}
       >
