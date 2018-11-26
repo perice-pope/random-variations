@@ -4,6 +4,7 @@ import { css, cx } from 'react-emotion'
 import _ from 'lodash'
 import * as tonal from 'tonal'
 import { RouteComponentProps } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import uuid from 'uuid/v4'
 import smoothscroll from 'smoothscroll-polyfill'
 
@@ -132,6 +133,7 @@ import ButtonWithMenu from './ButtonWithMenu'
 import ShareSessionModal from './ShareSessionModal'
 import settingsStore from '../services/settingsStore'
 import ToneRowModal from './ToneRowModal'
+import { trackPageView } from '../services/googleAnalytics'
 
 globalStyles()
 smoothscroll.polyfill()
@@ -341,6 +343,14 @@ class App extends React.Component<
   constructor(props) {
     super(props)
 
+    if (props.history) {
+      // Listen to history changes, and notify google analytics when the current page changes
+      props.history.listen(location => {
+        const user = firebase.auth().currentUser
+        trackPageView({ location, userId: user ? user.uid : undefined })
+      })
+    }
+
     this.state = _.merge({
       isMenuOpen: false,
       isInitialized: false,
@@ -476,6 +486,8 @@ class App extends React.Component<
       async () => {
         const isSharedSession = !!this.props.match.params.sharedSessionKey
         const shouldLoadUserSessions = user && !user.isAnonymous
+
+        trackPageView({ location: this.props.history.location, userId: user ? user.uid : undefined })
 
         const loadAndActivateOfflineSession = async () => {
           await sessionStore.loadAndActivateOfflineSession()
@@ -1260,7 +1272,7 @@ class App extends React.Component<
 
     const currentUser = firebase.auth().currentUser
 
-    const ShuffleButton =  noteCards.length > 0 && (
+    const ShuffleButton = noteCards.length > 0 && (
       <Tooltip
         title="Reshuffle cards"
         open={noteCards.length < 3 ? false : undefined}
@@ -1392,7 +1404,7 @@ class App extends React.Component<
       </Box>
     )
 
-    const TogglePlaybackButton =  noteCards.length > 0 && (
+    const TogglePlaybackButton = noteCards.length > 0 && (
       <Button
         disabled={noteCards.length < 1}
         title={isPlaying ? 'Stop' : 'Play'}
@@ -2244,4 +2256,4 @@ class App extends React.Component<
 }
 
 // @ts-ignore
-export default withStyles(styles, { withTheme: true })(withWidth()(App))
+export default withStyles(styles, { withTheme: true })(withWidth()(withRouter(App)))
