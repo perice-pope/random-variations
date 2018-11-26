@@ -1,7 +1,42 @@
 const _ = require('lodash')
 
 const getRawData = () => {
-  return `CHROMATIC	C C# D D# E F F# G G# A A# B C	
+  return `IONIAN	C D E F G A B C	Major - mode 1
+  DORIAN	C D Eb F G A Bb C	Major - mode 2
+  PHRYGIAN	C Db Eb F G Ab Bb C	Major - mode 3
+  LYDIAN	C D E F# G A B C	Major - mode 4
+  MIXOLYDIAN	C D E F G A Bb C	Major - mode 5
+  AEOLIAN, NATURAL MINOR	C D Eb F G Ab Bb C	Major - mode 6
+  LOCRIAN	C Db Eb F Gb Ab Bb C	Major - mode 7
+  HARMONIC MAJOR	C D E F G Ab B C	Harmonic Major - mode 1
+  DORIAN b5, ZANGULA	C D Eb F Gb A Bb C	Harmonic Major - mode 2
+  PHRYGIAN b4	C Db Eb Fb G Ab Bb C	Harmonic Major - mode 3
+  LYDIAN b3	C D Eb F# G A B C	Harmonic Major - mode 4
+  MIXOLYDIAN b2	C Db E F G A Bb C	Harmonic Major - mode 5
+  LYDIAN #2 #5	C D# E F# G# A B C	Harmonic Major - mode 6
+  LOCRIAN b7	C Db Eb F Gb Ab Bbb C	Harmonic Major - mode 7
+  MELODIC MINOR	C D Eb F G A B C	Melodic Minor - mode 1
+  DORIAN b2	C Db Eb F G A Bb C	Melodic Minor - mode 2
+  LYDIAN AUGMENTED	C D E F# G# A B C	Melodic Minor - mode 3
+  LYDIAN DOMINANT	C D E F# G A Bb C	Melodic Minor - mode 4
+  MIXOLYDIAN b6, HINDU	C D E F G Ab Bb C	Melodic Minor - mode 5
+  LOCRIAN #2	C D Eb F Gb Ab Bb C	Melodic Minor - mode 6
+  SUPER LOCRIAN, ALTERED SCALE	C Db Eb Fb Gb Ab Bb C	Melodic Minor - mode 7
+  HARMONIC MINOR	C D Eb F G Ab B C	Harmonic Minor - mode 1
+  LOCRIAN #6, HIJAZI	C Db Eb F Gb A Bb C	Harmonic Minor - mode 2
+  IONIAN #5	C D E F G# A B C	Harmonic Minor - mode 3
+  DORIAN #4, UKRAINIAN, HUNGARIAN	C D Eb F# G A Bb C	Harmonic Minor - mode 4
+  PHRYGIAN #3, PHYRGIAN DOMINANT, SPANISH GYPSY, HEBREW	C Db E F G Ab Bb C	Harmonic Minor - mode 5
+  LYDIAN #2, MAQAM MUSTAR	C D# E F# G A B C	Harmonic Minor - mode 6
+  LOCRIAN b4 b7	C Db Eb Fb Gb Ab Bbb C	Harmonic Minor - mode 7
+  DOUBLE HARMONIC, BYZANTINE, PERSIAN	C Db E F G Ab B C	Double Harmonic - mode 1
+  YUSEF SYNTHETIC 2	C D# E F# G A# B C	Double Harmonic - mode 2
+  DOUBLE HARMONIC - mode 3	C Db Eb Fb G Ab Abb C	Double Harmonic - mode 3
+  LYDIAN b3 b6, HUNGARIAN GYPSY, EGYPTIAN	C D Eb F# G Ab B C	Double Harmonic - mode 4
+  DOUBLE HARMONIC - mode 5	C Db E F Gb A Bb C	Double Harmonic - mode 5
+  DOUBLE HARMONIC - mode 6	C D# E F G# A B C	Double Harmonic - mode 6
+  DOUBLE HARMONIC - mode 7	C Db Ebb F Gb Ab Bbb C	Double Harmonic - mode 7
+  CHROMATIC	C C# D D# E F F# G G# A A# B C	
   CHINESE TWELVE TONE SCALE	C G D A E B F# C# Ab Eb Bb F C	
   ALGERIAN	C D Eb F F# G Ab B C	Alerigan - mode 1
   ALGERIAN - mode 2	C Db Eb E F Gb A Bb C	Alerigan - mode 2
@@ -67,41 +102,6 @@ const getRawData = () => {
   BEBOP MELODIC MINOR - mode 6	C C# D# E F# G A B C	Bebop Melodic Minor - mode 6
   BEBOP HALF DIMINISHED	C D Eb F Gb Ab Bb B C	Bebop Melodic Minor - mode 7
   BEBOP MELODIC MINOR - mode 8	C C# D# E F# G# A Bb C	Bebop Melodic Minor - mode 8
-  IONIAN	C D E F G A B C	Major - mode 1
-  DORIAN	C D Eb F G A Bb C	Major - mode 2
-  PHRYGIAN	C Db Eb F G Ab Bb C	Major - mode 3
-  LYDIAN	C D E F# G A B C	Major - mode 4
-  MIXOLYDIAN	C D E F G A Bb C	Major - mode 5
-  AEOLIAN, NATURAL MINOR	C D Eb F G Ab Bb C	Major - mode 6
-  LOCRIAN	C Db Eb F Gb Ab Bb C	Major - mode 7
-  HARMONIC MAJOR	C D E F G Ab B C	Harmonic Major - mode 1
-  DORIAN b5, ZANGULA	C D Eb F Gb A Bb C	Harmonic Major - mode 2
-  PHRYGIAN b4	C Db Eb Fb G Ab Bb C	Harmonic Major - mode 3
-  LYDIAN b3	C D Eb F# G A B C	Harmonic Major - mode 4
-  MIXOLYDIAN b2	C Db E F G A Bb C	Harmonic Major - mode 5
-  LYDIAN #2 #5	C D# E F# G# A B C	Harmonic Major - mode 6
-  LOCRIAN b7	C Db Eb F Gb Ab Bbb C	Harmonic Major - mode 7
-  MELODIC MINOR	C D Eb F G A B C	Melodic Minor - mode 1
-  DORIAN b2	C Db Eb F G A Bb C	Melodic Minor - mode 2
-  LYDIAN AUGMENTED	C D E F# G# A B C	Melodic Minor - mode 3
-  LYDIAN DOMINANT	C D E F# G A Bb C	Melodic Minor - mode 4
-  MIXOLYDIAN b6, HINDU	C D E F G Ab Bb C	Melodic Minor - mode 5
-  LOCRIAN #2	C D Eb F Gb Ab Bb C	Melodic Minor - mode 6
-  SUPER LOCRIAN, ALTERED SCALE	C Db Eb Fb Gb Ab Bb C	Melodic Minor - mode 7
-  HARMONIC MINOR	C D Eb F G Ab B C	Harmonic Minor - mode 1
-  LOCRIAN #6, HIJAZI	C Db Eb F Gb A Bb C	Harmonic Minor - mode 2
-  IONIAN #5	C D E F G# A B C	Harmonic Minor - mode 3
-  DORIAN #4, UKRAINIAN, HUNGARIAN	C D Eb F# G A Bb C	Harmonic Minor - mode 4
-  PHRYGIAN #3, PHYRGIAN DOMINANT, SPANISH GYPSY, HEBREW	C Db E F G Ab Bb C	Harmonic Minor - mode 5
-  LYDIAN #2, MAQAM MUSTAR	C D# E F# G A B C	Harmonic Minor - mode 6
-  LOCRIAN b4 b7	C Db Eb Fb Gb Ab Bbb C	Harmonic Minor - mode 7
-  DOUBLE HARMONIC, BYZANTINE, PERSIAN	C Db E F G Ab B C	Double Harmonic - mode 1
-  YUSEF SYNTHETIC 2	C D# E F# G A# B C	Double Harmonic - mode 2
-  DOUBLE HARMONIC - mode 3	C Db Eb Fb G Ab Abb C	Double Harmonic - mode 3
-  LYDIAN b3 b6, HUNGARIAN GYPSY, EGYPTIAN	C D Eb F# G Ab B C	Double Harmonic - mode 4
-  DOUBLE HARMONIC - mode 5	C Db E F Gb A Bb C	Double Harmonic - mode 5
-  DOUBLE HARMONIC - mode 6	C D# E F G# A B C	Double Harmonic - mode 6
-  DOUBLE HARMONIC - mode 7	C Db Ebb F Gb Ab Bbb C	Double Harmonic - mode 7
   HUNGARIAN BLUE SCALE	C D Eb F F# G# A C	Hungarian Blue Scale - mode 1
   HUNGARIAN BLUE SCALE - mode 2	C C# D# E F# G Bb C	Hungarian Blue Scale - mode 2
   HUNGARIAN BLUE SCALE - mode 3	C D Eb F F# A Bb C	Hungarian Blue Scale - mode 3
@@ -348,6 +348,7 @@ const getRawData = () => {
   TRUNCATED MESSIAEN 2 mode 2 ver B - mode 3	C Db Eb F# G A C	SYMMETRICAL, MESSIAEN
   TRUNCATED MESSIAEN 5 - mode 1	C Db F# G C	SYMMETRICAL, MESSIAEN
   TRUNCATED MESSIAEN 5 - mode 2	C F F# B C	SYMMETRICAL, MESSIAEN
+  TRIPLE DIMINISHED	C B C# D# - D C# Eb F - E Eb F G - F# F G A - Ab G A B - Bb A B C# - C	Non Octave Based
   `
 }
 

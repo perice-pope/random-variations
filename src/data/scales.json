@@ -1,5 +1,530 @@
 [
   {
+    "name": "ionian",
+    "notes": "C D E F G A B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      7,
+      9,
+      11,
+      12
+    ],
+    "mode": "major mode 1"
+  },
+  {
+    "name": "dorian",
+    "notes": "C D Eb F G A Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      7,
+      9,
+      10,
+      12
+    ],
+    "mode": "major mode 2"
+  },
+  {
+    "name": "phrygian",
+    "notes": "C Db Eb F G Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      7,
+      8,
+      10,
+      12
+    ],
+    "mode": "major mode 3"
+  },
+  {
+    "name": "lydian",
+    "notes": "C D E F# G A B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      7,
+      9,
+      11,
+      12
+    ],
+    "mode": "major mode 4"
+  },
+  {
+    "name": "mixolydian",
+    "notes": "C D E F G A Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      7,
+      9,
+      10,
+      12
+    ],
+    "mode": "major mode 5"
+  },
+  {
+    "name": "aeolian natural minor",
+    "notes": "C D Eb F G Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      7,
+      8,
+      10,
+      12
+    ],
+    "mode": "major mode 6"
+  },
+  {
+    "name": "locrian",
+    "notes": "C Db Eb F Gb Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      6,
+      8,
+      10,
+      12
+    ],
+    "mode": "major mode 7"
+  },
+  {
+    "name": "harmonic major",
+    "notes": "C D E F G Ab B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      7,
+      8,
+      11,
+      12
+    ],
+    "mode": "harmonic major mode 1"
+  },
+  {
+    "name": "dorian b 5 zangula",
+    "notes": "C D Eb F Gb A Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      6,
+      9,
+      10,
+      12
+    ],
+    "mode": "harmonic major mode 2"
+  },
+  {
+    "name": "phrygian b 4",
+    "notes": "C Db Eb Fb G Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      7,
+      8,
+      10,
+      12
+    ],
+    "mode": "harmonic major mode 3"
+  },
+  {
+    "name": "lydian b 3",
+    "notes": "C D Eb F# G A B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      6,
+      7,
+      9,
+      11,
+      12
+    ],
+    "mode": "harmonic major mode 4"
+  },
+  {
+    "name": "mixolydian b 2",
+    "notes": "C Db E F G A Bb C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      7,
+      9,
+      10,
+      12
+    ],
+    "mode": "harmonic major mode 5"
+  },
+  {
+    "name": "lydian 2 5",
+    "notes": "C D# E F# G# A B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      6,
+      8,
+      9,
+      11,
+      12
+    ],
+    "mode": "harmonic major mode 6"
+  },
+  {
+    "name": "locrian b 7",
+    "notes": "C Db Eb F Gb Ab Bbb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      6,
+      8,
+      9,
+      12
+    ],
+    "mode": "harmonic major mode 7"
+  },
+  {
+    "name": "melodic minor",
+    "notes": "C D Eb F G A B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      7,
+      9,
+      11,
+      12
+    ],
+    "mode": "melodic minor mode 1"
+  },
+  {
+    "name": "dorian b 2",
+    "notes": "C Db Eb F G A Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      7,
+      9,
+      10,
+      12
+    ],
+    "mode": "melodic minor mode 2"
+  },
+  {
+    "name": "lydian augmented",
+    "notes": "C D E F# G# A B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      9,
+      11,
+      12
+    ],
+    "mode": "melodic minor mode 3"
+  },
+  {
+    "name": "lydian dominant",
+    "notes": "C D E F# G A Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      7,
+      9,
+      10,
+      12
+    ],
+    "mode": "melodic minor mode 4"
+  },
+  {
+    "name": "mixolydian b 6 hindu",
+    "notes": "C D E F G Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      7,
+      8,
+      10,
+      12
+    ],
+    "mode": "melodic minor mode 5"
+  },
+  {
+    "name": "locrian 2",
+    "notes": "C D Eb F Gb Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      6,
+      8,
+      10,
+      12
+    ],
+    "mode": "melodic minor mode 6"
+  },
+  {
+    "name": "super locrian altered scale",
+    "notes": "C Db Eb Fb Gb Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      6,
+      8,
+      10,
+      12
+    ],
+    "mode": "melodic minor mode 7"
+  },
+  {
+    "name": "harmonic minor",
+    "notes": "C D Eb F G Ab B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      7,
+      8,
+      11,
+      12
+    ],
+    "mode": "harmonic minor mode 1"
+  },
+  {
+    "name": "locrian 6 hijazi",
+    "notes": "C Db Eb F Gb A Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      6,
+      9,
+      10,
+      12
+    ],
+    "mode": "harmonic minor mode 2"
+  },
+  {
+    "name": "ionian 5",
+    "notes": "C D E F G# A B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      8,
+      9,
+      11,
+      12
+    ],
+    "mode": "harmonic minor mode 3"
+  },
+  {
+    "name": "dorian 4 ukrainian hungarian",
+    "notes": "C D Eb F# G A Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      6,
+      7,
+      9,
+      10,
+      12
+    ],
+    "mode": "harmonic minor mode 4"
+  },
+  {
+    "name": "phrygian 3 phyrgian dominant spanish gypsy hebrew",
+    "notes": "C Db E F G Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      7,
+      8,
+      10,
+      12
+    ],
+    "mode": "harmonic minor mode 5"
+  },
+  {
+    "name": "lydian 2 maqam mustar",
+    "notes": "C D# E F# G A B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      6,
+      7,
+      9,
+      11,
+      12
+    ],
+    "mode": "harmonic minor mode 6"
+  },
+  {
+    "name": "locrian b 4 b 7",
+    "notes": "C Db Eb Fb Gb Ab Bbb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      6,
+      8,
+      9,
+      12
+    ],
+    "mode": "harmonic minor mode 7"
+  },
+  {
+    "name": "double harmonic byzantine persian",
+    "notes": "C Db E F G Ab B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      7,
+      8,
+      11,
+      12
+    ],
+    "mode": "double harmonic mode 1"
+  },
+  {
+    "name": "yusef synthetic 2",
+    "notes": "C D# E F# G A# B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      6,
+      7,
+      10,
+      11,
+      12
+    ],
+    "mode": "double harmonic mode 2"
+  },
+  {
+    "name": "double harmonic mode 3",
+    "notes": "C Db Eb Fb G Ab Abb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      7,
+      8,
+      7,
+      12
+    ],
+    "mode": "double harmonic mode 3"
+  },
+  {
+    "name": "lydian b 3 b 6 hungarian gypsy egyptian",
+    "notes": "C D Eb F# G Ab B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      6,
+      7,
+      8,
+      11,
+      12
+    ],
+    "mode": "double harmonic mode 4"
+  },
+  {
+    "name": "double harmonic mode 5",
+    "notes": "C Db E F Gb A Bb C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      6,
+      9,
+      10,
+      12
+    ],
+    "mode": "double harmonic mode 5"
+  },
+  {
+    "name": "double harmonic mode 6",
+    "notes": "C D# E F G# A B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      5,
+      8,
+      9,
+      11,
+      12
+    ],
+    "mode": "double harmonic mode 6"
+  },
+  {
+    "name": "double harmonic mode 7",
+    "notes": "C Db Ebb F Gb Ab Bbb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      5,
+      6,
+      8,
+      9,
+      12
+    ],
+    "mode": "double harmonic mode 7"
+  },
+  {
     "name": "chromatic",
     "notes": "C C# D D# E F F# G G# A A# B C",
     "semitones": [
@@ -1062,531 +1587,6 @@
       12
     ],
     "mode": "bebop melodic minor mode 8"
-  },
-  {
-    "name": "ionian",
-    "notes": "C D E F G A B C",
-    "semitones": [
-      0,
-      2,
-      4,
-      5,
-      7,
-      9,
-      11,
-      12
-    ],
-    "mode": "major mode 1"
-  },
-  {
-    "name": "dorian",
-    "notes": "C D Eb F G A Bb C",
-    "semitones": [
-      0,
-      2,
-      3,
-      5,
-      7,
-      9,
-      10,
-      12
-    ],
-    "mode": "major mode 2"
-  },
-  {
-    "name": "phrygian",
-    "notes": "C Db Eb F G Ab Bb C",
-    "semitones": [
-      0,
-      1,
-      3,
-      5,
-      7,
-      8,
-      10,
-      12
-    ],
-    "mode": "major mode 3"
-  },
-  {
-    "name": "lydian",
-    "notes": "C D E F# G A B C",
-    "semitones": [
-      0,
-      2,
-      4,
-      6,
-      7,
-      9,
-      11,
-      12
-    ],
-    "mode": "major mode 4"
-  },
-  {
-    "name": "mixolydian",
-    "notes": "C D E F G A Bb C",
-    "semitones": [
-      0,
-      2,
-      4,
-      5,
-      7,
-      9,
-      10,
-      12
-    ],
-    "mode": "major mode 5"
-  },
-  {
-    "name": "aeolian natural minor",
-    "notes": "C D Eb F G Ab Bb C",
-    "semitones": [
-      0,
-      2,
-      3,
-      5,
-      7,
-      8,
-      10,
-      12
-    ],
-    "mode": "major mode 6"
-  },
-  {
-    "name": "locrian",
-    "notes": "C Db Eb F Gb Ab Bb C",
-    "semitones": [
-      0,
-      1,
-      3,
-      5,
-      6,
-      8,
-      10,
-      12
-    ],
-    "mode": "major mode 7"
-  },
-  {
-    "name": "harmonic major",
-    "notes": "C D E F G Ab B C",
-    "semitones": [
-      0,
-      2,
-      4,
-      5,
-      7,
-      8,
-      11,
-      12
-    ],
-    "mode": "harmonic major mode 1"
-  },
-  {
-    "name": "dorian b 5 zangula",
-    "notes": "C D Eb F Gb A Bb C",
-    "semitones": [
-      0,
-      2,
-      3,
-      5,
-      6,
-      9,
-      10,
-      12
-    ],
-    "mode": "harmonic major mode 2"
-  },
-  {
-    "name": "phrygian b 4",
-    "notes": "C Db Eb Fb G Ab Bb C",
-    "semitones": [
-      0,
-      1,
-      3,
-      4,
-      7,
-      8,
-      10,
-      12
-    ],
-    "mode": "harmonic major mode 3"
-  },
-  {
-    "name": "lydian b 3",
-    "notes": "C D Eb F# G A B C",
-    "semitones": [
-      0,
-      2,
-      3,
-      6,
-      7,
-      9,
-      11,
-      12
-    ],
-    "mode": "harmonic major mode 4"
-  },
-  {
-    "name": "mixolydian b 2",
-    "notes": "C Db E F G A Bb C",
-    "semitones": [
-      0,
-      1,
-      4,
-      5,
-      7,
-      9,
-      10,
-      12
-    ],
-    "mode": "harmonic major mode 5"
-  },
-  {
-    "name": "lydian 2 5",
-    "notes": "C D# E F# G# A B C",
-    "semitones": [
-      0,
-      3,
-      4,
-      6,
-      8,
-      9,
-      11,
-      12
-    ],
-    "mode": "harmonic major mode 6"
-  },
-  {
-    "name": "locrian b 7",
-    "notes": "C Db Eb F Gb Ab Bbb C",
-    "semitones": [
-      0,
-      1,
-      3,
-      5,
-      6,
-      8,
-      9,
-      12
-    ],
-    "mode": "harmonic major mode 7"
-  },
-  {
-    "name": "melodic minor",
-    "notes": "C D Eb F G A B C",
-    "semitones": [
-      0,
-      2,
-      3,
-      5,
-      7,
-      9,
-      11,
-      12
-    ],
-    "mode": "melodic minor mode 1"
-  },
-  {
-    "name": "dorian b 2",
-    "notes": "C Db Eb F G A Bb C",
-    "semitones": [
-      0,
-      1,
-      3,
-      5,
-      7,
-      9,
-      10,
-      12
-    ],
-    "mode": "melodic minor mode 2"
-  },
-  {
-    "name": "lydian augmented",
-    "notes": "C D E F# G# A B C",
-    "semitones": [
-      0,
-      2,
-      4,
-      6,
-      8,
-      9,
-      11,
-      12
-    ],
-    "mode": "melodic minor mode 3"
-  },
-  {
-    "name": "lydian dominant",
-    "notes": "C D E F# G A Bb C",
-    "semitones": [
-      0,
-      2,
-      4,
-      6,
-      7,
-      9,
-      10,
-      12
-    ],
-    "mode": "melodic minor mode 4"
-  },
-  {
-    "name": "mixolydian b 6 hindu",
-    "notes": "C D E F G Ab Bb C",
-    "semitones": [
-      0,
-      2,
-      4,
-      5,
-      7,
-      8,
-      10,
-      12
-    ],
-    "mode": "melodic minor mode 5"
-  },
-  {
-    "name": "locrian 2",
-    "notes": "C D Eb F Gb Ab Bb C",
-    "semitones": [
-      0,
-      2,
-      3,
-      5,
-      6,
-      8,
-      10,
-      12
-    ],
-    "mode": "melodic minor mode 6"
-  },
-  {
-    "name": "super locrian altered scale",
-    "notes": "C Db Eb Fb Gb Ab Bb C",
-    "semitones": [
-      0,
-      1,
-      3,
-      4,
-      6,
-      8,
-      10,
-      12
-    ],
-    "mode": "melodic minor mode 7"
-  },
-  {
-    "name": "harmonic minor",
-    "notes": "C D Eb F G Ab B C",
-    "semitones": [
-      0,
-      2,
-      3,
-      5,
-      7,
-      8,
-      11,
-      12
-    ],
-    "mode": "harmonic minor mode 1"
-  },
-  {
-    "name": "locrian 6 hijazi",
-    "notes": "C Db Eb F Gb A Bb C",
-    "semitones": [
-      0,
-      1,
-      3,
-      5,
-      6,
-      9,
-      10,
-      12
-    ],
-    "mode": "harmonic minor mode 2"
-  },
-  {
-    "name": "ionian 5",
-    "notes": "C D E F G# A B C",
-    "semitones": [
-      0,
-      2,
-      4,
-      5,
-      8,
-      9,
-      11,
-      12
-    ],
-    "mode": "harmonic minor mode 3"
-  },
-  {
-    "name": "dorian 4 ukrainian hungarian",
-    "notes": "C D Eb F# G A Bb C",
-    "semitones": [
-      0,
-      2,
-      3,
-      6,
-      7,
-      9,
-      10,
-      12
-    ],
-    "mode": "harmonic minor mode 4"
-  },
-  {
-    "name": "phrygian 3 phyrgian dominant spanish gypsy hebrew",
-    "notes": "C Db E F G Ab Bb C",
-    "semitones": [
-      0,
-      1,
-      4,
-      5,
-      7,
-      8,
-      10,
-      12
-    ],
-    "mode": "harmonic minor mode 5"
-  },
-  {
-    "name": "lydian 2 maqam mustar",
-    "notes": "C D# E F# G A B C",
-    "semitones": [
-      0,
-      3,
-      4,
-      6,
-      7,
-      9,
-      11,
-      12
-    ],
-    "mode": "harmonic minor mode 6"
-  },
-  {
-    "name": "locrian b 4 b 7",
-    "notes": "C Db Eb Fb Gb Ab Bbb C",
-    "semitones": [
-      0,
-      1,
-      3,
-      4,
-      6,
-      8,
-      9,
-      12
-    ],
-    "mode": "harmonic minor mode 7"
-  },
-  {
-    "name": "double harmonic byzantine persian",
-    "notes": "C Db E F G Ab B C",
-    "semitones": [
-      0,
-      1,
-      4,
-      5,
-      7,
-      8,
-      11,
-      12
-    ],
-    "mode": "double harmonic mode 1"
-  },
-  {
-    "name": "yusef synthetic 2",
-    "notes": "C D# E F# G A# B C",
-    "semitones": [
-      0,
-      3,
-      4,
-      6,
-      7,
-      10,
-      11,
-      12
-    ],
-    "mode": "double harmonic mode 2"
-  },
-  {
-    "name": "double harmonic mode 3",
-    "notes": "C Db Eb Fb G Ab Abb C",
-    "semitones": [
-      0,
-      1,
-      3,
-      4,
-      7,
-      8,
-      7,
-      12
-    ],
-    "mode": "double harmonic mode 3"
-  },
-  {
-    "name": "lydian b 3 b 6 hungarian gypsy egyptian",
-    "notes": "C D Eb F# G Ab B C",
-    "semitones": [
-      0,
-      2,
-      3,
-      6,
-      7,
-      8,
-      11,
-      12
-    ],
-    "mode": "double harmonic mode 4"
-  },
-  {
-    "name": "double harmonic mode 5",
-    "notes": "C Db E F Gb A Bb C",
-    "semitones": [
-      0,
-      1,
-      4,
-      5,
-      6,
-      9,
-      10,
-      12
-    ],
-    "mode": "double harmonic mode 5"
-  },
-  {
-    "name": "double harmonic mode 6",
-    "notes": "C D# E F G# A B C",
-    "semitones": [
-      0,
-      3,
-      4,
-      5,
-      8,
-      9,
-      11,
-      12
-    ],
-    "mode": "double harmonic mode 6"
-  },
-  {
-    "name": "double harmonic mode 7",
-    "notes": "C Db Ebb F Gb Ab Bbb C",
-    "semitones": [
-      0,
-      1,
-      2,
-      5,
-      6,
-      8,
-      9,
-      12
-    ],
-    "mode": "double harmonic mode 7"
   },
   {
     "name": "hungarian blue scale",
@@ -5074,5 +5074,43 @@
       12
     ],
     "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "triple diminished",
+    "notes": "C B C# D# - D C# Eb F - E Eb F G - F# F G A - Ab G A B - Bb A B C# - C",
+    "semitones": [
+      0,
+      11,
+      1,
+      3,
+      null,
+      2,
+      1,
+      3,
+      5,
+      null,
+      4,
+      3,
+      5,
+      7,
+      null,
+      6,
+      5,
+      7,
+      9,
+      null,
+      8,
+      7,
+      9,
+      11,
+      null,
+      10,
+      9,
+      11,
+      1,
+      null,
+      12
+    ],
+    "mode": "non octave based"
   }
 ]

@@ -229,7 +229,7 @@ const getNoteCardsFromSessionCards = memoize(
 )
 
 const MaxNoteCards = 12
-const MaxLayoutWidth = 1100
+const MaxLayoutWidth = 1400
 const MenuWidth = 280
 
 const styles = theme => ({
@@ -671,27 +671,29 @@ class App extends React.Component<
 
     const keyWidth = width / keysCount
 
+    console.log(height)
+
     if (height <= 360) {
       return 30
     }
     if (height <= 500) {
       return 40
     }
+    if (height > 800) {
+      if (keyWidth > 20) {
+        return 120
+      }
+      if (keyWidth > 15) {
+        return 80
+      }
+      return 40
+    }
+
     if (height > 600) {
       return 60
     }
-    if (height > 500) {
-      return 50
-    }
 
-    if (keyWidth > 20) {
-      return 120
-    }
-    if (keyWidth > 15) {
-      return 80
-    }
-
-    return 40
+    return 50
   }
 
   private handleShuffleClick = () => {

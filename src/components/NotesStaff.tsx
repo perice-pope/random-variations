@@ -322,6 +322,9 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
           if (label.length > 6) {
             fontSize = 11
           }
+          if (label.length > 8) {
+            fontSize = 7
+          }
           const annotation = new Vex.Flow.Annotation(label)
             .setFont('Sans-serif', fontSize, 'bold')
             .setVerticalJustification(Vex.Flow.Annotation.VerticalJustify.TOP)

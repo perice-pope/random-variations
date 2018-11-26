@@ -63,7 +63,7 @@ const chordTypeOptionsByGroup = _.groupBy(
 
 const chordTypeOptionsGrouped = Object.keys(chordTypeOptionsByGroup).map(
   category => ({
-    label: _.capitalize(category),
+    label: `${_.capitalize(category)} Chords`,
     options: chordTypeOptionsByGroup[category],
   }),
 )
@@ -463,7 +463,11 @@ class ArpeggioModifierModal extends React.Component<
                 id="chord-preview"
                 clef={settingsStore.clefType}
                 ticks={this.generateStaffTicks()}
-                tickLabels={[`C${this.state.values.chordType}`]}
+                tickLabels={[
+                  `${tonal.Note.pc(this.props.baseNote || 'C4')}${
+                    this.state.values.chordType
+                  }`,
+                ]}
                 isPlaying={false}
                 showBreaks
                 activeTickIndex={undefined}

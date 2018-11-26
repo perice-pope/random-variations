@@ -26,7 +26,7 @@ import {
   ScaleModifier,
 } from '../types'
 import { ChangeEvent } from 'react'
-import { Input, FormHelperText } from '@material-ui/core'
+import { Input } from '@material-ui/core'
 import { css } from 'react-emotion'
 import Tooltip from './ui/Tooltip'
 import {
@@ -40,6 +40,7 @@ import { Box } from './ui'
 import NotesStaff from './NotesStaff'
 import { Omit } from '../utils'
 import settingsStore from '../services/settingsStore'
+import InputSelect from './ui/InputSelect'
 
 export type SubmitValuesType = Omit<ScaleModifier, 'enabled'>
 
@@ -56,19 +57,33 @@ type ScaleModifierModalState = {
 }
 
 type ScaleTypeOption = {
-  title: string
+  label: string
   value: ScaleType
+  mode: string
 }
 
-const scaleTypeOptions: ScaleTypeOption[] = _.sortBy(
-  scaleOptions,
-  'notesCount',
-).map(({ type, mode, title }) => ({
-  title: [_.capitalize(mode), _.capitalize(title)]
-    .filter(_.identity)
-    .join(' - '),
-  value: type,
-}))
+const scaleTypeOptions: ScaleTypeOption[] = scaleOptions.map(
+  ({ type, mode, title }) => ({
+    label: [_.capitalize(title), _.capitalize(mode)]
+      .filter(_.identity)
+      .join(' — '),
+    value: type,
+    mode: mode
+      ? `${_.capitalize(mode).replace(/mode \d+$/, '')}  Modes`
+      : 'Others',
+  }),
+)
+
+const scaleTypeOptionsByMode = _.groupBy(scaleTypeOptions, 'mode')
+
+const chordTypeOptionsGrouped = Object.keys(scaleTypeOptionsByMode).map(
+  mode => ({
+    label: `${_.capitalize(mode)}`,
+    options: scaleTypeOptionsByMode[mode],
+  }),
+)
+
+const scaleTypeToScaleTypeOptionMap = _.keyBy(scaleTypeOptions, 'value')
 
 type PatternPresetOption = {
   title: string
@@ -158,8 +173,8 @@ class ScaleModifierModal extends React.Component<
     })
   }
 
-  handleScaleTypeSelected = (e: ChangeEvent<HTMLSelectElement>) => {
-    const scaleType = e.target.value as ScaleType
+  handleScaleTypeSelected = (scaleOption: ScaleTypeOption) => {
+    const scaleType = scaleOption.value
     const scale =
       scaleByScaleType[scaleType] ||
       (scaleByScaleType[DEFAULT_SCALE_NAME] as Scale)
@@ -279,34 +294,22 @@ class ScaleModifierModal extends React.Component<
 
         <DialogContent id="scale-modifier-dialog-content">
           <Box maxWidth={600} width={1} mx="auto">
-            <Flex mt={[1, 3, 2]} flexDirection="row">
-              <FormControl className={css({ flex: 1 })}>
-                <InputLabel htmlFor="scale-type">Scale type</InputLabel>
-                <NativeSelect
-                  value={this.state.values.scaleType}
-                  onChange={this.handleScaleTypeSelected}
-                  name="ScaleType"
-                  input={<Input id="scale-type" />}
-                >
-                  {scaleTypeOptions.map(({ title, value }) => (
-                    <option key={value} value={value}>
-                      {title}
-                    </option>
-                  ))}
-                </NativeSelect>
-                {scale.notes && (
-                  <FormHelperText>
-                    {`Notes in key of C:  `}
-                    <span
-                      className={css({
-                        fontSize: '0.8rem',
-                        fontWeight: 'bold',
-                      })}
-                    >{`${scale.notes.split(' ').join(', ')}`}</span>
-                  </FormHelperText>
-                )}
-              </FormControl>
-            </Flex>
+            <InputSelect
+              textFieldProps={{
+                label: 'Scale type',
+                InputLabelProps: {
+                  shrink: true,
+                },
+              }}
+              value={
+                this.state.values.scaleType
+                  ? scaleTypeToScaleTypeOptionMap[this.state.values.scaleType]
+                  : undefined
+              }
+              onChange={this.handleScaleTypeSelected}
+              name="chordType"
+              options={chordTypeOptionsGrouped}
+            />
 
             <Flex mt={[1, 3, 2]} flexDirection="column">
               <Flex flexWrap="wrap" flexDirection="row" mt={4}>
