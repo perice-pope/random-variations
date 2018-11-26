@@ -3,9 +3,9 @@ import { ThemeProvider } from 'emotion-theming'
 import { css, cx } from 'react-emotion'
 import _ from 'lodash'
 import * as tonal from 'tonal'
-import * as Chord from 'tonal-chord'
 import { RouteComponentProps } from 'react-router'
 import uuid from 'uuid/v4'
+import smoothscroll from 'smoothscroll-polyfill'
 
 import JssProvider from 'react-jss/lib/JssProvider'
 import { create } from 'jss'
@@ -134,12 +134,12 @@ import settingsStore from '../services/settingsStore'
 import ToneRowModal from './ToneRowModal'
 
 globalStyles()
+smoothscroll.polyfill()
 
 // @ts-ignore
 window.notificationsStore = notificationsStore
 
 console.log('All supported audio fonts: ', _.map(AudioFontsConfig, 'title'))
-console.log('All supported chord names: ', Chord.names())
 
 const uiState = observable({
   isFullScreen: false,
@@ -235,6 +235,7 @@ const styles = theme => ({
     display: 'flex',
     height: '100%',
     width: '100%',
+    overflowX: 'hidden',
   },
   appBar: {
     transition: theme.transitions.create(['margin', 'width'], {
@@ -658,18 +659,26 @@ class App extends React.Component<
 
     const keyWidth = width / keysCount
 
+    if (height <= 360) {
+      return 30
+    }
+    if (height <= 500) {
+      return 40
+    }
+    if (height > 600) {
+      return 60
+    }
+    if (height > 500) {
+      return 50
+    }
+
     if (keyWidth > 20) {
       return 120
     }
     if (keyWidth > 15) {
       return 80
     }
-    if (height > 400) {
-      return 60
-    }
-    if (height > 300) {
-      return 50
-    }
+
     return 40
   }
 
@@ -793,7 +802,7 @@ class App extends React.Component<
   }
 
   private handleBpmChange = e => {
-    const value = parseIntEnsureInBounds(e.target.value, 0, 400)
+    const value = parseIntEnsureInBounds(e.target.value, 0, 500)
     if (sessionStore.activeSession) {
       sessionStore.activeSession.bpm = value
     }
@@ -1230,6 +1239,8 @@ class App extends React.Component<
     const { noteCards, noteCardsById } = this.getNoteCards()
 
     const isMobile = this.props.width === 'xs' || this.props.width === 'sm'
+    const shouldShowDesktopSessionControls =
+      this.state.height > 600 && this.state.width > 600
 
     const activeNoteCard =
       isPlaying && activeNoteCardId != null
@@ -1435,7 +1446,7 @@ class App extends React.Component<
 
             <Box className={css({ flexGrow: 1 })} />
 
-            {isMobile ? (
+            {!shouldShowDesktopSessionControls ? (
               <IconButton
                 color="inherit"
                 aria-label={
@@ -1473,8 +1484,13 @@ class App extends React.Component<
   `)
     const chipsProps = {
       clickable: true,
-      color: 'secondary' as "inherit" | "primary" | "secondary" | "default" | undefined,
-      variant: 'outlined' as "outlined",
+      color: 'secondary' as
+        | 'inherit'
+        | 'primary'
+        | 'secondary'
+        | 'default'
+        | undefined,
+      variant: 'outlined' as 'outlined',
       classes: { root: chipsStyles },
     }
     const ModifierChips = (
@@ -1487,7 +1503,7 @@ class App extends React.Component<
               onClick={this.openArpeggioAddingModal}
               onDelete={this.handleRemoveArpeggioClick}
               deleteIcon={
-                <Tooltip variant="gray" title="Remove chords" placement="right">
+                <Tooltip variant="gray" title="Remove chords" placement="top">
                   <DeleteIcon />
                 </Tooltip>
               }
@@ -1504,7 +1520,7 @@ class App extends React.Component<
               onClick={this.openScalesModal}
               onDelete={this.handleRemoveScalesClick}
               deleteIcon={
-                <Tooltip variant="gray" title="Remove scales" placement="right">
+                <Tooltip variant="gray" title="Remove scales" placement="top">
                   <DeleteIcon />
                 </Tooltip>
               }
@@ -1525,7 +1541,7 @@ class App extends React.Component<
                 <Tooltip
                   variant="gray"
                   title="Remove intervals"
-                  placement="right"
+                  placement="top"
                 >
                   <DeleteIcon />
                 </Tooltip>
@@ -1543,7 +1559,7 @@ class App extends React.Component<
                 <Tooltip
                   title="Remove enclosures"
                   variant="gray"
-                  placement="right"
+                  placement="top"
                 >
                   <DeleteIcon />
                 </Tooltip>
@@ -1793,15 +1809,17 @@ class App extends React.Component<
                   !isMobile && this.state.isMenuOpen && classes.contentShift,
                 )}
               >
-                <Box
+                <Flex
                   pt={[3, 3, 4]}
+                  flexDirection="column"
                   flex={1}
                   px={[3, 4, 4]}
                   maxWidth={MaxLayoutWidth}
                   width={1}
                   id="app-content"
                 >
-                  {uiState.isControlsShown || !isMobile ? (
+                  {uiState.isControlsShown ||
+                  shouldShowDesktopSessionControls ? (
                     <Flex
                       alignItems="center"
                       flexDirection="row"
@@ -1825,7 +1843,6 @@ class App extends React.Component<
                   ) : null}
 
                   <Flex
-                    flex={2}
                     alignItems="center"
                     justifyContent="center"
                     flexDirection="column"
@@ -1839,6 +1856,7 @@ class App extends React.Component<
                     >
                       <NoteCards
                         notes={noteCards}
+                        perLineCount={this.state.height > 568 ? 6 : 12}
                         activeNoteCardIndex={activeNoteCardIndex}
                         onChangeToEnharmonicClick={
                           this.handleChangeNoteCardToEnharmonicClick
@@ -1859,8 +1877,8 @@ class App extends React.Component<
                         alignItems="center"
                         justifyContent="center"
                         width={1}
-                        mt={[4, 2, 3]}
-                        mb={[2, 2, 3]}
+                        mt={[2, 2, 2]}
+                        mb={[2, 2, 2]}
                       >
                         <Fade in={this.state.isInitialized} appear>
                           <div>
@@ -1908,6 +1926,15 @@ class App extends React.Component<
                                     marginRight: '10px',
                                   }),
                                 ),
+                                classes: {
+                                  fab: css(
+                                    `height: 50px;
+                                    @media screen and (max-height: 400px) {
+                                      height: 30px;
+                                    }
+                                    `,
+                                  ),
+                                },
                               }}
                             />
                           </div>
@@ -1925,73 +1952,99 @@ class App extends React.Component<
 
                   <div
                     className={css(`
+                    display: flex;
+                    flex-direction: column;
+                    flex: 1;
+                    @media screen and (max-height: 600px) and (min-width: 500px) {
+                      flex-direction: row-reverse;
+                    }
+                  `)}
+                  >
+                    <div
+                      className={css(`
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
                     text-align: right;
                     color: #aaa;
                     font-size: 13px;
                     user-select: none;
 
+                    button {
+                      padding: 8px !important;
+                    }
+
                     @media screen and (min-width: 768px) {
                       font-size: 15px;
                     }
+
+                    @media screen and (max-height: 600px) and (min-width: 500px) {
+                      flex-direction: column-reverse;
+                      margin-left: 0.5rem;
+                    }
                   `)}
-                  >
-                    <span>{`x ${settingsStore.scaleZoomFactor}`}</span>
-                    <Tooltip title="Smaller font">
-                      <IconButton
-                        color="inherit"
-                        aria-label="Decrease font size"
-                        onClick={this.handleDecreaseZoomFactor}
-                      >
-                        <ZoomOutIcon />
-                      </IconButton>
-                    </Tooltip>
+                    >
+                      <span>{`x ${settingsStore.scaleZoomFactor}`}</span>
+                      <Tooltip title="Smaller font">
+                        <IconButton
+                          color="inherit"
+                          aria-label="Decrease font size"
+                          onClick={this.handleDecreaseZoomFactor}
+                        >
+                          <ZoomOutIcon />
+                        </IconButton>
+                      </Tooltip>
 
-                    <Tooltip title="Larger font">
-                      <IconButton
-                        color="inherit"
-                        aria-label="Increase font size"
-                        onClick={this.handleIncreaseZoomFactor}
-                      >
-                        <ZoomInIcon />
-                      </IconButton>
-                    </Tooltip>
+                      <Tooltip title="Larger font">
+                        <IconButton
+                          color="inherit"
+                          aria-label="Increase font size"
+                          onClick={this.handleIncreaseZoomFactor}
+                        >
+                          <ZoomInIcon />
+                        </IconButton>
+                      </Tooltip>
 
-                    <span>{'|'}</span>
+                      <Tooltip title="Notes staff settings">
+                        <IconButton
+                          color="inherit"
+                          aria-label="Change notes staff settings"
+                          onClick={() => {
+                            this.openSettingsModal()
+                          }}
+                        >
+                          <SettingsIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
 
-                    <Tooltip title="Notes staff settings">
-                      <IconButton
-                        color="inherit"
-                        aria-label="Change notes staff settings"
-                        onClick={() => {
-                          this.openSettingsModal()
-                        }}
-                      >
-                        <SettingsIcon />
-                      </IconButton>
-                    </Tooltip>
+                    <NotesStaff
+                      containerProps={{
+                        className: css(
+                          `width: 100%; flex: 1; overflow-y: auto; min-height: 100px`,
+                        ),
+                      }}
+                      scale={notesStaffScaleFactor}
+                      clef={settingsStore.clefType}
+                      maxLines={notesStaffMaxLines}
+                      isPlaying={isPlaying}
+                      key={this.state.contentWidth}
+                      showEnd
+                      id="notation"
+                      ticks={this.state.staffTicks}
+                      tickLabels={
+                        settingsStore.showNoteNamesAboveStaff
+                          ? this.state.tickLabels
+                          : undefined
+                      }
+                      activeTickIndex={
+                        isPlaying ? activeStaffTickIndex : undefined
+                      }
+                    />
                   </div>
+                </Flex>
 
-                  <NotesStaff
-                    scale={notesStaffScaleFactor}
-                    clef={settingsStore.clefType}
-                    maxLines={notesStaffMaxLines}
-                    isPlaying={isPlaying}
-                    key={this.state.contentWidth}
-                    showEnd
-                    id="notation"
-                    ticks={this.state.staffTicks}
-                    tickLabels={
-                      settingsStore.showNoteNamesAboveStaff
-                        ? this.state.tickLabels
-                        : undefined
-                    }
-                    activeTickIndex={
-                      isPlaying ? activeStaffTickIndex : undefined
-                    }
-                  />
-                </Box>
-
-                <Box mt={[2, 3, 4]}>
+                <Box mt={[2, 3, 3]}>
                   <PianoKeyboard
                     width={
                       this.state.width -
@@ -2131,9 +2184,7 @@ class App extends React.Component<
   }
 
   private getMaxNotesStaffLines() {
-    let maxLines = this.state.height >= 400 ? 4 : 1
-
-    return maxLines
+    return 16
   }
 
   private getNotesStaffScaleFactor(isMobile: boolean) {

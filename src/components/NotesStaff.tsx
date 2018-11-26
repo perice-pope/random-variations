@@ -109,7 +109,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
   private getHeight = () => {
     return (
-      (20 + this.getLinesCount() * this.props.staveHeight) * this.props.scale!
+      (50 + this.getLinesCount() * this.props.staveHeight) * this.props.scale!
     )
   }
 
@@ -410,6 +410,13 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         const activeLineXNew = noteHeadX
         const activeLineYNew = this.tickToLine[activeTickIndex] * staveHeight
 
+        if (this.boxRef && this.boxRef.current) {
+          this.boxRef.current.scrollTo({
+            top: activeLineYNew * (this.props.scale || 1.0),
+            behavior: 'smooth',
+          })
+        }
+
         // @ts-ignore
         this.activeLineEl.style = `transform: translateX(${activeLineXNew}px) translateY(${activeLineYNew}px);`
 
@@ -478,7 +485,18 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         // @ts-ignore
         ref={this.boxRef}
       >
-        <Box height={height} width={1} id={id} />
+        <Box
+          height={height}
+          width={1}
+          id={id}
+          className={css(`
+          svg {
+            * {
+              user-select: none;
+            }
+          }
+        `)}
+        />
       </div>
     )
 

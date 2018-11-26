@@ -87,6 +87,7 @@ const SortableNoteCard = SortableElement(
         active,
         bgColor,
         shouldFlip,
+        perLineCount,
         onClick,
         zIndex,
         ...props
@@ -100,7 +101,7 @@ const SortableNoteCard = SortableElement(
         <Flipped flipId={id} shouldFlip={shouldFlip}>
           <div
             className={css(`
-          width: 25%;
+          width: ${Math.floor(100 / perLineCount)}%;
           position: relative;
           z-index: ${active ? zIndex + 2 : zIndex + 1};
         `)}
@@ -158,6 +159,7 @@ const SortableNotesContainer = SortableContainer(
     shouldFlip,
     onChangeToEnharmonicClick,
     onEditClick,
+    perLineCount,
     onDeleteClick,
     onMouseOver,
     onMouseLeave,
@@ -175,7 +177,6 @@ const SortableNotesContainer = SortableContainer(
         className={css(`
           width: 100%;
           border-radius: 15px;
-          padding: 15px 10px;
           transition: background-color 0.3s;
           background-color: ${backgroundColor}
       `)}
@@ -192,6 +193,7 @@ const SortableNotesContainer = SortableContainer(
               // @ts-ignore
               bgColor={getNoteCardColorByNoteName(noteName)}
               tabIndex={-1}
+              perLineCount={perLineCount}
               width={1}
               zIndex={zIndex}
               active={activeNoteCardIndex === index}
@@ -229,6 +231,7 @@ export interface NoteCardNote {
 type NoteCardsProps = {
   notes: NoteCardNote[]
   zIndex?: number
+  perLineCount?: number
   activeNoteCardIndex?: number
   onMouseOver?: (index: number) => any
   onMouseLeave?: (index: number) => any
@@ -322,6 +325,7 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
       onMouseOver,
       onMouseLeave,
       zIndex,
+      perLineCount,
     } = this.props
 
     return (
@@ -335,6 +339,7 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
           transitionDuration={DRAG_AND_DROP_TRANSITION_DURATION_MS}
           activeNoteCardIndex={activeNoteCardIndex}
           items={notes}
+          perLineCount={perLineCount || 4}
           zIndex={zIndex || 1000}
           onMouseOver={onMouseOver}
           onMouseLeave={onMouseLeave}

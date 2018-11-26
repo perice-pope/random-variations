@@ -80,11 +80,6 @@ export default class AddEntityButton extends React.Component<
             disableTouchListener={showHelpTooltip || false}
           >
             <Button
-              classes={{
-                fab: css({
-                  height: '50px !important',
-                }),
-              }}
               variant="extendedFab"
               color="secondary"
               aria-label="Add"

@@ -170,7 +170,6 @@ class PianoKeyboard extends React.Component<
                 width: circleSize,
                 height: circleSize,
                 borderRadius: '100%',
-                marginBottom: '10px',
               }),
             )}
           />
