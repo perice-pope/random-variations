@@ -39,6 +39,36 @@ import { Flex } from './ui/Flex'
 import { Box } from './ui'
 import NotesStaff from './NotesStaff'
 import settingsStore from '../services/settingsStore'
+import InputSelect from './ui/InputSelect'
+
+type ChordTypeOption = {
+  label: string
+  value: ChordType
+  notesCount: number
+}
+
+const chordTypeOptions: ChordTypeOption[] = _.sortBy(
+  chordOptions.map(({ type, title }) => ({
+    label: `C${type} — ${_.capitalize(title)}`,
+    value: type,
+    notesCount: chordsByChordType[type].notesCount,
+  })),
+  'notesCount',
+)
+
+const chordTypeOptionsByGroup = _.groupBy(
+  chordTypeOptions,
+  to => chordsByChordType[to.value].category,
+)
+
+const chordTypeOptionsGrouped = Object.keys(chordTypeOptionsByGroup).map(
+  category => ({
+    label: _.capitalize(category),
+    options: chordTypeOptionsByGroup[category],
+  }),
+)
+
+const chordTypeToChordTypeOptionMap = _.keyBy(chordTypeOptions, 'value')
 
 export type SubmitValuesType = {
   chordType: ChordType
@@ -59,25 +89,6 @@ type ArpeggioModifierModalProps = {
 type ArpeggioModifierModalState = {
   values: SubmitValuesType
 }
-
-type ChordTypeOption = {
-  title: string
-  value: ChordType
-}
-
-const chordTypeOptions: ChordTypeOption[] = _.sortBy(
-  chordOptions.map(({ type, title }) => ({
-    title: _.capitalize(title),
-    value: type,
-    notesCount: chordsByChordType[type].notesCount,
-  })),
-  'notesCount',
-)
-
-const chordTypeOptionsByGroup = _.groupBy(
-  chordTypeOptions,
-  to => chordsByChordType[to.value].category,
-)
 
 type PatternPresetOption = {
   title: string
@@ -145,8 +156,8 @@ class ArpeggioModifierModal extends React.Component<
     })
   }
 
-  handleChordTypeSelected = (e: ChangeEvent<HTMLSelectElement>) => {
-    const chordType = e.target.value as ChordType
+  handleChordTypeSelected = (option: ChordTypeOption) => {
+    const chordType = option.value
     const chord = chordsByChordType[chordType] as Chord
     const { notesCount } = chord
 
@@ -317,29 +328,22 @@ class ArpeggioModifierModal extends React.Component<
 
         <DialogContent id="arpeggio-modifier-dialog-content">
           <Box maxWidth={600} width={1} mx="auto">
-            <Flex flexDirection="row">
-              <FormControl className={css({ flex: 1 })}>
-                <InputLabel htmlFor="chord-type">Chord type</InputLabel>
-                <NativeSelect
-                  value={this.state.values.chordType}
-                  onChange={this.handleChordTypeSelected}
-                  name="chordType"
-                  input={<Input id="chord-type" />}
-                >
-                  {Object.keys(chordTypeOptionsByGroup).map(groupName => (
-                    <optgroup key={groupName} label={groupName}>
-                      {chordTypeOptionsByGroup[groupName].map(
-                        ({ title, value }) => (
-                          <option key={value} value={value}>
-                            {`${title}`}
-                          </option>
-                        ),
-                      )}
-                    </optgroup>
-                  ))}
-                </NativeSelect>
-              </FormControl>
-            </Flex>
+            <InputSelect
+              textFieldProps={{
+                label: 'Chord type',
+                InputLabelProps: {
+                  shrink: true,
+                },
+              }}
+              value={
+                this.state.values.chordType
+                  ? chordTypeToChordTypeOptionMap[this.state.values.chordType]
+                  : undefined
+              }
+              onChange={this.handleChordTypeSelected}
+              name="chordType"
+              options={chordTypeOptionsGrouped}
+            />
 
             <Flex>
               <FormControl component="fieldset">
@@ -459,6 +463,7 @@ class ArpeggioModifierModal extends React.Component<
                 id="chord-preview"
                 clef={settingsStore.clefType}
                 ticks={this.generateStaffTicks()}
+                tickLabels={[`C${this.state.values.chordType}`]}
                 isPlaying={false}
                 showBreaks
                 activeTickIndex={undefined}

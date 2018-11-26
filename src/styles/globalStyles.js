@@ -15,6 +15,10 @@ export default () => injectGlobal`
     top: 70px !important;
   }
 
+  .text-soft {
+    color: #999;
+  }
+
   @font-face {
     font-family: 'Futura';
     src: url(${futuraMediumWoff2}) format('woff2'),
