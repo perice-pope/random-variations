@@ -159,9 +159,10 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     const { notesPerTick } = this
     let noteHeadX = 0
     if (
+      notesPerTick &&
       activeTickIndex != null &&
       activeTickIndex >= 0 &&
-      activeTickIndex < ticks.length
+      activeTickIndex < ticks.length && notesPerTick[activeTickIndex]
     ) {
       const notesPerActiveTick = notesPerTick[activeTickIndex]
       const activeNote = notesPerActiveTick.find(
@@ -484,7 +485,6 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
           })
         }
 
-        console.log('update: ', activeLineXNew)
         // @ts-ignore
         this.activeLineEl.style = `transform: translateX(${activeLineXNew}px) translateY(${activeLineYNew}px);`
 
