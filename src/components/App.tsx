@@ -34,6 +34,7 @@ import Plus1Icon from '@material-ui/icons/ExposurePlus1'
 import Minus1Icon from '@material-ui/icons/ExposureNeg1'
 import EditIcon from '@material-ui/icons/Edit'
 import ShareIcon from '@material-ui/icons/Share'
+import CloudDownloadIcon from '@material-ui/icons/CloudDownload'
 import SaveIcon from '@material-ui/icons/Save'
 import FullscreenIcon from '@material-ui/icons/Fullscreen'
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit'
@@ -43,6 +44,7 @@ import VerticalArrowsButton from '@material-ui/icons/ImportExport'
 import MetronomeIcon from 'mdi-material-ui/Metronome'
 import TextField from '@material-ui/core/TextField'
 import InputAdornment from '@material-ui/core/InputAdornment'
+import * as MidiWriter from 'midi-writer-js'
 
 import Chip from '@material-ui/core/Chip'
 
@@ -56,6 +58,7 @@ import {
   getNoteCardColorByNoteName,
   timeago,
   parseIntEnsureInBounds,
+  downloadBlob,
 } from '../utils'
 
 import theme from '../styles/theme'
@@ -477,6 +480,43 @@ class App extends React.Component<
     this.setState({ isMenuOpen: false }, () => {
       setTimeout(this.handleContentWidthUpdate, 500)
     })
+  }
+
+  private downloadAsMidi = (session: Session) => {
+    try {
+      // Start with a new track
+      const track = new MidiWriter.Track()
+
+      // Define an instrument (optional):
+      track.setTempo(session.bpm)
+      track.addEvent(new MidiWriter.ProgramChangeEvent({ instrument: 1 }))
+
+      const { ticks } = generateStaffTicks({
+        noteCards: getNoteCardsFromSessionCards(session.noteCards).noteCards,
+        modifiers: session.modifiers,
+        rests: session.rests,
+      })
+
+      ticks.forEach(tick => {
+        track.addEvent(
+          new MidiWriter.NoteEvent({
+            pitch: tick.notes.map(n => n.midi),
+            duration: '4',
+          }),
+        )
+      })
+
+      // Generate a data URI
+      const write = new MidiWriter.Writer([track])
+      downloadBlob(write.buildFile(), `${session.name}.midi`, 'audio/midi')
+    } catch (error) {
+      console.error(error)
+      notificationsStore.showNotification({
+        level: 'error',
+        autohide: 6000,
+        message: 'Could not export session as MIDI'
+      })
+    }
   }
 
   private onAuthStateChanged = (user: firebase.User | null) => {
@@ -1227,21 +1267,24 @@ class App extends React.Component<
     window.dispatchEvent(new Event('resize'))
   }
 
-  private transposeAllCards = (semitones) => {
+  private transposeAllCards = semitones => {
     if (!sessionStore.activeSession) {
       return
     }
-    sessionStore.activeSession.noteCards = sessionStore.activeSession.noteCards.map(nc => {
-      let noteName = nc.noteName
-      const midi = tonal.Note.midi(noteName)
-      if (midi + semitones < 96 && midi + semitones >= 24) { // "C7" and C0"
-        noteName = tonal.Note.fromMidi(midi + semitones, true)
-      }
-      return {
-        ...nc,
-        noteName,
-      }
-    })
+    sessionStore.activeSession.noteCards = sessionStore.activeSession.noteCards.map(
+      nc => {
+        let noteName = nc.noteName
+        const midi = tonal.Note.midi(noteName)
+        if (midi + semitones < 96 && midi + semitones >= 24) {
+          // "C7" and C0"
+          noteName = tonal.Note.fromMidi(midi + semitones, true)
+        }
+        return {
+          ...nc,
+          noteName,
+        }
+      },
+    )
   }
 
   private handleOctaveUpClick = () => this.transposeAllCards(12)
@@ -1321,7 +1364,11 @@ class App extends React.Component<
         closeAfterClick={false}
         renderButton={props => (
           <Tooltip title="Transpose all notes...">
-            <IconButton color="default" className={css({ marginLeft: '0.5rem' })} {...props} >
+            <IconButton
+              color="default"
+              className={css({ marginLeft: '0.5rem' })}
+              {...props}
+            >
               <VerticalArrowsButton fontSize="large" />
             </IconButton>
           </Tooltip>
@@ -1476,6 +1523,7 @@ class App extends React.Component<
         disabled={noteCards.length < 1}
         title={isPlaying ? 'Stop' : 'Play'}
         bg={isPlaying ? 'red' : '#00c200'}
+        mr={1}
         className={css({ maxWidth: '100px' })}
         onClick={this.togglePlayback}
       >
@@ -1505,7 +1553,7 @@ class App extends React.Component<
 
         <Flex flex={1} justifyContent="center">
           <Flex maxWidth={MaxLayoutWidth} width={1}>
-            {TogglePlaybackButton}
+            {!shouldShowDesktopSessionControls && TogglePlaybackButton}
 
             {isSignedIn &&
               sessionStore.activeSessionType === 'shared' && (
@@ -1812,6 +1860,16 @@ class App extends React.Component<
                         </MenuItem>
                         <MenuItem
                           onClick={() => {
+                            this.downloadAsMidi(session)
+                          }}
+                        >
+                          <ListItemIcon>
+                            <CloudDownloadIcon color="action" />
+                          </ListItemIcon>
+                          {' Download as MIDI'}
+                        </MenuItem>
+                        <MenuItem
+                          onClick={() => {
                             this.handleSaveSessionAs(session)
                           }}
                         >
@@ -1932,6 +1990,8 @@ class App extends React.Component<
                         mb={1}
                         mr={2}
                       >
+                        {shouldShowDesktopSessionControls &&
+                          TogglePlaybackButton}
                         {ShuffleButton}
                         {TransposeButton}
                         {ClearAllButton}

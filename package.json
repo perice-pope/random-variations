@@ -21,6 +21,7 @@
     "lodash": "^4.17.11",
     "mdi-material-ui": "^5.5.0",
     "memoize-one": "^4.0.3",
+    "midi-writer-js": "^1.5.2",
     "mobx": "^5.6.0",
     "mobx-react": "^5.4.2",
     "mobx-react-devtools": "^6.0.3",
