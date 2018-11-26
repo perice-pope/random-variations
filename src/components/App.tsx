@@ -29,6 +29,9 @@ import MenuIcon from '@material-ui/icons/Menu'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import DeleteIcon from '@material-ui/icons/Close'
 import PlusIcon from '@material-ui/icons/Add'
+import MinusIcon from '@material-ui/icons/Remove'
+import Plus1Icon from '@material-ui/icons/ExposurePlus1'
+import Minus1Icon from '@material-ui/icons/ExposureNeg1'
 import EditIcon from '@material-ui/icons/Edit'
 import ShareIcon from '@material-ui/icons/Share'
 import SaveIcon from '@material-ui/icons/Save'
@@ -36,6 +39,7 @@ import FullscreenIcon from '@material-ui/icons/Fullscreen'
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit'
 import ArrowsIcon from '@material-ui/icons/Cached'
 import TimerIcon from '@material-ui/icons/Timer'
+import VerticalArrowsButton from '@material-ui/icons/ImportExport'
 import MetronomeIcon from 'mdi-material-ui/Metronome'
 import TextField from '@material-ui/core/TextField'
 import InputAdornment from '@material-ui/core/InputAdornment'
@@ -1223,6 +1227,28 @@ class App extends React.Component<
     window.dispatchEvent(new Event('resize'))
   }
 
+  private transposeAllCards = (semitones) => {
+    if (!sessionStore.activeSession) {
+      return
+    }
+    sessionStore.activeSession.noteCards = sessionStore.activeSession.noteCards.map(nc => {
+      let noteName = nc.noteName
+      const midi = tonal.Note.midi(noteName)
+      if (midi + semitones < 96 && midi + semitones >= 24) { // "C7" and C0"
+        noteName = tonal.Note.fromMidi(midi + semitones, true)
+      }
+      return {
+        ...nc,
+        noteName,
+      }
+    })
+  }
+
+  private handleOctaveUpClick = () => this.transposeAllCards(12)
+  private handleOctaveDownClick = () => this.transposeAllCards(-12)
+  private handleSemitoneUpClick = () => this.transposeAllCards(1)
+  private handleSemitoneDownClick = () => this.transposeAllCards(-1)
+
   private renderApp = () => {
     if (!sessionStore.activeSession) {
       return
@@ -1288,6 +1314,47 @@ class App extends React.Component<
           <Hidden smDown>Randomize</Hidden>
         </Button>
       </Tooltip>
+    )
+
+    const TransposeButton = noteCards.length > 0 && (
+      <ButtonWithMenu
+        closeAfterClick={false}
+        renderButton={props => (
+          <Tooltip title="Transpose all notes...">
+            <IconButton color="default" className={css({ marginLeft: '0.5rem' })} {...props} >
+              <VerticalArrowsButton fontSize="large" />
+            </IconButton>
+          </Tooltip>
+        )}
+        renderMenu={props => (
+          <Menu {...props}>
+            <MenuItem onClick={this.handleOctaveUpClick}>
+              <ListItemIcon>
+                <PlusIcon />
+              </ListItemIcon>
+              Octave up
+            </MenuItem>
+            <MenuItem onClick={this.handleOctaveDownClick}>
+              <ListItemIcon>
+                <MinusIcon />
+              </ListItemIcon>
+              Octave down
+            </MenuItem>
+            <MenuItem onClick={this.handleSemitoneUpClick}>
+              <ListItemIcon>
+                <Plus1Icon />
+              </ListItemIcon>
+              Half-step up
+            </MenuItem>
+            <MenuItem onClick={this.handleSemitoneDownClick}>
+              <ListItemIcon>
+                <Minus1Icon />
+              </ListItemIcon>
+              Half-step down
+            </MenuItem>
+          </Menu>
+        )}
+      />
     )
 
     const ClearAllButton = noteCards.length > 0 && (
@@ -1738,8 +1805,8 @@ class App extends React.Component<
                             this.handleShareSession(session)
                           }}
                         >
-                        <ListItemIcon>
-                          <ShareIcon color="action" />
+                          <ListItemIcon>
+                            <ShareIcon color="action" />
                           </ListItemIcon>
                           {' Share'}
                         </MenuItem>
@@ -1748,8 +1815,8 @@ class App extends React.Component<
                             this.handleSaveSessionAs(session)
                           }}
                         >
-                        <ListItemIcon>
-                          <SaveIcon color="action" />
+                          <ListItemIcon>
+                            <SaveIcon color="action" />
                           </ListItemIcon>
                           {' Save as...'}
                         </MenuItem>
@@ -1768,8 +1835,8 @@ class App extends React.Component<
                             this.handleDeleteSession(session)
                           }}
                         >
-                        <ListItemIcon>
-                          <DeleteIcon color="action" />
+                          <ListItemIcon>
+                            <DeleteIcon color="action" />
                           </ListItemIcon>
                           {' Delete'}
                         </MenuItem>
@@ -1866,6 +1933,7 @@ class App extends React.Component<
                         mr={2}
                       >
                         {ShuffleButton}
+                        {TransposeButton}
                         {ClearAllButton}
                       </Box>
 

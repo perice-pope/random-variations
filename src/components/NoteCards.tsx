@@ -12,8 +12,8 @@ import MenuItem from '@material-ui/core/MenuItem'
 import PlusIcon from '@material-ui/icons/Add'
 import MinusIcon from '@material-ui/icons/Remove'
 import Plus1Icon from '@material-ui/icons/ExposurePlus1'
-import CompareArrowsIcon from '@material-ui/icons/CompareArrows'
 import Minus1Icon from '@material-ui/icons/ExposureNeg1'
+import CompareArrowsIcon from '@material-ui/icons/CompareArrows'
 import EditIcon from '@material-ui/icons/Edit'
 import RemoveIcon from '@material-ui/icons/Close'
 
@@ -161,6 +161,16 @@ const SortableNoteCard = SortableElement(
                   Octave up
                 </MenuItem>
                 <MenuItem
+                  disabled={octave < 2}
+                  onClick={this.handleOctaveDownClick}
+                >
+                  <ListItemIcon>
+                    <MinusIcon />
+                  </ListItemIcon>
+                  Octave down
+                </MenuItem>
+
+                <MenuItem
                   disabled={midi >= 95} // "B6"
                   onClick={this.handleSemitoneUpClick}
                 >
@@ -177,15 +187,6 @@ const SortableNoteCard = SortableElement(
                     <Minus1Icon />
                   </ListItemIcon>
                   Half-step down
-                </MenuItem>
-                <MenuItem
-                  disabled={octave < 2}
-                  onClick={this.handleOctaveDownClick}
-                >
-                  <ListItemIcon>
-                    <MinusIcon />
-                  </ListItemIcon>
-                  Octave down
                 </MenuItem>
 
                 {shouldShowChangeToEnharmonic && (

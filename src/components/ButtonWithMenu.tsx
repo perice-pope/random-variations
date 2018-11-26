@@ -3,6 +3,7 @@ import { MenuProps } from '@material-ui/core/Menu'
 import { ButtonProps } from '@material-ui/core/Button'
 
 type Props = {
+  closeAfterClick?: boolean
   renderMenu: (props: MenuProps) => React.ReactNode
   renderButton: (props: ButtonProps) => React.ReactNode
 }
@@ -24,6 +25,7 @@ export default class ButtonWithMenu extends React.Component<Props, State> {
 
   static defaultProps = {
     buttonProps: {},
+    closeAfterClick: true,
   }
 
   private openMenu = event => {
@@ -41,7 +43,7 @@ export default class ButtonWithMenu extends React.Component<Props, State> {
       <>
         {this.props.renderMenu({
           open: this.state.isMenuOpen,
-          onClick: this.closeMenu,
+          onClick: this.props.closeAfterClick ? this.closeMenu : undefined,
           onClose: this.closeMenu,
           anchorReference: 'anchorPosition',
           anchorPosition: this.state.menuPosition,
