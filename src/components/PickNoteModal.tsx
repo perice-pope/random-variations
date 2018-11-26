@@ -24,16 +24,15 @@ import { getNoteCardColorByNoteName } from '../utils'
 import { ChromaticNoteSharps } from '../types'
 import { css } from 'emotion'
 import { lighten } from 'polished'
-import { withAudioEngine } from './withAudioEngine'
-import AudioEngine from '../services/audioEngine'
+import {
+  withAudioEngine,
+  WithAudioEngineInjectedProps,
+} from './withAudioEngine'
 import styled from 'react-emotion'
-import { AudioFontId } from '../audioFontsConfig'
 import settingsStore from '../services/settingsStore'
 import { IconButton } from '@material-ui/core'
 
 type PickNoteModalProps = {
-  audioEngine: AudioEngine
-  audioFontId: AudioFontId
   isOpen: boolean
   onClose: () => any
   onSubmit: (args: { noteName: string }) => any
@@ -66,7 +65,7 @@ const NoteButton = styled(BaseButton)<NoteButtonProps>`
 // @ts-ignore
 @observer
 class PickNoteModal extends React.Component<
-  PickNoteModalProps & InjectedProps,
+  PickNoteModalProps & InjectedProps & WithAudioEngineInjectedProps,
   PickNoteModalState
 > {
   constructor(props) {

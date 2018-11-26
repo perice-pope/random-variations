@@ -15,6 +15,9 @@ import InputLabel from '@material-ui/core/InputLabel'
 import FormControl from '@material-ui/core/FormControl'
 import NativeSelect from '@material-ui/core/NativeSelect'
 import ArrowsIcon from '@material-ui/icons/Cached'
+import PlayIcon from '@material-ui/icons/PlayArrow'
+import StopIcon from '@material-ui/icons/Stop'
+import memoize from 'memoize-one'
 
 import PatternEditor from './PatternEditor'
 
@@ -26,7 +29,13 @@ import {
   Chord,
 } from '../types'
 import { ChangeEvent } from 'react'
-import { Input, FormControlLabel, RadioGroup, Radio } from '@material-ui/core'
+import {
+  Input,
+  FormControlLabel,
+  RadioGroup,
+  Radio,
+  IconButton,
+} from '@material-ui/core'
 import { css } from 'react-emotion'
 import Tooltip from './ui/Tooltip'
 import {
@@ -40,6 +49,13 @@ import { Box } from './ui'
 import NotesStaff from './NotesStaff'
 import settingsStore from '../services/settingsStore'
 import InputSelect from './ui/InputSelect'
+import {
+  withAudioEngine,
+  WithAudioEngineInjectedProps,
+} from './withAudioEngine'
+import AudioEngine, { AnimationCallback } from '../services/audioEngine'
+
+const audioEngine = new AudioEngine()
 
 type ChordTypeOption = {
   label: string
@@ -88,6 +104,8 @@ type ArpeggioModifierModalProps = {
 
 type ArpeggioModifierModalState = {
   values: SubmitValuesType
+  isPlaying: boolean
+  activeTickIndex?: number
 }
 
 type PatternPresetOption = {
@@ -119,7 +137,9 @@ const DEFAULT_CHORD_NAME = 'maj'
 
 // @ts-ignore
 class ArpeggioModifierModal extends React.Component<
-  ArpeggioModifierModalProps & { fullScreen: boolean },
+  ArpeggioModifierModalProps & {
+    fullScreen: boolean
+  } & WithAudioEngineInjectedProps,
   ArpeggioModifierModalState
 > {
   static defaultProps: Partial<ArpeggioModifierModalProps> = {
@@ -140,20 +160,25 @@ class ArpeggioModifierModal extends React.Component<
 
     this.state = {
       values: props.initialValues,
+      isPlaying: false,
     }
   }
 
   handleSubmit = () => {
+    audioEngine.stopLoop()
     this.props.onSubmit(this.state.values)
   }
 
   handleBrokenStackedChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    this.setState({
-      values: {
-        ...this.state.values,
-        isMelodic: event.target.value === 'broken',
+    this.setState(
+      {
+        values: {
+          ...this.state.values,
+          isMelodic: event.target.value === 'broken',
+        },
       },
-    })
+      this.setPlaybackLoop,
+    )
   }
 
   handleChordTypeSelected = (option: ChordTypeOption) => {
@@ -161,61 +186,70 @@ class ArpeggioModifierModal extends React.Component<
     const chord = chordsByChordType[chordType] as Chord
     const { notesCount } = chord
 
-    this.setState({
-      values: {
-        ...this.state.values,
-        chordType,
-        chordInversion: Math.min(
-          notesCount - 1,
-          this.state.values.chordInversion,
-        ),
-        pattern:
-          this.state.values.patternPreset !== 'custom'
-            ? generateChordPatternFromPreset({
-                chord,
-                patternPreset: this.state.values.patternPreset,
-              })
-            : {
-                ...this.state.values.pattern,
-                items: this.state.values.pattern.items.map(item => ({
-                  ...item,
-                  // Adapt the pattern to the new chord (e.g. when new chord has less notes, etc)
-                  note:
-                    item.note > notesCount
-                      ? 1 + ((item.note - 1) % notesCount)
-                      : item.note,
-                })),
-              },
+    this.setState(
+      {
+        values: {
+          ...this.state.values,
+          chordType,
+          chordInversion: Math.min(
+            notesCount - 1,
+            this.state.values.chordInversion,
+          ),
+          pattern:
+            this.state.values.patternPreset !== 'custom'
+              ? generateChordPatternFromPreset({
+                  chord,
+                  patternPreset: this.state.values.patternPreset,
+                })
+              : {
+                  ...this.state.values.pattern,
+                  items: this.state.values.pattern.items.map(item => ({
+                    ...item,
+                    // Adapt the pattern to the new chord (e.g. when new chord has less notes, etc)
+                    note:
+                      item.note > notesCount
+                        ? 1 + ((item.note - 1) % notesCount)
+                        : item.note,
+                  })),
+                },
+        },
       },
-    })
+      this.setPlaybackLoop,
+    )
   }
 
   handlePatternPresetSelected = (e: ChangeEvent<HTMLSelectElement>) => {
     const patternPreset = e.target.value as ArpeggioPatternPreset
 
-    this.setState({
-      values: {
-        ...this.state.values,
-        patternPreset,
-        pattern:
-          patternPreset !== 'custom'
-            ? generateChordPatternFromPreset({
-                chord: chordsByChordType[this.state.values.chordType],
-                patternPreset: patternPreset,
-              })
-            : this.state.values.pattern,
+    this.setState(
+      {
+        values: {
+          ...this.state.values,
+          patternPreset,
+          pattern:
+            patternPreset !== 'custom'
+              ? generateChordPatternFromPreset({
+                  chord: chordsByChordType[this.state.values.chordType],
+                  patternPreset: patternPreset,
+                })
+              : this.state.values.pattern,
+        },
       },
-    })
+      this.setPlaybackLoop,
+    )
   }
 
   handlePatternChange = (pattern: ArpeggioPattern) => {
-    this.setState({
-      values: {
-        ...this.state.values,
-        pattern: pattern,
-        patternPreset: 'custom',
+    this.setState(
+      {
+        values: {
+          ...this.state.values,
+          pattern: pattern,
+          patternPreset: 'custom',
+        },
       },
-    })
+      this.setPlaybackLoop,
+    )
   }
 
   handleChordInversionChange = (e: ChangeEvent<HTMLSelectElement>) => {
@@ -228,7 +262,7 @@ class ArpeggioModifierModal extends React.Component<
     })
   }
 
-  generateStaffTicks = () => {
+  generateStaffTicks = memoize(values => {
     const { chordType, chordInversion } = this.state.values
     const chord =
       chordsByChordType[chordType] || chordsByChordType[DEFAULT_CHORD_NAME]
@@ -291,6 +325,37 @@ class ArpeggioModifierModal extends React.Component<
     }
 
     return staffTicks
+  })
+
+  animationCallback: AnimationCallback = ({ tick }) => {
+    if (tick.notes.length > 0) {
+      this.setState({ activeTickIndex: tick.meta.staffTickIndex })
+    }
+  }
+
+  setPlaybackLoop = () => {
+    const ticks: StaffTick[] = [
+      ...this.generateStaffTicks(this.state.values),
+      {
+        id: 'rest',
+        notes: [],
+      },
+    ]
+    audioEngine.setAudioFont(this.props.audioFontId)
+    audioEngine.setBpm(120)
+    audioEngine.setLoop(ticks)
+    audioEngine.setAnimationCallback(this.animationCallback)
+  }
+
+  togglePlayback = () => {
+    if (this.state.isPlaying) {
+      audioEngine.stopLoop()
+      this.setState({ isPlaying: false })
+    } else {
+      this.setPlaybackLoop()
+      audioEngine.playLoop()
+      this.setState({ isPlaying: true, activeTickIndex: 0 })
+    }
   }
 
   handleRandomizePattern = () => {
@@ -318,6 +383,7 @@ class ArpeggioModifierModal extends React.Component<
     return (
       <Dialog
         fullWidth={true}
+        maxWidth="md"
         fullScreen={this.props.fullScreen}
         scroll="paper"
         open={this.props.isOpen}
@@ -327,7 +393,7 @@ class ArpeggioModifierModal extends React.Component<
         <DialogTitle id="arpeggio-modifier-dialog">Chords</DialogTitle>
 
         <DialogContent id="arpeggio-modifier-dialog-content">
-          <Box maxWidth={600} width={1} mx="auto">
+          <Box maxWidth={700} width={1} mx="auto">
             <InputSelect
               textFieldProps={{
                 label: 'Chord type',
@@ -458,22 +524,36 @@ class ArpeggioModifierModal extends React.Component<
               )}
             </Flex>
 
-            <Box>
+            <Flex flexDirection="row" alignItems="center">
+              <IconButton
+                color="secondary"
+                onClick={this.togglePlayback}
+                className={css(`margin-right: 0.5rem;`)}
+              >
+                {this.state.isPlaying ? (
+                  <StopIcon fontSize="large" />
+                ) : (
+                  <PlayIcon fontSize="large" />
+                )}
+              </IconButton>
               <NotesStaff
                 id="chord-preview"
                 clef={settingsStore.clefType}
-                ticks={this.generateStaffTicks()}
+                activeTickIndex={
+                  this.state.isPlaying ? this.state.activeTickIndex : undefined
+                }
+                ticks={this.generateStaffTicks(this.state.values)}
                 tickLabels={[
                   `${tonal.Note.pc(this.props.baseNote || 'C4')}${
                     this.state.values.chordType
                   }`,
                 ]}
-                isPlaying={false}
+                isPlaying={this.state.isPlaying}
                 showBreaks
-                activeTickIndex={undefined}
+                containerProps={{ flex: '1' }}
                 maxLines={1}
               />
-            </Box>
+            </Flex>
           </Box>
         </DialogContent>
 
@@ -490,6 +570,6 @@ class ArpeggioModifierModal extends React.Component<
   }
 }
 
-export default withMobileDialog<ArpeggioModifierModalProps>()(
-  ArpeggioModifierModal,
+export default withAudioEngine(
+  withMobileDialog<ArpeggioModifierModalProps>()(ArpeggioModifierModal),
 )

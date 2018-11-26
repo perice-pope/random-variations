@@ -64,7 +64,6 @@ import {
   StaffTick,
   ChromaticApproachesType,
   PlayableLoopTick,
-  PlayableLoop,
   User,
   Session,
   Scale,
@@ -487,7 +486,10 @@ class App extends React.Component<
         const isSharedSession = !!this.props.match.params.sharedSessionKey
         const shouldLoadUserSessions = user && !user.isAnonymous
 
-        trackPageView({ location: this.props.history.location, userId: user ? user.uid : undefined })
+        trackPageView({
+          location: this.props.history.location,
+          userId: user ? user.uid : undefined,
+        })
 
         const loadAndActivateOfflineSession = async () => {
           await sessionStore.loadAndActivateOfflineSession()
@@ -718,30 +720,10 @@ class App extends React.Component<
     settingsStore.saveSettingsLocally()
   }
 
-  private generateLoop = () => {
-    const { staffTicks } = this.state
-
-    // Generate loop
-    const loopTicks: PlayableLoopTick[] = staffTicks.map(
-      (staffTick, index) => ({
-        notes: staffTick.notes,
-        meta: {
-          staffTickIndex: index,
-          noteCardId: staffTick.noteCardId!,
-        },
-      }),
-    )
-
-    const loop: PlayableLoop = { ticks: loopTicks }
-    return loop
-  }
-
   private onNotesUpdated = async () => {
     console.log('onNotesUpdated')
     await this.updateStaffNotes()
-
-    const loop = this.generateLoop()
-    audioEngine.setLoop(loop)
+    audioEngine.setLoop(this.state.staffTicks)
   }
 
   private drawAnimation: AnimationCallback = ({
@@ -2258,4 +2240,6 @@ class App extends React.Component<
 }
 
 // @ts-ignore
-export default withStyles(styles, { withTheme: true })(withWidth()(withRouter(App)))
+export default withStyles(styles, { withTheme: true })(
+  withWidth()(withRouter(App)),
+)

@@ -233,6 +233,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     renderContext.clear()
     this.drawStaveAndClef()
     this.drawActiveNoteLine()
+    this.updateActiveNoteLine()
     // @ts-ignore
     const svg = renderContext.svg as SVGElement
 
@@ -316,7 +317,10 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         if (this.props.tickLabels && this.props.tickLabels[index]) {
           const label = this.props.tickLabels[index]
           let fontSize = 17
-          if (label.length > 3) {
+          if (label.length > 2) {
+            fontSize = 15
+          }
+          if (label.length > 4) {
             fontSize = 13
           }
           if (label.length > 6) {
@@ -393,6 +397,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
   }
 
   updateActiveNoteLine = () => {
+    console.log('updateActiveNoteLine')
     if (!this.activeLineEl) {
       this.drawActiveNoteLine()
     }
@@ -430,13 +435,12 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         this.activeLineEl.style = `transform: translateX(${activeLineXNew}px) translateY(${activeLineYNew}px);`
 
         activeNote.draw()
-        // if (tickLabels && tickLabels[activeTickIndex]) {
+
         this.renderContext.setStrokeStyle('black')
         this.renderContext.setFillStyle('black')
         this.labelAnnotations.forEach(modifier => {
           modifier.draw()
         })
-        // }
       }
     }
   }

@@ -4,7 +4,12 @@ import * as _ from 'lodash'
 import * as tonal from 'tonal'
 import UnmuteButton from 'unmute'
 
-import { PlayableLoop, PlayableNote, PlayableLoopTick } from '../types'
+import {
+  PlayableLoop,
+  PlayableNote,
+  PlayableLoopTick,
+  StaffTick,
+} from '../types'
 import audioFontsConfig, { AudioFontId, AudioFont } from '../audioFontsConfig'
 
 const audioFontsConfigById = _.keyBy(audioFontsConfig, 'id')
@@ -144,8 +149,12 @@ export default class AudioEngine {
 
     setTimeout(() => {
       Tone.Transport.stop()
-      this.countInSequence.stop()
-      this.loopSequence.stop()
+      if (this.countInSequence) {
+        this.countInSequence.stop()
+      }
+      if (this.loopSequence) {
+        this.loopSequence.stop()
+      }
     }, rampTimeMs)
   }
 
@@ -179,7 +188,20 @@ export default class AudioEngine {
     envelope.cancel()
   }
 
-  public setLoop = (loop: PlayableLoop) => {
+  public setLoop = (staffTicks: StaffTick[]) => {
+    // Generate loop
+    const loopTicks: PlayableLoopTick[] = staffTicks.map(
+      (staffTick, index) => ({
+        notes: staffTick.notes,
+        meta: {
+          staffTickIndex: index,
+          noteCardId: staffTick.noteCardId!,
+        },
+      }),
+    )
+
+    const loop: PlayableLoop = { ticks: loopTicks }
+
     this.loop = loop
     if (!this.loop.ticks) {
       this.loop.ticks = []
@@ -192,43 +214,47 @@ export default class AudioEngine {
     if (!this.loopSequence) {
       this.loopSequence = new Tone.Sequence(
         (contextTime, tick) => {
-          const duration = 60.0 / this.bpm
+          try {
+            const duration = 60.0 / this.bpm
 
-          if (this.metronomeEnabled && this.hasLoadedAudioFont('metronome')) {
+            if (this.metronomeEnabled && this.hasLoadedAudioFont('metronome')) {
+              this.audioFontPlayer.queueChord(
+                Tone.context,
+                Tone.context.destination,
+                this.audioFontCache['metronome'],
+                contextTime,
+                [tonal.Note.midi('C6')],
+                0.3,
+                // Volume
+                1.0,
+              )
+            }
+
+            const midiNotes = tick.notes.map(note => note.midi)
+
             this.audioFontPlayer.queueChord(
               Tone.context,
               Tone.context.destination,
-              this.audioFontCache['metronome'],
+              this.audioFontCache[this.audioFontId],
               contextTime,
-              [tonal.Note.midi('C6')],
-              0.3,
+              midiNotes,
+              duration,
               // Volume
               1.0,
             )
+
+            // Call animation callback
+            Tone.Draw.schedule(() => {
+              if (this.animationCallback) {
+                this.animationCallback({
+                  tick,
+                  loop: this.loop,
+                })
+              }
+            }, contextTime)
+          } catch (error) {
+            console.error(error)
           }
-
-          const midiNotes = tick.notes.map(note => note.midi)
-
-          this.audioFontPlayer.queueChord(
-            Tone.context,
-            Tone.context.destination,
-            this.audioFontCache[this.audioFontId],
-            contextTime,
-            midiNotes,
-            duration,
-            // Volume
-            1.0,
-          )
-
-          // Call animation callback
-          Tone.Draw.schedule(() => {
-            if (this.animationCallback) {
-              this.animationCallback({
-                tick,
-                loop: this.loop,
-              })
-            }
-          }, contextTime)
         },
         this.loop.ticks,
         '4n',
