@@ -108,9 +108,11 @@ window.getSemitonesUpTransposer = getSemitonesTransposer
 
 const getAllChordOptions: () => Chord[] = memoize(() => {
   return _.uniqBy(
-    chordsData.map(({ name, symbol, semitones, category }) => {
+    // @ts-ignore
+    chordsData.map(({ name, symbol, semitones, intervals, category }) => {
       return {
         semitones,
+        intervals,
         category,
         type: symbol,
         title: name,
@@ -423,11 +425,9 @@ export const addChordNotes = (
     ticksUpdated.splice(tickWithBaseNoteIndex, 1, {
       ...tickWithBaseNote,
       notes: _.sortBy(
-        chord.semitones
-          .map((semitonesCount, index) => {
-            let resultNote = getSemitonesTransposer(semitonesCount)(
-              baseNote.noteName,
-            )
+        chord.intervals
+          .map((interval, index) => {
+            let resultNote = transpose(baseNote.noteName, interval)
             if (
               chordModifier.chordInversion > 0 &&
               index >= chordModifier.chordInversion
@@ -460,8 +460,8 @@ export const addChordNotes = (
     if (muted) {
       return undefined
     }
-    const semitonesCount = note ? chord.semitones[note - 1] || 0 : 0
-    return getSemitonesTransposer(semitonesCount)(baseNote.noteName)
+    const interval = note ? chord.intervals[note - 1] || 0 : 0
+    return transpose(baseNote.noteName, interval)
   })
 
   const ticksWithArpeggioNotes = noteNamesWithArpeggio.map(

@@ -42,7 +42,6 @@ import {
   generateChordPatternFromPreset,
   chordOptions,
   chordsByChordType,
-  getSemitonesTransposer,
 } from '../musicUtils'
 import { Flex } from './ui/Flex'
 import { Box } from './ui'
@@ -280,7 +279,7 @@ class ArpeggioModifierModal extends React.Component<
     const { chordType, chordInversion } = this.state.values
     const chord =
       chordsByChordType[chordType] || chordsByChordType[DEFAULT_CHORD_NAME]
-    const { semitones } = chord
+    const { intervals } = chord
     const baseNote = this.props.baseNote || 'C4'
 
     let staffTicks: StaffTick[]
@@ -290,7 +289,7 @@ class ArpeggioModifierModal extends React.Component<
       staffTicks = this.state.values.pattern.items.map((item, index) => {
         const note = item.muted
           ? undefined
-          : getSemitonesTransposer(semitones[item.note - 1])(baseNote)
+          : transpose(baseNote, intervals[item.note - 1])
 
         return {
           id: `${index}`,
@@ -312,11 +311,9 @@ class ArpeggioModifierModal extends React.Component<
         {
           id: `tick-id`,
           notes: _.sortBy(
-            semitones
-              .map((semitonesCount, index) => {
-                let resultNote = getSemitonesTransposer(semitonesCount)(
-                  baseNote,
-                )
+            intervals
+              .map((interval, index) => {
+                let resultNote = transpose(baseNote, interval)
                 if (chordInversion > 0 && index >= chordInversion) {
                   resultNote = transpose(resultNote, '-8P')
                 }

@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const tonal = require('tonal')
 
 const getRawData = () => {
   return `Power Chord	5	C G	1 5	DYAD
@@ -171,24 +172,24 @@ const getRawData = () => {
   Major 7 (b13,#11,b9)	∆7 (b13,#11,b9)	C E G B Db F# Ab	1 3 5 7 b9 #11 13	13th
   Major 7 (b13,#11,#9)	∆7 (b13,#11,#9)	C E G B D# F# Ab	1 3 5 7 #9 #11 13	13th
   Major 7 (b13,#11,#9,b9)	∆7 (b13,#11,#9,b9)	C E G B Db D# F# Ab	1 3 5 7 b9 #9 #11 13	13th
-  Dominant 13	13	C E G Bb D (F) A	1 3 5 b7 9 13	13th
-  Dominant 13 (b9)	13 (b9)	C E G Bb Db (F) A	1 3 5 b7 b9 13	13th
-  Dominant 13 (#9)	13 (#9)	C E G Bb D# (F) A	1 3 5 b7 #9 13	13th
-  Dominant 13 (#9,b9)	13 (#9,b9)	C E G Bb Db D# (F) A	1 3 5 b7 b9 #9 13	13th
+  Dominant 13	13	C E G Bb D F A	1 3 5 b7 9 13	13th
+  Dominant 13 (b9)	13 (b9)	C E G Bb Db F A	1 3 5 b7 b9 13	13th
+  Dominant 13 (#9)	13 (#9)	C E G Bb D# F A	1 3 5 b7 #9 13	13th
+  Dominant 13 (#9,b9)	13 (#9,b9)	C E G Bb Db D# F A	1 3 5 b7 b9 #9 13	13th
   Dominant 13 (#11)	13 (#11)	C E G Bb D F# A	1 3 5 b7 9 #11 13	13th
   Dominant 13 (#11,b9)	13 (#11,b9)	C E G Bb Db F# A	1 3 5 b7 b9 #11 13	13th
   Dominant 13 (#11,#9)	13 (#11,#9)	C E G Bb D# F# A	1 3 5 b7 #9 #11 13	13th
   Dominant 13 (#11,#9,b9)	13 (#11,#9,b9)	C E G Bb Db D# F# A	1 3 5 b7 b9 #9 #11 13	13th
   Dominant 13 suspended 4	13sus	C F G Bb D A	1 4 5 b7 9 13	13th
   Dominant 13 suspended 4 (b9)	13sus (b9)	C E F Bb Db A	1 4 5 b7 b9 13	13th
-  Dominant 9 (b13)	9 (b13)	C E G Bb D (F) Ab	1 3 5 b7 9 (11) b13	13th
-  Dominant 9 (b13,b5)	9 (b13,b5)	C E Gb Bb D (F) Ab	1 3 b5 b7 9 (11) b13	13th
-  Dominant 7 (b13,b9)	7 (b13,b9)	C E G Bb Db (F) Ab	1 3 5 b7 b9 (11) b13	13th
-  Dominant 7 (b13,#9)	7 (b13,#9)	C E G Bb D# (F) Ab	1 3 5 b7 #9 (11) b13	13th
-  Dominant 7 (b13,#9,b9)	7 (b13,#9,b9)	C E G Bb Db D# (F) Ab	1 3 5 b7 b9 #9 (11) b13	13th
-  Dominant 7 (b13,b9,b5)	7 (b13,b9,b5)	C E Gb Bb Db (F) Ab	1 3 b5 b7 b9 (11) b13	13th
-  Dominant 7 (b13,#9,b5)	7 (b13,#9,b5)	C E Gb Bb D# (F) Ab	1 3 b5 b7 #9 (11) b13	13th
-  Dominant 7 (b13,#9,b9,b5)	7 (b13,#9,b9,b5)	C E Gb Bb Db D# (F) Ab	1 3 b5 b7 b9 #9 (11) b13	13th
+  Dominant 9 (b13)	9 (b13)	C E G Bb D F Ab	1 3 5 b7 9 (11) b13	13th
+  Dominant 9 (b13,b5)	9 (b13,b5)	C E Gb Bb D F Ab	1 3 b5 b7 9 (11) b13	13th
+  Dominant 7 (b13,b9)	7 (b13,b9)	C E G Bb Db F Ab	1 3 5 b7 b9 (11) b13	13th
+  Dominant 7 (b13,#9)	7 (b13,#9)	C E G Bb D# F Ab	1 3 5 b7 #9 (11) b13	13th
+  Dominant 7 (b13,#9,b9)	7 (b13,#9,b9)	C E G Bb Db D# F Ab	1 3 5 b7 b9 #9 (11) b13	13th
+  Dominant 7 (b13,b9,b5)	7 (b13,b9,b5)	C E Gb Bb Db F Ab	1 3 b5 b7 b9 (11) b13	13th
+  Dominant 7 (b13,#9,b5)	7 (b13,#9,b5)	C E Gb Bb D# F Ab	1 3 b5 b7 #9 (11) b13	13th
+  Dominant 7 (b13,#9,b9,b5)	7 (b13,#9,b9,b5)	C E Gb Bb Db D# F Ab	1 3 b5 b7 b9 #9 (11) b13	13th
   Dominant 9 (b13,#11)	9 (b13,#11)	C E G Bb D F# Ab	1 3 5 b7 9 #11 b13	13th
   Dominant 7 (b13,#11,b9)	7 (b13,#11,b9)	C E G Bb Db F# Ab	1 3 5 b7 b9 #11 b13	13th
   Dominant 7 (b13,#11,#9)	7 (b13,#11,#9)	C E G Bb D# F# Ab	1 3 5 b7 #9 #11 b13	13th
@@ -228,7 +229,7 @@ const getRawData = () => {
 
 const td = require('tonal-distance')
 
-const convertChord = str => {
+const getSemitones = str => {
   const notes = str
     .split(' ')
     .map(n => n.trim())
@@ -248,6 +249,34 @@ const convertChord = str => {
   return semitones
 }
 
+const getIntervals = str => {
+  const notes = str
+    .split(' ')
+    .map(n => n.trim())
+    .filter(x => x)
+
+  let intervals = []
+  let prevSemitiones = null
+  let octave = 1
+  const baseNote = `C${octave}`
+  notes.forEach(curNote => {
+    let curNoteWithOctave = `${curNote}${octave}`
+    let curSemitones = td.semitones(baseNote, curNoteWithOctave)
+    if (prevSemitiones != null && curSemitones < prevSemitiones) {
+      octave += 1
+      curNoteWithOctave = `${curNote}${octave}`
+      curSemitones = td.semitones(baseNote, curNoteWithOctave)
+    }
+    const interval = tonal.Distance.interval(baseNote, curNoteWithOctave)
+    intervals.push(interval)
+    prevSemitiones = curSemitones
+
+    // console.log(baseNote, curNoteWithOctave, curSemitones, interval)
+  })
+
+  return intervals
+}
+
 const getData = () => {
   const raw = getRawData()
   return raw
@@ -263,7 +292,8 @@ const getData = () => {
         name: _.lowerCase(name),
         symbol,
         notes,
-        semitones: convertChord(notes),
+        semitones: getSemitones(notes),
+        intervals: getIntervals(notes),
         category: _.lowerCase(category),
       }
     })

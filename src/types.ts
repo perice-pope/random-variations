@@ -65,6 +65,7 @@ export interface Chord {
   category: string
   title: string
   semitones: number[]
+  intervals: string[]
   notesCount: number
 }
 
