@@ -76,8 +76,9 @@ export interface Scale {
   type: ScaleType
   notes?: string
   mode: string
-  // Intervals of "tonal" JS library: "1P", "2M" and so on
   semitones: number[]
+  // Intervals of "tonal" JS library: "1P", "2M" and so on
+  intervals: string[]
   title: string
   notesCount: number
 }

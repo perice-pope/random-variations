@@ -289,7 +289,7 @@ class ArpeggioModifierModal extends React.Component<
       staffTicks = this.state.values.pattern.items.map((item, index) => {
         const note = item.muted
           ? undefined
-          : transpose(baseNote, intervals[item.note - 1])
+          : transpose(baseNote, intervals[item.note - 1] || '1P')
 
         return {
           id: `${index}`,

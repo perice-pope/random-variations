@@ -33,7 +33,6 @@ import {
   scaleOptions,
   scaleByScaleType,
   generateScalePatternFromPreset,
-  getSemitonesTransposer,
 } from '../musicUtils'
 import { Flex } from './ui/Flex'
 import { Box } from './ui'
@@ -228,17 +227,17 @@ class ScaleModifierModal extends React.Component<
   generateStaffTicks = () => {
     const { scaleType } = this.state.values
     const scale = scaleByScaleType[scaleType]
-    const { semitones = [] } = scale
+    const { intervals = [] } = scale
     const baseNote = this.props.baseNote || 'C4'
 
     let staffTicks: StaffTick[]
 
     staffTicks = this.state.values.pattern.items.map((item, index) => {
-      const semitonesCount =
-        item && !item.muted ? semitones[item.note - 1] || 0 : 0
+      const interval =
+        item && !item.muted ? intervals[item.note - 1] || '1P ' : '1P'
       const note = item.muted
         ? undefined
-        : getSemitonesTransposer(semitonesCount)(baseNote)
+        : (tonal.Distance.transpose(baseNote, interval) as string)
 
       return {
         id: `${index}`,

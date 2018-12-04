@@ -125,9 +125,11 @@ const getAllChordOptions: () => Chord[] = memoize(() => {
 
 const getAllScaleOptions: () => Scale[] = memoize(() => {
   return _.uniqBy(
-    scalesData.map(({ name, notes, mode, semitones }) => {
+    // @ts-ignore
+    scalesData.map(({ name, notes, mode, semitones, intervals }) => {
       return {
         semitones,
+        intervals,
         mode,
         notes,
         type: name,
@@ -460,7 +462,7 @@ export const addChordNotes = (
     if (muted) {
       return undefined
     }
-    const interval = note ? chord.intervals[note - 1] || 0 : 0
+    const interval = note ? chord.intervals[note - 1] || '1P' : '1P'
     return transpose(baseNote.noteName, interval)
   })
 
@@ -514,7 +516,7 @@ export const addScaleNotes = (
   const scale =
     scaleByScaleType[scaleModifier.scaleType] ||
     scaleByScaleType[DEFAULT_SCALE_NAME]
-  const { semitones } = scale || []
+  const { intervals } = scale || []
 
   // Add melodic (arpeggio) scale notes, each in its own staff tick
   let noteNamesWithArpeggio
@@ -523,8 +525,8 @@ export const addScaleNotes = (
     if (muted) {
       return undefined
     }
-    const semitonesCount = note ? semitones[note - 1] || 0 : 0
-    return getSemitonesTransposer(semitonesCount)(baseNote.noteName)
+    const interval = note ? intervals[note - 1] || '1P' : '1P'
+    return tonal.Distance.transpose(baseNote.noteName, interval)
   })
 
   const ticksWithArpeggioNotes = noteNamesWithArpeggio.map(

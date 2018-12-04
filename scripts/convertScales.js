@@ -354,12 +354,22 @@ const getRawData = () => {
 
 const td = require('tonal-distance')
 
-const convertScale = str => {
+const getSemitones = str => {
   const notes = str
     .split(' ')
     .map(n => n.trim())
     .filter(x => x)
     .map(n => td.semitones('C', n))
+  notes.splice(notes.length - 1, 1)
+  return notes
+}
+
+const getIntervals = str => {
+  const notes = str
+    .split(' ')
+    .map(n => n.trim())
+    .filter(x => x)
+    .map(n => td.interval('C', n))
   notes.splice(notes.length - 1, 1)
   return notes
 }
@@ -376,7 +386,8 @@ const getData = () => {
       return {
         name: _.lowerCase(name),
         notes,
-        semitones: [...convertScale(notes), 12],
+        semitones: [...getSemitones(notes), 12],
+        intervals: [...getIntervals(notes), '8P'],
         mode: _.lowerCase(mode),
       }
     })
