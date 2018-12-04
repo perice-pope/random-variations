@@ -1045,6 +1045,14 @@ class App extends React.Component<
     })
   }
 
+  private afterModifierDialogClosed = () => {
+    const activeSession = sessionStore.activeSession
+    if (activeSession) {
+      // Restore session's BPM after closing the modal
+      audioEngine.setBpm(activeSession.bpm)
+    }
+  }
+
   private handleArpeggioModifierModalConfirm = (
     values: ArpeggioModifierModalSubmitValues,
   ) => {
@@ -1053,7 +1061,7 @@ class App extends React.Component<
         ...values,
         enabled: true,
       }
-      audioEngine.setBpm(sessionStore.activeSession.bpm)
+      this.afterModifierDialogClosed()
     }
     this.closeArpeggioAddingModal()
   }
@@ -1066,7 +1074,7 @@ class App extends React.Component<
         ...values,
         enabled: true,
       }
-      audioEngine.setBpm(sessionStore.activeSession.bpm)
+      this.afterModifierDialogClosed()
     }
     this.closeScalesModal()
   }
@@ -1079,7 +1087,7 @@ class App extends React.Component<
         ...values,
         enabled: true,
       }
-      audioEngine.setBpm(sessionStore.activeSession.bpm)
+      this.afterModifierDialogClosed()
     }
 
     this.closeIntervalsModal()
@@ -1095,7 +1103,7 @@ class App extends React.Component<
         type,
         enabled: true,
       }
-      audioEngine.setBpm(sessionStore.activeSession.bpm)
+      this.afterModifierDialogClosed()
     }
     this.closeChromaticApproachesModal()
   }

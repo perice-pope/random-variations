@@ -15,6 +15,9 @@ import InputLabel from '@material-ui/core/InputLabel'
 import FormControl from '@material-ui/core/FormControl'
 import NativeSelect from '@material-ui/core/NativeSelect'
 import ArrowsIcon from '@material-ui/icons/Cached'
+import PlayIcon from '@material-ui/icons/PlayArrow'
+import StopIcon from '@material-ui/icons/Stop'
+import memoize from 'memoize-one'
 
 import PatternEditor from './PatternEditor'
 
@@ -27,7 +30,7 @@ import {
   ScaleModifier,
 } from '../types'
 import { ChangeEvent } from 'react'
-import { Input } from '@material-ui/core'
+import { Input, IconButton } from '@material-ui/core'
 import { css } from 'react-emotion'
 import Tooltip from './ui/Tooltip'
 import {
@@ -41,6 +44,14 @@ import NotesStaff from './NotesStaff'
 import { Omit } from '../utils'
 import settingsStore from '../services/settingsStore'
 import InputSelect from './ui/InputSelect'
+import {
+  WithAudioEngineInjectedProps,
+  withAudioEngine,
+} from './withAudioEngine'
+
+import AudioEngine, { AnimationCallback } from '../services/audioEngine'
+
+const audioEngine = new AudioEngine()
 
 export type SubmitValuesType = Omit<ScaleModifier, 'enabled'>
 
@@ -54,6 +65,8 @@ type ScaleModifierModalProps = {
 
 type ScaleModifierModalState = {
   values: SubmitValuesType
+  isPlaying: boolean
+  activeTickIndex?: number
 }
 
 type ScaleTypeOption = {
@@ -126,7 +139,9 @@ const patternPresetOptions: PatternPresetOption[] = [
   ),
 ]
 
-type Props = ScaleModifierModalProps & { fullScreen: boolean }
+type Props = ScaleModifierModalProps & {
+  fullScreen: boolean
+} & WithAudioEngineInjectedProps
 
 const DEFAULT_SCALE_NAME = 'ionian'
 
@@ -160,17 +175,22 @@ class ScaleModifierModal extends React.Component<
           scale,
         }),
       },
+      isPlaying: false,
     }
   }
 
   handleSubmit = () => {
+    audioEngine.stopLoop()
     this.props.onSubmit(this.state.values)
   }
 
   handleIsMelodicSwitchChange = event => {
-    this.setState({
-      values: { ...this.state.values, isMelodic: event.target.checked },
-    })
+    this.setState(
+      {
+        values: { ...this.state.values, isMelodic: event.target.checked },
+      },
+      this.setPlaybackLoop,
+    )
   }
 
   handleScaleTypeSelected = (scaleOption: ScaleTypeOption) => {
@@ -179,53 +199,62 @@ class ScaleModifierModal extends React.Component<
       scaleByScaleType[scaleType] ||
       (scaleByScaleType[DEFAULT_SCALE_NAME] as Scale)
 
-    this.setState({
-      values: {
-        ...this.state.values,
-        scaleType,
-        pattern:
-          this.state.values.patternPreset !== 'custom'
-            ? generateScalePatternFromPreset({
-                scale,
-                patternPreset: this.state.values.patternPreset,
-              })
-            : adaptPatternForScale({
-                scale,
-                pattern: this.state.values.pattern,
-              }),
+    this.setState(
+      {
+        values: {
+          ...this.state.values,
+          scaleType,
+          pattern:
+            this.state.values.patternPreset !== 'custom'
+              ? generateScalePatternFromPreset({
+                  scale,
+                  patternPreset: this.state.values.patternPreset,
+                })
+              : adaptPatternForScale({
+                  scale,
+                  pattern: this.state.values.pattern,
+                }),
+        },
       },
-    })
+      this.setPlaybackLoop,
+    )
   }
 
   handlePatternPresetSelected = (e: ChangeEvent<HTMLSelectElement>) => {
     const patternPreset = e.target.value as ScalePatternPreset
 
-    this.setState({
-      values: {
-        ...this.state.values,
-        patternPreset,
-        pattern:
-          patternPreset !== 'custom'
-            ? generateScalePatternFromPreset({
-                scale: scaleByScaleType[this.state.values.scaleType],
-                patternPreset: patternPreset,
-              })
-            : this.state.values.pattern,
+    this.setState(
+      {
+        values: {
+          ...this.state.values,
+          patternPreset,
+          pattern:
+            patternPreset !== 'custom'
+              ? generateScalePatternFromPreset({
+                  scale: scaleByScaleType[this.state.values.scaleType],
+                  patternPreset: patternPreset,
+                })
+              : this.state.values.pattern,
+        },
       },
-    })
+      this.setPlaybackLoop,
+    )
   }
 
   handlePatternChange = (pattern: ScalePattern) => {
-    this.setState({
-      values: {
-        ...this.state.values,
-        pattern: pattern,
-        patternPreset: 'custom',
+    this.setState(
+      {
+        values: {
+          ...this.state.values,
+          pattern: pattern,
+          patternPreset: 'custom',
+        },
       },
-    })
+      this.setPlaybackLoop,
+    )
   }
 
-  generateStaffTicks = () => {
+  generateStaffTicks = memoize(values => {
     const { scaleType } = this.state.values
     const scale = scaleByScaleType[scaleType]
     const { intervals = [] } = scale
@@ -260,7 +289,7 @@ class ScaleModifierModal extends React.Component<
     })
 
     return staffTicks
-  }
+  })
 
   handleRandomizePattern = () => {
     const scale = scaleByScaleType[this.state.values.scaleType]
@@ -272,6 +301,38 @@ class ScaleModifierModal extends React.Component<
       })),
     }
     this.handlePatternChange(newPattern)
+  }
+
+  // TODO: refactor common code here and in ArpeggioModifierModal
+  animationCallback: AnimationCallback = ({ tick }) => {
+    if (tick.notes.length > 0) {
+      this.setState({ activeTickIndex: tick.meta.staffTickIndex })
+    }
+  }
+
+  setPlaybackLoop = () => {
+    const ticks: StaffTick[] = [
+      ...this.generateStaffTicks(this.state.values),
+      {
+        id: 'rest',
+        notes: [],
+      },
+    ]
+    audioEngine.setAudioFont(this.props.audioFontId)
+    audioEngine.setBpm(120)
+    audioEngine.setLoop(ticks)
+    audioEngine.setAnimationCallback(this.animationCallback)
+  }
+
+  togglePlayback = () => {
+    if (this.state.isPlaying) {
+      audioEngine.stopLoop()
+      this.setState({ isPlaying: false })
+    } else {
+      this.setPlaybackLoop()
+      audioEngine.playLoop()
+      this.setState({ isPlaying: true, activeTickIndex: 0 })
+    }
   }
 
   render() {
@@ -373,15 +434,33 @@ class ScaleModifierModal extends React.Component<
             </Flex>
 
             <Box>
-              <NotesStaff
-                id="scale-preview"
-                clef={settingsStore.clefType}
-                ticks={this.generateStaffTicks()}
-                isPlaying={false}
-                showBreaks
-                activeTickIndex={undefined}
-                maxLines={1}
-              />
+              <Flex flexDirection="row" alignItems="center">
+                <IconButton
+                  color="secondary"
+                  onClick={this.togglePlayback}
+                  className={css(`margin-right: 0.5rem;`)}
+                >
+                  {this.state.isPlaying ? (
+                    <StopIcon fontSize="large" />
+                  ) : (
+                    <PlayIcon fontSize="large" />
+                  )}
+                </IconButton>
+                <NotesStaff
+                  id="chord-preview"
+                  clef={settingsStore.clefType}
+                  activeTickIndex={
+                    this.state.isPlaying
+                      ? this.state.activeTickIndex
+                      : undefined
+                  }
+                  ticks={this.generateStaffTicks(this.state.values)}
+                  isPlaying={this.state.isPlaying}
+                  showBreaks
+                  containerProps={{ flex: '1' }}
+                  maxLines={1}
+                />
+              </Flex>
             </Box>
           </Box>
         </DialogContent>
@@ -399,4 +478,6 @@ class ScaleModifierModal extends React.Component<
   }
 }
 
-export default withMobileDialog<ScaleModifierModalProps>()(ScaleModifierModal)
+export default withAudioEngine(
+  withMobileDialog<ScaleModifierModalProps>()(ScaleModifierModal),
+)
