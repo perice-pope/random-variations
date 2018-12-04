@@ -2278,9 +2278,6 @@ class App extends React.Component<
             onClose={this.closeArpeggioAddingModal}
             onSubmit={this.handleArpeggioModifierModalConfirm}
             initialValues={modifiers.chords}
-            baseNote={
-              noteCards && noteCards[0] ? noteCards[0].noteName : undefined
-            }
           />
 
           <IntervalModifierModal
@@ -2288,9 +2285,6 @@ class App extends React.Component<
             onClose={this.closeIntervalsModal}
             onSubmit={this.handleIntervalsModifierModalConfirm}
             initialValues={modifiers.intervals}
-            baseNote={
-              noteCards && noteCards[0] ? noteCards[0].noteName : undefined
-            }
           />
 
           <ScaleModifierModal
@@ -2298,9 +2292,6 @@ class App extends React.Component<
             onClose={this.closeScalesModal}
             onSubmit={this.handleScaleModifierModalConfirm}
             initialValues={modifiers.scales}
-            baseNote={
-              noteCards && noteCards[0] ? noteCards[0].noteName : undefined
-            }
           />
 
           <ChromaticApproachesModifierModal
