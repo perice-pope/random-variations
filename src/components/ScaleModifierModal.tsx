@@ -10,6 +10,7 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 
+import FormHelperText from '@material-ui/core/FormHelperText'
 import InputLabel from '@material-ui/core/InputLabel'
 import FormControl from '@material-ui/core/FormControl'
 import NativeSelect from '@material-ui/core/NativeSelect'
@@ -309,6 +310,17 @@ class ScaleModifierModal extends React.Component<
               name="chordType"
               options={chordTypeOptionsGrouped}
             />
+            {scale.notes && (
+              <FormHelperText>
+                {`Notes in key of C:  `}
+                <span
+                  className={css({
+                    fontSize: '0.8rem',
+                    fontWeight: 'bold',
+                  })}
+                >{`${scale.notes.split(' ').join(', ')}`}</span>
+              </FormHelperText>
+            )}
 
             <Flex mt={[1, 3, 2]} flexDirection="column">
               <Flex flexWrap="wrap" flexDirection="row" mt={4}>

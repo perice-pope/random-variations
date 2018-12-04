@@ -109,16 +109,19 @@ window.getSemitonesUpTransposer = getSemitonesTransposer
 const getAllChordOptions: () => Chord[] = memoize(() => {
   return _.uniqBy(
     // @ts-ignore
-    chordsData.map(({ name, symbol, semitones, intervals, category }) => {
-      return {
-        semitones,
-        intervals,
-        category,
-        type: symbol,
-        title: name,
-        notesCount: semitones.length,
-      } as Chord
-    }) as Chord[],
+    chordsData.map(
+      ({ name, symbol, semitones, intervals, category, notes }) => {
+        return {
+          semitones,
+          intervals,
+          category,
+          notes,
+          type: symbol,
+          title: name,
+          notesCount: semitones.length,
+        } as Chord
+      },
+    ) as Chord[],
     'type',
   )
 })

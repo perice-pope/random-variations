@@ -35,6 +35,7 @@ import {
   RadioGroup,
   Radio,
   IconButton,
+  FormHelperText,
 } from '@material-ui/core'
 import { css } from 'react-emotion'
 import Tooltip from './ui/Tooltip'
@@ -421,6 +422,17 @@ class ArpeggioModifierModal extends React.Component<
               name="chordType"
               options={chordTypeOptionsGrouped}
             />
+            {chord.notes && (
+              <FormHelperText>
+                {`Notes in key of C:  `}
+                <span
+                  className={css({
+                    fontSize: '0.8rem',
+                    fontWeight: 'bold',
+                  })}
+                >{`${chord.notes.split(' ').join(', ')}`}</span>
+              </FormHelperText>
+            )}
 
             <Flex>
               <FormControl component="fieldset">

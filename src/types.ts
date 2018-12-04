@@ -63,6 +63,7 @@ export type ChordType = string
 export interface Chord {
   type: ChordType
   category: string
+  notes?: string
   title: string
   semitones: number[]
   intervals: string[]
