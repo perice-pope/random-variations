@@ -15,7 +15,7 @@ type AddEntityButtonProps = {
   onAddIntervalsClick: () => any
   onAddArpeggioClick: () => any
   onAddScaleClick: () => any
-  onAddChromaticApproachesClick: () => any
+  onAddEnclosuresClick: () => any
   buttonProps?: ButtonProps
   enableOnlyNote?: boolean
   disableSingleNote?: boolean
@@ -24,7 +24,7 @@ type AddEntityButtonProps = {
   disableToneRow?: boolean
   disableScales?: boolean
   disableIntervals?: boolean
-  disableChromaticApproaches?: boolean
+  disableEnclosures?: boolean
 }
 
 export default class AddEntityButton extends React.Component<
@@ -42,14 +42,14 @@ export default class AddEntityButton extends React.Component<
       disableScales,
       disableSingleNote,
       disableToneRow,
-      disableChromaticApproaches,
+      disableEnclosures,
       showHelpTooltip,
     } = this.props
 
     const allOptionsAreDisabled =
       disableSingleNote &&
       disableChords &&
-      disableChromaticApproaches &&
+      disableEnclosures &&
       disableScales &&
       disableIntervals &&
       disableToneRow
@@ -128,10 +128,10 @@ export default class AddEntityButton extends React.Component<
                 Scale
               </MenuItem>
             )}
-            {!disableChromaticApproaches && (
+            {!disableEnclosures && (
               <MenuItem
                 disabled={enableOnlyNote}
-                onClick={this.props.onAddChromaticApproachesClick}
+                onClick={this.props.onAddEnclosuresClick}
               >
                 Enclosure
               </MenuItem>

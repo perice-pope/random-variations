@@ -9,6 +9,7 @@ import {
   chordsByChordType,
   generateScalePatternFromPreset,
   scaleByScaleType,
+  enclosureByEnclosureType,
 } from './musicUtils'
 
 import TimeAgo from 'react-time-ago'
@@ -170,9 +171,9 @@ export const createDefaultSession = () => {
           patternPreset: 'ascending',
         }),
       },
-      chromaticApproaches: {
+      enclosures: {
         enabled: false,
-        type: 'above',
+        enclosure: enclosureByEnclosureType['one up, one down'],
       },
     },
     noteCards: [],

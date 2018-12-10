@@ -298,7 +298,9 @@ class SessionStore {
     }
 
     let sessionsByKey = _.keyBy(
-      await base.fetch(userSessionsKey(user.uid), { asArray: true }),
+      await base.fetch(userSessionsKey(user.uid), {
+        asArray: true,
+      }),
       'key',
     )
 

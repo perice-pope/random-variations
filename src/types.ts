@@ -127,16 +127,38 @@ export interface ScaleModifier {
   pattern: ScalePattern
 }
 
-export type ChromaticApproachesType =
-  | 'above'
-  | 'below'
-  | 'up down'
-  | 'down up'
+export type EnclosuresType =
   | 'random'
+  | 'one up'
+  | 'one down'
+  | 'two up'
+  | 'two down'
+  | 'one up, one down'
+  | 'one down, one up'
+  | 'three up'
+  | 'three down'
+  | 'two up, one down'
+  | 'two down, one up'
+  | 'one up, two down'
+  | 'one down, two up'
+  | 'four up'
+  | 'four down'
+  | 'three up, one down'
+  | 'three down, one up'
+  | 'two up, two down'
+  | 'two down, two up'
+  | 'one up, three down'
+  | 'one down, three up'
 
-export interface ChromaticApproachesModifier {
+export interface Enclosure {
+  type: EnclosuresType
+  title: string
+  semitones: number[]
+}
+
+export interface EnclosuresModifier {
   enabled: boolean
-  type: ChromaticApproachesType
+  enclosure: Enclosure
 }
 
 export type IntervalType =
@@ -164,7 +186,7 @@ export interface IntervalsModifier {
 export interface NoteModifiers {
   chords: ChordModifier
   scales: ScaleModifier
-  chromaticApproaches: ChromaticApproachesModifier
+  enclosures: EnclosuresModifier
   intervals: IntervalsModifier
 }
 

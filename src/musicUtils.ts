@@ -5,6 +5,7 @@ import * as _ from 'lodash'
 import { memoize } from 'lodash/fp'
 import uuid from 'uuid/v4'
 
+import enclosuresData from './data/enclosures.json'
 import chordsData from './data/chords.json'
 import scalesData from './data/scales.json'
 
@@ -15,7 +16,7 @@ import {
   NoteModifiers,
   StaffNote,
   ChordModifier,
-  ChromaticApproachesModifier,
+  EnclosuresModifier,
   StaffTick,
   NoteCardType,
   Chord,
@@ -27,6 +28,10 @@ import {
   ScaleModifier,
   IntervalType,
   IntervalsModifier,
+  Enclosure,
+  EnclosuresType,
+  ChordType,
+  ScaleType,
 } from './types'
 
 export const NoteNamesWithSharps = [
@@ -126,6 +131,20 @@ const getAllChordOptions: () => Chord[] = memoize(() => {
   )
 })
 
+const getAllEnclosureOptions: () => Enclosure[] = memoize(() => {
+  return _.uniqBy(
+    // @ts-ignore
+    enclosuresData.map(({ type, title, semitones }) => {
+      return {
+        semitones,
+        type,
+        title,
+      } as Enclosure
+    }) as Enclosure[],
+    'type',
+  )
+})
+
 const getAllScaleOptions: () => Scale[] = memoize(() => {
   return _.uniqBy(
     // @ts-ignore
@@ -145,10 +164,19 @@ const getAllScaleOptions: () => Scale[] = memoize(() => {
 })
 
 export const chordOptions = getAllChordOptions()
-export const chordsByChordType = _.keyBy(chordOptions, 'type')
+export const chordsByChordType = _.keyBy(chordOptions, 'type') as {
+  [type in ChordType]: Chord
+}
 
 export const scaleOptions = getAllScaleOptions()
-export const scaleByScaleType = _.keyBy(scaleOptions, 'type')
+export const scaleByScaleType = _.keyBy(scaleOptions, 'type') as {
+  [type in ScaleType]: Scale
+}
+
+export const enclosureOptions = getAllEnclosureOptions()
+export const enclosureByEnclosureType = _.keyBy(enclosureOptions, 'type') as {
+  [type in EnclosuresType]: Enclosure
+}
 
 export const generateChordPatternFromPreset = ({
   chord,
@@ -305,9 +333,9 @@ export const generateScalePatternFromPreset = ({
   return pattern
 }
 
-export const addApproachNotes = (
+export const addEnclosureNotes = (
   ticks: StaffTick[],
-  approach: ChromaticApproachesModifier,
+  enclosureModifier: EnclosuresModifier,
 ): StaffTick[] => {
   if (!ticks || ticks.length === 0) {
     return ticks
@@ -332,48 +360,32 @@ export const addApproachNotes = (
   }
   const baseNote = tickWithBaseNote.notes[baseNoteIndex]
 
-  let approachNotes: Partial<StaffNote>[] = []
+  let enclosureNotes: Partial<StaffNote>[] = []
 
-  const approachType =
-    approach.type === 'random' ? _.sample(['above', 'below']) : approach.type
-  const intervalUp = tonal.Interval.fromSemitones(1)
-  const intervalDown = `-${intervalUp}`
+  const enclosureToUse =
+    enclosureModifier.enclosure.type === 'random'
+      ? _.sample(enclosureOptions)!
+      : enclosureModifier.enclosure
 
-  if (approachType === 'above') {
-    approachNotes = [
-      {
-        noteName: transpose(baseNote.noteName, intervalUp),
-      },
-    ]
-  } else if (approachType === 'below') {
-    approachNotes = [
-      {
-        noteName: transpose(baseNote.noteName, intervalDown),
-      },
-    ]
-  } else if (approachType === 'up down') {
-    approachNotes = [
-      {
-        noteName: transpose(baseNote.noteName, intervalUp),
-      },
-      {
-        noteName: transpose(baseNote.noteName, intervalDown),
-      },
-    ]
-  } else if (approachType === 'down up') {
-    approachNotes = [
-      {
-        noteName: transpose(baseNote.noteName, intervalDown),
-      },
-      {
-        noteName: transpose(baseNote.noteName, intervalUp),
-      },
-    ]
-  }
+  enclosureNotes = enclosureToUse.semitones
+    .map(semitoneStep => {
+      // For notes above the base note, use flats
+      if (semitoneStep > 0) {
+        return tonal.Note.fromMidi(
+          tonal.Note.midi(baseNote.noteName)! + semitoneStep,
+        )
+      }
+      // For notes above the base note, use sharps
+      return tonal.Note.fromMidi(
+        tonal.Note.midi(baseNote.noteName)! - semitoneStep,
+        true,
+      )
+    })
+    .map(noteName => ({ noteName }))
 
-  const approachNotesColor = '#1B34AC'
+  const enclosureNotesColor = '#1B34AC'
 
-  const ticksWithApproachNotes = approachNotes.map(
+  const ticksWithEnclosureNotes = enclosureNotes.map(
     ({ noteName }) =>
       ({
         noteCardId: tickWithBaseNote.noteCardId,
@@ -383,14 +395,14 @@ export const addApproachNotes = (
             noteName,
             midi: tonal.Note.midi(noteName!),
             isMainNote: false,
-            color: approachNotesColor,
+            color: enclosureNotesColor,
             id: uuid(),
           } as StaffNote,
         ],
       } as StaffTick),
   )
   const updatedTicks = [...ticks]
-  updatedTicks.splice(tickWithBaseNoteIndex, 0, ...ticksWithApproachNotes)
+  updatedTicks.splice(tickWithBaseNoteIndex, 0, ...ticksWithEnclosureNotes)
   return updatedTicks
 }
 
@@ -658,7 +670,7 @@ export const addIntervalNotes = (
  * Generates a collection of staff notes for the session, given the note cards and session modifiers.
  *
  * @param noteCards - note cards of the session from which staff notes should be generated
- * @param modifiers - session modifiers such as chromatic approach, etc
+ * @param modifiers - session modifiers such as chromatic enclosure, etc
  */
 export const generateStaffTicks = ({
   noteCards,
@@ -700,11 +712,8 @@ export const generateStaffTicks = ({
       ticksForCard = addIntervalNotes(ticksForCard, modifiers.intervals)
     }
 
-    if (modifiers.chromaticApproaches.enabled) {
-      ticksForCard = addApproachNotes(
-        ticksForCard,
-        modifiers.chromaticApproaches,
-      )
+    if (modifiers.enclosures.enabled) {
+      ticksForCard = addEnclosureNotes(ticksForCard, modifiers.enclosures)
     }
 
     ticksForCard.forEach(tick => {

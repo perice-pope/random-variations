@@ -69,7 +69,7 @@ import NoteCards from './NoteCards'
 import {
   NoteCardType,
   StaffTick,
-  ChromaticApproachesType,
+  EnclosuresType,
   PlayableLoopTick,
   User,
   Session,
@@ -86,7 +86,7 @@ import ScaleModifierModal, {
 import IntervalModifierModal, {
   SubmitValuesType as IntervalModifierModalSubmitValues,
 } from './IntervalModifierModal'
-import ChromaticApproachesModifierModal from './ChromaticApproachesModifierModal'
+import EnclosuresModifierModal from './EnclosuresModifierModal'
 import PianoKeyboard, {
   pianoNoteRangeWide,
   pianoNoteRangeNarrow,
@@ -102,6 +102,7 @@ import {
   generateStaffTicks,
   scaleByScaleType,
   SemitonesToIntervalShortNameMap,
+  enclosureByEnclosureType,
 } from '../musicUtils'
 import AudioFontsConfig, { AudioFontId } from '../audioFontsConfig'
 import AudioEngine, { AnimationCallback } from '../services/audioEngine'
@@ -191,7 +192,7 @@ type AppState = {
   shareSessionModalSession?: Session
 
   // Modifier dialogs
-  chromaticApproachesModalIsOpen: boolean
+  enclosuresModalIsOpen: boolean
   chordsModalIsOpen: boolean
   scalesModalIsOpen: boolean
   intervalsModalIsOpen: boolean
@@ -382,7 +383,7 @@ class App extends React.Component<
       signInModalIsOpen: false,
       isSignedIn: false,
 
-      chromaticApproachesModalIsOpen: false,
+      enclosuresModalIsOpen: false,
       chordsModalIsOpen: false,
       scalesModalIsOpen: false,
       intervalsModalIsOpen: false,
@@ -1014,10 +1015,10 @@ class App extends React.Component<
   private closeIntervalsModal = () =>
     this.setState({ intervalsModalIsOpen: false })
 
-  private openChromaticApproachesModal = () =>
-    this.setState({ chromaticApproachesModalIsOpen: true })
-  private closeChromaticApproachesModal = () =>
-    this.setState({ chromaticApproachesModalIsOpen: false })
+  private openEnclosuresModal = () =>
+    this.setState({ enclosuresModalIsOpen: true })
+  private closeEnclosuresModal = () =>
+    this.setState({ enclosuresModalIsOpen: false })
 
   private updateNoteCard = ({ noteCardId, noteName }) => {
     if (sessionStore.activeSession) {
@@ -1093,19 +1094,19 @@ class App extends React.Component<
     this.closeIntervalsModal()
   }
 
-  handleChromaticApproachModifierModalConfirm = ({
+  handleEnclosureModifierModalConfirm = ({
     type,
   }: {
-    type: ChromaticApproachesType
+    type: EnclosuresType
   }) => {
     if (sessionStore.activeSession) {
-      sessionStore.activeSession.modifiers.chromaticApproaches = {
-        type,
+      sessionStore.activeSession.modifiers.enclosures = {
+        enclosure: enclosureByEnclosureType[type],
         enabled: true,
       }
       this.afterModifierDialogClosed()
     }
-    this.closeChromaticApproachesModal()
+    this.closeEnclosuresModal()
   }
 
   private handleRemoveArpeggioClick = () => {
@@ -1126,9 +1127,9 @@ class App extends React.Component<
     }
   }
 
-  private handleRemoveChromaticApproachesClick = () => {
+  private handleRemoveEnclosuresClick = () => {
     if (sessionStore.activeSession) {
-      sessionStore.activeSession.modifiers.chromaticApproaches.enabled = false
+      sessionStore.activeSession.modifiers.enclosures.enabled = false
     }
   }
 
@@ -1688,11 +1689,11 @@ class App extends React.Component<
           </Tooltip>
         )}
 
-        {modifiers.chromaticApproaches.enabled && (
+        {modifiers.enclosures.enabled && (
           <Tooltip title="Change enclosures settings" disableFocusListener>
             <Chip
               {...chipsProps}
-              label={`Enclosure: ${modifiers.chromaticApproaches.type}`}
+              label={`Enclosure: ${modifiers.enclosures.enclosure.type}`}
               deleteIcon={
                 <Tooltip
                   title="Remove enclosures"
@@ -1702,8 +1703,8 @@ class App extends React.Component<
                   <DeleteIcon />
                 </Tooltip>
               }
-              onClick={this.openChromaticApproachesModal}
-              onDelete={this.handleRemoveChromaticApproachesClick}
+              onClick={this.openEnclosuresModal}
+              onDelete={this.handleRemoveEnclosuresClick}
             />
           </Tooltip>
         )}
@@ -2064,8 +2065,8 @@ class App extends React.Component<
                               onAddToneRowClick={this.openToneRowAddingModal}
                               onAddArpeggioClick={this.openArpeggioAddingModal}
                               onAddScaleClick={this.openScalesModal}
-                              onAddChromaticApproachesClick={
-                                this.openChromaticApproachesModal
+                              onAddEnclosuresClick={
+                                this.openEnclosuresModal
                               }
                               onAddIntervalsClick={this.openIntervalsModal}
                               disableSingleNote={
@@ -2087,8 +2088,8 @@ class App extends React.Component<
                                 modifiers.chords.enabled ||
                                 modifiers.intervals.enabled
                               }
-                              disableChromaticApproaches={
-                                modifiers.chromaticApproaches.enabled
+                              disableEnclosures={
+                                modifiers.enclosures.enabled
                               }
                               buttonProps={{
                                 disabled: isPlaying,
@@ -2302,11 +2303,11 @@ class App extends React.Component<
             initialValues={modifiers.scales}
           />
 
-          <ChromaticApproachesModifierModal
-            isOpen={this.state.chromaticApproachesModalIsOpen}
-            onClose={this.closeChromaticApproachesModal}
-            onSubmit={this.handleChromaticApproachModifierModalConfirm}
-            defaultType={modifiers.chromaticApproaches.type}
+          <EnclosuresModifierModal
+            isOpen={this.state.enclosuresModalIsOpen}
+            onClose={this.closeEnclosuresModal}
+            onSubmit={this.handleEnclosureModifierModalConfirm}
+            defaultType={modifiers.enclosures.enclosure.type}
           />
 
           <ToneRowModal
