@@ -119,7 +119,7 @@ class EnclosuresModifierModal extends React.Component<
           notes: [
             {
               noteName,
-              color: 'red',
+              color: 'black',
               id: `${index}`,
               isMainNote: false,
               midi: tonal.Note.midi(noteName),
@@ -132,7 +132,7 @@ class EnclosuresModifierModal extends React.Component<
         notes: [
           {
             noteName: baseNote,
-            color: 'black',
+            color: 'red',
             id: 'main',
             isMainNote: true,
             midi: tonal.Note.midi(baseNote),
