@@ -22,6 +22,20 @@ const ANONYMOUS_USER_UID = 'anonymous-user-uid'
 
 type ActiveSessionType = 'offline' | 'my' | 'shared'
 
+const preprocessSessionData = (session: Session): Session => ({
+  ...createDefaultSession(),
+  noteCards: [],
+  ...session,
+  modifiers: {
+    enclosures: { enabled: false },
+    chords: { enabled: false },
+    scales: { enabled: false },
+    intervals: { enabled: false },
+    ...createDefaultSession().modifiers,
+    ...session.modifiers,
+  },
+})
+
 class SessionStore {
   @observable
   private _hasLoadedMySessions = false
@@ -167,7 +181,7 @@ class SessionStore {
     } else {
       this._sharedSession = {
         noteCards: [],
-        ...session,
+        ...preprocessSessionData(session),
         key: sessionKey,
       }
     }
@@ -198,7 +212,7 @@ class SessionStore {
     const session = await base.fetch(userSessionKey(user.uid, sessionKey), {})
     this._mySessionsByKey[sessionKey] = {
       noteCards: [],
-      ...session,
+      ...preprocessSessionData(session),
       key: sessionKey,
     }
 
@@ -314,10 +328,7 @@ class SessionStore {
 
     this._mySessionsByKey = {
       ...this._mySessionsByKey,
-      ..._.mapValues(sessionsByKey, session => ({
-        noteCards: [],
-        ...session,
-      })),
+      ..._.mapValues(sessionsByKey, preprocessSessionData),
     }
     this._hasLoadedMySessions = true
   }

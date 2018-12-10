@@ -273,7 +273,7 @@ class ArpeggioModifierModal extends React.Component<
         ...this.state.values,
         chordInversion,
       },
-    })
+    }, this.setPlaybackLoop)
   }
 
   generateStaffTicks = memoize(values => {
@@ -354,7 +354,6 @@ class ArpeggioModifierModal extends React.Component<
       },
     ]
     audioEngine.setAudioFont(this.props.audioFontId)
-    audioEngine.setBpm(120)
     audioEngine.setLoop(ticks)
     audioEngine.setAnimationCallback(this.animationCallback)
   }

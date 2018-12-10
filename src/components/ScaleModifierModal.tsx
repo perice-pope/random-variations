@@ -319,7 +319,6 @@ class ScaleModifierModal extends React.Component<
       },
     ]
     audioEngine.setAudioFont(this.props.audioFontId)
-    audioEngine.setBpm(120)
     audioEngine.setLoop(ticks)
     audioEngine.setAnimationCallback(this.animationCallback)
   }

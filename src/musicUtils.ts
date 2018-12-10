@@ -377,7 +377,7 @@ export const addEnclosureNotes = (
       }
       // For notes above the base note, use sharps
       return tonal.Note.fromMidi(
-        tonal.Note.midi(baseNote.noteName)! - semitoneStep,
+        tonal.Note.midi(baseNote.noteName)! + semitoneStep,
         true,
       )
     })
