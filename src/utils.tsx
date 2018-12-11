@@ -137,6 +137,7 @@ export const parseIntEnsureInBounds = (value, min, max) => {
 export const createDefaultSession = () => {
   const defaultSession: Partial<Session> = {
     name: 'Default session',
+    id: 'default-session',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
 

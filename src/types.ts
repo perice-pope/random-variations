@@ -204,7 +204,7 @@ export interface SharedSessionInfo {
  * Persisted sharable session
  */
 export interface Session {
-  key: string
+  id: string
   sharedKey?: string
   author?: string
   name: string

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import Rebase from 're-base'
 import * as firebase from 'firebase'
+import 'firebase/firestore'
 
 // Initialize Firebase
 const config = {
@@ -12,6 +13,16 @@ const config = {
   messagingSenderId: '905007255924',
 }
 firebase.initializeApp(config)
+
+firebase
+  .firestore()
+  .enablePersistence()
+  .then(() => {
+    console.log('Offline persistence enabled')
+  })
+  .catch(err => {
+    console.log('Offline persistence error: ', err.code)
+  })
 
 export const base = Rebase.createClass(firebase.database())
 

@@ -595,25 +595,26 @@ class App extends React.Component<
     }
   }
 
-  private activateMySession = (sessionKey?: string) => {
-    console.log('activateMySession: ', sessionKey)
+  private activateMySession = (sessionId?: string) => {
+    console.log('activateMySession: ', sessionId)
     const firstSession = sessionStore.mySessionsSorted[0]
-    let key = sessionKey
-    if (!sessionKey && firstSession) {
-      key = firstSession.key
+    console.log('firstSession', JSON.stringify(firstSession))
+    let id = sessionId
+    if (!sessionId && firstSession) {
+      id = firstSession.id
     }
     try {
-      sessionStore.activateMySessionByKey(key)
-      if (this.props.match.params.sessionKey !== key) {
-        this.props.history.replace(`/s/${key}`)
+      sessionStore.activateMySessionById(id)
+      if (this.props.match.params.sessionKey !== id) {
+        this.props.history.replace(`/s/${id}`)
       }
     } catch (e) {
       console.error(e)
 
-      key = firstSession.key
-      sessionStore.activateMySessionByKey(key)
-      if (this.props.match.params.sessionKey !== key) {
-        this.props.history.replace(`/s/${key}`)
+      id = firstSession.id
+      sessionStore.activateMySessionById(id)
+      if (this.props.match.params.sessionKey !== id) {
+        this.props.history.replace(`/s/${id}`)
       }
     }
   }
@@ -1154,7 +1155,7 @@ class App extends React.Component<
       ...sessionStore.activeSession,
       name: sessionName,
     })
-    this.props.history.replace(`/s/${newSession.key}`)
+    this.props.history.replace(`/s/${newSession.id}`)
     notificationsStore.showNotification({
       message: `Saved "${
         originalSession.name
@@ -1204,8 +1205,8 @@ class App extends React.Component<
       return
     }
 
-    await sessionStore.deleteMySessionByKey(session.key)
-    sessionStore.activateMySessionByKey(sessionStore.mySessionsSorted[0].key)
+    await sessionStore.deleteMySessionById(session.id)
+    sessionStore.activateMySessionById(sessionStore.mySessionsSorted[0].id)
     notificationsStore.showNotification({
       message: `Deleted your session "${session.name}"`,
       level: 'success',
@@ -1243,7 +1244,7 @@ class App extends React.Component<
   }
 
   private handleShareSession = async session => {
-    await sessionStore.shareMySessionByKey(session.key)
+    await sessionStore.shareMySessionById(session.id)
     this.setState({
       shareSessionModalIsOpen: true,
       shareSessionModalSession: session,
@@ -1821,11 +1822,11 @@ class App extends React.Component<
               <ListItem
                 selected={
                   sessionStore.activeSession &&
-                  session.key === sessionStore.activeSession.key
+                  session.id === sessionStore.activeSession.id
                 }
                 button
-                key={session.key}
-                onClick={() => this.activateMySession(session.key)}
+                key={session.id}
+                onClick={() => this.activateMySession(session.id)}
               >
                 <ListItemText
                   primary={session.name || 'Unnamed session'}
@@ -1848,7 +1849,7 @@ class App extends React.Component<
                       </IconButton>
                     )}
                     renderMenu={props => (
-                      <Menu id={`session-menu-${session.key}`} {...props}>
+                      <Menu id={`session-menu-${session.id}`} {...props}>
                         <MenuItem
                           onClick={() => {
                             this.handleShareSession(session)

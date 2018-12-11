@@ -1,6 +1,6 @@
 import { observable, computed, reaction, toJS } from 'mobx'
 import firebase, { base } from './firebase'
-import { Session, SharedSessionInfo } from '../types'
+import { Session } from '../types'
 import _ from 'lodash'
 import uuid from 'uuid/v4'
 import { createDefaultSession } from '../utils'
@@ -9,14 +9,6 @@ import { createDefaultSession } from '../utils'
 window.base = base
 // @ts-ignore
 window.firebase = firebase
-
-// Keys to reference the Firebase realtime DB
-const userSessionsKey = userKey => `users/${userKey}/sessions`
-const userSessionKey = (userKey, sessionKey) =>
-  `${userSessionsKey(userKey)}/${sessionKey}`
-const sharedSessionInfoRootKey = `sharedSessions`
-const getSharedSessionInfoPath = sharedSessionKey =>
-  `${sharedSessionInfoRootKey}/${sharedSessionKey}`
 
 const ANONYMOUS_USER_UID = 'anonymous-user-uid'
 
@@ -36,6 +28,10 @@ const preprocessSessionData = (session: Session): Session => ({
   },
 })
 
+const db = firebase.firestore()
+const sessionsRef = db.collection('sessions')
+// const usersRef = db.collection("users")
+
 class SessionStore {
   @observable
   private _hasLoadedMySessions = false
@@ -45,7 +41,7 @@ class SessionStore {
   private _hasLoadedSharedSession = false
 
   @observable
-  private _mySessionsByKey: { [sessionKey: string]: Session } = {}
+  private _mySessionsById: { [sessionKey: string]: Session } = {}
   @observable
   private _sharedSession?: Session = undefined
   @observable
@@ -73,7 +69,7 @@ class SessionStore {
           activeSessionType !== 'offline' &&
           activeSession.author === user.uid
         ) {
-          this.saveMySession(activeSession.key)
+          this.saveMySession(activeSession.id)
         }
       },
       { delay: 1000 },
@@ -110,22 +106,22 @@ class SessionStore {
       return this._sharedSession
     }
     if (this._activeSessionType === 'my' && this._myActiveSessionKey != null) {
-      return this._mySessionsByKey[this._myActiveSessionKey]
+      return this._mySessionsById[this._myActiveSessionKey]
     }
     return undefined
   }
 
   @computed
   public get mySessions() {
-    return _.values(this._mySessionsByKey) as Session[]
+    return _.values(this._mySessionsById) as Session[]
   }
 
   @computed
-  public get mySessionsByKey() {
+  public get mySessionsById() {
     if (!this._hasLoadedMySessions) {
       throw new Error('My sessions have not been loaded yet')
     }
-    return _.keyBy(this.mySessions, 'key')
+    return _.keyBy(this.mySessions, 'id')
   }
 
   @computed
@@ -137,52 +133,39 @@ class SessionStore {
     ) as Session[]
   }
 
-  public loadAndActivateSharedSession = async sharedSessionInfoKey => {
-    console.log(
-      'SessionStore > loadAndActivateSharedSession',
-      sharedSessionInfoKey,
-    )
-    const sharedInfo = await base.fetch(
-      getSharedSessionInfoPath(sharedSessionInfoKey),
-      {},
-    )
-    const { user: userKey, session: sessionKey } = sharedInfo
-    console.log('SessionStore > loadAndActivateSharedSession', {
-      userKey,
-      sessionKey,
-    })
+  public loadAndActivateSharedSession = async sessionSharedKey => {
+    console.log('SessionStore > loadAndActivateSharedSession', sessionSharedKey)
 
-    if (!sessionKey || !userKey) {
+    let sessionQuerySnapshot: firebase.firestore.QuerySnapshot
+    try {
+      sessionQuerySnapshot = await sessionsRef
+        .where('sharedKey', '==', sessionSharedKey)
+        .get()
+
+      if (!sessionQuerySnapshot.docs || sessionQuerySnapshot.docs.length < 1) {
+        throw new Error(
+          `Could not find a shared session with sharedKey = "${sessionSharedKey}"`,
+        )
+      }
+    } catch (error) {
       throw new Error(
-        `Could not load shared session: "${getSharedSessionInfoPath(
-          sharedSessionInfoKey,
-        )}" doesn't contain all necessary info`,
+        `Could not load shared session by its shared key: "${sessionSharedKey}"`,
       )
     }
 
-    const session = (await base.fetch(
-      userSessionKey(userKey, sessionKey),
-      {},
-    )) as Session
-
-    if (!session || _.isEmpty(session)) {
-      throw new Error(
-        `Could not find shared session under "${userSessionKey(
-          userKey,
-          sessionKey,
-        )}"`,
-      )
-    }
+    const sessionDoc = sessionQuerySnapshot.docs[0]
+    const session = sessionDoc.data() as Session
+    const sessionId = sessionDoc.id
 
     const user = this.getCurrentUser()
     if (user && session.author === user.uid) {
       // The shared session is in fact my session
-      this._sharedSession = this._mySessionsByKey[sessionKey]
+      this._sharedSession = this._mySessionsById[sessionId]
     } else {
       this._sharedSession = {
         noteCards: [],
         ...preprocessSessionData(session),
-        key: sessionKey,
+        id: sessionId,
       }
     }
 
@@ -200,107 +183,98 @@ class SessionStore {
       throw new Error('No current user')
     }
 
-    const ref = await base.push(userSessionsKey(user.uid), {
-      data: {
-        ...createDefaultSession(),
-        ..._.omit(values, ['author', 'key']),
-        author: user.uid,
-      } as Session,
-    })
-    const sessionKey = ref.key
+    const newSessionDoc = await sessionsRef.add({
+      ...createDefaultSession(),
+      ..._.omit(values, ['author']),
+      author: user.uid,
+    } as Session)
+    const sessionId = newSessionDoc.id
+    const session = {
+      ...(await newSessionDoc.get()).data(),
+      id: sessionId,
+    } as Session
 
-    const session = await base.fetch(userSessionKey(user.uid, sessionKey), {})
-    this._mySessionsByKey[sessionKey] = {
+    this._mySessionsById[sessionId] = {
       noteCards: [],
       ...preprocessSessionData(session),
-      key: sessionKey,
     }
 
-    this._myActiveSessionKey = sessionKey
+    this._myActiveSessionKey = sessionId
     this._activeSessionType = 'my'
-    return this._mySessionsByKey[sessionKey]
+    return this._mySessionsById[sessionId]
   }
 
-  public saveMySession = async sessionKey => {
-    const session = this._mySessionsByKey[sessionKey]
+  public saveMySession = async sessionId => {
+    console.log('SessionStore > saveMySession', sessionId)
+    const session = this._mySessionsById[sessionId]
     if (!session) {
       return
     }
-    console.log('SessionStore > saveMySession', sessionKey, session)
-    await base.update(userSessionKey(session.author, session.key), {
-      data: {
-        ...session,
-        updatedAt: new Date().getTime(),
-      },
+    await sessionsRef.doc(sessionId).set({
+      ...session,
+      updatedAt: new Date().getTime(),
     })
   }
 
-  public deleteMySessionByKey = async key => {
+  public deleteMySessionById = async sessionId => {
     const user = this.getCurrentUser()
     if (!user) {
       throw new Error('No current user')
     }
 
-    await base.remove(userSessionKey(user.uid, key))
-    delete this._mySessionsByKey[key]
+    await sessionsRef.doc(sessionId).delete()
+    delete this._mySessionsById[sessionId]
 
-    if (Object.keys(this._mySessionsByKey).length === 0) {
+    if (Object.keys(this._mySessionsById).length === 0) {
       await this.createAndActivateNewSession({ name: 'New session' })
     } else {
-      this._myActiveSessionKey = this.mySessions[0].key
+      this._myActiveSessionKey = this.mySessions[0].id
     }
   }
 
-  public shareMySessionByKey = async key => {
+  public shareMySessionById = async sessionId => {
     const user = this.getCurrentUser()
     if (!user) {
       throw new Error('No current user')
     }
 
-    const session = this._mySessionsByKey[key]
+    const session = this._mySessionsById[sessionId]
     if (!session) {
-      throw new Error(`Session not found: ${key}`)
+      throw new Error(`Session not found: ${sessionId}`)
     }
 
-    const sharedSessionInfoRef = await base.push(sharedSessionInfoRootKey, {
-      data: {
-        session: session.key,
-        user: user.uid,
-      } as SharedSessionInfo,
-    })
-
-    // Store the sharedKey on the remote Session data object
-    await base.update(userSessionKey(user.uid, session.key), {
-      data: {
-        sharedKey: sharedSessionInfoRef.key,
-      },
-    })
-    // Update local Session data too
-    session.sharedKey = sharedSessionInfoRef.key
+    if (session.sharedKey) {
+      return
+    }
+    const sharedKey = uuid()
+    await sessionsRef.doc(sessionId).set({ sharedKey })
+    session.sharedKey = sharedKey
     return session.sharedKey
   }
 
-  public unshareMySessionByKey = async key => {
+  public unshareMySessionById = async sessionId => {
     const user = this.getCurrentUser()
     if (!user) {
       throw new Error('No current user')
     }
 
-    const session = this._mySessionsByKey[key]
+    const session = this._mySessionsById[sessionId]
     if (!session) {
-      throw new Error(`Session not found: ${key}`)
+      throw new Error(`Session not found: ${sessionId}`)
     }
 
     if (!session.sharedKey) {
       return
     }
 
-    await base.remove(getSharedSessionInfoPath(session.sharedKey))
-    session.sharedKey = undefined
+    if (session.sharedKey) {
+      return
+    }
+    await sessionsRef.doc(sessionId).update({ sharedKey: null })
   }
 
   public clearMySessions = () => {
-    this._mySessionsByKey = {}
+    this._mySessionsById = {}
     this._myActiveSessionKey = undefined
   }
 
@@ -311,34 +285,36 @@ class SessionStore {
       throw new Error('No current user')
     }
 
-    let sessionsByKey = _.keyBy(
-      await base.fetch(userSessionsKey(user.uid), {
-        asArray: true,
-      }),
-      'key',
-    )
+    let sessionsDocList = (await sessionsRef
+      .where('author', '==', user.uid)
+      .get()).docs
 
-    if (!sessionsByKey || Object.keys(sessionsByKey).length === 0) {
+    let sessionsById = {}
+    sessionsDocList.forEach(doc => {
+      sessionsById[doc.id] = {
+        ...doc.data(),
+        id: doc.id,
+      }
+    })
+
+    if (!sessionsById || Object.keys(sessionsById).length === 0) {
       await this.createAndActivateNewSession()
-      sessionsByKey = _.keyBy(
-        await base.fetch(userSessionsKey(user.uid), { asArray: true }),
-        'key',
-      )
+    } else {
+      this._mySessionsById = {
+        ...this._mySessionsById,
+        ..._.mapValues(sessionsById, preprocessSessionData),
+      }
     }
 
-    this._mySessionsByKey = {
-      ...this._mySessionsByKey,
-      ..._.mapValues(sessionsByKey, preprocessSessionData),
-    }
     this._hasLoadedMySessions = true
   }
 
-  public activateMySessionByKey = sessionKey => {
-    console.log('SessionStore > activateMySessionByKey', sessionKey)
+  public activateMySessionById = sessionKey => {
+    console.log('SessionStore > activateMySessionById', sessionKey)
     if (!this._hasLoadedMySessions) {
       throw new Error("My sessions haven't been loaded yet")
     }
-    if (!this.mySessionsByKey[sessionKey]) {
+    if (!this.mySessionsById[sessionKey]) {
       throw new Error(`No session found: "${sessionKey}"`)
     }
     this._myActiveSessionKey = sessionKey
