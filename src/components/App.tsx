@@ -1362,6 +1362,7 @@ class App extends React.Component<
 
     const { noteCards, noteCardsById } = this.getNoteCards()
 
+    const isPhone = this.props.width === 'xs'
     const isMobile = this.props.width === 'xs' || this.props.width === 'sm'
     const shouldShowDesktopSessionControls =
       this.state.height > 600 && this.state.width > 600
@@ -1467,46 +1468,36 @@ class App extends React.Component<
 
             <Divider />
 
-            <MenuItem
-                          onClick={() => this.handleShareSession()}
-                        >
-                          <ListItemIcon>
-                            <ShareIcon color="action" />
-                          </ListItemIcon>
-                          {' Share'}
-                        </MenuItem>
-                        <MenuItem
-                        onClick={() => this.downloadAsMidi()}
-                        >
-                          <ListItemIcon>
-                            <CloudDownloadIcon color="action" />
-                          </ListItemIcon>
-                          {' Download as MIDI'}
-                        </MenuItem>
-                        <MenuItem
-                        onClick={() => this.handleSaveSessionAs()}
-                        >
-                          <ListItemIcon>
-                            <SaveIcon color="action" />
-                          </ListItemIcon>
-                          {' Save as...'}
-                        </MenuItem>
-                        <MenuItem
-                        onClick={() => this.handleRenameSession()}
-                        >
-                          <ListItemIcon>
-                            <EditIcon color="action" />
-                          </ListItemIcon>
-                          {' Rename'}
-                        </MenuItem>
-                        <MenuItem
-                        onClick={() => this.handleDeleteSession()}
-                        >
-                          <ListItemIcon>
-                            <DeleteIcon color="action" />
-                          </ListItemIcon>
-                          {' Delete'}
-                        </MenuItem>
+            <MenuItem onClick={() => this.handleShareSession()}>
+              <ListItemIcon>
+                <ShareIcon color="action" />
+              </ListItemIcon>
+              {' Share'}
+            </MenuItem>
+            <MenuItem onClick={() => this.downloadAsMidi()}>
+              <ListItemIcon>
+                <CloudDownloadIcon color="action" />
+              </ListItemIcon>
+              {' Download as MIDI'}
+            </MenuItem>
+            <MenuItem onClick={() => this.handleSaveSessionAs()}>
+              <ListItemIcon>
+                <SaveIcon color="action" />
+              </ListItemIcon>
+              {' Save as...'}
+            </MenuItem>
+            <MenuItem onClick={() => this.handleRenameSession()}>
+              <ListItemIcon>
+                <EditIcon color="action" />
+              </ListItemIcon>
+              {' Rename'}
+            </MenuItem>
+            <MenuItem onClick={() => this.handleDeleteSession()}>
+              <ListItemIcon>
+                <DeleteIcon color="action" />
+              </ListItemIcon>
+              {' Delete'}
+            </MenuItem>
           </Menu>
         )}
       />
@@ -1607,7 +1598,10 @@ class App extends React.Component<
         })}
         InputProps={{
           endAdornment: (
-            <InputAdornment position="end" classes={{root: css(`width: 200px;`)}}>
+            <InputAdornment
+              position="end"
+              classes={{ root: css(`width: 200px;`) }}
+            >
               Rest beats
             </InputAdornment>
           ),
@@ -1662,7 +1656,10 @@ class App extends React.Component<
         title={isPlaying ? 'Stop' : 'Play'}
         bg={isPlaying ? 'red' : '#00c200'}
         mr={1}
-        className={cx(css({ maxWidth: '100px' }), isMobile && css(`height: 40px;`))}
+        className={cx(
+          css({ maxWidth: '100px' }),
+          isMobile && css(`height: 40px;`),
+        )}
         onClick={this.togglePlayback}
       >
         {isPlaying ? (
@@ -2007,7 +2004,7 @@ class App extends React.Component<
                           {' Download as MIDI'}
                         </MenuItem>
 
-<Divider/>
+                        <Divider />
 
                         <MenuItem
                           onClick={() => {
@@ -2168,17 +2165,26 @@ class App extends React.Component<
                       />
                     </Grow>
 
-                    <Box px={[1, 2, 2]} width={1}>
-                      <Flex
-                        id="modifiers-container"
-                        flexDirection="row"
-                        alignItems="center"
-                        justifyContent="center"
+                    <Fade
+                      in={this.state.isInitialized}
+                      appear
+                    >
+                      <Box
+                        px={[1, 2, 2]}
                         width={1}
-                        mt={[2, 2, 2]}
-                        mb={[2, 2, 2]}
+                        display={
+                          this.state.isPlaying && isPhone ? 'none' : 'block'
+                        }
                       >
-                        <Fade in={this.state.isInitialized} appear>
+                        <Flex
+                          id="modifiers-container"
+                          flexDirection="row"
+                          alignItems="center"
+                          justifyContent="center"
+                          width={1}
+                          mt={[2, 2, 2]}
+                          mb={[2, 2, 2]}
+                        >
                           <div>
                             <AddEntityButton
                               showHelpTooltip={
@@ -2236,16 +2242,16 @@ class App extends React.Component<
                               }}
                             />
                           </div>
-                        </Fade>
-                        <Flex
-                          flex-direction="row"
-                          alignItems="center"
-                          flexWrap="wrap"
-                        >
-                          {ModifierChips}
+                          <Flex
+                            flex-direction="row"
+                            alignItems="center"
+                            flexWrap="wrap"
+                          >
+                            {ModifierChips}
+                          </Flex>
                         </Flex>
-                      </Flex>
-                    </Box>
+                      </Box>
+                    </Fade>
                   </Flex>
 
                   <div
@@ -2259,28 +2265,33 @@ class App extends React.Component<
                   `)}
                   >
                     <div
-                      className={css(`
-                    display: flex;
-                    justify-content: flex-end;
-                    align-items: center;
-                    text-align: right;
-                    color: #aaa;
-                    font-size: 13px;
-                    user-select: none;
+                      className={cx(
+                        css(`
+                      display: flex;
+                      justify-content: flex-end;
+                      align-items: center;
+                      text-align: right;
+                      color: #aaa;
+                      font-size: 13px;
+                      user-select: none;
 
-                    button {
-                      padding: 8px !important;
-                    }
+                      button {
+                        padding: 8px !important;
+                      }
 
-                    @media screen and (min-width: 768px) {
-                      font-size: 15px;
-                    }
+                      @media screen and (min-width: 768px) {
+                        font-size: 15px;
+                      }
 
-                    @media screen and (max-height: 600px) and (min-width: 500px) {
-                      flex-direction: column-reverse;
-                      margin-left: 0.5rem;
-                    }
-                  `)}
+                      @media screen and (max-height: 600px) and (min-width: 500px) {
+                        flex-direction: column-reverse;
+                        margin-left: 0.5rem;
+                      }
+                    `),
+                        this.state.isPlaying &&
+                          isPhone &&
+                          css(`display: none;`),
+                      )}
                     >
                       <span>{`x ${settingsStore.scaleZoomFactor}`}</span>
                       <Tooltip title="Smaller font">
@@ -2476,7 +2487,7 @@ class App extends React.Component<
                   <Typography variant="h5">Session tempo</Typography>
                   <Flex alignItems="center">
                     {TempoTextInput}
-                    <span className={css(`flex: 1;`)}/>
+                    <span className={css(`flex: 1;`)} />
                     {ToggleMetronomeButton}
                   </Flex>
                   {TempoSliderInput}
@@ -2491,7 +2502,7 @@ class App extends React.Component<
                   </Typography>
                   <Flex alignItems="center">
                     {CountInTextInput}
-                    <span className={css(`flex: 1;`)}/>
+                    <span className={css(`flex: 1;`)} />
                     {ToggleCountInButton}
                   </Flex>
                 </Box>
