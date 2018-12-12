@@ -1390,7 +1390,7 @@ class App extends React.Component<
         closeAfterClick={false}
         renderButton={props =>
           this.props.width === 'xs' ? (
-            <Tooltip title="Session actions...">
+            <Tooltip title="Session actions..." disableFocusListener disableTouchListener>
               <IconButton color="default" {...props}>
                 <MoreVertIcon />
               </IconButton>
@@ -1525,7 +1525,7 @@ class App extends React.Component<
     )
 
     const SessionParamsButton = (
-      <Tooltip title={'Tempo, rests and count-in settings'}>
+      <Tooltip title={'Tempo, rests and count-in settings'} disableFocusListener disableTouchListener>
         <MuiButton
           color="default"
           className={css(`display: inline-flex; align-items: center; `)}
