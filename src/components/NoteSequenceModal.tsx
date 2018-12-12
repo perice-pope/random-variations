@@ -6,7 +6,6 @@ import Button from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
-import DialogTitle from '@material-ui/core/DialogTitle'
 import { observer } from 'mobx-react'
 import uuid from 'uuid/v4'
 import withMobileDialog, {
@@ -26,6 +25,7 @@ import {
   NativeSelect,
   Input,
   Typography,
+  Divider,
 } from '@material-ui/core'
 import NoteCards, { NoteCardNote } from './NoteCards'
 import { NoteNamesWithSharps, SemitonesToIntervalNameMap } from '../musicUtils'
@@ -223,14 +223,15 @@ class NoteSequenceModal extends React.Component<
         onClose={this.submit}
         aria-labelledby="pick-note-dialog"
       >
-        <DialogTitle id="pick-note-dialog">Add note sequence</DialogTitle>
-
         <DialogContent className={css(`overflow-x: hidden;`)}>
-          <Box width={1} maxWidth={600} mx="auto" flex={1} mt={2}>
-            <Flex flexDirection="column" alignItems="center">
-              <Typography className={css(`font-size: 20px;`)}>
-                Start sequence at:
-              </Typography>
+          <Typography variant="h4">Add note sequence</Typography>
+          <Typography variant="subtitle1">
+            A number of notes with equal intervals in between
+          </Typography>
+
+          <Box mt={3}>
+            <Typography variant="h5">Starting note</Typography>
+            <Flex flexDirection="column" mb={3}>
               <Flex flexWrap="wrap" flex={1} mt={2} maxWidth={300} width={1}>
                 <NoteCards
                   disableRemoving
@@ -247,14 +248,8 @@ class NoteSequenceModal extends React.Component<
               </Flex>
             </Flex>
 
-            <Flex
-              mt={4}
-              mb={2}
-              width={1}
-              flexDirection="row"
-              justifyContent="center"
-              flexWrap="wrap"
-            >
+            <Typography variant="h5">Interval between notes</Typography>
+            <Flex mb={2} mt={2} width={1} flexDirection="row" flexWrap="wrap">
               <FormControl
                 className={css(
                   `width: 100%; max-width: 150px; margin-right: 20px;`,
@@ -292,15 +287,9 @@ class NoteSequenceModal extends React.Component<
               </FormControl>
             </Flex>
 
-            <Flex
-              mt={3}
-              mb={2}
-              width={1}
-              flexDirection="column"
-              alignItems="center"
-            >
+            <Flex mt={3} mb={3} width={1} flexDirection="column">
               <Typography id="slider-label" className={css(`font-size: 20px;`)}>
-                {`1 step = ${
+                {`${
                   SemitonesToIntervalNameMap[
                     tonal.Interval.fromSemitones(this.state.values.stepInterval)
                   ]
@@ -322,22 +311,22 @@ class NoteSequenceModal extends React.Component<
               />
             </Flex>
 
+            <Divider light />
+
             <Box mt={4} width={1}>
-              <Typography
-                className={css(`font-size: 24px; text-align: center;`)}
-              >
-                Resulting note sequence:
-              </Typography>
-              <Flex flexWrap="wrap" flex={1} mt={2}>
-                <NoteCards
-                  hideContextMenu
-                  zIndex={10000000}
-                  notes={this.state.notes}
-                  onChangeToEnharmonicClick={
-                    this.handleChangeNoteCardToEnharmonicClick
-                  }
-                />
-              </Flex>
+              <Typography variant="h5">Resulting note sequence</Typography>
+              <div className={css(`min-height: 180px;`)}>
+                <Flex flexWrap="wrap" flex={1} mt={2}>
+                  <NoteCards
+                    hideContextMenu
+                    zIndex={10000000}
+                    notes={this.state.notes}
+                    onChangeToEnharmonicClick={
+                      this.handleChangeNoteCardToEnharmonicClick
+                    }
+                  />
+                </Flex>
+              </div>
             </Box>
           </Box>
         </DialogContent>
@@ -361,5 +350,7 @@ class NoteSequenceModal extends React.Component<
 }
 
 export default withAudioEngine(
-  withMobileDialog<NoteSequenceModalProps>()(NoteSequenceModal),
+  withMobileDialog<NoteSequenceModalProps>({ breakpoint: 'xs' })(
+    NoteSequenceModal,
+  ),
 )

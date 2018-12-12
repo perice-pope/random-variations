@@ -300,16 +300,19 @@ class ToneRowModal extends React.Component<
       <Dialog
         fullScreen={this.props.fullScreen}
         fullWidth={true}
+        maxWidth="md"
         scroll="paper"
         open={this.props.isOpen}
         onClose={this.submit}
         aria-labelledby="pick-note-dialog"
       >
-        <DialogTitle id="pick-note-dialog">Add a tone row</DialogTitle>
+        <DialogTitle id="pick-note-dialog">
+          <Typography variant="h4">Add a tone row</Typography>
+        </DialogTitle>
 
         <DialogContent className={css(`overflow-x: hidden;`)}>
-          <Box width={1} maxWidth={600} mx="auto" flex={1} mt={2}>
-            <Box mb={2} width={1}>
+          <Box>
+            <Box mb={2}>
               <Typography id="slider-label" className={css(`font-size: 20px;`)}>
                 Notes count: {notes.length}
               </Typography>
@@ -364,19 +367,21 @@ class ToneRowModal extends React.Component<
               </Tooltip>
             </Flex>
 
-            <Flex flexWrap="wrap" flex={1} mt={2}>
-              <NoteCards
-                zIndex={10000000}
-                notes={this.state.notes}
-                onCardsReorder={this.handleCardsReorder}
-                onCardDraggedOut={this.deleteNoteCard}
-                onEditNote={this.handleEditNote}
-                onChangeToEnharmonicClick={
-                  this.handleChangeNoteCardToEnharmonicClick
-                }
-                onDeleteClick={this.deleteNoteCard}
-              />
-            </Flex>
+            <div className={css(`min-height: 180px;`)}>
+              <Flex flexWrap="wrap" flex={1} mt={4} mb={3}>
+                <NoteCards
+                  zIndex={10000000}
+                  notes={this.state.notes}
+                  onCardsReorder={this.handleCardsReorder}
+                  onCardDraggedOut={this.deleteNoteCard}
+                  onEditNote={this.handleEditNote}
+                  onChangeToEnharmonicClick={
+                    this.handleChangeNoteCardToEnharmonicClick
+                  }
+                  onDeleteClick={this.deleteNoteCard}
+                />
+              </Flex>
+            </div>
 
             <Flex alignItems="center" justifyContent="center">
               <IconButton
@@ -475,5 +480,5 @@ class ToneRowModal extends React.Component<
 }
 
 export default withAudioEngine(
-  withMobileDialog<ToneRowModalProps>()(ToneRowModal),
+  withMobileDialog<ToneRowModalProps>({ breakpoint: 'xs' })(ToneRowModal),
 )

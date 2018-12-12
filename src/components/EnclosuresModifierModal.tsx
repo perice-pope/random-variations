@@ -23,6 +23,7 @@ import {
   Input,
   InputLabel,
   IconButton,
+  Typography,
 } from '@material-ui/core'
 import NotesStaff from './NotesStaff'
 import { Flex, Box } from './ui'
@@ -78,11 +79,16 @@ class EnclosuresModifierModal extends React.Component<
     isPlaying: false,
   }
 
+  handleClose = () => {
+    audioEngine.stopLoop()
+    this.setState({ isPlaying: false })
+    this.props.onClose()
+  }
+
   handleSubmit = () => {
     audioEngine.stopLoop()
-    this.props.onSubmit({
-      type: this.state.type,
-    })
+    this.setState({ isPlaying: false })
+    this.props.onSubmit({ type: this.state.type })
   }
 
   handleTypeSelected = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -180,39 +186,43 @@ class EnclosuresModifierModal extends React.Component<
         fullWidth={true}
         fullScreen={this.props.fullScreen}
         open={this.props.isOpen}
+        maxWidth="sm"
+        scroll="paper"
         onClose={this.handleSubmit}
         aria-labelledby="chromatic-approach-modifier-dialog"
       >
         <DialogTitle id="chromatic-approach-modifier-dialog">
-          Enclosure
+          <Typography variant="h4">Enclosures</Typography>
         </DialogTitle>
 
         <DialogContent>
-          <Box maxWidth={600} width={1} mx="auto">
-            <FormControl className={css({ flex: 1, marginRight: '1rem' })}>
-              <InputLabel htmlFor="enclosure-type-preset">
-                Enclosure type
-              </InputLabel>
-              <NativeSelect
-                value={this.state.type}
-                onChange={this.handleTypeSelected}
-                name="type"
-                input={<Input id="enclosure-type-preset" />}
-              >
-                {EnclosuresOptions.map(({ title, value }) => (
-                  <option key={value} value={value}>
-                    {title}
-                  </option>
-                ))}
-              </NativeSelect>
-            </FormControl>
+          <Box>
+            <Box>
+              <FormControl className={css({ flex: 1, marginRight: '1rem' })}>
+                <InputLabel htmlFor="enclosure-type-preset">
+                  Enclosure type
+                </InputLabel>
+                <NativeSelect
+                  value={this.state.type}
+                  onChange={this.handleTypeSelected}
+                  name="type"
+                  input={<Input id="enclosure-type-preset" />}
+                >
+                  {EnclosuresOptions.map(({ title, value }) => (
+                    <option key={value} value={value}>
+                      {title}
+                    </option>
+                  ))}
+                </NativeSelect>
+              </FormControl>
+            </Box>
 
             <Box>
               <Flex flexDirection="row" alignItems="center">
                 <IconButton
                   color="secondary"
                   onClick={this.togglePlayback}
-                  className={css(`margin-right: 0.5rem;`)}
+                  className={css(`margin-left: -1rem; margin-right: 0.5rem;`)}
                 >
                   {this.state.isPlaying ? (
                     <StopIcon fontSize="large" />
@@ -240,7 +250,7 @@ class EnclosuresModifierModal extends React.Component<
         </DialogContent>
 
         <DialogActions>
-          <MuButton onClick={this.props.onClose} color="secondary">
+          <MuButton onClick={this.handleClose} color="secondary">
             Cancel
           </MuButton>
           <MuButton onClick={this.handleSubmit} color="primary" autoFocus>
@@ -253,5 +263,7 @@ class EnclosuresModifierModal extends React.Component<
 }
 
 export default withAudioEngine(
-  withMobileDialog<EnclosuresModifierModalProps>()(EnclosuresModifierModal),
+  withMobileDialog<EnclosuresModifierModalProps>({ breakpoint: 'xs' })(
+    EnclosuresModifierModal,
+  ),
 )

@@ -38,14 +38,14 @@ const getRawData = () => {
   DOUBLE HARMONIC - mode 7	C Db Ebb F Gb Ab Bbb C	Double Harmonic - mode 7
   CHROMATIC	C C# D D# E F F# G G# A A# B C	
   CHINESE TWELVE TONE SCALE	C G D A E B F# C# Ab Eb Bb F C	
-  ALGERIAN	C D Eb F F# G Ab B C	Alerigan - mode 1
-  ALGERIAN - mode 2	C Db Eb E F Gb A Bb C	Alerigan - mode 2
-  ALGERIAN - mode 3	C D Eb E F G# A B C	Alerigan - mode 3
-  ALGERIAN - mode 4	C C# D Eb F# G A Bb C	Alerigan - mode 4
-  ALGERIAN - mode 5	C C# D F F# G# A B C	Alerigan - mode 5
-  ALGERIAN - mode 6	C C# E F G Ab Bb B C	Alerigan - mode 6
-  ALGERIAN - mode 7	C D# E F# G A Bb B C	Alerigan - mode 7
-  ALGERIAN - mode 8	C Db Eb Fb Gb G Ab A C	Alerigan - mode 8
+  ALGERIAN	C D Eb F F# G Ab B C	Algerian - mode 1
+  ALGERIAN - mode 2	C Db Eb E F Gb A Bb C	Algerian - mode 2
+  ALGERIAN - mode 3	C D Eb E F G# A B C	Algerian - mode 3
+  ALGERIAN - mode 4	C C# D Eb F# G A Bb C	Algerian - mode 4
+  ALGERIAN - mode 5	C C# D F F# G# A B C	Algerian - mode 5
+  ALGERIAN - mode 6	C C# E F G Ab Bb B C	Algerian - mode 6
+  ALGERIAN - mode 7	C D# E F# G A Bb B C	Algerian - mode 7
+  ALGERIAN - mode 8	C Db Eb Fb Gb G Ab A C	Algerian - mode 8
   ASYMMETRICALLY EXPANDED IONIAN SCALE	C D E F# G# A Bb B C	Asymmetrically Expanded Ionian Scale - mode 1
   ASYMMETRICALLY EXPANDED IONIAN SCALE - mode 2	C D E F# G G# A Bb C	Asymmetrically Expanded Ionian Scale - mode 2
   ASYMMETRICALLY EXPANDED IONIAN SCALE - mode 3	C D E F F# G Ab Bb C	Asymmetrically Expanded Ionian Scale - mode 3

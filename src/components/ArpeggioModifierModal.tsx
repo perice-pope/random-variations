@@ -11,7 +11,6 @@ import DialogContent from '@material-ui/core/DialogContent'
 import DialogTitle from '@material-ui/core/DialogTitle'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 
-import InputLabel from '@material-ui/core/InputLabel'
 import FormControl from '@material-ui/core/FormControl'
 import NativeSelect from '@material-ui/core/NativeSelect'
 import ArrowsIcon from '@material-ui/icons/Cached'
@@ -36,6 +35,8 @@ import {
   Radio,
   IconButton,
   FormHelperText,
+  Typography,
+  Divider,
 } from '@material-ui/core'
 import { css } from 'react-emotion'
 import Tooltip from './ui/Tooltip'
@@ -164,8 +165,15 @@ class ArpeggioModifierModal extends React.Component<
     }
   }
 
+  handleClose = () => {
+    audioEngine.stopLoop()
+    this.setState({ isPlaying: false })
+    this.props.onClose()
+  }
+
   handleSubmit = () => {
     audioEngine.stopLoop()
+    this.setState({ isPlaying: false })
     this.props.onSubmit(this.state.values)
   }
 
@@ -268,12 +276,15 @@ class ArpeggioModifierModal extends React.Component<
 
   handleChordInversionChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const chordInversion: number = parseInt(e.target.value, 10)
-    this.setState({
-      values: {
-        ...this.state.values,
-        chordInversion,
+    this.setState(
+      {
+        values: {
+          ...this.state.values,
+          chordInversion,
+        },
       },
-    }, this.setPlaybackLoop)
+      this.setPlaybackLoop,
+    )
   }
 
   generateStaffTicks = memoize(values => {
@@ -401,39 +412,43 @@ class ArpeggioModifierModal extends React.Component<
         onClose={this.handleSubmit}
         aria-labelledby="arpeggio-modifier-dialog"
       >
-        <DialogTitle id="arpeggio-modifier-dialog">Chords</DialogTitle>
+        <DialogTitle id="arpeggio-modifier-dialog">
+          <Typography variant="h4">Chords</Typography>
+        </DialogTitle>
 
         <DialogContent id="arpeggio-modifier-dialog-content">
-          <Box maxWidth={700} width={1} mx="auto">
-            <InputSelect
-              textFieldProps={{
-                label: 'Chord type',
-                InputLabelProps: {
-                  shrink: true,
-                },
-              }}
-              value={
-                this.state.values.chordType
-                  ? chordTypeToChordTypeOptionMap[this.state.values.chordType]
-                  : undefined
-              }
-              onChange={this.handleChordTypeSelected}
-              name="chordType"
-              options={chordTypeOptionsGrouped}
-            />
-            {chord.notes && (
-              <FormHelperText>
-                {`Notes in key of C:  `}
-                <span
-                  className={css({
-                    fontSize: '0.8rem',
-                    fontWeight: 'bold',
-                  })}
-                >{`${chord.notes.split(' ').join(', ')}`}</span>
-              </FormHelperText>
-            )}
+          <Box>
+            <Typography variant="h5">Chord type</Typography>
+            <Box mt={2}>
+              <InputSelect
+                textFieldProps={{
+                  InputLabelProps: {
+                    shrink: true,
+                  },
+                }}
+                value={
+                  this.state.values.chordType
+                    ? chordTypeToChordTypeOptionMap[this.state.values.chordType]
+                    : undefined
+                }
+                onChange={this.handleChordTypeSelected}
+                name="chordType"
+                options={chordTypeOptionsGrouped}
+              />
+              {chord.notes && (
+                <FormHelperText>
+                  {`Notes in key of C:  `}
+                  <span
+                    className={css({
+                      fontSize: '0.8rem',
+                      fontWeight: 'bold',
+                    })}
+                  >{`${chord.notes.split(' ').join(', ')}`}</span>
+                </FormHelperText>
+              )}
+            </Box>
 
-            <Flex>
+            <Flex mt={2} mb={2}>
               <FormControl component="fieldset">
                 <RadioGroup
                   row
@@ -456,15 +471,22 @@ class ArpeggioModifierModal extends React.Component<
               </FormControl>
             </Flex>
 
-            <Flex mt={1} flexDirection="column">
-              <Flex flexWrap="wrap" flexDirection="row" mt={2}>
+            <Divider light />
+
+            <Flex mb={3} mt={3} flexDirection="column">
+              <Typography variant="h5">
+                {isMelodic ? 'Pattern' : 'Inversion'}
+              </Typography>
+              <Flex
+                flexWrap="wrap"
+                flexDirection="row"
+                alignItems="center"
+                mt={2}
+              >
                 {isMelodic && (
                   <FormControl
                     className={css({ flex: 1, marginRight: '1rem' })}
                   >
-                    <InputLabel htmlFor="arp-pattern-preset">
-                      Pattern
-                    </InputLabel>
                     <NativeSelect
                       value={this.state.values.patternPreset}
                       onChange={this.handlePatternPresetSelected}
@@ -484,9 +506,6 @@ class ArpeggioModifierModal extends React.Component<
                   <FormControl
                     className={css({ flex: 1, marginRight: '1rem' })}
                   >
-                    <InputLabel htmlFor="arp-chord-inversion">
-                      Inversion
-                    </InputLabel>
                     <NativeSelect
                       value={this.state.values.chordInversion}
                       onChange={this.handleChordInversionChange}
@@ -546,41 +565,48 @@ class ArpeggioModifierModal extends React.Component<
               )}
             </Flex>
 
-            <Flex flexDirection="row" alignItems="center">
-              <IconButton
-                color="secondary"
-                onClick={this.togglePlayback}
-                className={css(`margin-right: 0.5rem;`)}
-              >
-                {this.state.isPlaying ? (
-                  <StopIcon fontSize="large" />
-                ) : (
-                  <PlayIcon fontSize="large" />
-                )}
-              </IconButton>
-              <NotesStaff
-                id="chord-preview"
-                clef={settingsStore.clefType}
-                activeTickIndex={
-                  this.state.isPlaying ? this.state.activeTickIndex : undefined
-                }
-                ticks={this.generateStaffTicks(this.state.values)}
-                tickLabels={[
-                  `${tonal.Note.pc(this.props.baseNote || 'C4')}${
-                    this.state.values.chordType
-                  }`,
-                ]}
-                isPlaying={this.state.isPlaying}
-                showBreaks
-                containerProps={{ flex: '1' }}
-                maxLines={1}
-              />
-            </Flex>
+            <Divider light />
+
+            <Box mt={3}>
+              <Typography variant="h5">Preview</Typography>
+
+              <Flex flexDirection="row" alignItems="center">
+                <IconButton
+                  color="secondary"
+                  onClick={this.togglePlayback}
+                  className={css(`margin-left: -1rem; margin-right: 0.5rem;`)}
+                >
+                  {this.state.isPlaying ? (
+                    <StopIcon fontSize="large" />
+                  ) : (
+                    <PlayIcon fontSize="large" />
+                  )}
+                </IconButton>
+                <NotesStaff
+                  id="chord-preview"
+                  clef={settingsStore.clefType}
+                  activeTickIndex={
+                    this.state.isPlaying
+                      ? this.state.activeTickIndex
+                      : undefined
+                  }
+                  ticks={this.generateStaffTicks(this.state.values)}
+                  tickLabels={[
+                    `${tonal.Note.pc(this.props.baseNote || 'C4')}${
+                      this.state.values.chordType
+                    }`,
+                  ]}
+                  isPlaying={this.state.isPlaying}
+                  showBreaks
+                  containerProps={{ flex: '1' }}
+                />
+              </Flex>
+            </Box>
           </Box>
         </DialogContent>
 
         <DialogActions>
-          <MuButton onClick={this.props.onClose} color="secondary">
+          <MuButton onClick={this.handleClose} color="secondary">
             Cancel
           </MuButton>
           <MuButton onClick={this.handleSubmit} color="primary" autoFocus>
@@ -593,5 +619,7 @@ class ArpeggioModifierModal extends React.Component<
 }
 
 export default withAudioEngine(
-  withMobileDialog<ArpeggioModifierModalProps>()(ArpeggioModifierModal),
+  withMobileDialog<ArpeggioModifierModalProps>({ breakpoint: 'sm' })(
+    ArpeggioModifierModal,
+  ),
 )

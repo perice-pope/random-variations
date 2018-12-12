@@ -20,6 +20,7 @@ import Typography from '@material-ui/core/Typography'
 import IconButton from '@material-ui/core/IconButton'
 import Hidden from '@material-ui/core/Hidden'
 
+import MoreVertIcon from '@material-ui/icons/MoreVert'
 import ZoomInIcon from '@material-ui/icons/ZoomIn'
 import ZoomOutIcon from '@material-ui/icons/ZoomOut'
 import SettingsIcon from '@material-ui/icons/Settings'
@@ -40,8 +41,8 @@ import FullscreenIcon from '@material-ui/icons/Fullscreen'
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit'
 import ArrowsIcon from '@material-ui/icons/Cached'
 import TimerIcon from '@material-ui/icons/Timer'
-import VerticalArrowsButton from '@material-ui/icons/ImportExport'
 import MetronomeIcon from 'mdi-material-ui/Metronome'
+import PauseIcon from 'mdi-material-ui/Pause'
 import TextField from '@material-ui/core/TextField'
 import InputAdornment from '@material-ui/core/InputAdornment'
 import * as MidiWriter from 'midi-writer-js'
@@ -131,6 +132,9 @@ import {
   Menu,
   MenuItem,
   ListItemAvatar,
+  Dialog,
+  DialogContent,
+  DialogActions,
 } from '@material-ui/core'
 import { WithWidth } from '@material-ui/core/withWidth'
 import memoize from 'memoize-one'
@@ -141,7 +145,8 @@ import ShareSessionModal from './ShareSessionModal'
 import settingsStore from '../services/settingsStore'
 import ToneRowModal from './ToneRowModal'
 import { trackPageView } from '../services/googleAnalytics'
-import NoteSequenceModal from './NoteSequenceModal';
+import NoteSequenceModal from './NoteSequenceModal'
+import Slider from '@material-ui/lab/Slider'
 
 globalStyles()
 smoothscroll.polyfill()
@@ -154,6 +159,7 @@ console.log('All supported audio fonts: ', _.map(AudioFontsConfig, 'title'))
 const uiState = observable({
   isFullScreen: false,
   isControlsShown: false,
+  isTempoModalShown: false,
 })
 
 type AppState = {
@@ -486,7 +492,8 @@ class App extends React.Component<
     })
   }
 
-  private downloadAsMidi = (session: Session) => {
+  private downloadAsMidi = (session?: Session) => {
+    session = (session || sessionStore.activeSession) as Session
     try {
       // Start with a new track
       const track = new MidiWriter.Track()
@@ -518,7 +525,7 @@ class App extends React.Component<
       notificationsStore.showNotification({
         level: 'error',
         autohide: 6000,
-        message: 'Could not export session as MIDI'
+        message: 'Could not export session as MIDI',
       })
     }
   }
@@ -853,6 +860,12 @@ class App extends React.Component<
     }
   }
 
+  private handleBpmSliderChange = (e, value) => {
+    if (sessionStore.activeSession) {
+      sessionStore.activeSession.bpm = value
+    }
+  }
+
   private handleCountInCountsChange = e => {
     const value = parseIntEnsureInBounds(e.target.value, 0, 16)
     if (sessionStore.activeSession) {
@@ -1010,7 +1023,6 @@ class App extends React.Component<
     this.setState({ noteSequenceAddingModalIsOpen: false })
   private openNoteSequenceAddingModal = () =>
     this.setState({ noteSequenceAddingModalIsOpen: true })
-  
 
   private openArpeggioAddingModal = () =>
     this.setState({ chordsModalIsOpen: true })
@@ -1187,7 +1199,7 @@ class App extends React.Component<
     this.closeNoteAddingModal()
   }
 
-  private addNotesToSession = (noteNames) => {
+  private addNotesToSession = noteNames => {
     if (sessionStore.activeSession) {
       sessionStore.activeSession.noteCards = [
         ...sessionStore.activeSession.noteCards,
@@ -1212,7 +1224,8 @@ class App extends React.Component<
     this.closeNoteSequenceAddingModal()
   }
 
-  private handleDeleteSession = async session => {
+  private handleDeleteSession = async (session?: Session) => {
+    session = (session || sessionStore.activeSession) as Session
     if (
       !confirm(
         `Do you really want to delete session${
@@ -1232,7 +1245,8 @@ class App extends React.Component<
     })
   }
 
-  private handleRenameSession = async (session: Session) => {
+  private handleRenameSession = async (session?: Session) => {
+    session = (session || sessionStore.activeSession) as Session
     const newName = prompt('Rename the session', session.name)
     if (!newName) {
       return
@@ -1245,13 +1259,14 @@ class App extends React.Component<
     })
   }
 
-  private handleSaveSessionAs = async (session: Session) => {
+  private handleSaveSessionAs = async (session?: Session) => {
+    session = (session || sessionStore.activeSession) as Session
     const newName = prompt('Save current session as a new session:', '')
     if (!newName) {
       return
     }
     await sessionStore.createAndActivateNewSession({
-      ...sessionStore.activeSession,
+      ...session,
       name: newName,
     })
     notificationsStore.showNotification({
@@ -1261,7 +1276,15 @@ class App extends React.Component<
     })
   }
 
-  private handleShareSession = async session => {
+  private closeTempoParamsDialog = () => {
+    uiState.isTempoModalShown = false
+  }
+  private openTempoParamsDialog = () => {
+    uiState.isTempoModalShown = true
+  }
+
+  private handleShareSession = async (session?: Session) => {
+    session = (session || sessionStore.activeSession) as Session
     await sessionStore.shareMySessionById(session.id)
     this.setState({
       shareSessionModalIsOpen: true,
@@ -1361,124 +1384,211 @@ class App extends React.Component<
 
     const currentUser = firebase.auth().currentUser
 
-    const ShuffleButton = noteCards.length > 0 && (
-      <Tooltip
-        title="Reshuffle cards"
-        open={noteCards.length < 3 ? false : undefined}
-      >
-        <Button
-          disabled={noteCards.length < 3}
-          m={[1, 2]}
-          color="primary"
-          variant="extendedFab"
-          onClick={this.handleShuffleClick}
-        >
-          <ArrowsIcon className={css({ margin: '0 0.5rem' })} />
-          <Hidden smDown>Randomize</Hidden>
-        </Button>
-      </Tooltip>
-    )
-
-    const TransposeButton = noteCards.length > 0 && (
+    const SessionActionsButton = noteCards.length > 0 && (
       <ButtonWithMenu
         closeAfterClick={false}
-        renderButton={props => (
-          <Tooltip title="Transpose all notes...">
-            <IconButton
+        renderButton={props =>
+          this.props.width === 'xs' ? (
+            <Tooltip title="Session actions...">
+              <IconButton color="default" {...props}>
+                <MoreVertIcon />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <Button
+              className={css(`margin-left: 1rem;`)}
               color="default"
-              className={css({ marginLeft: '0.5rem' })}
               {...props}
             >
-              <VerticalArrowsButton fontSize="large" />
-            </IconButton>
-          </Tooltip>
-        )}
+              <MenuIcon className={css(`margin-right: 0.5rem;`)} />
+              Session
+            </Button>
+          )
+        }
         renderMenu={props => (
           <Menu {...props}>
-            <MenuItem onClick={this.handleOctaveUpClick}>
+            <MenuItem
+              onClick={this.handleShuffleClick}
+              disabled={noteCards.length < 3}
+            >
+              <ListItemIcon>
+                <ArrowsIcon />
+              </ListItemIcon>
+              Randomize session
+            </MenuItem>
+            <MenuItem
+              onClick={this.handleRemoveAllNotes}
+              disabled={noteCards.length === 0}
+            >
+              <ListItemIcon>
+                <DeleteIcon />
+              </ListItemIcon>
+              Clear session
+            </MenuItem>
+
+            <Divider />
+
+            <MenuItem
+              onClick={this.handleOctaveUpClick}
+              disabled={noteCards.length === 0}
+            >
               <ListItemIcon>
                 <PlusIcon />
               </ListItemIcon>
-              Octave up
+              Transpose: Octave up
             </MenuItem>
-            <MenuItem onClick={this.handleOctaveDownClick}>
+            <MenuItem
+              onClick={this.handleOctaveDownClick}
+              disabled={noteCards.length === 0}
+            >
               <ListItemIcon>
                 <MinusIcon />
               </ListItemIcon>
-              Octave down
+              Transpose: Octave down
             </MenuItem>
-            <MenuItem onClick={this.handleSemitoneUpClick}>
+            <MenuItem
+              onClick={this.handleSemitoneUpClick}
+              disabled={noteCards.length === 0}
+            >
               <ListItemIcon>
                 <Plus1Icon />
               </ListItemIcon>
-              Half-step up
+              Transpose: Half-step up
             </MenuItem>
-            <MenuItem onClick={this.handleSemitoneDownClick}>
+            <MenuItem
+              onClick={this.handleSemitoneDownClick}
+              disabled={noteCards.length === 0}
+            >
               <ListItemIcon>
                 <Minus1Icon />
               </ListItemIcon>
-              Half-step down
+              Transpose: Half-step down
             </MenuItem>
+
+            <Divider />
+
+            <MenuItem
+                          onClick={() => this.handleShareSession()}
+                        >
+                          <ListItemIcon>
+                            <ShareIcon color="action" />
+                          </ListItemIcon>
+                          {' Share'}
+                        </MenuItem>
+                        <MenuItem
+                        onClick={() => this.downloadAsMidi()}
+                        >
+                          <ListItemIcon>
+                            <CloudDownloadIcon color="action" />
+                          </ListItemIcon>
+                          {' Download as MIDI'}
+                        </MenuItem>
+                        <MenuItem
+                        onClick={() => this.handleSaveSessionAs()}
+                        >
+                          <ListItemIcon>
+                            <SaveIcon color="action" />
+                          </ListItemIcon>
+                          {' Save as...'}
+                        </MenuItem>
+                        <MenuItem
+                        onClick={() => this.handleRenameSession()}
+                        >
+                          <ListItemIcon>
+                            <EditIcon color="action" />
+                          </ListItemIcon>
+                          {' Rename'}
+                        </MenuItem>
+                        <MenuItem
+                        onClick={() => this.handleDeleteSession()}
+                        >
+                          <ListItemIcon>
+                            <DeleteIcon color="action" />
+                          </ListItemIcon>
+                          {' Delete'}
+                        </MenuItem>
           </Menu>
         )}
       />
     )
 
-    const ClearAllButton = noteCards.length > 0 && (
-      <Tooltip
-        title="Clear all notes"
-        variant="gray"
-        open={noteCards.length === 0 ? false : undefined}
-      >
-        <MuiButton
-          disabled={noteCards.length === 0}
-          color="secondary"
-          className={css(`margin: 0.5rem;`)}
-          onClick={this.handleRemoveAllNotes}
-        >
-          <DeleteIcon className={css({ margin: '0 0.5rem' })} />
-          <Hidden xsDown>Clear all</Hidden>
-        </MuiButton>
-      </Tooltip>
-    )
-
     const ToggleCountInButton = (
-      <Tooltip
-        title={countInEnabled ? 'Turn off count in' : 'Turn on count in'}
+      <MuiButton
+        color={countInEnabled ? 'secondary' : 'default'}
+        className={css(`margin: 0.5rem; margin-right: 0;`)}
+        onClick={this.handleCountInToggle}
       >
-        <IconButton
-          color={countInEnabled ? 'primary' : 'default'}
-          className={css(`margin: 0.5rem; margin-right: 0;`)}
-          onClick={this.handleCountInToggle}
-        >
-          <TimerIcon />
-        </IconButton>
-      </Tooltip>
+        <TimerIcon className={css(`margin-right: 0.5rem;`)} />
+        {countInEnabled ? 'Count in on' : 'Count in off'}
+      </MuiButton>
     )
     const ToggleMetronomeButton = (
-      <Tooltip
-        title={metronomeEnabled ? 'Turn metronome off' : 'Turn metronome on'}
+      <MuiButton
+        color={metronomeEnabled ? 'secondary' : 'default'}
+        className={css(`margin: 0.5rem; margin-left: 1rem;`)}
+        onClick={this.handleMetronomeToggle}
       >
-        <IconButton
-          color={metronomeEnabled ? 'primary' : 'default'}
-          className={css(`margin: 0.5rem; margin-left: 1rem;`)}
-          onClick={this.handleMetronomeToggle}
+        <MetronomeIcon className={css(`margin-right: 0.5rem;`)} />
+        {metronomeEnabled ? 'Metronome on' : 'Metronome off'}
+      </MuiButton>
+    )
+
+    const SessionParamsButton = (
+      <Tooltip title={'Tempo, rests and count-in settings'}>
+        <MuiButton
+          color="default"
+          className={css(`display: inline-flex; align-items: center; `)}
+          onClick={this.openTempoParamsDialog}
         >
-          <MetronomeIcon />
-        </IconButton>
+          <span
+            className={css(
+              `margin-right: 1rem; display: flex; align-items: center; `,
+            )}
+          >
+            <TimerIcon
+              fontSize="small"
+              color={countInEnabled ? 'secondary' : 'disabled'}
+              className={css(`margin-right: 5px;`)}
+            />
+            {countInCounts}
+          </span>
+          <span
+            className={css(
+              `margin-right: 1rem; display: flex; align-items: center; `,
+            )}
+          >
+            <PauseIcon
+              fontSize="small"
+              color="disabled"
+              className={css(`margin-right: 5px;`)}
+            />
+            {rests}
+          </span>
+          <span
+            className={css(
+              `margin-right: 1rem; display: flex; align-items: center; `,
+            )}
+          >
+            <MetronomeIcon
+              fontSize="small"
+              color={metronomeEnabled ? 'secondary' : 'disabled'}
+              className={css(`margin-right: 5px;`)}
+            />
+            {bpm} BPM
+          </span>
+        </MuiButton>
       </Tooltip>
     )
 
     const CountInTextInput = (
       <TextField
         className={css({
-          marginLeft: '15px',
-          maxWidth: '65px',
+          maxWidth: '100px',
         })}
         InputProps={{
+          endAdornment: <InputAdornment position="end">Beats</InputAdornment>,
           className: css({ fontSize: '1.3rem' }),
         }}
-        label="Count in"
         id="countInCounts"
         disabled={!countInEnabled}
         type="number"
@@ -1493,13 +1603,16 @@ class App extends React.Component<
     const RestsTextInput = (
       <TextField
         className={css({
-          marginLeft: '15px',
-          maxWidth: '50px',
+          maxWidth: '200px',
         })}
         InputProps={{
+          endAdornment: (
+            <InputAdornment position="end" classes={{root: css(`width: 200px;`)}}>
+              Rest beats
+            </InputAdornment>
+          ),
           className: css({ fontSize: '1.3rem' }),
         }}
-        label="Rests"
         id="rests"
         type="number"
         // @ts-ignore
@@ -1512,8 +1625,7 @@ class App extends React.Component<
     )
     const TempoTextInput = (
       <TextField
-        className={css({ maxWidth: '95px' })}
-        label="Tempo"
+        className={css({ maxWidth: '100px' })}
         InputProps={{
           endAdornment: <InputAdornment position="end">BPM</InputAdornment>,
           className: css({ fontSize: '1.3rem' }),
@@ -1528,15 +1640,21 @@ class App extends React.Component<
         onChange={this.handleBpmChange}
       />
     )
-    const SessionControls = (
-      <Box mb={1}>
-        {ToggleCountInButton}
-        {RestsTextInput}
-        {CountInTextInput}
-        {ToggleMetronomeButton}
-        {TempoTextInput}
+    const TempoSliderInput = (
+      <Box mb={2} width={1}>
+        <Slider
+          classes={{
+            container: css(`padding: 1rem;`),
+          }}
+          value={bpm}
+          min={1}
+          max={400}
+          step={1}
+          onChange={this.handleBpmSliderChange}
+        />
       </Box>
     )
+    const SessionControls = <Box mb={1}>{SessionParamsButton}</Box>
 
     const TogglePlaybackButton = noteCards.length > 0 && (
       <Button
@@ -1544,7 +1662,7 @@ class App extends React.Component<
         title={isPlaying ? 'Stop' : 'Play'}
         bg={isPlaying ? 'red' : '#00c200'}
         mr={1}
-        className={css({ maxWidth: '100px' })}
+        className={cx(css({ maxWidth: '100px' }), isMobile && css(`height: 40px;`))}
         onClick={this.togglePlayback}
       >
         {isPlaying ? (
@@ -1572,7 +1690,7 @@ class App extends React.Component<
         </IconButton>
 
         <Flex flex={1} justifyContent="center">
-          <Flex maxWidth={MaxLayoutWidth} width={1}>
+          <Flex maxWidth={MaxLayoutWidth} width={1} alignItems="center">
             {!shouldShowDesktopSessionControls && TogglePlaybackButton}
 
             {isSignedIn &&
@@ -1888,6 +2006,9 @@ class App extends React.Component<
                           </ListItemIcon>
                           {' Download as MIDI'}
                         </MenuItem>
+
+<Divider/>
+
                         <MenuItem
                           onClick={() => {
                             this.handleSaveSessionAs(session)
@@ -2012,9 +2133,7 @@ class App extends React.Component<
                       >
                         {shouldShowDesktopSessionControls &&
                           TogglePlaybackButton}
-                        {ShuffleButton}
-                        {TransposeButton}
-                        {ClearAllButton}
+                        {SessionActionsButton}
                       </Box>
 
                       {SessionControls}
@@ -2035,7 +2154,7 @@ class App extends React.Component<
                     >
                       <NoteCards
                         notes={noteCards}
-                        perLineCount={this.state.height > 568 ? 6 : 12}
+                        perLineCount={this.state.height > 568 ? 6 : 6}
                         activeNoteCardIndex={activeNoteCardIndex}
                         onChangeToEnharmonicClick={
                           this.handleChangeNoteCardToEnharmonicClick
@@ -2070,12 +2189,12 @@ class App extends React.Component<
                               enableOnlyNote={noteCards.length === 0}
                               onAddSingleNoteClick={this.openNoteAddingModal}
                               onAddToneRowClick={this.openToneRowAddingModal}
-                              onAddNoteSequenceClick={this.openNoteSequenceAddingModal}
+                              onAddNoteSequenceClick={
+                                this.openNoteSequenceAddingModal
+                              }
                               onAddArpeggioClick={this.openArpeggioAddingModal}
                               onAddScaleClick={this.openScalesModal}
-                              onAddEnclosuresClick={
-                                this.openEnclosuresModal
-                              }
+                              onAddEnclosuresClick={this.openEnclosuresModal}
                               onAddIntervalsClick={this.openIntervalsModal}
                               disableSingleNote={
                                 noteCards.length >= MaxNoteCards
@@ -2097,9 +2216,7 @@ class App extends React.Component<
                                 modifiers.chords.enabled ||
                                 modifiers.intervals.enabled
                               }
-                              disableEnclosures={
-                                modifiers.enclosures.enabled
-                              }
+                              disableEnclosures={modifiers.enclosures.enabled}
                               buttonProps={{
                                 disabled: isPlaying,
                                 className: cx(
@@ -2335,12 +2452,72 @@ class App extends React.Component<
             onSubmit={this.handleAddNoteSequenceModalSubmit}
           />
 
-
           <PickNoteModal
             isOpen={this.state.noteAddingModalIsOpen}
             onClose={this.closeNoteAddingModal}
             onSubmit={this.handleAddNoteModalSubmit}
           />
+
+          <Dialog
+            fullScreen={this.props.width === 'xs'}
+            maxWidth="sm"
+            fullWidth
+            scroll="paper"
+            open={uiState.isTempoModalShown}
+            onClose={this.closeTempoParamsDialog}
+            aria-labelledby="tempo-params-dialog"
+          >
+            <DialogContent
+              id="tempo-params-content"
+              className={css(`overflow-x: hidden;`)}
+            >
+              <Box>
+                <Box>
+                  <Typography variant="h5">Session tempo</Typography>
+                  <Flex alignItems="center">
+                    {TempoTextInput}
+                    <span className={css(`flex: 1;`)}/>
+                    {ToggleMetronomeButton}
+                  </Flex>
+                  {TempoSliderInput}
+                </Box>
+
+                <Divider light />
+
+                <Box mt={3} mb={3}>
+                  <Typography variant="h5">Count-in</Typography>
+                  <Typography variant="subtitle1">
+                    Number of metronome beats to play before playing the notes
+                  </Typography>
+                  <Flex alignItems="center">
+                    {CountInTextInput}
+                    <span className={css(`flex: 1;`)}/>
+                    {ToggleCountInButton}
+                  </Flex>
+                </Box>
+
+                <Divider light />
+
+                <Box mt={3}>
+                  <Typography variant="h5">Rests</Typography>
+                  <Typography variant="subtitle1">
+                    Number of rest beats between note groups
+                  </Typography>
+                  {RestsTextInput}
+                </Box>
+              </Box>
+            </DialogContent>
+
+            <DialogActions>
+              <MuiButton
+                onClick={this.closeTempoParamsDialog}
+                color="primary"
+                autoFocus
+              >
+                OK
+              </MuiButton>
+            </DialogActions>
+          </Dialog>
         </MeasureScreenSize>
       </>
     )

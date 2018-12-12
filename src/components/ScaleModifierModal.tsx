@@ -11,7 +11,6 @@ import DialogTitle from '@material-ui/core/DialogTitle'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 
 import FormHelperText from '@material-ui/core/FormHelperText'
-import InputLabel from '@material-ui/core/InputLabel'
 import FormControl from '@material-ui/core/FormControl'
 import NativeSelect from '@material-ui/core/NativeSelect'
 import ArrowsIcon from '@material-ui/icons/Cached'
@@ -30,7 +29,7 @@ import {
   ScaleModifier,
 } from '../types'
 import { ChangeEvent } from 'react'
-import { Input, IconButton } from '@material-ui/core'
+import { Input, IconButton, Typography, Divider } from '@material-ui/core'
 import { css } from 'react-emotion'
 import Tooltip from './ui/Tooltip'
 import {
@@ -77,9 +76,12 @@ type ScaleTypeOption = {
 
 const scaleTypeOptions: ScaleTypeOption[] = scaleOptions.map(
   ({ type, mode, title }) => ({
-    label: [_.capitalize(title), _.capitalize(mode)]
-      .filter(_.identity)
-      .join(' — '),
+    label:
+      _.capitalize(title) === _.capitalize(mode)
+        ? _.capitalize(title)
+        : [_.capitalize(title), _.capitalize(mode)]
+            .filter(_.identity)
+            .join(' — '),
     value: type,
     mode: mode
       ? `${_.capitalize(mode).replace(/mode \d+$/, '')}  Modes`
@@ -89,7 +91,7 @@ const scaleTypeOptions: ScaleTypeOption[] = scaleOptions.map(
 
 const scaleTypeOptionsByMode = _.groupBy(scaleTypeOptions, 'mode')
 
-const chordTypeOptionsGrouped = Object.keys(scaleTypeOptionsByMode).map(
+const scaleTypeOptionsGrouped = Object.keys(scaleTypeOptionsByMode).map(
   mode => ({
     label: `${_.capitalize(mode)}`,
     options: scaleTypeOptionsByMode[mode],
@@ -179,8 +181,15 @@ class ScaleModifierModal extends React.Component<
     }
   }
 
+  handleClose = () => {
+    audioEngine.stopLoop()
+    this.setState({ isPlaying: false })
+    this.props.onClose()
+  }
+
   handleSubmit = () => {
     audioEngine.stopLoop()
+    this.setState({ isPlaying: false })
     this.props.onSubmit(this.state.values)
   }
 
@@ -345,47 +354,59 @@ class ScaleModifierModal extends React.Component<
       <Dialog
         fullWidth={true}
         fullScreen={this.props.fullScreen}
+        maxWidth="md"
         scroll="paper"
         open={this.props.isOpen}
         onClose={this.handleSubmit}
         aria-labelledby="scale-modifier-dialog"
       >
-        <DialogTitle id="scale-modifier-dialog">Scales</DialogTitle>
+        <DialogTitle id="scale-modifier-dialog">
+          <Typography variant="h4">Scales</Typography>
+        </DialogTitle>
 
         <DialogContent id="scale-modifier-dialog-content">
-          <Box maxWidth={600} width={1} mx="auto">
-            <InputSelect
-              textFieldProps={{
-                label: 'Scale type',
-                InputLabelProps: {
-                  shrink: true,
-                },
-              }}
-              value={
-                this.state.values.scaleType
-                  ? scaleTypeToScaleTypeOptionMap[this.state.values.scaleType]
-                  : undefined
-              }
-              onChange={this.handleScaleTypeSelected}
-              name="chordType"
-              options={chordTypeOptionsGrouped}
-            />
-            {scale.notes && (
-              <FormHelperText>
-                {`Notes in key of C:  `}
-                <span
-                  className={css({
-                    fontSize: '0.8rem',
-                    fontWeight: 'bold',
-                  })}
-                >{`${scale.notes.split(' ').join(', ')}`}</span>
-              </FormHelperText>
-            )}
+          <Box>
+            <Typography variant="h5">Scale type</Typography>
+            <Box mt={2} mb={2}>
+              <InputSelect
+                textFieldProps={{
+                  InputLabelProps: {
+                    shrink: true,
+                  },
+                }}
+                value={
+                  this.state.values.scaleType
+                    ? scaleTypeToScaleTypeOptionMap[this.state.values.scaleType]
+                    : undefined
+                }
+                onChange={this.handleScaleTypeSelected}
+                name="chordType"
+                options={scaleTypeOptionsGrouped}
+              />
+              {scale.notes && (
+                <FormHelperText>
+                  {`Notes in key of C:  `}
+                  <span
+                    className={css({
+                      fontSize: '0.8rem',
+                      fontWeight: 'bold',
+                    })}
+                  >{`${scale.notes.split(' ').join(', ')}`}</span>
+                </FormHelperText>
+              )}
+            </Box>
 
-            <Flex mt={[1, 3, 2]} flexDirection="column">
-              <Flex flexWrap="wrap" flexDirection="row" mt={4}>
+            <Divider light />
+
+            <Flex mt={3} mb={3} flexDirection="column">
+              <Typography variant="h5">Pattern</Typography>
+              <Flex
+                mt={2}
+                flexWrap="wrap"
+                flexDirection="row"
+                alignItems="center"
+              >
                 <FormControl className={css({ flex: 1, marginRight: '1rem' })}>
-                  <InputLabel htmlFor="arp-pattern-preset">Pattern</InputLabel>
                   <NativeSelect
                     value={this.state.values.patternPreset}
                     onChange={this.handlePatternPresetSelected}
@@ -432,12 +453,16 @@ class ScaleModifierModal extends React.Component<
               </Box>
             </Flex>
 
-            <Box>
+            <Divider light />
+
+            <Box mt={3}>
+              <Typography variant="h5">Preview</Typography>
+
               <Flex flexDirection="row" alignItems="center">
                 <IconButton
                   color="secondary"
                   onClick={this.togglePlayback}
-                  className={css(`margin-right: 0.5rem;`)}
+                  className={css(`margin-left: -1rem; margin-right: 0.5rem;`)}
                 >
                   {this.state.isPlaying ? (
                     <StopIcon fontSize="large" />
@@ -445,6 +470,7 @@ class ScaleModifierModal extends React.Component<
                     <PlayIcon fontSize="large" />
                   )}
                 </IconButton>
+
                 <NotesStaff
                   id="chord-preview"
                   clef={settingsStore.clefType}
@@ -457,7 +483,6 @@ class ScaleModifierModal extends React.Component<
                   isPlaying={this.state.isPlaying}
                   showBreaks
                   containerProps={{ flex: '1' }}
-                  maxLines={1}
                 />
               </Flex>
             </Box>
@@ -465,7 +490,7 @@ class ScaleModifierModal extends React.Component<
         </DialogContent>
 
         <DialogActions>
-          <MuButton onClick={this.props.onClose} color="secondary">
+          <MuButton onClick={this.handleClose} color="secondary">
             Cancel
           </MuButton>
           <MuButton onClick={this.handleSubmit} color="primary" autoFocus>
@@ -478,5 +503,7 @@ class ScaleModifierModal extends React.Component<
 }
 
 export default withAudioEngine(
-  withMobileDialog<ScaleModifierModalProps>()(ScaleModifierModal),
+  withMobileDialog<ScaleModifierModalProps>({ breakpoint: 'sm' })(
+    ScaleModifierModal,
+  ),
 )

@@ -126,7 +126,7 @@ export default class AddEntityButton extends React.Component<
                 disabled={enableOnlyNote}
                 onClick={this.props.onAddArpeggioClick}
               >
-                Chord
+                Chords
               </MenuItem>
             )}
             {!disableScales && (
@@ -134,7 +134,7 @@ export default class AddEntityButton extends React.Component<
                 disabled={enableOnlyNote}
                 onClick={this.props.onAddScaleClick}
               >
-                Scale
+                Scales
               </MenuItem>
             )}
             {!disableEnclosures && (
@@ -142,7 +142,7 @@ export default class AddEntityButton extends React.Component<
                 disabled={enableOnlyNote}
                 onClick={this.props.onAddEnclosuresClick}
               >
-                Enclosure
+                Enclosures
               </MenuItem>
             )}
           </Menu>

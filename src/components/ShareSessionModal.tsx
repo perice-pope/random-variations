@@ -10,7 +10,7 @@ import withMobileDialog, {
 } from '@material-ui/core/withMobileDialog'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 
-import { Input } from '@material-ui/core'
+import { Input, Typography } from '@material-ui/core'
 import { Session } from '../types'
 import { notificationsStore } from './ToastNotifications'
 import { css } from 'emotion'
@@ -38,7 +38,9 @@ class ShareSessionModal extends React.Component<
         onClose={this.props.onClose}
         aria-labelledby="share-dialog"
       >
-        <DialogTitle id="share-dialog">Share your session</DialogTitle>
+        <DialogTitle id="share-dialog">
+          <Typography variant="h4">Share your session</Typography>
+        </DialogTitle>
         <DialogContent>
           <p>Here's a sharable link to your session:</p>
           <div className={css({ marginBottom: '1rem' })}>
@@ -69,4 +71,6 @@ class ShareSessionModal extends React.Component<
   }
 }
 
-export default withMobileDialog<ShareSessionModalProps>()(ShareSessionModal)
+export default withMobileDialog<ShareSessionModalProps>({ breakpoint: 'xs' })(
+  ShareSessionModal,
+)

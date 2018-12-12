@@ -30,7 +30,7 @@ import {
 } from './withAudioEngine'
 import styled from 'react-emotion'
 import settingsStore from '../services/settingsStore'
-import { IconButton } from '@material-ui/core'
+import { IconButton, Typography } from '@material-ui/core'
 
 type PickNoteModalProps = {
   isOpen: boolean
@@ -212,13 +212,18 @@ class PickNoteModal extends React.Component<
 
     return (
       <Dialog
+        fullWidth={true}
         fullScreen={this.props.fullScreen}
         open={this.props.isOpen}
+        maxWidth="sm"
         scroll="paper"
         onClose={this.props.onClose}
         aria-labelledby="pick-note-dialog"
       >
-        <DialogTitle id="pick-note-dialog">Pick a note</DialogTitle>
+        <DialogTitle id="pick-note-dialog">
+          <Typography variant="h4">Pick a note</Typography>
+        </DialogTitle>
+
         <DialogContent>
           <Box width={1} flex={1}>
             <Flex flexWrap="wrap" flex={1}>
@@ -359,5 +364,5 @@ class PickNoteModal extends React.Component<
 }
 
 export default withAudioEngine(
-  withMobileDialog<PickNoteModalProps>()(PickNoteModal),
+  withMobileDialog<PickNoteModalProps>({ breakpoint: 'xs' })(PickNoteModal),
 )

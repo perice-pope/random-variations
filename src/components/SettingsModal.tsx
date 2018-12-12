@@ -19,7 +19,10 @@ import {
   Input,
   Switch,
   FormControlLabel,
+  Divider,
+  Typography,
 } from '@material-ui/core'
+import { Box } from './ui'
 
 export type SettingsFormValues = {
   audioFontId: AudioFontId
@@ -120,62 +123,73 @@ class SettingsModal extends React.Component<
       <Dialog
         fullWidth={true}
         fullScreen={this.props.fullScreen}
+        maxWidth="sm"
+        scroll="paper"
         open={this.props.isOpen}
         onClose={this.handleSubmit}
         aria-labelledby="settings-dialog"
       >
-        <DialogTitle id="settings-dialog">Settings</DialogTitle>
+        <DialogTitle id="settings-dialog">
+          <Typography variant="h4">Settings</Typography>
+        </DialogTitle>
 
         <DialogContent>
-          <div>
-            <FormControl className={css({ marginBottom: '1rem' })}>
-              <InputLabel htmlFor="instrument-sound">
-                Instrument sound
-              </InputLabel>
-              <NativeSelect
-                value={this.state.values.audioFontId}
-                onChange={this.handleAudioFontSelected}
-                name="audioFontId"
-                input={<Input id="instrument-sound" />}
-              >
-                {AudioFontOptions.map(({ title, value }) => (
-                  <option key={value} value={value}>
-                    {title}
-                  </option>
-                ))}
-              </NativeSelect>
-            </FormControl>
-          </div>
+          <Box mb={3}>
+            <Typography variant="h5">Instrument sound</Typography>
 
-          <div>
-            <FormControl className={css({ marginBottom: '1rem' })}>
-              <InputLabel htmlFor="clef-type">Clef type</InputLabel>
-              <NativeSelect
-                value={this.state.values.clefType}
-                onChange={this.handleClefSelected}
-                name="clefType"
-                input={<Input id="clef-type" />}
-              >
-                {ClefTypeOptions.map(({ title, value }) => (
-                  <option key={value} value={value}>
-                    {title}
-                  </option>
-                ))}
-              </NativeSelect>
-            </FormControl>
-          </div>
+            <Box mt={2}>
+              <FormControl className={css({ marginBottom: '1rem' })}>
+                <NativeSelect
+                  value={this.state.values.audioFontId}
+                  onChange={this.handleAudioFontSelected}
+                  name="audioFontId"
+                  input={<Input id="instrument-sound" />}
+                >
+                  {AudioFontOptions.map(({ title, value }) => (
+                    <option key={value} value={value}>
+                      {title}
+                    </option>
+                  ))}
+                </NativeSelect>
+              </FormControl>
+            </Box>
+          </Box>
 
-          <FormControlLabel
-            control={
-              <Switch
-                checked={this.state.values.showNoteNamesAboveStaff}
-                onChange={this.handleChangeShownNoteNamesAboveStaff}
-                value={this.state.values.showNoteNamesAboveStaff}
-                color="primary"
-              />
-            }
-            label="Show note names above staff?"
-          />
+          <Divider light />
+
+          <Box mt={3}>
+            <Typography variant="h5">Notes staff</Typography>
+
+            <Box mt={2}>
+              <FormControl className={css({ marginBottom: '1rem' })}>
+                <InputLabel htmlFor="clef-type">Clef type</InputLabel>
+                <NativeSelect
+                  value={this.state.values.clefType}
+                  onChange={this.handleClefSelected}
+                  name="clefType"
+                  input={<Input id="clef-type" />}
+                >
+                  {ClefTypeOptions.map(({ title, value }) => (
+                    <option key={value} value={value}>
+                      {title}
+                    </option>
+                  ))}
+                </NativeSelect>
+              </FormControl>
+            </Box>
+
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={this.state.values.showNoteNamesAboveStaff}
+                  onChange={this.handleChangeShownNoteNamesAboveStaff}
+                  value={this.state.values.showNoteNamesAboveStaff}
+                  color="primary"
+                />
+              }
+              label="Show note names above staff?"
+            />
+          </Box>
         </DialogContent>
 
         <DialogActions>
@@ -191,4 +205,6 @@ class SettingsModal extends React.Component<
   }
 }
 
-export default withMobileDialog<SettingsModalProps>()(SettingsModal)
+export default withMobileDialog<SettingsModalProps>({ breakpoint: 'xs' })(
+  SettingsModal,
+)
