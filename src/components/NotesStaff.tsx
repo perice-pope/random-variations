@@ -518,6 +518,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
       let cardsPerLine = Math.ceil(cardIds.length / lines)
 
       const lineToCardIds = _.chunk(cardIds, cardsPerLine)
+
       cardIdToLine = {}
       let maxLineNotesCount = 0
       for (let line = 0; line < lineToCardIds.length; ++line) {
@@ -531,7 +532,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
       }
 
       const minWidthPerNote = boxWidth / maxLineNotesCount / (scale || 1)
-      if (minWidthPerNote > 40 && maxLineNotesCount < 32) {
+      if (minWidthPerNote > 60 && maxLineNotesCount < 32) {
         break
       }
     }
