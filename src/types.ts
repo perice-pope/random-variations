@@ -162,6 +162,7 @@ export interface EnclosuresModifier {
 }
 
 export type IntervalType =
+  | '1P'
   | '2m'
   | '2M'
   | '3m'

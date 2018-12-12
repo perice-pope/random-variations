@@ -141,6 +141,7 @@ import ShareSessionModal from './ShareSessionModal'
 import settingsStore from '../services/settingsStore'
 import ToneRowModal from './ToneRowModal'
 import { trackPageView } from '../services/googleAnalytics'
+import NoteSequenceModal from './NoteSequenceModal';
 
 globalStyles()
 smoothscroll.polyfill()
@@ -199,6 +200,7 @@ type AppState = {
 
   noteAddingModalIsOpen: boolean
   toneRowAddingModalIsOpen: boolean
+  noteSequenceAddingModalIsOpen: boolean
 }
 
 // This is needed to ensure the right CSS script tags insertion order to ensure
@@ -389,6 +391,7 @@ class App extends React.Component<
       intervalsModalIsOpen: false,
       noteAddingModalIsOpen: false,
       toneRowAddingModalIsOpen: false,
+      noteSequenceAddingModalIsOpen: false,
 
       settingsModalIsOpen: false,
       shareSessionModalIsOpen: false,
@@ -1003,6 +1006,12 @@ class App extends React.Component<
   private openToneRowAddingModal = () =>
     this.setState({ toneRowAddingModalIsOpen: true })
 
+  private closeNoteSequenceAddingModal = () =>
+    this.setState({ noteSequenceAddingModalIsOpen: false })
+  private openNoteSequenceAddingModal = () =>
+    this.setState({ noteSequenceAddingModalIsOpen: true })
+  
+
   private openArpeggioAddingModal = () =>
     this.setState({ chordsModalIsOpen: true })
   private closeArpeggioAddingModal = () =>
@@ -1178,7 +1187,7 @@ class App extends React.Component<
     this.closeNoteAddingModal()
   }
 
-  private handleAddToneRowModalSubmit = ({ noteNames }) => {
+  private addNotesToSession = (noteNames) => {
     if (sessionStore.activeSession) {
       sessionStore.activeSession.noteCards = [
         ...sessionStore.activeSession.noteCards,
@@ -1191,7 +1200,16 @@ class App extends React.Component<
         ),
       ]
     }
-    this.closeNoteAddingModal()
+  }
+
+  private handleAddToneRowModalSubmit = ({ noteNames }) => {
+    this.addNotesToSession(noteNames)
+    this.closeToneRowAddingModal()
+  }
+
+  private handleAddNoteSequenceModalSubmit = ({ noteNames }) => {
+    this.addNotesToSession(noteNames)
+    this.closeNoteSequenceAddingModal()
   }
 
   private handleDeleteSession = async session => {
@@ -2052,6 +2070,7 @@ class App extends React.Component<
                               enableOnlyNote={noteCards.length === 0}
                               onAddSingleNoteClick={this.openNoteAddingModal}
                               onAddToneRowClick={this.openToneRowAddingModal}
+                              onAddNoteSequenceClick={this.openNoteSequenceAddingModal}
                               onAddArpeggioClick={this.openArpeggioAddingModal}
                               onAddScaleClick={this.openScalesModal}
                               onAddEnclosuresClick={
@@ -2062,6 +2081,7 @@ class App extends React.Component<
                                 noteCards.length >= MaxNoteCards
                               }
                               disableToneRow={noteCards.length >= MaxNoteCards}
+                              disableNoteSequence={noteCards.length > 0}
                               disableChords={
                                 modifiers.chords.enabled ||
                                 modifiers.scales.enabled ||
@@ -2306,6 +2326,15 @@ class App extends React.Component<
             onClose={this.closeToneRowAddingModal}
             onSubmit={this.handleAddToneRowModalSubmit}
           />
+
+          <NoteSequenceModal
+            defaultNotesCount={Math.min(4, MaxNoteCards - noteCards.length)}
+            maxNotesCount={MaxNoteCards - noteCards.length}
+            isOpen={this.state.noteSequenceAddingModalIsOpen}
+            onClose={this.closeNoteSequenceAddingModal}
+            onSubmit={this.handleAddNoteSequenceModalSubmit}
+          />
+
 
           <PickNoteModal
             isOpen={this.state.noteAddingModalIsOpen}

@@ -4,7 +4,7 @@ import * as ReactDOM from 'react-dom'
 import Root from './components/Root'
 import './index.css'
 
-import { unregister } from './registerServiceWorker'
+import register from './registerServiceWorker'
 
 const rootEl = document.getElementById('root') as HTMLElement
 
@@ -13,4 +13,4 @@ const render = Component => {
 }
 
 render(Root)
-unregister()
+register()

@@ -125,6 +125,8 @@ const SortableNoteCard = SortableElement(
         perLineCount,
         onClick,
         zIndex,
+        hideContextMenu,
+        disableRemoving,
         ...props
       } = this.props
       const menuId = `note-card-menu-${id}`
@@ -148,7 +150,7 @@ const SortableNoteCard = SortableElement(
                 id={menuId}
                 anchorReference="anchorPosition"
                 anchorPosition={this.state.menuPosition}
-                open={this.state.menuOpen}
+                open={!hideContextMenu && this.state.menuOpen}
                 onClose={this.closeMenu}
               >
                 <MenuItem
@@ -208,12 +210,14 @@ const SortableNoteCard = SortableElement(
                   Change note...
                 </MenuItem>
 
-                <MenuItem onClick={this.handleDeleteClick} color="secondary">
-                  <ListItemIcon>
-                    <RemoveIcon />
-                  </ListItemIcon>
-                  Remove
-                </MenuItem>
+                {!disableRemoving && (
+                  <MenuItem onClick={this.handleDeleteClick} color="secondary">
+                    <ListItemIcon>
+                      <RemoveIcon />
+                    </ListItemIcon>
+                    Remove
+                  </MenuItem>
+                )}
               </Menu>
               <NoteCard
                 flex={1}
@@ -241,6 +245,8 @@ const SortableNotesContainer = SortableContainer(
     innerRef,
     children,
     activeNoteCardIndex,
+    hideContextMenu,
+    disableRemoving,
     shouldFlip,
     onChangeToEnharmonicClick,
     onEditClick,
@@ -280,6 +286,8 @@ const SortableNotesContainer = SortableContainer(
               bgColor={getNoteCardColorByNoteName(noteName)}
               tabIndex={-1}
               perLineCount={perLineCount}
+              hideContextMenu={hideContextMenu}
+              disableRemoving={disableRemoving}
               width={1}
               zIndex={zIndex}
               active={activeNoteCardIndex === index}
@@ -317,15 +325,18 @@ export interface NoteCardNote {
 
 type NoteCardsProps = {
   notes: NoteCardNote[]
+  draggable?: boolean
+  disableRemoving?: boolean
+  hideContextMenu?: boolean
   zIndex?: number
   perLineCount?: number
   activeNoteCardIndex?: number
   onMouseOver?: (index: number) => any
   onMouseLeave?: (index: number) => any
-  onCardsReorder: (arg: { oldIndex: number; newIndex: number }) => any
-  onChangeToEnharmonicClick: (index: number) => any
-  onDeleteClick: (index: number) => any
-  onCardDraggedOut: (index: number) => any
+  onCardsReorder?: (arg: { oldIndex: number; newIndex: number }) => any
+  onChangeToEnharmonicClick?: (index: number) => any
+  onDeleteClick?: (index: number) => any
+  onCardDraggedOut?: (index: number) => any
   onEditNote?: (index: number, data: { noteName: string }) => any
 }
 
@@ -358,7 +369,9 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
       this.state.isDraggingOutOfContainer &&
       typeof this.state.noteCardDraggedIndex !== 'undefined'
     ) {
-      this.props.onCardDraggedOut(this.state.noteCardDraggedIndex)
+      if (this.props.onCardDraggedOut) {
+        this.props.onCardDraggedOut(this.state.noteCardDraggedIndex)
+      }
     } else if (this.props.onCardsReorder && oldIndex !== newIndex) {
       this.props.onCardsReorder({ oldIndex, newIndex })
     }
@@ -419,6 +432,8 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
       onMouseLeave,
       zIndex,
       perLineCount,
+      hideContextMenu,
+      disableRemoving,
     } = this.props
 
     return (
@@ -429,6 +444,8 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
           isDraggingOutOfContainer={this.state.isDraggingOutOfContainer}
           innerRef={this.containerRef}
           shouldFlip={this.shouldFlip}
+          hideContextMenu={hideContextMenu}
+          disableRemoving={disableRemoving}
           transitionDuration={DRAG_AND_DROP_TRANSITION_DURATION_MS}
           activeNoteCardIndex={activeNoteCardIndex}
           items={notes}

@@ -50,6 +50,7 @@ export const NoteNamesWithSharps = [
 ]
 
 export const SemitonesToIntervalLongNameMap: { [k in IntervalType]: string } = {
+  '1P': 'Unison',
   '2m': 'Minor second',
   '2M': 'Major second',
   '3m': 'Minor third',
@@ -65,6 +66,7 @@ export const SemitonesToIntervalLongNameMap: { [k in IntervalType]: string } = {
 }
 
 export const SemitonesToIntervalNameMap: { [k in IntervalType]: string } = {
+  '1P': 'Unison',
   '2m': 'Minor 2nd',
   '2M': 'Major 2nd',
   '3m': 'Minor 3rd',
@@ -82,6 +84,7 @@ export const SemitonesToIntervalNameMap: { [k in IntervalType]: string } = {
 export const SemitonesToIntervalShortNameMap: {
   [k in IntervalType]: string
 } = {
+  '1P': 'P1',
   '2m': 'Mi2',
   '2M': 'Ma2',
   '3m': 'Mi3',

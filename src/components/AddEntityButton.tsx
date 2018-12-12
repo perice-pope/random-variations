@@ -12,6 +12,7 @@ import ButtonWithMenu from './ButtonWithMenu'
 type AddEntityButtonProps = {
   onAddSingleNoteClick: () => any
   onAddToneRowClick: () => any
+  onAddNoteSequenceClick: () => any
   onAddIntervalsClick: () => any
   onAddArpeggioClick: () => any
   onAddScaleClick: () => any
@@ -22,6 +23,7 @@ type AddEntityButtonProps = {
   showHelpTooltip?: boolean
   disableChords?: boolean
   disableToneRow?: boolean
+  disableNoteSequence?: boolean
   disableScales?: boolean
   disableIntervals?: boolean
   disableEnclosures?: boolean
@@ -42,6 +44,7 @@ export default class AddEntityButton extends React.Component<
       disableScales,
       disableSingleNote,
       disableToneRow,
+      disableNoteSequence,
       disableEnclosures,
       showHelpTooltip,
     } = this.props
@@ -52,7 +55,8 @@ export default class AddEntityButton extends React.Component<
       disableEnclosures &&
       disableScales &&
       disableIntervals &&
-      disableToneRow
+      disableToneRow &&
+      disableNoteSequence
     const buttonProps = this.props.buttonProps || {}
 
     return (
@@ -102,6 +106,11 @@ export default class AddEntityButton extends React.Component<
             {!disableToneRow && (
               <MenuItem onClick={this.props.onAddToneRowClick}>
                 Tone row
+              </MenuItem>
+            )}
+            {!disableNoteSequence && (
+              <MenuItem onClick={this.props.onAddNoteSequenceClick}>
+                Note sequence
               </MenuItem>
             )}
             {!disableIntervals && (
