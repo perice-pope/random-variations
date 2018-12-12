@@ -521,11 +521,12 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
       cardIdToLine = {}
       let maxLineNotesCount = 0
+      console.log(lineToCardIds)
       for (let line = 0; line < lineToCardIds.length; ++line) {
         let lineNotesCount = 0
         lineToCardIds[line].forEach(cardId => {
           cardIdToLine[cardId] = line
-          lineNotesCount += cardIdToTickIndexes[cardId].length - 1
+          lineNotesCount += cardIdToTickIndexes[cardId].length
         })
 
         maxLineNotesCount = Math.max(lineNotesCount, maxLineNotesCount)
