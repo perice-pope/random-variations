@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as _ from 'lodash'
 import * as tonal from 'tonal'
 
+import memoize from 'memoize-one'
 import Button from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
@@ -28,7 +29,7 @@ import {
   Divider,
 } from '@material-ui/core'
 import NoteCards, { NoteCardNote } from './NoteCards'
-import { NoteNamesWithSharps, SemitonesToIntervalNameMap } from '../musicUtils'
+import { SemitonesToIntervalNameMap } from '../musicUtils'
 import Slider from '@material-ui/lab/Slider'
 
 type NoteSequenceModalProps = {
@@ -36,6 +37,9 @@ type NoteSequenceModalProps = {
   onClose: () => any
   onSubmit: (args: { noteNames: string[] }) => any
 }
+
+const flipDirection = (direction: 'up' | 'down') =>
+  direction === 'up' ? 'down' : 'up'
 
 interface FormValues {
   startNoteName: string
@@ -53,44 +57,6 @@ type NoteSequenceModalState = {
   noteNameMouseOver?: string
 
   notes: NoteCardNote[]
-}
-
-const generateNoteSequence = (
-  noteName: string,
-  stepInterval: number,
-  direction: 'up' | 'down',
-) => {
-  const notes: string[] = []
-  const notesUsedSharps = {}
-  const octave = tonal.Note.oct(noteName)
-  let currentNote = noteName
-  let currentNoteSharp = currentNote.includes('b')
-    ? (tonal.Note.enharmonic(currentNote) as string)
-    : currentNote
-
-  while (!notesUsedSharps[currentNoteSharp] && notes.length <= 12) {
-    notesUsedSharps[currentNoteSharp] = true
-    notes.push(currentNote)
-
-    const nextNote = tonal.Note.fromMidi(
-      (tonal.Note.midi(currentNote) as number) +
-        stepInterval * (direction === 'up' ? 1 : -1),
-    ) as string
-    const nextNotePitch = tonal.Note.pc(nextNote)
-
-    currentNote = `${nextNotePitch}${octave}`
-    currentNoteSharp = currentNote.includes('b')
-      ? (tonal.Note.enharmonic(currentNote) as string)
-      : currentNote
-  }
-
-  return notes.map(
-    (name, index) =>
-      ({
-        noteName: name,
-        id: uuid(),
-      } as NoteCardNote),
-  )
 }
 
 // @ts-ignore
@@ -115,8 +81,92 @@ class NoteSequenceModal extends React.Component<
 
       noteEditingModalIsOpen: false,
 
-      notes: generateNoteSequence(startNoteName, stepInterval, direction),
+      notes: this.generateNoteSequence(startNoteName, stepInterval, direction),
     }
+  }
+
+  generateNoteSequence = (
+    noteName: string,
+    stepInterval: number,
+    direction: 'up' | 'down',
+  ) => {
+    const notes: string[] = []
+    const notesUsedSharps = {}
+    const octave = tonal.Note.oct(noteName) as number
+    let currentNote = noteName
+    let currentNoteSharp = currentNote.includes('b')
+      ? (tonal.Note.enharmonic(currentNote) as string)
+      : currentNote
+
+    let index = 0
+    while (!notesUsedSharps[currentNoteSharp] && notes.length < 12) {
+      notesUsedSharps[currentNoteSharp] = true
+      notes.push(currentNote)
+
+      let nextNote: string
+      let nextNoteOctave: number
+
+      // For perfect 4th / perfect 5th, we want to alternate between up/down step direction
+      if (stepInterval === 5) {
+        const currentDirection =
+          index % 2 ? flipDirection(direction) : direction
+        const currentStepInterval = index % 2 ? 5 : 7
+
+        nextNote = tonal.Note.fromMidi(
+          (tonal.Note.midi(currentNote) as number) +
+            (currentDirection === 'up' ? 1 : -1) * currentStepInterval,
+          true,
+        )
+        nextNoteOctave = tonal.Note.oct(nextNote) as number
+      } else {
+        nextNote = tonal.Note.fromMidi(
+          (tonal.Note.midi(currentNote) as number) +
+            stepInterval * (direction === 'up' ? 1 : -1),
+          true,
+        ) as string
+        nextNoteOctave = tonal.Note.oct(nextNote) as number
+
+        if (nextNoteOctave > octave) {
+          nextNote = tonal.Note.fromMidi(
+            (tonal.Note.midi(nextNote) as number) - 12,
+            true,
+          )
+          nextNoteOctave = tonal.Note.oct(nextNote) as number
+        }
+        if (nextNoteOctave < octave) {
+          nextNote = tonal.Note.fromMidi(
+            (tonal.Note.midi(nextNote) as number) + 12,
+            true,
+          )
+          nextNoteOctave = tonal.Note.oct(nextNote) as number
+        }
+      }
+
+      nextNote =
+        nextNote.includes('#') && direction === 'down'
+          ? (tonal.Note.enharmonic(nextNote) as string)
+          : nextNote
+
+      const nextNoteSharp = nextNote.includes('b')
+        ? (tonal.Note.enharmonic(nextNote) as string)
+        : nextNote
+      console.log(nextNote, nextNoteSharp, direction)
+
+      currentNote = nextNote
+      currentNoteSharp = nextNoteSharp
+
+      index += 1
+    }
+
+    console.log(notes)
+
+    return notes.map(
+      (name, index) =>
+        ({
+          noteName: name,
+          id: uuid(),
+        } as NoteCardNote),
+    )
   }
 
   setNoteNameMouseOver = noteName =>
@@ -150,7 +200,7 @@ class NoteSequenceModal extends React.Component<
 
   regenerateNoteSequence = () => {
     this.setState({
-      notes: generateNoteSequence(
+      notes: this.generateNoteSequence(
         this.state.values.startNoteName,
         this.state.values.stepInterval,
         this.state.values.direction,
@@ -176,19 +226,19 @@ class NoteSequenceModal extends React.Component<
     { title: 'Down', value: 'down' },
   ]
 
-  private getIntervalOptions = () =>
-    NoteNamesWithSharps.map(
-      noteName => tonal.Distance.semitones(noteName, 'C') as number,
-    )
-      .filter(x => x != null)
-      .map(semitones => {
-        const interval = tonal.Interval.fromSemitones(semitones)
-        const intervalName = SemitonesToIntervalNameMap[interval]
-        return {
-          title: intervalName || interval,
-          value: semitones,
-        }
-      })
+  private getIntervalOptions = memoize(() =>
+    ['2m', '2M', '3m', '3M', '4P', '5d'].map(interval => {
+      const semitones = tonal.Interval.semitones(interval) as number
+      const intervalName =
+        interval === '4P'
+          ? 'Perfect 4th / Perfect 5th'
+          : SemitonesToIntervalNameMap[interval]
+      return {
+        title: intervalName || interval,
+        value: semitones,
+      }
+    }),
+  )
 
   private handleStartNoteChange = (index, { noteName }) =>
     this.setState(
@@ -252,7 +302,7 @@ class NoteSequenceModal extends React.Component<
             <Flex mb={2} mt={2} width={1} flexDirection="row" flexWrap="wrap">
               <FormControl
                 className={css(
-                  `width: 100%; max-width: 150px; margin-right: 20px;`,
+                  `width: 100%; max-width: 210px; margin-right: 20px;`,
                 )}
               >
                 <InputLabel htmlFor="select-interval">Step interval</InputLabel>
@@ -303,8 +353,8 @@ class NoteSequenceModal extends React.Component<
                   this.state.values.stepInterval *
                   (this.state.values.direction === 'up' ? 1 : -1)
                 }
-                min={-12}
-                max={12}
+                min={-7}
+                max={7}
                 step={1}
                 aria-labelledby="slider-label"
                 onChange={this.handleSliderValueChanged}
@@ -315,7 +365,7 @@ class NoteSequenceModal extends React.Component<
 
             <Box mt={4} width={1}>
               <Typography variant="h5">Resulting note sequence</Typography>
-              <div className={css(`min-height: 180px;`)}>
+              <div className={css(`min-height: 250px;`)}>
                 <Flex flexWrap="wrap" flex={1} mt={2}>
                   <NoteCards
                     hideContextMenu
