@@ -2408,6 +2408,7 @@ class App extends React.Component<
               audioFontId: settingsStore.audioFontId,
               clefType: settingsStore.clefType,
               showNoteNamesAboveStaff: settingsStore.showNoteNamesAboveStaff,
+              showNoteOctaves: settingsStore.showNoteOctaves,
             }}
             onSubmit={this.submitSettingsModal}
             onAudioFontChanged={this.handleAudioFontChanged}

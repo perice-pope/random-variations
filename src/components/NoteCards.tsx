@@ -21,6 +21,8 @@ import { Flex, Text } from './ui'
 import NoteCard from './NoteCard'
 import { getNoteCardColorByNoteName } from '../utils'
 import PickNoteModal from './PickNoteModal'
+import { observer } from 'mobx-react'
+import settingsStore from '../services/settingsStore'
 
 const FlipperStyled = styled(Flipper)`
   width: 100%;
@@ -237,83 +239,89 @@ const SortableNoteCard = SortableElement(
 )
 
 const SortableNotesContainer = SortableContainer(
-  ({
-    items,
-    isDragging,
-    zIndex,
-    isDraggingOutOfContainer,
-    innerRef,
-    children,
-    activeNoteCardIndex,
-    hideContextMenu,
-    disableRemoving,
-    shouldFlip,
-    onChangeToEnharmonicClick,
-    onEditClick,
-    perLineCount,
-    onDeleteClick,
-    onEditNote,
-    onMouseOver,
-    onMouseLeave,
-  }) => {
-    let backgroundColor = 'transparent'
-    if (isDraggingOutOfContainer) {
-      backgroundColor = '#ffe4e4'
-    } else if (isDragging) {
-      backgroundColor = '#eff8ff'
-    }
+  observer(
+    ({
+      items,
+      isDragging,
+      zIndex,
+      isDraggingOutOfContainer,
+      innerRef,
+      children,
+      activeNoteCardIndex,
+      hideContextMenu,
+      disableRemoving,
+      shouldFlip,
+      onChangeToEnharmonicClick,
+      onEditClick,
+      perLineCount,
+      onDeleteClick,
+      onEditNote,
+      onMouseOver,
+      onMouseLeave,
+    }) => {
+      let backgroundColor = 'transparent'
+      if (isDraggingOutOfContainer) {
+        backgroundColor = '#ffe4e4'
+      } else if (isDragging) {
+        backgroundColor = '#eff8ff'
+      }
 
-    return (
-      <div
-        ref={innerRef}
-        className={css(`
+      return (
+        <div
+          ref={innerRef}
+          className={css(`
           width: 100%;
           border-radius: 15px;
           transition: background-color 0.3s;
           background-color: ${backgroundColor}
       `)}
-      >
-        <FlipperStyled flipKey={items}>
-          {items.map(({ noteName, id }, index) => (
-            <SortableNoteCard
-              noteName={noteName}
-              // @ts-ignore
-              shouldFlip={shouldFlip}
-              id={id}
-              key={id}
-              index={index}
-              // @ts-ignore
-              bgColor={getNoteCardColorByNoteName(noteName)}
-              tabIndex={-1}
-              perLineCount={perLineCount}
-              hideContextMenu={hideContextMenu}
-              disableRemoving={disableRemoving}
-              width={1}
-              zIndex={zIndex}
-              active={activeNoteCardIndex === index}
-              onEditClick={() => onEditClick(index)}
-              onNoteEdited={noteName => onEditNote(index, noteName)}
-              onChangeToEnharmonicClick={() => onChangeToEnharmonicClick(index)}
-              onDeleteClick={() => onDeleteClick(index)}
-              onMouseOver={() => {
-                if (onMouseOver) {
-                  onMouseOver(index)
+        >
+          <FlipperStyled flipKey={items}>
+            {items.map(({ noteName, id }, index) => (
+              <SortableNoteCard
+                noteName={noteName}
+                // @ts-ignore
+                shouldFlip={shouldFlip}
+                id={id}
+                key={id}
+                index={index}
+                // @ts-ignore
+                bgColor={getNoteCardColorByNoteName(noteName)}
+                tabIndex={-1}
+                perLineCount={perLineCount}
+                hideContextMenu={hideContextMenu}
+                disableRemoving={disableRemoving}
+                width={1}
+                zIndex={zIndex}
+                active={activeNoteCardIndex === index}
+                onEditClick={() => onEditClick(index)}
+                onNoteEdited={noteName => onEditNote(index, noteName)}
+                onChangeToEnharmonicClick={() =>
+                  onChangeToEnharmonicClick(index)
                 }
-              }}
-              onMouseLeave={() => {
-                if (onMouseLeave) {
-                  onMouseLeave(index)
-                }
-              }}
-            >
-              {noteName}
-            </SortableNoteCard>
-          ))}
-          {children}
-        </FlipperStyled>
-      </div>
-    )
-  },
+                onDeleteClick={() => onDeleteClick(index)}
+                onMouseOver={() => {
+                  if (onMouseOver) {
+                    onMouseOver(index)
+                  }
+                }}
+                onMouseLeave={() => {
+                  if (onMouseLeave) {
+                    onMouseLeave(index)
+                  }
+                }}
+              >
+                {settingsStore.showNoteOctaves
+                  ? noteName
+                  : tonal.Note.pc(noteName)}
+              </SortableNoteCard>
+            ))}
+            {children}
+          </FlipperStyled>
+        </div>
+      )
+    },
+  ),
 )
 
 const DRAG_AND_DROP_TRANSITION_DURATION_MS = 300

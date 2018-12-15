@@ -28,6 +28,7 @@ export type SettingsFormValues = {
   audioFontId: AudioFontId
   clefType: ClefType
   showNoteNamesAboveStaff: boolean
+  showNoteOctaves: boolean
 }
 
 type SubmitArgsType = {
@@ -118,6 +119,13 @@ class SettingsModal extends React.Component<
     })
   }
 
+  handleChangeShownNoteOctaves = event => {
+    const value = event.target.checked
+    this.setState({
+      values: { ...this.state.values, showNoteOctaves: value },
+    })
+  }
+
   render() {
     return (
       <Dialog
@@ -135,6 +143,22 @@ class SettingsModal extends React.Component<
 
         <DialogContent>
           <Box mb={3}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={this.state.values.showNoteOctaves}
+                  onChange={this.handleChangeShownNoteOctaves}
+                  value={this.state.values.showNoteOctaves}
+                  color="primary"
+                />
+              }
+              label="Show octave numbers next to note names (e.g. C3)"
+            />
+          </Box>
+
+          <Divider light />
+
+          <Box mb={3} mt={3}>
             <Typography variant="h5">Instrument sound</Typography>
 
             <Box mt={2}>
@@ -187,7 +211,7 @@ class SettingsModal extends React.Component<
                   color="primary"
                 />
               }
-              label="Show note names above staff?"
+              label="Show note names above staff"
             />
           </Box>
         </DialogContent>

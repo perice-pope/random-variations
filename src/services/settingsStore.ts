@@ -7,6 +7,7 @@ interface SettingsStoreData {
   clefType: ClefType
   enharmonicFlatsMap: EnharmonicFlatsMap
   scaleZoomFactor: number
+  showNoteOctaves: boolean
   showNoteNamesAboveStaff: boolean
 }
 
@@ -24,6 +25,9 @@ class SettingsStore {
   @observable
   public showNoteNamesAboveStaff = true
 
+  @observable
+  public showNoteOctaves = false
+
   public saveSettingsLocally = () => {
     const savedState: SettingsStoreData = {
       audioFontId: this.audioFontId,
@@ -31,6 +35,7 @@ class SettingsStore {
       clefType: this.clefType,
       scaleZoomFactor: this.scaleZoomFactor,
       showNoteNamesAboveStaff: this.showNoteNamesAboveStaff,
+      showNoteOctaves: this.showNoteOctaves,
     }
     console.log('SettingsStore > saveSettingsLocally: ', savedState)
     window.localStorage.setItem('appState', JSON.stringify(savedState))
