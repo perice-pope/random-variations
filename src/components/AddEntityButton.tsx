@@ -6,7 +6,7 @@ import AddIcon from '@material-ui/icons/Add'
 import Button, { ButtonProps } from '@material-ui/core/Button'
 import { css } from 'emotion'
 import Tooltip from './ui/Tooltip'
-import { Hidden } from '@material-ui/core'
+import { Hidden, Divider } from '@material-ui/core'
 import ButtonWithMenu from './ButtonWithMenu'
 
 type AddEntityButtonProps = {
@@ -17,6 +17,7 @@ type AddEntityButtonProps = {
   onAddArpeggioClick: () => any
   onAddScaleClick: () => any
   onAddEnclosuresClick: () => any
+  onAddDirectionsClick: () => any
   buttonProps?: ButtonProps
   enableOnlyNote?: boolean
   disableSingleNote?: boolean
@@ -27,6 +28,7 @@ type AddEntityButtonProps = {
   disableScales?: boolean
   disableIntervals?: boolean
   disableEnclosures?: boolean
+  disableDirections?: boolean
 }
 
 export default class AddEntityButton extends React.Component<
@@ -46,6 +48,7 @@ export default class AddEntityButton extends React.Component<
       disableToneRow,
       disableNoteSequence,
       disableEnclosures,
+      disableDirections,
       showHelpTooltip,
     } = this.props
 
@@ -56,7 +59,9 @@ export default class AddEntityButton extends React.Component<
       disableScales &&
       disableIntervals &&
       disableToneRow &&
-      disableNoteSequence
+      disableNoteSequence &&
+      disableDirections
+
     const buttonProps = this.props.buttonProps || {}
 
     return (
@@ -108,11 +113,16 @@ export default class AddEntityButton extends React.Component<
                 Tone row
               </MenuItem>
             )}
-            {!disableNoteSequence && (
-              <MenuItem onClick={this.props.onAddNoteSequenceClick}>
-                Note sequence
-              </MenuItem>
-            )}
+
+            <MenuItem
+              onClick={this.props.onAddNoteSequenceClick}
+              disabled={disableNoteSequence}
+            >
+              Note sequence
+            </MenuItem>
+
+            <Divider />
+
             {!disableIntervals && (
               <MenuItem
                 disabled={enableOnlyNote}
@@ -145,6 +155,15 @@ export default class AddEntityButton extends React.Component<
                 Enclosures
               </MenuItem>
             )}
+
+            <Divider />
+
+            <MenuItem
+              onClick={this.props.onAddDirectionsClick}
+              disabled={disableDirections}
+            >
+              Pattern directions
+            </MenuItem>
           </Menu>
         )}
       />

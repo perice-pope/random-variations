@@ -161,6 +161,14 @@ export interface EnclosuresModifier {
   enclosure: Enclosure
 }
 
+export type PatternDirectionType = 'forward' | 'reversed'
+
+export interface PatternDirection {
+  title: string
+  type: string
+  pattern: PatternDirectionType[]
+}
+
 export type IntervalType =
   | '1P'
   | '2m'
@@ -176,6 +184,12 @@ export type IntervalType =
   | '7M'
   | '8P'
 
+export interface DirectionsModifier {
+  enabled: boolean
+  random: boolean
+  direction: PatternDirection
+}
+
 export interface IntervalsModifier {
   enabled: boolean
   // See https://danigb.github.io/tonal/api/module-Distance.html#.interval
@@ -189,6 +203,7 @@ export interface NoteModifiers {
   scales: ScaleModifier
   enclosures: EnclosuresModifier
   intervals: IntervalsModifier
+  directions: DirectionsModifier
 }
 
 export interface SessionNoteCard {

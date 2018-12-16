@@ -147,6 +147,9 @@ import ToneRowModal from './ToneRowModal'
 import { trackPageView } from '../services/googleAnalytics'
 import NoteSequenceModal from './NoteSequenceModal'
 import Slider from '@material-ui/lab/Slider'
+import DirectionsModifierModal, {
+  SubmitValuesType as DirectionsModifierModalSubmitValues,
+} from './DirectionsModifierModal'
 
 globalStyles()
 smoothscroll.polyfill()
@@ -203,6 +206,7 @@ type AppState = {
   chordsModalIsOpen: boolean
   scalesModalIsOpen: boolean
   intervalsModalIsOpen: boolean
+  directionsModalIsOpen: boolean
 
   noteAddingModalIsOpen: boolean
   toneRowAddingModalIsOpen: boolean
@@ -395,6 +399,7 @@ class App extends React.Component<
       chordsModalIsOpen: false,
       scalesModalIsOpen: false,
       intervalsModalIsOpen: false,
+      directionsModalIsOpen: false,
       noteAddingModalIsOpen: false,
       toneRowAddingModalIsOpen: false,
       noteSequenceAddingModalIsOpen: false,
@@ -1037,6 +1042,11 @@ class App extends React.Component<
   private closeIntervalsModal = () =>
     this.setState({ intervalsModalIsOpen: false })
 
+  private openDirectionsModal = () =>
+    this.setState({ directionsModalIsOpen: true })
+  private closeDirectionsModal = () =>
+    this.setState({ directionsModalIsOpen: false })
+
   private openEnclosuresModal = () =>
     this.setState({ enclosuresModalIsOpen: true })
   private closeEnclosuresModal = () =>
@@ -1078,6 +1088,18 @@ class App extends React.Component<
       }
     }
     this.closeArpeggioAddingModal()
+  }
+
+  private handleDirectionsModifierModalConfirm = (
+    values: DirectionsModifierModalSubmitValues,
+  ) => {
+    if (sessionStore.activeSession) {
+      sessionStore.activeSession.modifiers.directions = {
+        ...values,
+        enabled: true,
+      }
+    }
+    this.closeDirectionsModal()
   }
 
   private handleScaleModifierModalConfirm = (
@@ -1122,6 +1144,12 @@ class App extends React.Component<
   private handleRemoveArpeggioClick = () => {
     if (sessionStore.activeSession) {
       sessionStore.activeSession.modifiers.chords.enabled = false
+    }
+  }
+
+  private handleRemoveDirectionsClick = () => {
+    if (sessionStore.activeSession) {
+      sessionStore.activeSession.modifiers.directions.enabled = false
     }
   }
 
@@ -1390,7 +1418,11 @@ class App extends React.Component<
         closeAfterClick={false}
         renderButton={props =>
           this.props.width === 'xs' ? (
-            <Tooltip title="Session actions..." disableFocusListener disableTouchListener>
+            <Tooltip
+              title="Session actions..."
+              disableFocusListener
+              disableTouchListener
+            >
               <IconButton color="default" {...props}>
                 <MoreVertIcon />
               </IconButton>
@@ -1525,7 +1557,11 @@ class App extends React.Component<
     )
 
     const SessionParamsButton = (
-      <Tooltip title={'Tempo, rests and count-in settings'} disableFocusListener disableTouchListener>
+      <Tooltip
+        title={'Tempo, rests and count-in settings'}
+        disableFocusListener
+        disableTouchListener
+      >
         <MuiButton
           color="default"
           className={css(`display: inline-flex; align-items: center; `)}
@@ -1827,6 +1863,26 @@ class App extends React.Component<
               }
               onClick={this.openEnclosuresModal}
               onDelete={this.handleRemoveEnclosuresClick}
+            />
+          </Tooltip>
+        )}
+
+        {modifiers.directions.enabled && (
+          <Tooltip title="Change pattern directions" disableFocusListener>
+            <Chip
+              {...chipsProps}
+              label={`Direction: ${modifiers.directions.direction.title}`}
+              onClick={this.openDirectionsModal}
+              onDelete={this.handleRemoveDirectionsClick}
+              deleteIcon={
+                <Tooltip
+                  variant="gray"
+                  title="Remove directions"
+                  placement="top"
+                >
+                  <DeleteIcon />
+                </Tooltip>
+              }
             />
           </Tooltip>
         )}
@@ -2165,10 +2221,7 @@ class App extends React.Component<
                       />
                     </Grow>
 
-                    <Fade
-                      in={this.state.isInitialized}
-                      appear
-                    >
+                    <Fade in={this.state.isInitialized} appear>
                       <Box
                         px={[1, 2, 2]}
                         width={1}
@@ -2198,6 +2251,7 @@ class App extends React.Component<
                               onAddNoteSequenceClick={
                                 this.openNoteSequenceAddingModal
                               }
+                              onAddDirectionsClick={this.openDirectionsModal}
                               onAddArpeggioClick={this.openArpeggioAddingModal}
                               onAddScaleClick={this.openScalesModal}
                               onAddEnclosuresClick={this.openEnclosuresModal}
@@ -2207,6 +2261,12 @@ class App extends React.Component<
                               }
                               disableToneRow={noteCards.length >= MaxNoteCards}
                               disableNoteSequence={noteCards.length > 0}
+                              disableDirections={
+                                modifiers.directions.enabled ||
+                                (!modifiers.scales.enabled &&
+                                  !modifiers.chords.enabled &&
+                                  !modifiers.intervals.enabled)
+                              }
                               disableChords={
                                 modifiers.chords.enabled ||
                                 modifiers.scales.enabled ||
@@ -2462,6 +2522,13 @@ class App extends React.Component<
             isOpen={this.state.noteSequenceAddingModalIsOpen}
             onClose={this.closeNoteSequenceAddingModal}
             onSubmit={this.handleAddNoteSequenceModalSubmit}
+          />
+
+          <DirectionsModifierModal
+            isOpen={this.state.directionsModalIsOpen}
+            onClose={this.closeDirectionsModal}
+            onSubmit={this.handleDirectionsModifierModalConfirm}
+            initialValues={modifiers.directions}
           />
 
           <PickNoteModal

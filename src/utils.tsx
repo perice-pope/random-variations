@@ -10,6 +10,7 @@ import {
   generateScalePatternFromPreset,
   scaleByScaleType,
   enclosureByEnclosureType,
+  patternDirectionOptions,
 } from './musicUtils'
 
 import TimeAgo from 'react-time-ago'
@@ -146,6 +147,11 @@ export const createDefaultSession = () => {
     countInCounts: 3,
     countInEnabled: false,
     modifiers: {
+      directions: {
+        enabled: false,
+        random: false,
+        direction: patternDirectionOptions[0],
+      },
       intervals: {
         enabled: false,
         direction: 'ascending',

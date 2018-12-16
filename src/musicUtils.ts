@@ -32,6 +32,7 @@ import {
   EnclosuresType,
   ChordType,
   ScaleType,
+  PatternDirection,
 } from './types'
 
 export const NoteNamesWithSharps = [
@@ -114,6 +115,31 @@ window.tonal = tonal
 // @ts-ignore
 window.getSemitonesUpTransposer = getSemitonesTransposer
 
+const getAllPatternDirectionOptions: () => PatternDirection[] = memoize(() => {
+  return [
+    {
+      title: 'Forward',
+      type: 'forward',
+      pattern: ['forward'],
+    } as PatternDirection,
+    {
+      title: 'Reversed',
+      type: 'reversed',
+      pattern: ['reversed'],
+    } as PatternDirection,
+    {
+      title: 'Forward / Reversed',
+      type: 'forward-reversed',
+      pattern: ['forward', 'reversed'],
+    } as PatternDirection,
+    {
+      title: 'Reversed / Forward',
+      type: 'reversed-forward',
+      pattern: ['reversed', 'forward'],
+    } as PatternDirection,
+  ]
+})
+
 const getAllChordOptions: () => Chord[] = memoize(() => {
   return _.uniqBy(
     // @ts-ignore
@@ -179,6 +205,14 @@ export const scaleByScaleType = _.keyBy(scaleOptions, 'type') as {
 export const enclosureOptions = getAllEnclosureOptions()
 export const enclosureByEnclosureType = _.keyBy(enclosureOptions, 'type') as {
   [type in EnclosuresType]: Enclosure
+}
+
+export const patternDirectionOptions = getAllPatternDirectionOptions()
+export const patternDirectionByType = _.keyBy(
+  patternDirectionOptions,
+  'type',
+) as {
+  [type: string]: PatternDirection
 }
 
 export const generateChordPatternFromPreset = ({
