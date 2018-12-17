@@ -441,14 +441,6 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
       this.renderContext
         .setFont('Sans-Serif', fontSize, 900)
         .fillText(label, x, y)
-
-      // const annotation = new Vex.Flow.Annotation(label)
-      //   .setFont('Sans-serif', fontSize, 'bold')
-      //   .setVerticalJustification(Vex.Flow.Annotation.VerticalJustify.TOP)
-
-      // this.labelAnnotations.push(annotation)
-
-      // vexFlowNote.addModifier(0, annotation)
     })
 
     this.renderContext.setStrokeStyle('black')
