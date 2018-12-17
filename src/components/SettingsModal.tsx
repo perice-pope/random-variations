@@ -211,7 +211,7 @@ class SettingsModal extends React.Component<
                   color="primary"
                 />
               }
-              label="Show note names above staff"
+              label="Show note / chord names above staff"
             />
           </Box>
         </DialogContent>

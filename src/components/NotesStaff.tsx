@@ -360,31 +360,6 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         })
 
         notes = [vexFlowNote]
-
-        if (this.props.tickLabels && this.props.tickLabels[index]) {
-          const label = this.props.tickLabels[index]
-          let fontSize = 17
-          if (label.length > 2) {
-            fontSize = 15
-          }
-          if (label.length > 4) {
-            fontSize = 14
-          }
-          if (label.length > 6) {
-            fontSize = 13
-          }
-          if (label.length > 8) {
-            fontSize = 12
-          }
-
-          const annotation = new Vex.Flow.Annotation(label)
-            .setFont('Sans-serif', fontSize, 'bold')
-            .setVerticalJustification(Vex.Flow.Annotation.VerticalJustify.TOP)
-
-          this.labelAnnotations.push(annotation)
-
-          vexFlowNote.addModifier(0, annotation)
-        }
       }
 
       if (shouldAddMeasureLine) {
@@ -434,6 +409,47 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         _.flatten(lineToTickNotes[i]),
       )
     }
+
+    tickToNotes.forEach((notes, tickIndex) => {
+      if (
+        notes.length === 0 ||
+        !this.props.tickLabels ||
+        !this.props.tickLabels[tickIndex]
+      ) {
+        return
+      }
+
+      const label = this.props.tickLabels[tickIndex]
+      let fontSize = 17
+      if (label.length > 2) {
+        fontSize = 15
+      }
+      if (label.length > 4) {
+        fontSize = 14
+      }
+      if (label.length > 6) {
+        fontSize = 13
+      }
+      if (label.length > 8) {
+        fontSize = 12
+      }
+
+      const firstNote = notes[0]
+      const y = firstNote.getYForTopText(1)
+      const x = firstNote.getAbsoluteX()
+
+      this.renderContext
+        .setFont('Sans-Serif', fontSize, 900)
+        .fillText(label, x, y)
+
+      // const annotation = new Vex.Flow.Annotation(label)
+      //   .setFont('Sans-serif', fontSize, 'bold')
+      //   .setVerticalJustification(Vex.Flow.Annotation.VerticalJustify.TOP)
+
+      // this.labelAnnotations.push(annotation)
+
+      // vexFlowNote.addModifier(0, annotation)
+    })
 
     this.renderContext.setStrokeStyle('black')
     this.renderContext.setFillStyle('black')
