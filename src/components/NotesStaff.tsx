@@ -448,7 +448,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
   }
 
   updateActiveNoteLine = () => {
-    console.log('updateActiveNoteLine')
+    // console.log('updateActiveNoteLine')
     if (!this.activeLineEl) {
       this.drawActiveNoteLine()
     }

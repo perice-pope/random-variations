@@ -72,6 +72,11 @@ class DirectionsModifierModal extends React.Component<
 
   handleDirectionTypeSelected = (e: ChangeEvent<HTMLSelectElement>) => {
     const directionType = e.target.value
+    console.log(
+      directionType,
+      patternDirectionByType,
+      patternDirectionByType[directionType],
+    )
 
     this.setState({
       values: {
@@ -102,7 +107,7 @@ class DirectionsModifierModal extends React.Component<
         <DialogTitle id="direction-modifier-dialog">
           <Typography variant="h4">Directions</Typography>
           <Typography variant="subtitle1">
-            Change direction of scale and chord patterns
+            Change direction of note patterns in each measure
           </Typography>
         </DialogTitle>
 

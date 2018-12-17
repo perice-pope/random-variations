@@ -116,30 +116,96 @@ window.tonal = tonal
 // @ts-ignore
 window.getSemitonesUpTransposer = getSemitonesTransposer
 
-const getAllPatternDirectionOptions: () => PatternDirection[] = memoize(() => {
+const getAllPatternDirectionOptions: () => PatternDirection[] = () => {
   return [
     {
-      title: 'Forward',
-      type: 'forward',
       pattern: ['forward'],
-    } as PatternDirection,
+    } as Partial<PatternDirection>,
     {
-      title: 'Reversed',
-      type: 'reversed',
       pattern: ['reversed'],
-    } as PatternDirection,
+    } as Partial<PatternDirection>,
     {
-      title: 'Forward / Reversed',
-      type: 'forward-reversed',
       pattern: ['forward', 'reversed'],
-    } as PatternDirection,
+    } as Partial<PatternDirection>,
     {
-      title: 'Reversed / Forward',
-      type: 'reversed-forward',
       pattern: ['reversed', 'forward'],
-    } as PatternDirection,
-  ]
-})
+    } as Partial<PatternDirection>,
+
+    {
+      pattern: ['forward', 'forward', 'reversed'],
+    } as Partial<PatternDirection>,
+    {
+      pattern: ['forward', 'reversed', 'forward'],
+    } as Partial<PatternDirection>,
+    {
+      pattern: ['forward', 'reversed', 'reversed'],
+    } as Partial<PatternDirection>,
+    {
+      pattern: ['reversed', 'forward', 'forward'],
+    } as Partial<PatternDirection>,
+    {
+      pattern: ['reversed', 'forward', 'reversed'],
+    } as Partial<PatternDirection>,
+    {
+      pattern: ['reversed', 'reversed', 'forward'],
+    } as Partial<PatternDirection>,
+    {
+      pattern: ['reversed', 'reversed', 'forward'],
+    } as Partial<PatternDirection>,
+
+    {
+      pattern: ['forward', 'forward', 'forward', 'reversed'],
+    } as Partial<PatternDirection>,
+    {
+      pattern: ['forward', 'forward', 'reversed', 'forward'],
+    } as Partial<PatternDirection>,
+    {
+      pattern: ['forward', 'reversed', 'forward', 'forward'],
+    } as Partial<PatternDirection>,
+    {
+      pattern: ['reversed', 'forward', 'forward', 'forward'],
+    } as Partial<PatternDirection>,
+
+    {
+      pattern: ['forward', 'forward', 'reversed', 'reversed'],
+    } as Partial<PatternDirection>,
+    {
+      pattern: ['forward', 'reversed', 'forward', 'reversed'],
+    } as Partial<PatternDirection>,
+    {
+      pattern: ['forward', 'reversed', 'reversed', 'forward'],
+    } as Partial<PatternDirection>,
+    {
+      pattern: ['reversed', 'forward', 'forward', 'reversed'],
+    } as Partial<PatternDirection>,
+    {
+      pattern: ['reversed', 'forward', 'reversed', 'forward'],
+    } as Partial<PatternDirection>,
+    {
+      pattern: ['reversed', 'reversed', 'forward', 'forward'],
+    } as Partial<PatternDirection>,
+
+    {
+      pattern: ['forward', 'reversed', 'reversed', 'reversed'],
+    } as Partial<PatternDirection>,
+    {
+      pattern: ['reversed', 'forward', 'reversed', 'reversed'],
+    } as Partial<PatternDirection>,
+    {
+      pattern: ['reversed', 'reversed', 'forward', 'reversed'],
+    } as Partial<PatternDirection>,
+    {
+      pattern: ['reversed', 'reversed', 'reversed', 'forward'],
+    } as Partial<PatternDirection>,
+  ].map(
+    ({ pattern }) =>
+      ({
+        pattern,
+        title: pattern!.map(x => _.capitalize(x)).join(' / '),
+        type: pattern!.map(x => x[0]).join(''),
+      } as PatternDirection),
+  )
+}
 
 const getAllChordOptions: () => Chord[] = memoize(() => {
   return _.uniqBy(
@@ -215,6 +281,8 @@ export const patternDirectionByType = _.keyBy(
 ) as {
   [type: string]: PatternDirection
 }
+
+console.log(patternDirectionOptions, patternDirectionByType)
 
 export const generateChordPatternFromPreset = ({
   chord,

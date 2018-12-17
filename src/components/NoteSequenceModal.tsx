@@ -150,15 +150,12 @@ class NoteSequenceModal extends React.Component<
       const nextNoteSharp = nextNote.includes('b')
         ? (tonal.Note.enharmonic(nextNote) as string)
         : nextNote
-      console.log(nextNote, nextNoteSharp, direction)
 
       currentNote = nextNote
       currentNoteSharp = nextNoteSharp
 
       index += 1
     }
-
-    console.log(notes)
 
     return notes.map(
       (name, index) =>

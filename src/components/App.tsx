@@ -734,8 +734,6 @@ class App extends React.Component<
 
     const keyWidth = width / keysCount
 
-    console.log(height)
-
     if (height <= 360) {
       return 30
     }
@@ -1871,7 +1869,7 @@ class App extends React.Component<
           <Tooltip title="Change pattern directions" disableFocusListener>
             <Chip
               {...chipsProps}
-              label={`Direction: ${modifiers.directions.direction.title}`}
+              label={`Direction: ${modifiers.directions.direction.title.split(' / ').map(x => x[0]).join(', ')}`}
               onClick={this.openDirectionsModal}
               onDelete={this.handleRemoveDirectionsClick}
               deleteIcon={
