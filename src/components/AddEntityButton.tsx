@@ -103,16 +103,19 @@ export default class AddEntityButton extends React.Component<
         )}
         renderMenu={props => (
           <Menu id="add-entity-menu" {...props}>
-            {!disableSingleNote && (
-              <MenuItem onClick={this.props.onAddSingleNoteClick}>
-                Note
-              </MenuItem>
-            )}
-            {!disableToneRow && (
-              <MenuItem onClick={this.props.onAddToneRowClick}>
-                Tone row
-              </MenuItem>
-            )}
+            <MenuItem
+              onClick={this.props.onAddSingleNoteClick}
+              disabled={disableSingleNote}
+            >
+              Note
+            </MenuItem>
+
+            <MenuItem
+              onClick={this.props.onAddToneRowClick}
+              disabled={disableToneRow}
+            >
+              Tone row
+            </MenuItem>
 
             <MenuItem
               onClick={this.props.onAddNoteSequenceClick}

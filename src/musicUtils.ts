@@ -33,6 +33,7 @@ import {
   ChordType,
   ScaleType,
   PatternDirection,
+  PatternDirectionType,
 } from './types'
 
 export const NoteNamesWithSharps = [
@@ -724,7 +725,9 @@ export const generateStaffTicks = ({
   const tickLabels: { [tickIndex: number]: string } = {}
 
   let currentTickIndex = 0
-  noteCards.forEach(noteCard => {
+  let currentDirectionIndex = 0
+
+  noteCards.forEach((noteCard, noteCardIndex) => {
     let ticksForCard: StaffTick[] = [
       {
         noteCardId: noteCard.id,
@@ -751,6 +754,23 @@ export const generateStaffTicks = ({
 
     if (modifiers.enclosures.enabled) {
       ticksForCard = addEnclosureNotes(ticksForCard, modifiers.enclosures)
+    }
+
+    if (modifiers.directions.enabled) {
+      let direction: PatternDirectionType = 'forward'
+      if (modifiers.directions.random) {
+        direction = Math.random() > 0.5 ? 'forward' : 'reversed'
+      } else {
+        direction =
+          modifiers.directions.direction.pattern[currentDirectionIndex]
+        currentDirectionIndex =
+          (currentDirectionIndex + 1) %
+          modifiers.directions.direction.pattern.length
+      }
+
+      if (direction === 'reversed') {
+        ticksForCard = ticksForCard.reverse()
+      }
     }
 
     ticksForCard.forEach(tick => {
