@@ -1,4754 +1,1778 @@
 [
   {
-    "name": "power chord",
+    "name": "Power Chord",
     "symbol": "5",
     "notes": "C G",
-    "semitones": [
-      0,
-      7
-    ],
-    "intervals": [
-      "1P",
-      "5P"
-    ],
+    "semitones": [0, 7],
+    "intervals": ["1P", "5P"],
     "category": "dyad"
   },
   {
-    "name": "major triad",
+    "name": "Major Triad",
     "symbol": "maj",
     "notes": "C E G",
-    "semitones": [
-      0,
-      4,
-      7
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P"
-    ],
+    "semitones": [0, 4, 7],
+    "intervals": ["1P", "3M", "5P"],
     "category": "triads"
   },
   {
-    "name": "augmented triad",
+    "name": "Augmented Triad",
     "symbol": "+",
     "notes": "C E G#",
-    "semitones": [
-      0,
-      4,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A"
-    ],
+    "semitones": [0, 4, 8],
+    "intervals": ["1P", "3M", "5A"],
     "category": "triads"
   },
   {
-    "name": "major b 5 triad",
+    "name": "Major (b5) Triad",
     "symbol": "maj (b5)",
     "notes": "C E Gb",
-    "semitones": [
-      0,
-      4,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d"
-    ],
+    "semitones": [0, 4, 6],
+    "intervals": ["1P", "3M", "5d"],
     "category": "triads"
   },
   {
-    "name": "suspended 4 triad",
+    "name": "Suspended 4 Triad",
     "symbol": "sus",
     "notes": "C F G",
-    "semitones": [
-      0,
-      5,
-      7
-    ],
-    "intervals": [
-      "1P",
-      "4P",
-      "5P"
-    ],
+    "semitones": [0, 5, 7],
+    "intervals": ["1P", "4P", "5P"],
     "category": "triads"
   },
   {
-    "name": "suspended 2 triad",
+    "name": "Suspended 2 Triad",
     "symbol": "sus2",
     "notes": "C D G",
-    "semitones": [
-      0,
-      2,
-      7
-    ],
-    "intervals": [
-      "1P",
-      "2M",
-      "5P"
-    ],
+    "semitones": [0, 2, 7],
+    "intervals": ["1P", "2M", "5P"],
     "category": "triads"
   },
   {
-    "name": "minor triad",
+    "name": "Minor Triad",
     "symbol": "-",
     "notes": "C Eb G",
-    "semitones": [
-      0,
-      3,
-      7
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P"
-    ],
+    "semitones": [0, 3, 7],
+    "intervals": ["1P", "3m", "5P"],
     "category": "triads"
   },
   {
-    "name": "minor 5 triad",
+    "name": "Minor (#5) Triad",
     "symbol": "- (#5)",
     "notes": "C Eb G#",
-    "semitones": [
-      0,
-      3,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5A"
-    ],
+    "semitones": [0, 3, 8],
+    "intervals": ["1P", "3m", "5A"],
     "category": "triads"
   },
   {
-    "name": "diminished triad",
+    "name": "Diminished Triad",
     "symbol": "°",
     "notes": "C Eb Gb",
-    "semitones": [
-      0,
-      3,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d"
-    ],
+    "semitones": [0, 3, 6],
+    "intervals": ["1P", "3m", "5d"],
     "category": "triads"
   },
   {
-    "name": "perfect perfect quartal triad",
+    "name": "Perfect Perfect Quartal Triad",
     "symbol": "Q (P4,P4)",
     "notes": "C F Bb",
-    "semitones": [
-      0,
-      5,
-      10
-    ],
-    "intervals": [
-      "1P",
-      "4P",
-      "7m"
-    ],
+    "semitones": [0, 5, 10],
+    "intervals": ["1P", "4P", "7m"],
     "category": "triads"
   },
   {
-    "name": "perfect augmented quartal triad",
+    "name": "Perfect Augmented Quartal Triad",
     "symbol": "Q (P4,A4)",
     "notes": "C F B",
-    "semitones": [
-      0,
-      5,
-      11
-    ],
-    "intervals": [
-      "1P",
-      "4P",
-      "7M"
-    ],
+    "semitones": [0, 5, 11],
+    "intervals": ["1P", "4P", "7M"],
     "category": "triads"
   },
   {
-    "name": "augmented perfect quartal triad",
+    "name": "Augmented Perfect Quartal Triad",
     "symbol": "Q (A4,P4)",
     "notes": "C F# B",
-    "semitones": [
-      0,
-      6,
-      11
-    ],
-    "intervals": [
-      "1P",
-      "4A",
-      "7M"
-    ],
+    "semitones": [0, 6, 11],
+    "intervals": ["1P", "4A", "7M"],
     "category": "triads"
   },
   {
-    "name": "major triad add 2",
+    "name": "Major Triad add 2",
     "symbol": "maj2",
     "notes": "C D E G",
-    "semitones": [
-      0,
-      2,
-      4,
-      7
-    ],
-    "intervals": [
-      "1P",
-      "2M",
-      "3M",
-      "5P"
-    ],
+    "semitones": [0, 2, 4, 7],
+    "intervals": ["1P", "2M", "3M", "5P"],
     "category": "triad add 2"
   },
   {
-    "name": "augemented triad add 2",
+    "name": "Augemented Triad add 2",
     "symbol": "+2",
     "notes": "C D E G#",
-    "semitones": [
-      0,
-      2,
-      4,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "2M",
-      "3M",
-      "5A"
-    ],
+    "semitones": [0, 2, 4, 8],
+    "intervals": ["1P", "2M", "3M", "5A"],
     "category": "triad add 2"
   },
   {
-    "name": "suspended 4 triad add 2",
+    "name": "Suspended 4 Triad add 2",
     "symbol": "sus2/4",
     "notes": "C D F G",
-    "semitones": [
-      0,
-      2,
-      5,
-      7
-    ],
-    "intervals": [
-      "1P",
-      "2M",
-      "4P",
-      "5P"
-    ],
+    "semitones": [0, 2, 5, 7],
+    "intervals": ["1P", "2M", "4P", "5P"],
     "category": "triad add 2"
   },
   {
-    "name": "minor triad add 2",
+    "name": "Minor Triad add 2",
     "symbol": "-2",
     "notes": "C D Eb G",
-    "semitones": [
-      0,
-      2,
-      3,
-      7
-    ],
-    "intervals": [
-      "1P",
-      "2M",
-      "3m",
-      "5P"
-    ],
+    "semitones": [0, 2, 3, 7],
+    "intervals": ["1P", "2M", "3m", "5P"],
     "category": "triad add 2"
   },
   {
-    "name": "diminished triad add 2",
+    "name": "Diminished Triad add 2",
     "symbol": "°2",
     "notes": "C D Eb Gb",
-    "semitones": [
-      0,
-      2,
-      3,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "2M",
-      "3m",
-      "5d"
-    ],
+    "semitones": [0, 2, 3, 6],
+    "intervals": ["1P", "2M", "3m", "5d"],
     "category": "triad add 2"
   },
   {
-    "name": "major b 5 triad add 2",
+    "name": "Major (b5) Triad add 2",
     "symbol": "maj2 (b5)",
     "notes": "C D E Gb",
-    "semitones": [
-      0,
-      2,
-      4,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "2M",
-      "3M",
-      "5d"
-    ],
+    "semitones": [0, 2, 4, 6],
+    "intervals": ["1P", "2M", "3M", "5d"],
     "category": "triad add 2"
   },
   {
-    "name": "major triad add b 2",
+    "name": "Major Triad add b2",
     "symbol": "maj (b2)",
     "notes": "C Db E G",
-    "semitones": [
-      0,
-      1,
-      4,
-      7
-    ],
-    "intervals": [
-      "1P",
-      "2m",
-      "3M",
-      "5P"
-    ],
+    "semitones": [0, 1, 4, 7],
+    "intervals": ["1P", "2m", "3M", "5P"],
     "category": "triad add 2"
   },
   {
-    "name": "augemented add b 2",
+    "name": "Augemented add b2",
     "symbol": "+ (b2)",
     "notes": "C Db E G#",
-    "semitones": [
-      0,
-      1,
-      4,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "2m",
-      "3M",
-      "5A"
-    ],
+    "semitones": [0, 1, 4, 8],
+    "intervals": ["1P", "2m", "3M", "5A"],
     "category": "triad add 2"
   },
   {
-    "name": "suspended 4 triad add b 2",
+    "name": "Suspended 4 Triad add b2",
     "symbol": "sus (b2)",
     "notes": "C Db F G",
-    "semitones": [
-      0,
-      1,
-      5,
-      7
-    ],
-    "intervals": [
-      "1P",
-      "2m",
-      "4P",
-      "5P"
-    ],
+    "semitones": [0, 1, 5, 7],
+    "intervals": ["1P", "2m", "4P", "5P"],
     "category": "triad add 2"
   },
   {
-    "name": "minor triad add b 2",
+    "name": "Minor Triad add b2",
     "symbol": "- (b2)",
     "notes": "C Db Eb G",
-    "semitones": [
-      0,
-      1,
-      3,
-      7
-    ],
-    "intervals": [
-      "1P",
-      "2m",
-      "3m",
-      "5P"
-    ],
+    "semitones": [0, 1, 3, 7],
+    "intervals": ["1P", "2m", "3m", "5P"],
     "category": "triad add 2"
   },
   {
-    "name": "diminished triad add b 2",
+    "name": "Diminished Triad add b2",
     "symbol": "° (b2)",
     "notes": "C Db Eb Gb",
-    "semitones": [
-      0,
-      1,
-      3,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "2m",
-      "3m",
-      "5d"
-    ],
+    "semitones": [0, 1, 3, 6],
+    "intervals": ["1P", "2m", "3m", "5d"],
     "category": "triad add 2"
   },
   {
-    "name": "major b 5 triad add b 2",
+    "name": "Major (b5) Triad add b2",
     "symbol": "maj (b5,b2)",
     "notes": "C Db E Gb",
-    "semitones": [
-      0,
-      1,
-      4,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "2m",
-      "3M",
-      "5d"
-    ],
+    "semitones": [0, 1, 4, 6],
+    "intervals": ["1P", "2m", "3M", "5d"],
     "category": "triad add 2"
   },
   {
-    "name": "major triad add 2",
+    "name": "Major Triad add #2",
     "symbol": "maj (#2)",
     "notes": "C D# E G",
-    "semitones": [
-      0,
-      3,
-      4,
-      7
-    ],
-    "intervals": [
-      "1P",
-      "2A",
-      "3M",
-      "5P"
-    ],
+    "semitones": [0, 3, 4, 7],
+    "intervals": ["1P", "2A", "3M", "5P"],
     "category": "triad add 2"
   },
   {
-    "name": "augemented triad add 2",
+    "name": "Augemented Triad add #2",
     "symbol": "+ (#2)",
     "notes": "C D# E G#",
-    "semitones": [
-      0,
-      3,
-      4,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "2A",
-      "3M",
-      "5A"
-    ],
+    "semitones": [0, 3, 4, 8],
+    "intervals": ["1P", "2A", "3M", "5A"],
     "category": "triad add 2"
   },
   {
-    "name": "major b 5 triad add 2",
+    "name": "Major (b5) Triad add #2",
     "symbol": "maj (b5,#2)",
     "notes": "C D# E Gb",
-    "semitones": [
-      0,
-      3,
-      4,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "2A",
-      "3M",
-      "5d"
-    ],
+    "semitones": [0, 3, 4, 6],
+    "intervals": ["1P", "2A", "3M", "5d"],
     "category": "triad add 2"
   },
   {
-    "name": "major 6",
+    "name": "Major 6",
     "symbol": "6",
     "notes": "C E G A",
-    "semitones": [
-      0,
-      4,
-      7,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "6M"
-    ],
+    "semitones": [0, 4, 7, 9],
+    "intervals": ["1P", "3M", "5P", "6M"],
     "category": "7th"
   },
   {
-    "name": "major 7",
+    "name": "Major 7",
     "symbol": "∆7",
     "notes": "C E G B",
-    "semitones": [
-      0,
-      4,
-      7,
-      11
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M"
-    ],
+    "semitones": [0, 4, 7, 11],
+    "intervals": ["1P", "3M", "5P", "7M"],
     "category": "7th"
   },
   {
-    "name": "major 7 add 6",
+    "name": "Major 7 add 6",
     "symbol": "∆6/7",
     "notes": "C E G A B",
-    "semitones": [
-      0,
-      4,
-      7,
-      9,
-      11
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "6M",
-      "7M"
-    ],
+    "semitones": [0, 4, 7, 9, 11],
+    "intervals": ["1P", "3M", "5P", "6M", "7M"],
     "category": "7th"
   },
   {
-    "name": "major 7 5",
+    "name": "Major 7 #5",
     "symbol": "∆7(#5)",
     "notes": "C E G# B",
-    "semitones": [
-      0,
-      4,
-      8,
-      11
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7M"
-    ],
+    "semitones": [0, 4, 8, 11],
+    "intervals": ["1P", "3M", "5A", "7M"],
     "category": "7th"
   },
   {
-    "name": "major 7 b 5",
+    "name": "Major 7 b5",
     "symbol": "∆7(b5)",
     "notes": "C E Gb B",
-    "semitones": [
-      0,
-      4,
-      6,
-      11
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "7M"
-    ],
+    "semitones": [0, 4, 6, 11],
+    "intervals": ["1P", "3M", "5d", "7M"],
     "category": "7th"
   },
   {
-    "name": "major 7 suspended 4",
+    "name": "Major 7 suspended 4",
     "symbol": "∆7(sus4)",
     "notes": "C F G B",
-    "semitones": [
-      0,
-      5,
-      7,
-      11
-    ],
-    "intervals": [
-      "1P",
-      "4P",
-      "5P",
-      "7M"
-    ],
+    "semitones": [0, 5, 7, 11],
+    "intervals": ["1P", "4P", "5P", "7M"],
     "category": "7th"
   },
   {
-    "name": "dominant 7",
+    "name": "Dominant 7",
     "symbol": "7",
     "notes": "C E G Bb",
-    "semitones": [
-      0,
-      4,
-      7,
-      10
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m"
-    ],
+    "semitones": [0, 4, 7, 10],
+    "intervals": ["1P", "3M", "5P", "7m"],
     "category": "7th"
   },
   {
-    "name": "dominant 7 add 6",
+    "name": "Dominant 7 add 6",
     "symbol": "7/6",
     "notes": "C E G A Bb",
-    "semitones": [
-      0,
-      4,
-      7,
-      9,
-      10
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "6M",
-      "7m"
-    ],
+    "semitones": [0, 4, 7, 9, 10],
+    "intervals": ["1P", "3M", "5P", "6M", "7m"],
     "category": "7th"
   },
   {
-    "name": "dominant 7 5",
+    "name": "Dominant 7(#5)",
     "symbol": "+7 or 7(#5)",
     "notes": "C E G# Bb",
-    "semitones": [
-      0,
-      4,
-      8,
-      10
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7m"
-    ],
+    "semitones": [0, 4, 8, 10],
+    "intervals": ["1P", "3M", "5A", "7m"],
     "category": "7th"
   },
   {
-    "name": "dominant 7 b 5",
+    "name": "Dominant 7(b5)",
     "symbol": "7(b5)",
     "notes": "C E Gb Bb",
-    "semitones": [
-      0,
-      4,
-      6,
-      10
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "7m"
-    ],
+    "semitones": [0, 4, 6, 10],
+    "intervals": ["1P", "3M", "5d", "7m"],
     "category": "7th"
   },
   {
-    "name": "dominant 7 5 b 5",
+    "name": "Dominant 7 (#5,b5)",
     "symbol": "7 (#5,b5)",
     "notes": "C E Gb G# Bb",
-    "semitones": [
-      0,
-      4,
-      6,
-      8,
-      10
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "5A",
-      "7m"
-    ],
+    "semitones": [0, 4, 6, 8, 10],
+    "intervals": ["1P", "3M", "5d", "5A", "7m"],
     "category": "7th"
   },
   {
-    "name": "dominant 7 suspended 4",
+    "name": "Dominant 7 suspended 4",
     "symbol": "7sus",
     "notes": "C F G Bb",
-    "semitones": [
-      0,
-      5,
-      7,
-      10
-    ],
-    "intervals": [
-      "1P",
-      "4P",
-      "5P",
-      "7m"
-    ],
+    "semitones": [0, 5, 7, 10],
+    "intervals": ["1P", "4P", "5P", "7m"],
     "category": "7th"
   },
   {
-    "name": "minor 6",
+    "name": "Minor 6",
     "symbol": "-6",
     "notes": "C Eb G A",
-    "semitones": [
-      0,
-      3,
-      7,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "6M"
-    ],
+    "semitones": [0, 3, 7, 9],
+    "intervals": ["1P", "3m", "5P", "6M"],
     "category": "7th"
   },
   {
-    "name": "minor 7",
+    "name": "Minor 7",
     "symbol": "-7",
     "notes": "C Eb G Bb",
-    "semitones": [
-      0,
-      3,
-      7,
-      10
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7m"
-    ],
+    "semitones": [0, 3, 7, 10],
+    "intervals": ["1P", "3m", "5P", "7m"],
     "category": "7th"
   },
   {
-    "name": "minor 7 add 6",
+    "name": "Minor 7  add 6",
     "symbol": "-6/7",
     "notes": "C Eb G A Bb",
-    "semitones": [
-      0,
-      3,
-      7,
-      9,
-      10
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "6M",
-      "7m"
-    ],
+    "semitones": [0, 3, 7, 9, 10],
+    "intervals": ["1P", "3m", "5P", "6M", "7m"],
     "category": "7th"
   },
   {
-    "name": "minor 7 5",
+    "name": "Minor 7 (#5)",
     "symbol": "-7 (#5)",
     "notes": "C Eb G# Bb",
-    "semitones": [
-      0,
-      3,
-      8,
-      10
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5A",
-      "7m"
-    ],
+    "semitones": [0, 3, 8, 10],
+    "intervals": ["1P", "3m", "5A", "7m"],
     "category": "7th"
   },
   {
-    "name": "minor 7 b 5 or half diminished",
+    "name": "Minor 7 (b5) or Half-Diminished",
     "symbol": "-7 (b5) or ø7",
     "notes": "C Eb Gb Bb",
-    "semitones": [
-      0,
-      3,
-      6,
-      10
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7m"
-    ],
+    "semitones": [0, 3, 6, 10],
+    "intervals": ["1P", "3m", "5d", "7m"],
     "category": "7th"
   },
   {
-    "name": "minor major 7",
+    "name": "Minor (major7)",
     "symbol": "- (∆7)",
     "notes": "C Eb G B",
-    "semitones": [
-      0,
-      3,
-      7,
-      11
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7M"
-    ],
+    "semitones": [0, 3, 7, 11],
+    "intervals": ["1P", "3m", "5P", "7M"],
     "category": "7th"
   },
   {
-    "name": "minor 6 major 7",
+    "name": "Minor  6 (major7)",
     "symbol": "- 6 (∆7)",
     "notes": "C Eb G A B",
-    "semitones": [
-      0,
-      3,
-      7,
-      9,
-      11
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "6M",
-      "7M"
-    ],
+    "semitones": [0, 3, 7, 9, 11],
+    "intervals": ["1P", "3m", "5P", "6M", "7M"],
     "category": "7th"
   },
   {
-    "name": "minor major 7 5",
+    "name": "Minor (major7,#5)",
     "symbol": "- (∆7,#5)",
     "notes": "C Eb G# B",
-    "semitones": [
-      0,
-      3,
-      8,
-      11
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5A",
-      "7M"
-    ],
+    "semitones": [0, 3, 8, 11],
+    "intervals": ["1P", "3m", "5A", "7M"],
     "category": "7th"
   },
   {
-    "name": "diminished major 7",
+    "name": "Diminished (major7)",
     "symbol": "° (∆7)",
     "notes": "C Eb Gb B",
-    "semitones": [
-      0,
-      3,
-      6,
-      11
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7M"
-    ],
+    "semitones": [0, 3, 6, 11],
+    "intervals": ["1P", "3m", "5d", "7M"],
     "category": "7th"
   },
   {
-    "name": "diminished 7",
+    "name": "Diminished 7",
     "symbol": "°7",
     "notes": "C Eb Gb Bbb",
-    "semitones": [
-      0,
-      3,
-      6,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7d"
-    ],
+    "semitones": [0, 3, 6, 9],
+    "intervals": ["1P", "3m", "5d", "7d"],
     "category": "7th"
   },
   {
-    "name": "diminished major 7 diminished 7",
+    "name": "Diminished  (major7,diminished7)",
     "symbol": "° (∆7,bb7)",
     "notes": "C Eb Gb Bbb B",
-    "semitones": [
-      0,
-      3,
-      6,
-      9,
-      11
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7d",
-      "7M"
-    ],
+    "semitones": [0, 3, 6, 9, 11],
+    "intervals": ["1P", "3m", "5d", "7d", "7M"],
     "category": "7th"
   },
   {
-    "name": "quartal up to b 10",
+    "name": "Quartal up to b10",
     "symbol": "Q (P4,P4,P4)",
     "notes": "C F Bb Eb",
-    "semitones": [
-      0,
-      5,
-      10,
-      15
-    ],
-    "intervals": [
-      "1P",
-      "4P",
-      "7m",
-      "10m"
-    ],
+    "semitones": [0, 5, 10, 15],
+    "intervals": ["1P", "4P", "7m", "10m"],
     "category": "7th"
   },
   {
-    "name": "major 6 add 9",
+    "name": "Major 6 add 9",
     "symbol": "6/9",
     "notes": "C E G A D",
-    "semitones": [
-      0,
-      4,
-      7,
-      9,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "6M",
-      "9M"
-    ],
+    "semitones": [0, 4, 7, 9, 14],
+    "intervals": ["1P", "3M", "5P", "6M", "9M"],
     "category": "9th"
   },
   {
-    "name": "major 6 b 9",
+    "name": "Major 6 (b9)",
     "symbol": "6 (b9)",
     "notes": "C E G A Db",
-    "semitones": [
-      0,
-      4,
-      7,
-      9,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "6M",
-      "9m"
-    ],
+    "semitones": [0, 4, 7, 9, 13],
+    "intervals": ["1P", "3M", "5P", "6M", "9m"],
     "category": "9th"
   },
   {
-    "name": "major 6 9",
+    "name": "Major 6 (#9)",
     "symbol": "6 (#9)",
     "notes": "C E G A D#",
-    "semitones": [
-      0,
-      4,
-      7,
-      9,
-      15
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "6M",
-      "9A"
-    ],
+    "semitones": [0, 4, 7, 9, 15],
+    "intervals": ["1P", "3M", "5P", "6M", "9A"],
     "category": "9th"
   },
   {
-    "name": "major 9",
+    "name": "Major 9",
     "symbol": "∆9",
     "notes": "C E G B D",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9M"
-    ],
+    "semitones": [0, 4, 7, 11, 14],
+    "intervals": ["1P", "3M", "5P", "7M", "9M"],
     "category": "9th"
   },
   {
-    "name": "major 9 5",
+    "name": "Major 9 (#5)",
     "symbol": "∆9 (#5)",
     "notes": "C E G# B D",
-    "semitones": [
-      0,
-      4,
-      8,
-      11,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7M",
-      "9M"
-    ],
+    "semitones": [0, 4, 8, 11, 14],
+    "intervals": ["1P", "3M", "5A", "7M", "9M"],
     "category": "9th"
   },
   {
-    "name": "major 9 b 5",
+    "name": "Major 9 (b5)",
     "symbol": "∆9 (b5)",
     "notes": "C E Gb B D",
-    "semitones": [
-      0,
-      4,
-      6,
-      11,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "7M",
-      "9M"
-    ],
+    "semitones": [0, 4, 6, 11, 14],
+    "intervals": ["1P", "3M", "5d", "7M", "9M"],
     "category": "9th"
   },
   {
-    "name": "major 7 b 9",
+    "name": "Major 7 (b9)",
     "symbol": "∆7 (b9)",
     "notes": "C E G B Db",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9m"
-    ],
+    "semitones": [0, 4, 7, 11, 13],
+    "intervals": ["1P", "3M", "5P", "7M", "9m"],
     "category": "9th"
   },
   {
-    "name": "major 7 9",
+    "name": "Major 7 (#9)",
     "symbol": "∆7 (#9)",
     "notes": "C E G B D#",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      15
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9A"
-    ],
+    "semitones": [0, 4, 7, 11, 15],
+    "intervals": ["1P", "3M", "5P", "7M", "9A"],
     "category": "9th"
   },
   {
-    "name": "major 7 b 9 5",
+    "name": "Major 7 (b9,#5)",
     "symbol": "∆7 (b9,#5)",
     "notes": "C E G# B Db",
-    "semitones": [
-      0,
-      4,
-      8,
-      11,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7M",
-      "9m"
-    ],
+    "semitones": [0, 4, 8, 11, 13],
+    "intervals": ["1P", "3M", "5A", "7M", "9m"],
     "category": "9th"
   },
   {
-    "name": "major 7 b 5 9",
+    "name": "Major 7 (b5,9)",
     "symbol": "∆7 (b5,9)",
     "notes": "C E Gb B Db",
-    "semitones": [
-      0,
-      4,
-      6,
-      11,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "7M",
-      "9m"
-    ],
+    "semitones": [0, 4, 6, 11, 13],
+    "intervals": ["1P", "3M", "5d", "7M", "9m"],
     "category": "9th"
   },
   {
-    "name": "major 7 9 5",
+    "name": "Major 7 (#9,#5)",
     "symbol": "∆7 (#9,#5)",
     "notes": "C E G# B D#",
-    "semitones": [
-      0,
-      4,
-      8,
-      11,
-      15
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7M",
-      "9A"
-    ],
+    "semitones": [0, 4, 8, 11, 15],
+    "intervals": ["1P", "3M", "5A", "7M", "9A"],
     "category": "9th"
   },
   {
-    "name": "major 7 9 b 9",
+    "name": "Major 7 (#9, b9)",
     "symbol": "∆7 (#9, b9)",
     "notes": "C E Gb B D#",
-    "semitones": [
-      0,
-      4,
-      6,
-      11,
-      15
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "7M",
-      "9A"
-    ],
+    "semitones": [0, 4, 6, 11, 15],
+    "intervals": ["1P", "3M", "5d", "7M", "9A"],
     "category": "9th"
   },
   {
-    "name": "dominant 9",
+    "name": "Dominant 9",
     "symbol": "9",
     "notes": "C E G Bb D",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9M"
-    ],
+    "semitones": [0, 4, 7, 10, 14],
+    "intervals": ["1P", "3M", "5P", "7m", "9M"],
     "category": "9th"
   },
   {
-    "name": "dominant 9 suspended 4",
+    "name": "Dominant 9 suspended 4",
     "symbol": "9sus",
     "notes": "C F G Bb D",
-    "semitones": [
-      0,
-      5,
-      7,
-      10,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "4P",
-      "5P",
-      "7m",
-      "9M"
-    ],
+    "semitones": [0, 5, 7, 10, 14],
+    "intervals": ["1P", "4P", "5P", "7m", "9M"],
     "category": "9th"
   },
   {
-    "name": "dominant 9 5",
+    "name": "Dominant 9 (#5)",
     "symbol": "9 (#5)",
     "notes": "C E G# Bb D",
-    "semitones": [
-      0,
-      4,
-      8,
-      10,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7m",
-      "9M"
-    ],
+    "semitones": [0, 4, 8, 10, 14],
+    "intervals": ["1P", "3M", "5A", "7m", "9M"],
     "category": "9th"
   },
   {
-    "name": "dominant 9 b 5",
+    "name": "Dominant 9 (b5)",
     "symbol": "9 (b5)",
     "notes": "C E Gb Bb D",
-    "semitones": [
-      0,
-      4,
-      6,
-      10,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "7m",
-      "9M"
-    ],
+    "semitones": [0, 4, 6, 10, 14],
+    "intervals": ["1P", "3M", "5d", "7m", "9M"],
     "category": "9th"
   },
   {
-    "name": "dominant 9 5 b 5",
+    "name": "Dominant 9 (#5,b5)",
     "symbol": "9 (#5,b5)",
     "notes": "C E Gb G# Bb D",
-    "semitones": [
-      0,
-      4,
-      6,
-      8,
-      10,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "5A",
-      "7m",
-      "9M"
-    ],
+    "semitones": [0, 4, 6, 8, 10, 14],
+    "intervals": ["1P", "3M", "5d", "5A", "7m", "9M"],
     "category": "9th"
   },
   {
-    "name": "dominant 7 b 9",
+    "name": "Dominant 7 (b9)",
     "symbol": "7 (b9)",
     "notes": "C E G Bb Db",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9m"
-    ],
+    "semitones": [0, 4, 7, 10, 13],
+    "intervals": ["1P", "3M", "5P", "7m", "9m"],
     "category": "9th"
   },
   {
-    "name": "dominant 7 suspended 4 b 9",
+    "name": "Dominant 7 suspended 4 (b9)",
     "symbol": "7sus (b9)",
     "notes": "C F G Bb Db",
-    "semitones": [
-      0,
-      5,
-      7,
-      10,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "4P",
-      "5P",
-      "7m",
-      "9m"
-    ],
+    "semitones": [0, 5, 7, 10, 13],
+    "intervals": ["1P", "4P", "5P", "7m", "9m"],
     "category": "9th"
   },
   {
-    "name": "dominant 7 b 9 5",
+    "name": "Dominant 7 (b9,#5)",
     "symbol": "7 (b9,#5)",
     "notes": "C E G# Bb Db",
-    "semitones": [
-      0,
-      4,
-      8,
-      10,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7m",
-      "9m"
-    ],
+    "semitones": [0, 4, 8, 10, 13],
+    "intervals": ["1P", "3M", "5A", "7m", "9m"],
     "category": "9th"
   },
   {
-    "name": "dominant 7 b 9 b 5",
+    "name": "Dominant 7 (b9,b5)",
     "symbol": "7 (b9,b5)",
     "notes": "C E Gb Bb Db",
-    "semitones": [
-      0,
-      4,
-      6,
-      10,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "7m",
-      "9m"
-    ],
+    "semitones": [0, 4, 6, 10, 13],
+    "intervals": ["1P", "3M", "5d", "7m", "9m"],
     "category": "9th"
   },
   {
-    "name": "dominant 7 b 9 5 b 9",
+    "name": "Dominant 7 (b9,#5,b9)",
     "symbol": "7 (b9,#5,b9)",
     "notes": "C E Gb G# Bb Db",
-    "semitones": [
-      0,
-      4,
-      6,
-      8,
-      10,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "5A",
-      "7m",
-      "9m"
-    ],
+    "semitones": [0, 4, 6, 8, 10, 13],
+    "intervals": ["1P", "3M", "5d", "5A", "7m", "9m"],
     "category": "9th"
   },
   {
-    "name": "dominant 7 9",
+    "name": "Dominant 7 (#9)",
     "symbol": "7 (#9)",
     "notes": "C E G Bb D#",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      15
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9A"
-    ],
+    "semitones": [0, 4, 7, 10, 15],
+    "intervals": ["1P", "3M", "5P", "7m", "9A"],
     "category": "9th"
   },
   {
-    "name": "dominant 7 9 5",
+    "name": "Dominant 7 (#9,#5)",
     "symbol": "7 (#9,#5)",
     "notes": "C E G# Bb D#",
-    "semitones": [
-      0,
-      4,
-      8,
-      10,
-      15
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7m",
-      "9A"
-    ],
+    "semitones": [0, 4, 8, 10, 15],
+    "intervals": ["1P", "3M", "5A", "7m", "9A"],
     "category": "9th"
   },
   {
-    "name": "dominant 7 9 b 5",
+    "name": "Dominant 7 (#9,b5)",
     "symbol": "7 (#9,b5)",
     "notes": "C E Gb Bb D#",
-    "semitones": [
-      0,
-      4,
-      6,
-      10,
-      15
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "7m",
-      "9A"
-    ],
+    "semitones": [0, 4, 6, 10, 15],
+    "intervals": ["1P", "3M", "5d", "7m", "9A"],
     "category": "9th"
   },
   {
-    "name": "dominant 7 9 5 b 9",
+    "name": "Dominant 7 (#9,#5,b9)",
     "symbol": "7 (#9,#5,b9)",
     "notes": "C E Gb G# Bb D#",
-    "semitones": [
-      0,
-      4,
-      6,
-      8,
-      10,
-      15
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "5A",
-      "7m",
-      "9A"
-    ],
+    "semitones": [0, 4, 6, 8, 10, 15],
+    "intervals": ["1P", "3M", "5d", "5A", "7m", "9A"],
     "category": "9th"
   },
   {
-    "name": "dominant 7 9 b 9",
+    "name": "Dominant 7 (#9,b9)",
     "symbol": "7 (#9,b9)",
     "notes": "C E G Bb Db D#",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      13,
-      3
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9m",
-      "9A"
-    ],
+    "semitones": [0, 4, 7, 10, 13, 3],
+    "intervals": ["1P", "3M", "5P", "7m", "9m", "9A"],
     "category": "9th"
   },
   {
-    "name": "dominant 7 9 b 9 5",
+    "name": "Dominant 7 (#9,b9,#5)",
     "symbol": "7 (#9,b9,#5)",
     "notes": "C E G# Bb Db D#",
-    "semitones": [
-      0,
-      4,
-      8,
-      10,
-      13,
-      3
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7m",
-      "9m",
-      "9A"
-    ],
+    "semitones": [0, 4, 8, 10, 13, 3],
+    "intervals": ["1P", "3M", "5A", "7m", "9m", "9A"],
     "category": "9th"
   },
   {
-    "name": "dominant 7 9 b 9 b 5",
+    "name": "Dominant 7 (#9,b9,b5)",
     "symbol": "7 (#9,b9,b5)",
     "notes": "C E Gb Bb Db D#",
-    "semitones": [
-      0,
-      4,
-      6,
-      10,
-      13,
-      3
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "7m",
-      "9m",
-      "9A"
-    ],
+    "semitones": [0, 4, 6, 10, 13, 3],
+    "intervals": ["1P", "3M", "5d", "7m", "9m", "9A"],
     "category": "9th"
   },
   {
-    "name": "dominant 7 9 b 9 5 b 5 or dominant 7 altered",
+    "name": "Dominant 7 (#9,b9,#5,b5) or \"Dominant 7 altered\"",
     "symbol": "7 (#9,b9,#5,b5) or \"7alt\"",
     "notes": "C E Gb G# Bb Db D#",
-    "semitones": [
-      0,
-      4,
-      6,
-      8,
-      10,
-      13,
-      3
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "5A",
-      "7m",
-      "9m",
-      "9A"
-    ],
+    "semitones": [0, 4, 6, 8, 10, 13, 3],
+    "intervals": ["1P", "3M", "5d", "5A", "7m", "9m", "9A"],
     "category": "9th"
   },
   {
-    "name": "minor 6 add 9",
+    "name": "Minor 6 add 9",
     "symbol": "-6/9",
     "notes": "C Eb G A D",
-    "semitones": [
-      0,
-      3,
-      7,
-      9,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "6M",
-      "9M"
-    ],
+    "semitones": [0, 3, 7, 9, 14],
+    "intervals": ["1P", "3m", "5P", "6M", "9M"],
     "category": "9th"
   },
   {
-    "name": "minor 9 major 7",
+    "name": "Minor 9 (major7)",
     "symbol": "-9 (∆7)",
     "notes": "C Eb G B D",
-    "semitones": [
-      0,
-      3,
-      7,
-      11,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7M",
-      "9M"
-    ],
+    "semitones": [0, 3, 7, 11, 14],
+    "intervals": ["1P", "3m", "5P", "7M", "9M"],
     "category": "9th"
   },
   {
-    "name": "minor 6 add 9 major 7",
+    "name": "Minor 6 add 9 (major7)",
     "symbol": "-6/9 (∆7)",
     "notes": "C Eb G A B D",
-    "semitones": [
-      0,
-      3,
-      7,
-      9,
-      11,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "6M",
-      "7M",
-      "9M"
-    ],
+    "semitones": [0, 3, 7, 9, 11, 14],
+    "intervals": ["1P", "3m", "5P", "6M", "7M", "9M"],
     "category": "9th"
   },
   {
-    "name": "minor 9 major 7 5",
+    "name": "Minor 9 (major7,#5)",
     "symbol": "-9 (∆7,#5)",
     "notes": "C Eb G# B D",
-    "semitones": [
-      0,
-      3,
-      8,
-      11,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5A",
-      "7M",
-      "9M"
-    ],
+    "semitones": [0, 3, 8, 11, 14],
+    "intervals": ["1P", "3m", "5A", "7M", "9M"],
     "category": "9th"
   },
   {
-    "name": "minor 6 b 9",
+    "name": "Minor 6 (b9)",
     "symbol": "-6 (b9)",
     "notes": "C Eb G A Db",
-    "semitones": [
-      0,
-      3,
-      7,
-      9,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "6M",
-      "9m"
-    ],
+    "semitones": [0, 3, 7, 9, 13],
+    "intervals": ["1P", "3m", "5P", "6M", "9m"],
     "category": "9th"
   },
   {
-    "name": "minor b 9 major 7",
+    "name": "Minor  (b9,major7)",
     "symbol": "- (b9,∆7)",
     "notes": "C Eb G B Db",
-    "semitones": [
-      0,
-      3,
-      7,
-      11,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7M",
-      "9m"
-    ],
+    "semitones": [0, 3, 7, 11, 13],
+    "intervals": ["1P", "3m", "5P", "7M", "9m"],
     "category": "9th"
   },
   {
-    "name": "minor b 9 major 7 5",
+    "name": "Minor (b9,major7,#5)",
     "symbol": "- (b9,∆7,#5)",
     "notes": "C Eb G# B Db",
-    "semitones": [
-      0,
-      3,
-      8,
-      11,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5A",
-      "7M",
-      "9m"
-    ],
+    "semitones": [0, 3, 8, 11, 13],
+    "intervals": ["1P", "3m", "5A", "7M", "9m"],
     "category": "9th"
   },
   {
-    "name": "minor 9",
+    "name": "Minor 9",
     "symbol": "-9",
     "notes": "C Eb G Bb D",
-    "semitones": [
-      0,
-      3,
-      7,
-      10,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7m",
-      "9M"
-    ],
+    "semitones": [0, 3, 7, 10, 14],
+    "intervals": ["1P", "3m", "5P", "7m", "9M"],
     "category": "9th"
   },
   {
-    "name": "minor 9 5 or church",
+    "name": "Minor 9 (#5) or \"church\"",
     "symbol": "-9 (#5) or \"church\"",
     "notes": "C Eb G# Bb D",
-    "semitones": [
-      0,
-      3,
-      8,
-      10,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5A",
-      "7m",
-      "9M"
-    ],
+    "semitones": [0, 3, 8, 10, 14],
+    "intervals": ["1P", "3m", "5A", "7m", "9M"],
     "category": "9th"
   },
   {
-    "name": "minor 9 b 5",
+    "name": "Minor 9 (b5)",
     "symbol": "-9 (b5)",
     "notes": "C Eb Gb Bb D",
-    "semitones": [
-      0,
-      3,
-      6,
-      10,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7m",
-      "9M"
-    ],
+    "semitones": [0, 3, 6, 10, 14],
+    "intervals": ["1P", "3m", "5d", "7m", "9M"],
     "category": "9th"
   },
   {
-    "name": "minor 7 b 9",
+    "name": "Minor 7 (b9)",
     "symbol": "-7 (b9)",
     "notes": "C Eb G Bb Db",
-    "semitones": [
-      0,
-      3,
-      7,
-      10,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7m",
-      "9m"
-    ],
+    "semitones": [0, 3, 7, 10, 13],
+    "intervals": ["1P", "3m", "5P", "7m", "9m"],
     "category": "9th"
   },
   {
-    "name": "minor 7 b 9 5",
+    "name": "Minor 7 (b9,#5)",
     "symbol": "-7 (b9,#5)",
     "notes": "C Eb G# Bb Db",
-    "semitones": [
-      0,
-      3,
-      8,
-      10,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5A",
-      "7m",
-      "9m"
-    ],
+    "semitones": [0, 3, 8, 10, 13],
+    "intervals": ["1P", "3m", "5A", "7m", "9m"],
     "category": "9th"
   },
   {
-    "name": "minor 7 b 9 b 5",
+    "name": "Minor 7 (b9,b5)",
     "symbol": "-7 (b9,b5)",
     "notes": "C Eb Gb Bb Db",
-    "semitones": [
-      0,
-      3,
-      6,
-      10,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7m",
-      "9m"
-    ],
+    "semitones": [0, 3, 6, 10, 13],
+    "intervals": ["1P", "3m", "5d", "7m", "9m"],
     "category": "9th"
   },
   {
-    "name": "diminished 9",
+    "name": "Diminished 9",
     "symbol": "°9",
     "notes": "C Eb Gb Bbb D",
-    "semitones": [
-      0,
-      3,
-      6,
-      9,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7d",
-      "9M"
-    ],
+    "semitones": [0, 3, 6, 9, 14],
+    "intervals": ["1P", "3m", "5d", "7d", "9M"],
     "category": "9th"
   },
   {
-    "name": "diminished 9 major 7 diminished 7",
+    "name": "Diminished 9 (major7,diminished7)",
     "symbol": "°9 (∆7,bb7)",
     "notes": "C Eb Gb Bbb B D",
-    "semitones": [
-      0,
-      3,
-      6,
-      9,
-      11,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7d",
-      "7M",
-      "9M"
-    ],
+    "semitones": [0, 3, 6, 9, 11, 14],
+    "intervals": ["1P", "3m", "5d", "7d", "7M", "9M"],
     "category": "9th"
   },
   {
-    "name": "diminished 9 major 7",
+    "name": "Diminished 9 (major7)",
     "symbol": "°9 (∆7)",
     "notes": "C Eb Gb B D",
-    "semitones": [
-      0,
-      3,
-      6,
-      11,
-      14
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7M",
-      "9M"
-    ],
+    "semitones": [0, 3, 6, 11, 14],
+    "intervals": ["1P", "3m", "5d", "7M", "9M"],
     "category": "9th"
   },
   {
-    "name": "diminished 7 b 9",
+    "name": "Diminished 7 (b9)",
     "symbol": "°7 (b9)",
     "notes": "C Eb Gb Bbb Db",
-    "semitones": [
-      0,
-      3,
-      6,
-      9,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7d",
-      "9m"
-    ],
+    "semitones": [0, 3, 6, 9, 13],
+    "intervals": ["1P", "3m", "5d", "7d", "9m"],
     "category": "9th"
   },
   {
-    "name": "diminished b 9 major 7",
+    "name": "Diminished (b9,major7)",
     "symbol": "° (b9,∆7)",
     "notes": "C Eb Gb B Db",
-    "semitones": [
-      0,
-      3,
-      6,
-      11,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7M",
-      "9m"
-    ],
+    "semitones": [0, 3, 6, 11, 13],
+    "intervals": ["1P", "3m", "5d", "7M", "9m"],
     "category": "9th"
   },
   {
-    "name": "diminished b 9 major 7 diminished 7",
+    "name": "Diminished  (b9,major7,diminished7)",
     "symbol": "° (b9,∆7,bb7)",
     "notes": "C Eb Gb Bbb B Db",
-    "semitones": [
-      0,
-      3,
-      6,
-      9,
-      11,
-      13
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7d",
-      "7M",
-      "9m"
-    ],
+    "semitones": [0, 3, 6, 9, 11, 13],
+    "intervals": ["1P", "3m", "5d", "7d", "7M", "9m"],
     "category": "9th"
   },
   {
-    "name": "major 9 11",
+    "name": "Major 9 (#11)",
     "symbol": "∆9 (#11)",
     "notes": "C E G B D F#",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      14,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9M",
-      "11A"
-    ],
+    "semitones": [0, 4, 7, 11, 14, 6],
+    "intervals": ["1P", "3M", "5P", "7M", "9M", "11A"],
     "category": "11 th"
   },
   {
-    "name": "major 9 11 5",
+    "name": "Major 9 (#11,#5)",
     "symbol": "∆9 (#11,#5)",
     "notes": "C E G# B D F#",
-    "semitones": [
-      0,
-      4,
-      8,
-      11,
-      14,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7M",
-      "9M",
-      "11A"
-    ],
+    "semitones": [0, 4, 8, 11, 14, 6],
+    "intervals": ["1P", "3M", "5A", "7M", "9M", "11A"],
     "category": "11 th"
   },
   {
-    "name": "major 7 11 b 9",
+    "name": "Major 7 (#11,b9)",
     "symbol": "∆7 (#11,b9)",
     "notes": "C E G B Db F#",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      13,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9m",
-      "11A"
-    ],
+    "semitones": [0, 4, 7, 11, 13, 6],
+    "intervals": ["1P", "3M", "5P", "7M", "9m", "11A"],
     "category": "11 th"
   },
   {
-    "name": "major 7 11 9",
+    "name": "Major 7 (#11,#9)",
     "symbol": "∆7 (#11,#9)",
     "notes": "C E G B D# F#",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      15,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9A",
-      "11A"
-    ],
+    "semitones": [0, 4, 7, 11, 15, 6],
+    "intervals": ["1P", "3M", "5P", "7M", "9A", "11A"],
     "category": "11 th"
   },
   {
-    "name": "major 7 11 9 b 9",
+    "name": "Major 7 (#11,#9,b9)",
     "symbol": "∆7 (#11,#9,b9)",
     "notes": "C E G B Db D# F#",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      13,
-      3,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9m",
-      "9A",
-      "11A"
-    ],
+    "semitones": [0, 4, 7, 11, 13, 3, 6],
+    "intervals": ["1P", "3M", "5P", "7M", "9m", "9A", "11A"],
     "category": "11 th"
   },
   {
-    "name": "major 7 11 b 9 5",
+    "name": "Major 7 (#11,b9,#5)",
     "symbol": "∆7 (#11,b9,#5)",
     "notes": "C E G# B Db F#",
-    "semitones": [
-      0,
-      4,
-      8,
-      11,
-      13,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7M",
-      "9m",
-      "11A"
-    ],
+    "semitones": [0, 4, 8, 11, 13, 6],
+    "intervals": ["1P", "3M", "5A", "7M", "9m", "11A"],
     "category": "11 th"
   },
   {
-    "name": "major 7 11 9 5",
+    "name": "Major 7 (#11,#9,#5)",
     "symbol": "∆7 (#11,#9,#5)",
     "notes": "C E G# B D# F#",
-    "semitones": [
-      0,
-      4,
-      8,
-      11,
-      15,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7M",
-      "9A",
-      "11A"
-    ],
+    "semitones": [0, 4, 8, 11, 15, 6],
+    "intervals": ["1P", "3M", "5A", "7M", "9A", "11A"],
     "category": "11 th"
   },
   {
-    "name": "major 7 11 9 b 9 5",
+    "name": "Major 7 (#11,#9,b9,#5)",
     "symbol": "∆7 (#11,#9,b9,#5)",
     "notes": "C E G# B Db D# F#",
-    "semitones": [
-      0,
-      4,
-      8,
-      11,
-      13,
-      3,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7M",
-      "9m",
-      "9A",
-      "11A"
-    ],
+    "semitones": [0, 4, 8, 11, 13, 3, 6],
+    "intervals": ["1P", "3M", "5A", "7M", "9m", "9A", "11A"],
     "category": "11 th"
   },
   {
-    "name": "dominant 11",
+    "name": "Dominant 11",
     "symbol": "11",
     "notes": "C E G Bb D F",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      14,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9M",
-      "11P"
-    ],
+    "semitones": [0, 4, 7, 10, 14, 5],
+    "intervals": ["1P", "3M", "5P", "7m", "9M", "11P"],
     "category": "11 th"
   },
   {
-    "name": "dominant 11 5",
+    "name": "Dominant 11 (#5)",
     "symbol": "11 (#5)",
     "notes": "C E G# Bb D F",
-    "semitones": [
-      0,
-      4,
-      8,
-      10,
-      14,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7m",
-      "9M",
-      "11P"
-    ],
+    "semitones": [0, 4, 8, 10, 14, 5],
+    "intervals": ["1P", "3M", "5A", "7m", "9M", "11P"],
     "category": "11 th"
   },
   {
-    "name": "dominant 11 b 5",
+    "name": "Dominant 11 (b5)",
     "symbol": "11 (b5)",
     "notes": "C E Gb Bb D F",
-    "semitones": [
-      0,
-      4,
-      6,
-      10,
-      14,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "7m",
-      "9M",
-      "11P"
-    ],
+    "semitones": [0, 4, 6, 10, 14, 5],
+    "intervals": ["1P", "3M", "5d", "7m", "9M", "11P"],
     "category": "11 th"
   },
   {
-    "name": "dominant 11 5 b 5",
+    "name": "Dominant 11 (#5,b5)",
     "symbol": "11 (#5,b5)",
     "notes": "C E Gb G# Bb D F",
-    "semitones": [
-      0,
-      4,
-      6,
-      8,
-      10,
-      14,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "5A",
-      "7m",
-      "9M",
-      "11P"
-    ],
+    "semitones": [0, 4, 6, 8, 10, 14, 5],
+    "intervals": ["1P", "3M", "5d", "5A", "7m", "9M", "11P"],
     "category": "11 th"
   },
   {
-    "name": "dominant 11 b 9",
+    "name": "Dominant 11 (b9)",
     "symbol": "11 (b9)",
     "notes": "C E G Bb Db F",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      13,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9m",
-      "11P"
-    ],
+    "semitones": [0, 4, 7, 10, 13, 5],
+    "intervals": ["1P", "3M", "5P", "7m", "9m", "11P"],
     "category": "11 th"
   },
   {
-    "name": "dominant 11 9",
+    "name": "Dominant 11 (#9)",
     "symbol": "11 (#9)",
     "notes": "C E G Bb D# F",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      15,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9A",
-      "11P"
-    ],
+    "semitones": [0, 4, 7, 10, 15, 5],
+    "intervals": ["1P", "3M", "5P", "7m", "9A", "11P"],
     "category": "11 th"
   },
   {
-    "name": "dominant 11 9 b 9",
+    "name": "Dominant 11 (#9,b9)",
     "symbol": "11 (#9,b9)",
     "notes": "C E G Bb Db D# F",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      13,
-      3,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9m",
-      "9A",
-      "11P"
-    ],
+    "semitones": [0, 4, 7, 10, 13, 3, 5],
+    "intervals": ["1P", "3M", "5P", "7m", "9m", "9A", "11P"],
     "category": "11 th"
   },
   {
-    "name": "dominant 11 b 9 b 5",
+    "name": "Dominant 11 (b9,b5)",
     "symbol": "11 (b9,b5)",
     "notes": "C E Gb Bb Db F",
-    "semitones": [
-      0,
-      4,
-      6,
-      10,
-      13,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "7m",
-      "9m",
-      "11P"
-    ],
+    "semitones": [0, 4, 6, 10, 13, 5],
+    "intervals": ["1P", "3M", "5d", "7m", "9m", "11P"],
     "category": "11 th"
   },
   {
-    "name": "dominant 11 b 9 5",
+    "name": "Dominant 11 (b9.#5)",
     "symbol": "11 (b9.#5)",
     "notes": "C E G# Bb Db F",
-    "semitones": [
-      0,
-      4,
-      8,
-      10,
-      13,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7m",
-      "9m",
-      "11P"
-    ],
+    "semitones": [0, 4, 8, 10, 13, 5],
+    "intervals": ["1P", "3M", "5A", "7m", "9m", "11P"],
     "category": "11 th"
   },
   {
-    "name": "dominant 11 9 b 5",
+    "name": "Dominant 11 (#9,b5)",
     "symbol": "11 (#9,b5)",
     "notes": "C E Gb Bb D# F",
-    "semitones": [
-      0,
-      4,
-      6,
-      10,
-      15,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "7m",
-      "9A",
-      "11P"
-    ],
+    "semitones": [0, 4, 6, 10, 15, 5],
+    "intervals": ["1P", "3M", "5d", "7m", "9A", "11P"],
     "category": "11 th"
   },
   {
-    "name": "dominant 11 9 5",
+    "name": "Dominant 11 (#9,#5)",
     "symbol": "11 (#9,#5)",
     "notes": "C E G# Bb D# F",
-    "semitones": [
-      0,
-      4,
-      8,
-      10,
-      15,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7m",
-      "9A",
-      "11P"
-    ],
+    "semitones": [0, 4, 8, 10, 15, 5],
+    "intervals": ["1P", "3M", "5A", "7m", "9A", "11P"],
     "category": "11 th"
   },
   {
-    "name": "dominant 11 9 b 9 b 5",
+    "name": "Dominant 11 (#9,b9,b5)",
     "symbol": "11 (#9,b9,b5)",
     "notes": "C E Gb Bb Db D# F",
-    "semitones": [
-      0,
-      4,
-      6,
-      10,
-      13,
-      3,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "7m",
-      "9m",
-      "9A",
-      "11P"
-    ],
+    "semitones": [0, 4, 6, 10, 13, 3, 5],
+    "intervals": ["1P", "3M", "5d", "7m", "9m", "9A", "11P"],
     "category": "11 th"
   },
   {
-    "name": "dominant 11 9 b 9 5",
+    "name": "Dominant 11 (#9,b9,#5)",
     "symbol": "11 (#9,b9,#5)",
     "notes": "C E G# Bb Db D# F",
-    "semitones": [
-      0,
-      4,
-      8,
-      10,
-      13,
-      3,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7m",
-      "9m",
-      "9A",
-      "11P"
-    ],
+    "semitones": [0, 4, 8, 10, 13, 3, 5],
+    "intervals": ["1P", "3M", "5A", "7m", "9m", "9A", "11P"],
     "category": "11 th"
   },
   {
-    "name": "dominant 9 11",
+    "name": "Dominant 9 (#11)",
     "symbol": "9 (#11)",
     "notes": "C E G Bb D F#",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      14,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9M",
-      "11A"
-    ],
+    "semitones": [0, 4, 7, 10, 14, 6],
+    "intervals": ["1P", "3M", "5P", "7m", "9M", "11A"],
     "category": "11 th"
   },
   {
-    "name": "dominant 9 11 5",
+    "name": "Dominant 9 (#11,#5)",
     "symbol": "9 (#11,#5)",
     "notes": "C E G# Bb D F#",
-    "semitones": [
-      0,
-      4,
-      8,
-      10,
-      14,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7m",
-      "9M",
-      "11A"
-    ],
+    "semitones": [0, 4, 8, 10, 14, 6],
+    "intervals": ["1P", "3M", "5A", "7m", "9M", "11A"],
     "category": "11 th"
   },
   {
-    "name": "dominant 7 11 b 9",
+    "name": "Dominant 7 (#11,b9)",
     "symbol": "7 (#11,b9)",
     "notes": "C E G Bb Db F#",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      13,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9m",
-      "11A"
-    ],
+    "semitones": [0, 4, 7, 10, 13, 6],
+    "intervals": ["1P", "3M", "5P", "7m", "9m", "11A"],
     "category": "11 th"
   },
   {
-    "name": "dominant 7 11 9",
+    "name": "Dominant 7 (#11,#9)",
     "symbol": "7 (#11,#9)",
     "notes": "C E G Bb D# F#",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      15,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9A",
-      "11A"
-    ],
+    "semitones": [0, 4, 7, 10, 15, 6],
+    "intervals": ["1P", "3M", "5P", "7m", "9A", "11A"],
     "category": "11 th"
   },
   {
-    "name": "dominant 7 11 9 b 9",
+    "name": "Dominant 7 (#11,#9,b9)",
     "symbol": "7 (#11,#9,b9)",
     "notes": "C E G Bb Db D# F#",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      13,
-      3,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9m",
-      "9A",
-      "11A"
-    ],
+    "semitones": [0, 4, 7, 10, 13, 3, 6],
+    "intervals": ["1P", "3M", "5P", "7m", "9m", "9A", "11A"],
     "category": "11 th"
   },
   {
-    "name": "dominant 7 11 b 9 5",
+    "name": "Dominant 7 (#11,b9,#5)",
     "symbol": "7 (#11,b9,#5)",
     "notes": "C E G# Bb Db F#",
-    "semitones": [
-      0,
-      4,
-      8,
-      10,
-      13,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7m",
-      "9m",
-      "11A"
-    ],
+    "semitones": [0, 4, 8, 10, 13, 6],
+    "intervals": ["1P", "3M", "5A", "7m", "9m", "11A"],
     "category": "11 th"
   },
   {
-    "name": "dominant 7 11 9 5",
+    "name": "Dominant 7 (#11,#9,#5)",
     "symbol": "7 (#11,#9,#5)",
     "notes": "C E G# Bb D# F#",
-    "semitones": [
-      0,
-      4,
-      8,
-      10,
-      15,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7m",
-      "9A",
-      "11A"
-    ],
+    "semitones": [0, 4, 8, 10, 15, 6],
+    "intervals": ["1P", "3M", "5A", "7m", "9A", "11A"],
     "category": "11 th"
   },
   {
-    "name": "dominant 7 11 9 b 9 5",
+    "name": "Dominant 7 (#11,#9,b9,#5)",
     "symbol": "7 (#11,#9,b9,#5)",
     "notes": "C E G# Bb Db D# F#",
-    "semitones": [
-      0,
-      4,
-      8,
-      10,
-      13,
-      3,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5A",
-      "7m",
-      "9m",
-      "9A",
-      "11A"
-    ],
+    "semitones": [0, 4, 8, 10, 13, 3, 6],
+    "intervals": ["1P", "3M", "5A", "7m", "9m", "9A", "11A"],
     "category": "11 th"
   },
   {
-    "name": "minor 11 major 7",
+    "name": "Minor 11 (major7)",
     "symbol": "-11 (∆7)",
     "notes": "C Eb G B D F",
-    "semitones": [
-      0,
-      3,
-      7,
-      11,
-      14,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7M",
-      "9M",
-      "11P"
-    ],
+    "semitones": [0, 3, 7, 11, 14, 5],
+    "intervals": ["1P", "3m", "5P", "7M", "9M", "11P"],
     "category": "11 th"
   },
   {
-    "name": "minor 11 major 7 5",
+    "name": "Minor 11 (major7,#5)",
     "symbol": "-11 (∆7,#5)",
     "notes": "C Eb G# B D F",
-    "semitones": [
-      0,
-      3,
-      8,
-      11,
-      14,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5A",
-      "7M",
-      "9M",
-      "11P"
-    ],
+    "semitones": [0, 3, 8, 11, 14, 5],
+    "intervals": ["1P", "3m", "5A", "7M", "9M", "11P"],
     "category": "11 th"
   },
   {
-    "name": "minor 11 b 9 major 7",
+    "name": "Minor 11 (b9,major7)",
     "symbol": "-11 (b9,∆7)",
     "notes": "C Eb G B Db F",
-    "semitones": [
-      0,
-      3,
-      7,
-      11,
-      13,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7M",
-      "9m",
-      "11P"
-    ],
+    "semitones": [0, 3, 7, 11, 13, 5],
+    "intervals": ["1P", "3m", "5P", "7M", "9m", "11P"],
     "category": "11 th"
   },
   {
-    "name": "minor 11 b 9 major 7 5",
+    "name": "Minor 11 (b9,major7,#5)",
     "symbol": "-11 (b9,∆7,#5)",
     "notes": "C Eb G# B Db F",
-    "semitones": [
-      0,
-      3,
-      8,
-      11,
-      13,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5A",
-      "7M",
-      "9m",
-      "11P"
-    ],
+    "semitones": [0, 3, 8, 11, 13, 5],
+    "intervals": ["1P", "3m", "5A", "7M", "9m", "11P"],
     "category": "11 th"
   },
   {
-    "name": "minor 9 11 major 7",
+    "name": "Minor 9 (#11,major7)",
     "symbol": "-9 (#11,∆7)",
     "notes": "C Eb G B D F#",
-    "semitones": [
-      0,
-      3,
-      7,
-      11,
-      14,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7M",
-      "9M",
-      "11A"
-    ],
+    "semitones": [0, 3, 7, 11, 14, 6],
+    "intervals": ["1P", "3m", "5P", "7M", "9M", "11A"],
     "category": "11 th"
   },
   {
-    "name": "minor 9 11 major 7 5",
+    "name": "Minor 9 (#11,major7,#5)",
     "symbol": "-9 (#11,∆7,#5)",
     "notes": "C Eb G# B D F#",
-    "semitones": [
-      0,
-      3,
-      8,
-      11,
-      14,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5A",
-      "7M",
-      "9M",
-      "11A"
-    ],
+    "semitones": [0, 3, 8, 11, 14, 6],
+    "intervals": ["1P", "3m", "5A", "7M", "9M", "11A"],
     "category": "11 th"
   },
   {
-    "name": "minor 11 b 9 major 7",
+    "name": "Minor  (#11,b9,major7)",
     "symbol": "- (#11,b9,∆7)",
     "notes": "C Eb G B Db F#",
-    "semitones": [
-      0,
-      3,
-      7,
-      11,
-      13,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7M",
-      "9m",
-      "11A"
-    ],
+    "semitones": [0, 3, 7, 11, 13, 6],
+    "intervals": ["1P", "3m", "5P", "7M", "9m", "11A"],
     "category": "11 th"
   },
   {
-    "name": "minor 11 b 9 5",
+    "name": "Minor  (#11,b9,#5)",
     "symbol": "- (#11,b9,#5)",
     "notes": "C Eb G# B Db F#",
-    "semitones": [
-      0,
-      3,
-      8,
-      11,
-      13,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5A",
-      "7M",
-      "9m",
-      "11A"
-    ],
+    "semitones": [0, 3, 8, 11, 13, 6],
+    "intervals": ["1P", "3m", "5A", "7M", "9m", "11A"],
     "category": "11 th"
   },
   {
-    "name": "minor 11",
+    "name": "Minor 11",
     "symbol": "-11",
     "notes": "C Eb G Bb D F",
-    "semitones": [
-      0,
-      3,
-      7,
-      10,
-      14,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7m",
-      "9M",
-      "11P"
-    ],
+    "semitones": [0, 3, 7, 10, 14, 5],
+    "intervals": ["1P", "3m", "5P", "7m", "9M", "11P"],
     "category": "11 th"
   },
   {
-    "name": "minor 11 5",
+    "name": "Minor 11 (#5)",
     "symbol": "-11 (#5)",
     "notes": "C Eb G# Bb D F",
-    "semitones": [
-      0,
-      3,
-      8,
-      10,
-      14,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5A",
-      "7m",
-      "9M",
-      "11P"
-    ],
+    "semitones": [0, 3, 8, 10, 14, 5],
+    "intervals": ["1P", "3m", "5A", "7m", "9M", "11P"],
     "category": "11 th"
   },
   {
-    "name": "minor 11 b 5",
+    "name": "Minor 11 (b5)",
     "symbol": "-11 (b5)",
     "notes": "C Eb Gb Bb D F",
-    "semitones": [
-      0,
-      3,
-      6,
-      10,
-      14,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7m",
-      "9M",
-      "11P"
-    ],
+    "semitones": [0, 3, 6, 10, 14, 5],
+    "intervals": ["1P", "3m", "5d", "7m", "9M", "11P"],
     "category": "11 th"
   },
   {
-    "name": "minor 11 b 9",
+    "name": "Minor 11 (b9)",
     "symbol": "-11 (b9)",
     "notes": "C Eb G Bb Db F",
-    "semitones": [
-      0,
-      3,
-      7,
-      10,
-      13,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7m",
-      "9m",
-      "11P"
-    ],
+    "semitones": [0, 3, 7, 10, 13, 5],
+    "intervals": ["1P", "3m", "5P", "7m", "9m", "11P"],
     "category": "11 th"
   },
   {
-    "name": "minor 11 b 9 b 5",
+    "name": "Minor 11 (b9,b5)",
     "symbol": "-11 (b9,b5)",
     "notes": "C Eb Gb Bb Db F",
-    "semitones": [
-      0,
-      3,
-      6,
-      10,
-      13,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7m",
-      "9m",
-      "11P"
-    ],
+    "semitones": [0, 3, 6, 10, 13, 5],
+    "intervals": ["1P", "3m", "5d", "7m", "9m", "11P"],
     "category": "11 th"
   },
   {
-    "name": "minor 11 b 9 5",
+    "name": "Minor 11 (b9,#5)",
     "symbol": "-11 (b9,#5)",
     "notes": "C Eb G# Bb Db F",
-    "semitones": [
-      0,
-      3,
-      8,
-      10,
-      13,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5A",
-      "7m",
-      "9m",
-      "11P"
-    ],
+    "semitones": [0, 3, 8, 10, 13, 5],
+    "intervals": ["1P", "3m", "5A", "7m", "9m", "11P"],
     "category": "11 th"
   },
   {
-    "name": "minor 9 11",
+    "name": "Minor 9 (#11)",
     "symbol": "-9 (#11)",
     "notes": "C Eb G Bb D F#",
-    "semitones": [
-      0,
-      3,
-      7,
-      10,
-      14,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7m",
-      "9M",
-      "11A"
-    ],
+    "semitones": [0, 3, 7, 10, 14, 6],
+    "intervals": ["1P", "3m", "5P", "7m", "9M", "11A"],
     "category": "11 th"
   },
   {
-    "name": "minor 9 11 5",
+    "name": "Minor 9 (#11,#5)",
     "symbol": "-9 (#11,#5)",
     "notes": "C Eb G# Bb D F#",
-    "semitones": [
-      0,
-      3,
-      8,
-      10,
-      14,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5A",
-      "7m",
-      "9M",
-      "11A"
-    ],
+    "semitones": [0, 3, 8, 10, 14, 6],
+    "intervals": ["1P", "3m", "5A", "7m", "9M", "11A"],
     "category": "11 th"
   },
   {
-    "name": "minor 7 11 b 9",
+    "name": "Minor 7 (#11,b9)",
     "symbol": "-7 (#11,b9)",
     "notes": "C Eb G Bb Db F#",
-    "semitones": [
-      0,
-      3,
-      7,
-      10,
-      13,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7m",
-      "9m",
-      "11A"
-    ],
+    "semitones": [0, 3, 7, 10, 13, 6],
+    "intervals": ["1P", "3m", "5P", "7m", "9m", "11A"],
     "category": "11 th"
   },
   {
-    "name": "minor 7 11 b 9 5",
+    "name": "Minor 7 (#11,b9,#5)",
     "symbol": "-7 (#11,b9,#5)",
     "notes": "C Eb G# Bb Db F#",
-    "semitones": [
-      0,
-      3,
-      8,
-      10,
-      13,
-      6
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5A",
-      "7m",
-      "9m",
-      "11A"
-    ],
+    "semitones": [0, 3, 8, 10, 13, 6],
+    "intervals": ["1P", "3m", "5A", "7m", "9m", "11A"],
     "category": "11 th"
   },
   {
-    "name": "diminished 11",
+    "name": "Diminished 11",
     "symbol": "°11",
     "notes": "C Eb Gb Bbb D F",
-    "semitones": [
-      0,
-      3,
-      6,
-      9,
-      14,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7d",
-      "9M",
-      "11P"
-    ],
+    "semitones": [0, 3, 6, 9, 14, 5],
+    "intervals": ["1P", "3m", "5d", "7d", "9M", "11P"],
     "category": "11 th"
   },
   {
-    "name": "diminished 11 major 7",
+    "name": "Diminished 11 (major7)",
     "symbol": "°11 (∆7)",
     "notes": "C Eb Gb B D F",
-    "semitones": [
-      0,
-      3,
-      6,
-      11,
-      14,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7M",
-      "9M",
-      "11P"
-    ],
+    "semitones": [0, 3, 6, 11, 14, 5],
+    "intervals": ["1P", "3m", "5d", "7M", "9M", "11P"],
     "category": "11 th"
   },
   {
-    "name": "diminished 11 b 9 major 7",
+    "name": "Diminished 11 (b9,major7)",
     "symbol": "°11 (b9,∆7)",
     "notes": "C Eb Gb B Db F",
-    "semitones": [
-      0,
-      3,
-      6,
-      11,
-      13,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7M",
-      "9m",
-      "11P"
-    ],
+    "semitones": [0, 3, 6, 11, 13, 5],
+    "intervals": ["1P", "3m", "5d", "7M", "9m", "11P"],
     "category": "11 th"
   },
   {
-    "name": "diminished 11 major 7 diminished 7",
+    "name": "Diminished 11 (major7,diminished7)",
     "symbol": "°11 (∆7,bb7)",
     "notes": "C Eb Gb Bbb B D F",
-    "semitones": [
-      0,
-      3,
-      6,
-      9,
-      11,
-      14,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7d",
-      "7M",
-      "9M",
-      "11P"
-    ],
+    "semitones": [0, 3, 6, 9, 11, 14, 5],
+    "intervals": ["1P", "3m", "5d", "7d", "7M", "9M", "11P"],
     "category": "11 th"
   },
   {
-    "name": "diminished 11 b 9",
+    "name": "Diminished 11 (b9)",
     "symbol": "°11 (b9)",
     "notes": "C Eb Gb Bbb Db F",
-    "semitones": [
-      0,
-      3,
-      6,
-      9,
-      13,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7d",
-      "9m",
-      "11P"
-    ],
+    "semitones": [0, 3, 6, 9, 13, 5],
+    "intervals": ["1P", "3m", "5d", "7d", "9m", "11P"],
     "category": ""
   },
   {
-    "name": "diminished 11 b 9 major 7 diminished 7",
+    "name": "Diminished 11 (b9,major7,diminished7)",
     "symbol": "°11 (b9,∆7,bb7)",
     "notes": "C Eb Gb Bbb B Db F",
-    "semitones": [
-      0,
-      3,
-      6,
-      9,
-      11,
-      13,
-      5
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7d",
-      "7M",
-      "9m",
-      "11P"
-    ],
+    "semitones": [0, 3, 6, 9, 11, 13, 5],
+    "intervals": ["1P", "3m", "5d", "7d", "7M", "9m", "11P"],
     "category": ""
   },
   {
-    "name": "major 13",
+    "name": "Major 13",
     "symbol": "∆13",
     "notes": "C E G B D A",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      14,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9M",
-      "13M"
-    ],
+    "semitones": [0, 4, 7, 11, 14, 9],
+    "intervals": ["1P", "3M", "5P", "7M", "9M", "13M"],
     "category": "13 th"
   },
   {
-    "name": "major 13 b 9",
+    "name": "Major 13 (b9)",
     "symbol": "∆13 (b9)",
     "notes": "C E G B Db A",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      13,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9m",
-      "13M"
-    ],
+    "semitones": [0, 4, 7, 11, 13, 9],
+    "intervals": ["1P", "3M", "5P", "7M", "9m", "13M"],
     "category": "13 th"
   },
   {
-    "name": "major 13 9",
+    "name": "Major 13 (#9)",
     "symbol": "∆13 (#9)",
     "notes": "C E G B D# A",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      15,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9A",
-      "13M"
-    ],
+    "semitones": [0, 4, 7, 11, 15, 9],
+    "intervals": ["1P", "3M", "5P", "7M", "9A", "13M"],
     "category": "13 th"
   },
   {
-    "name": "major 13 9 b 9",
+    "name": "Major 13 (#9,b9)",
     "symbol": "∆13 (#9,b9)",
     "notes": "C E G B Db D# A",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      13,
-      3,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9m",
-      "9A",
-      "13M"
-    ],
+    "semitones": [0, 4, 7, 11, 13, 3, 9],
+    "intervals": ["1P", "3M", "5P", "7M", "9m", "9A", "13M"],
     "category": "13 th"
   },
   {
-    "name": "major 13 11",
+    "name": "Major 13 (#11)",
     "symbol": "∆13 (#11)",
     "notes": "C E G B D F# A",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      14,
-      6,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9M",
-      "11A",
-      "13M"
-    ],
+    "semitones": [0, 4, 7, 11, 14, 6, 9],
+    "intervals": ["1P", "3M", "5P", "7M", "9M", "11A", "13M"],
     "category": "13 th"
   },
   {
-    "name": "major 13 11 b 9",
+    "name": "Major 13 (#11,b9)",
     "symbol": "∆13 (#11,b9)",
     "notes": "C E G B Db F# A",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      13,
-      6,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9m",
-      "11A",
-      "13M"
-    ],
+    "semitones": [0, 4, 7, 11, 13, 6, 9],
+    "intervals": ["1P", "3M", "5P", "7M", "9m", "11A", "13M"],
     "category": "13 th"
   },
   {
-    "name": "major 13 11 9",
+    "name": "Major 13 (#11,#9)",
     "symbol": "∆13 (#11,#9)",
     "notes": "C E G B D# F# A",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      15,
-      6,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9A",
-      "11A",
-      "13M"
-    ],
+    "semitones": [0, 4, 7, 11, 15, 6, 9],
+    "intervals": ["1P", "3M", "5P", "7M", "9A", "11A", "13M"],
     "category": "13 th"
   },
   {
-    "name": "major 13 11 9 b 9",
+    "name": "Major 13 (#11,#9,b9)",
     "symbol": "∆13 (#11,#9,b9)",
     "notes": "C E G B Db D# F# A",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      13,
-      3,
-      6,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9m",
-      "9A",
-      "11A",
-      "13M"
-    ],
+    "semitones": [0, 4, 7, 11, 13, 3, 6, 9],
+    "intervals": ["1P", "3M", "5P", "7M", "9m", "9A", "11A", "13M"],
     "category": "13 th"
   },
   {
-    "name": "major 9 b 13",
+    "name": "Major 9 (b13)",
     "symbol": "∆9 (b13)",
     "notes": "C E G B D Ab",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      14,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9M",
-      "13m"
-    ],
+    "semitones": [0, 4, 7, 11, 14, 8],
+    "intervals": ["1P", "3M", "5P", "7M", "9M", "13m"],
     "category": "13 th"
   },
   {
-    "name": "major 7 b 13 b 9",
+    "name": "Major 7 (b13,b9)",
     "symbol": "∆7 (b13,b9)",
     "notes": "C E G B Db Ab",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      13,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9m",
-      "13m"
-    ],
+    "semitones": [0, 4, 7, 11, 13, 8],
+    "intervals": ["1P", "3M", "5P", "7M", "9m", "13m"],
     "category": "13 th"
   },
   {
-    "name": "major 11 b 13 b 9",
+    "name": "Major 11 (b13,b9)",
     "symbol": "∆11 (b13,b9)",
     "notes": "C E G B Db F Ab",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      13,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9m",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 4, 7, 11, 13, 5, 8],
+    "intervals": ["1P", "3M", "5P", "7M", "9m", "11P", "13m"],
     "category": ""
   },
   {
-    "name": "major 7 b 13 9",
+    "name": "Major 7 (b13,#9)",
     "symbol": "∆7 (b13,#9)",
     "notes": "C E G B D# Ab",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      15,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9A",
-      "13m"
-    ],
+    "semitones": [0, 4, 7, 11, 15, 8],
+    "intervals": ["1P", "3M", "5P", "7M", "9A", "13m"],
     "category": "13 th"
   },
   {
-    "name": "major 7 b 13 9 b 9",
+    "name": "Major 7 (b13,#9,b9)",
     "symbol": "∆7 (b13,#9,b9)",
     "notes": "C E G B Db D# Ab",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      13,
-      3,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9m",
-      "9A",
-      "13m"
-    ],
+    "semitones": [0, 4, 7, 11, 13, 3, 8],
+    "intervals": ["1P", "3M", "5P", "7M", "9m", "9A", "13m"],
     "category": "13 th"
   },
   {
-    "name": "major 9 b 13 11",
+    "name": "Major 9 (b13,#11)",
     "symbol": "∆9 (b13,#11)",
     "notes": "C E G B D F# Ab",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      14,
-      6,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9M",
-      "11A",
-      "13m"
-    ],
+    "semitones": [0, 4, 7, 11, 14, 6, 8],
+    "intervals": ["1P", "3M", "5P", "7M", "9M", "11A", "13m"],
     "category": "13 th"
   },
   {
-    "name": "major 7 b 13 11 b 9",
+    "name": "Major 7 (b13,#11,b9)",
     "symbol": "∆7 (b13,#11,b9)",
     "notes": "C E G B Db F# Ab",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      13,
-      6,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9m",
-      "11A",
-      "13m"
-    ],
+    "semitones": [0, 4, 7, 11, 13, 6, 8],
+    "intervals": ["1P", "3M", "5P", "7M", "9m", "11A", "13m"],
     "category": "13 th"
   },
   {
-    "name": "major 7 b 13 11 9",
+    "name": "Major 7 (b13,#11,#9)",
     "symbol": "∆7 (b13,#11,#9)",
     "notes": "C E G B D# F# Ab",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      15,
-      6,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9A",
-      "11A",
-      "13m"
-    ],
+    "semitones": [0, 4, 7, 11, 15, 6, 8],
+    "intervals": ["1P", "3M", "5P", "7M", "9A", "11A", "13m"],
     "category": "13 th"
   },
   {
-    "name": "major 7 b 13 11 9 b 9",
+    "name": "Major 7 (b13,#11,#9,b9)",
     "symbol": "∆7 (b13,#11,#9,b9)",
     "notes": "C E G B Db D# F# Ab",
-    "semitones": [
-      0,
-      4,
-      7,
-      11,
-      13,
-      3,
-      6,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7M",
-      "9m",
-      "9A",
-      "11A",
-      "13m"
-    ],
+    "semitones": [0, 4, 7, 11, 13, 3, 6, 8],
+    "intervals": ["1P", "3M", "5P", "7M", "9m", "9A", "11A", "13m"],
     "category": "13 th"
   },
   {
-    "name": "dominant 13",
+    "name": "Dominant 13",
     "symbol": "13",
     "notes": "C E G Bb D F A",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      14,
-      5,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9M",
-      "11P",
-      "13M"
-    ],
+    "semitones": [0, 4, 7, 10, 14, 5, 9],
+    "intervals": ["1P", "3M", "5P", "7m", "9M", "11P", "13M"],
     "category": "13 th"
   },
   {
-    "name": "dominant 13 b 9",
+    "name": "Dominant 13 (b9)",
     "symbol": "13 (b9)",
     "notes": "C E G Bb Db F A",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      13,
-      5,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9m",
-      "11P",
-      "13M"
-    ],
+    "semitones": [0, 4, 7, 10, 13, 5, 9],
+    "intervals": ["1P", "3M", "5P", "7m", "9m", "11P", "13M"],
     "category": "13 th"
   },
   {
-    "name": "dominant 13 9",
+    "name": "Dominant 13 (#9)",
     "symbol": "13 (#9)",
     "notes": "C E G Bb D# F A",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      15,
-      5,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9A",
-      "11P",
-      "13M"
-    ],
+    "semitones": [0, 4, 7, 10, 15, 5, 9],
+    "intervals": ["1P", "3M", "5P", "7m", "9A", "11P", "13M"],
     "category": "13 th"
   },
   {
-    "name": "dominant 13 9 b 9",
+    "name": "Dominant 13 (#9,b9)",
     "symbol": "13 (#9,b9)",
     "notes": "C E G Bb Db D# F A",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      13,
-      3,
-      5,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9m",
-      "9A",
-      "11P",
-      "13M"
-    ],
+    "semitones": [0, 4, 7, 10, 13, 3, 5, 9],
+    "intervals": ["1P", "3M", "5P", "7m", "9m", "9A", "11P", "13M"],
     "category": "13 th"
   },
   {
-    "name": "dominant 13 11",
+    "name": "Dominant 13 (#11)",
     "symbol": "13 (#11)",
     "notes": "C E G Bb D F# A",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      14,
-      6,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9M",
-      "11A",
-      "13M"
-    ],
+    "semitones": [0, 4, 7, 10, 14, 6, 9],
+    "intervals": ["1P", "3M", "5P", "7m", "9M", "11A", "13M"],
     "category": "13 th"
   },
   {
-    "name": "dominant 13 11 b 9",
+    "name": "Dominant 13 (#11,b9)",
     "symbol": "13 (#11,b9)",
     "notes": "C E G Bb Db F# A",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      13,
-      6,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9m",
-      "11A",
-      "13M"
-    ],
+    "semitones": [0, 4, 7, 10, 13, 6, 9],
+    "intervals": ["1P", "3M", "5P", "7m", "9m", "11A", "13M"],
     "category": "13 th"
   },
   {
-    "name": "dominant 13 11 9",
+    "name": "Dominant 13 (#11,#9)",
     "symbol": "13 (#11,#9)",
     "notes": "C E G Bb D# F# A",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      15,
-      6,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9A",
-      "11A",
-      "13M"
-    ],
+    "semitones": [0, 4, 7, 10, 15, 6, 9],
+    "intervals": ["1P", "3M", "5P", "7m", "9A", "11A", "13M"],
     "category": "13 th"
   },
   {
-    "name": "dominant 13 11 9 b 9",
+    "name": "Dominant 13 (#11,#9,b9)",
     "symbol": "13 (#11,#9,b9)",
     "notes": "C E G Bb Db D# F# A",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      13,
-      3,
-      6,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9m",
-      "9A",
-      "11A",
-      "13M"
-    ],
+    "semitones": [0, 4, 7, 10, 13, 3, 6, 9],
+    "intervals": ["1P", "3M", "5P", "7m", "9m", "9A", "11A", "13M"],
     "category": "13 th"
   },
   {
-    "name": "dominant 13 suspended 4",
+    "name": "Dominant 13 suspended 4",
     "symbol": "13sus",
     "notes": "C F G Bb D A",
-    "semitones": [
-      0,
-      5,
-      7,
-      10,
-      14,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "4P",
-      "5P",
-      "7m",
-      "9M",
-      "13M"
-    ],
+    "semitones": [0, 5, 7, 10, 14, 9],
+    "intervals": ["1P", "4P", "5P", "7m", "9M", "13M"],
     "category": "13 th"
   },
   {
-    "name": "dominant 13 suspended 4 b 9",
+    "name": "Dominant 13 suspended 4 (b9)",
     "symbol": "13sus (b9)",
     "notes": "C E F Bb Db A",
-    "semitones": [
-      0,
-      4,
-      5,
-      10,
-      13,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "4P",
-      "7m",
-      "9m",
-      "13M"
-    ],
+    "semitones": [0, 4, 5, 10, 13, 9],
+    "intervals": ["1P", "3M", "4P", "7m", "9m", "13M"],
     "category": "13 th"
   },
   {
-    "name": "dominant 9 b 13",
+    "name": "Dominant 9 (b13)",
     "symbol": "9 (b13)",
     "notes": "C E G Bb D F Ab",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      14,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9M",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 4, 7, 10, 14, 5, 8],
+    "intervals": ["1P", "3M", "5P", "7m", "9M", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "dominant 9 b 13 b 5",
+    "name": "Dominant 9 (b13,b5)",
     "symbol": "9 (b13,b5)",
     "notes": "C E Gb Bb D F Ab",
-    "semitones": [
-      0,
-      4,
-      6,
-      10,
-      14,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "7m",
-      "9M",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 4, 6, 10, 14, 5, 8],
+    "intervals": ["1P", "3M", "5d", "7m", "9M", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "dominant 7 b 13 b 9",
+    "name": "Dominant 7 (b13,b9)",
     "symbol": "7 (b13,b9)",
     "notes": "C E G Bb Db F Ab",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      13,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9m",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 4, 7, 10, 13, 5, 8],
+    "intervals": ["1P", "3M", "5P", "7m", "9m", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "dominant 7 b 13 9",
+    "name": "Dominant 7 (b13,#9)",
     "symbol": "7 (b13,#9)",
     "notes": "C E G Bb D# F Ab",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      15,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9A",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 4, 7, 10, 15, 5, 8],
+    "intervals": ["1P", "3M", "5P", "7m", "9A", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "dominant 7 b 13 9 b 9",
+    "name": "Dominant 7 (b13,#9,b9)",
     "symbol": "7 (b13,#9,b9)",
     "notes": "C E G Bb Db D# F Ab",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      13,
-      3,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9m",
-      "9A",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 4, 7, 10, 13, 3, 5, 8],
+    "intervals": ["1P", "3M", "5P", "7m", "9m", "9A", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "dominant 7 b 13 b 9 b 5",
+    "name": "Dominant 7 (b13,b9,b5)",
     "symbol": "7 (b13,b9,b5)",
     "notes": "C E Gb Bb Db F Ab",
-    "semitones": [
-      0,
-      4,
-      6,
-      10,
-      13,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "7m",
-      "9m",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 4, 6, 10, 13, 5, 8],
+    "intervals": ["1P", "3M", "5d", "7m", "9m", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "dominant 7 b 13 9 b 5",
+    "name": "Dominant 7 (b13,#9,b5)",
     "symbol": "7 (b13,#9,b5)",
     "notes": "C E Gb Bb D# F Ab",
-    "semitones": [
-      0,
-      4,
-      6,
-      10,
-      15,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "7m",
-      "9A",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 4, 6, 10, 15, 5, 8],
+    "intervals": ["1P", "3M", "5d", "7m", "9A", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "dominant 7 b 13 9 b 9 b 5",
+    "name": "Dominant 7 (b13,#9,b9,b5)",
     "symbol": "7 (b13,#9,b9,b5)",
     "notes": "C E Gb Bb Db D# F Ab",
-    "semitones": [
-      0,
-      4,
-      6,
-      10,
-      13,
-      3,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5d",
-      "7m",
-      "9m",
-      "9A",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 4, 6, 10, 13, 3, 5, 8],
+    "intervals": ["1P", "3M", "5d", "7m", "9m", "9A", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "dominant 9 b 13 11",
+    "name": "Dominant 9 (b13,#11)",
     "symbol": "9 (b13,#11)",
     "notes": "C E G Bb D F# Ab",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      14,
-      6,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9M",
-      "11A",
-      "13m"
-    ],
+    "semitones": [0, 4, 7, 10, 14, 6, 8],
+    "intervals": ["1P", "3M", "5P", "7m", "9M", "11A", "13m"],
     "category": "13 th"
   },
   {
-    "name": "dominant 7 b 13 11 b 9",
+    "name": "Dominant 7 (b13,#11,b9)",
     "symbol": "7 (b13,#11,b9)",
     "notes": "C E G Bb Db F# Ab",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      13,
-      6,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9m",
-      "11A",
-      "13m"
-    ],
+    "semitones": [0, 4, 7, 10, 13, 6, 8],
+    "intervals": ["1P", "3M", "5P", "7m", "9m", "11A", "13m"],
     "category": "13 th"
   },
   {
-    "name": "dominant 7 b 13 11 9",
+    "name": "Dominant 7 (b13,#11,#9)",
     "symbol": "7 (b13,#11,#9)",
     "notes": "C E G Bb D# F# Ab",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      15,
-      6,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9A",
-      "11A",
-      "13m"
-    ],
+    "semitones": [0, 4, 7, 10, 15, 6, 8],
+    "intervals": ["1P", "3M", "5P", "7m", "9A", "11A", "13m"],
     "category": "13 th"
   },
   {
-    "name": "dominant 7 b 13 11 9 b 9",
+    "name": "Dominant 7 (b13,#11,#9,b9)",
     "symbol": "7 (b13,#11,#9,b9)",
     "notes": "C E G Bb Db D# F# Ab",
-    "semitones": [
-      0,
-      4,
-      7,
-      10,
-      13,
-      3,
-      6,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3M",
-      "5P",
-      "7m",
-      "9m",
-      "9A",
-      "11A",
-      "13m"
-    ],
+    "semitones": [0, 4, 7, 10, 13, 3, 6, 8],
+    "intervals": ["1P", "3M", "5P", "7m", "9m", "9A", "11A", "13m"],
     "category": "13 th"
   },
   {
-    "name": "minor 13 major 7",
+    "name": "Minor 13 (major7)",
     "symbol": "-13 (∆7)",
     "notes": "C Eb G B D F A",
-    "semitones": [
-      0,
-      3,
-      7,
-      11,
-      14,
-      5,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7M",
-      "9M",
-      "11P",
-      "13M"
-    ],
+    "semitones": [0, 3, 7, 11, 14, 5, 9],
+    "intervals": ["1P", "3m", "5P", "7M", "9M", "11P", "13M"],
     "category": "13 th"
   },
   {
-    "name": "minor 13 major 7 b 5",
+    "name": "Minor 13 (major7,b5)",
     "symbol": "-13 (∆7,b5)",
     "notes": "C Eb Gb B D F A",
-    "semitones": [
-      0,
-      3,
-      6,
-      11,
-      14,
-      5,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7M",
-      "9M",
-      "11P",
-      "13M"
-    ],
+    "semitones": [0, 3, 6, 11, 14, 5, 9],
+    "intervals": ["1P", "3m", "5d", "7M", "9M", "11P", "13M"],
     "category": "13 th"
   },
   {
-    "name": "minor 13 b 9 major 7",
+    "name": "Minor 13 (b9,major7)",
     "symbol": "-13 (b9,∆7)",
     "notes": "C Eb G B Db F A",
-    "semitones": [
-      0,
-      3,
-      7,
-      11,
-      13,
-      5,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7M",
-      "9m",
-      "11P",
-      "13M"
-    ],
+    "semitones": [0, 3, 7, 11, 13, 5, 9],
+    "intervals": ["1P", "3m", "5P", "7M", "9m", "11P", "13M"],
     "category": "13 th"
   },
   {
-    "name": "minor 13 b 9 major 7 b 5",
+    "name": "Minor 13 (b9,major7,b5)",
     "symbol": "-13 (b9,∆7,b5)",
     "notes": "C Eb Gb B Db F A",
-    "semitones": [
-      0,
-      3,
-      6,
-      11,
-      13,
-      5,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7M",
-      "9m",
-      "11P",
-      "13M"
-    ],
+    "semitones": [0, 3, 6, 11, 13, 5, 9],
+    "intervals": ["1P", "3m", "5d", "7M", "9m", "11P", "13M"],
     "category": "13 th"
   },
   {
-    "name": "minor 13 11 major 7",
+    "name": "Minor 13 (#11,major7)",
     "symbol": "-13 (#11,∆7)",
     "notes": "C Eb G B D F# A",
-    "semitones": [
-      0,
-      3,
-      7,
-      11,
-      14,
-      6,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7M",
-      "9M",
-      "11A",
-      "13M"
-    ],
+    "semitones": [0, 3, 7, 11, 14, 6, 9],
+    "intervals": ["1P", "3m", "5P", "7M", "9M", "11A", "13M"],
     "category": "13 th"
   },
   {
-    "name": "minor 13 11 b 9 major 7",
+    "name": "Minor 13 (#11,b9,major7)",
     "symbol": "-13 (#11,b9,∆7)",
     "notes": "C Eb G B Db F# A",
-    "semitones": [
-      0,
-      3,
-      7,
-      11,
-      13,
-      6,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7M",
-      "9m",
-      "11A",
-      "13M"
-    ],
+    "semitones": [0, 3, 7, 11, 13, 6, 9],
+    "intervals": ["1P", "3m", "5P", "7M", "9m", "11A", "13M"],
     "category": "13 th"
   },
   {
-    "name": "minor 13",
+    "name": "Minor 13",
     "symbol": "-13",
     "notes": "C Eb G Bb D F A",
-    "semitones": [
-      0,
-      3,
-      7,
-      10,
-      14,
-      5,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7m",
-      "9M",
-      "11P",
-      "13M"
-    ],
+    "semitones": [0, 3, 7, 10, 14, 5, 9],
+    "intervals": ["1P", "3m", "5P", "7m", "9M", "11P", "13M"],
     "category": "13 th"
   },
   {
-    "name": "minor 13 b 5",
+    "name": "Minor 13 (b5)",
     "symbol": "-13 (b5)",
     "notes": "C Eb Gb Bb D F A",
-    "semitones": [
-      0,
-      3,
-      6,
-      10,
-      14,
-      5,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7m",
-      "9M",
-      "11P",
-      "13M"
-    ],
+    "semitones": [0, 3, 6, 10, 14, 5, 9],
+    "intervals": ["1P", "3m", "5d", "7m", "9M", "11P", "13M"],
     "category": "13 th"
   },
   {
-    "name": "minor 13 b 9",
+    "name": "Minor 13 (b9)",
     "symbol": "-13 (b9)",
     "notes": "C Eb G Bb Db F A",
-    "semitones": [
-      0,
-      3,
-      7,
-      10,
-      13,
-      5,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7m",
-      "9m",
-      "11P",
-      "13M"
-    ],
+    "semitones": [0, 3, 7, 10, 13, 5, 9],
+    "intervals": ["1P", "3m", "5P", "7m", "9m", "11P", "13M"],
     "category": "13 th"
   },
   {
-    "name": "minor 13 b 9 b 5",
+    "name": "Minor 13 (b9,b5)",
     "symbol": "-13 (b9,b5)",
     "notes": "C Eb Gb Bb Db F A",
-    "semitones": [
-      0,
-      3,
-      6,
-      10,
-      13,
-      5,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7m",
-      "9m",
-      "11P",
-      "13M"
-    ],
+    "semitones": [0, 3, 6, 10, 13, 5, 9],
+    "intervals": ["1P", "3m", "5d", "7m", "9m", "11P", "13M"],
     "category": "13 th"
   },
   {
-    "name": "minor 13 11",
+    "name": "Minor 13 (#11)",
     "symbol": "-13 (#11)",
     "notes": "C Eb G Bb D F# A",
-    "semitones": [
-      0,
-      3,
-      7,
-      10,
-      14,
-      6,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7m",
-      "9M",
-      "11A",
-      "13M"
-    ],
+    "semitones": [0, 3, 7, 10, 14, 6, 9],
+    "intervals": ["1P", "3m", "5P", "7m", "9M", "11A", "13M"],
     "category": "13 th"
   },
   {
-    "name": "minor 13 11 b 9",
+    "name": "Minor 13 (#11,b9)",
     "symbol": "-13 (#11,b9)",
     "notes": "C Eb G Bb Db F# A",
-    "semitones": [
-      0,
-      3,
-      7,
-      10,
-      13,
-      6,
-      9
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7m",
-      "9m",
-      "11A",
-      "13M"
-    ],
+    "semitones": [0, 3, 7, 10, 13, 6, 9],
+    "intervals": ["1P", "3m", "5P", "7m", "9m", "11A", "13M"],
     "category": "13 th"
   },
   {
-    "name": "minor 11 b 13 major 7",
+    "name": "Minor 11 (b13,major7)",
     "symbol": "-11 (b13,∆7)",
     "notes": "C Eb G B D F Ab",
-    "semitones": [
-      0,
-      3,
-      7,
-      11,
-      14,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7M",
-      "9M",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 3, 7, 11, 14, 5, 8],
+    "intervals": ["1P", "3m", "5P", "7M", "9M", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "minor 11 b 13 b 9 major 7",
+    "name": "Minor 11 (b13,b9,major7)",
     "symbol": "-11 (b13,b9,∆7)",
     "notes": "C Eb G B Db F Ab",
-    "semitones": [
-      0,
-      3,
-      7,
-      11,
-      13,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7M",
-      "9m",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 3, 7, 11, 13, 5, 8],
+    "intervals": ["1P", "3m", "5P", "7M", "9m", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "minor 11 b 13 b 9 b 5",
+    "name": "Minor 11 (b13,b9,b5)",
     "symbol": "-11 (b13,b9,b5)",
     "notes": "C Eb Gb B Db F Ab",
-    "semitones": [
-      0,
-      3,
-      6,
-      11,
-      13,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7M",
-      "9m",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 3, 6, 11, 13, 5, 8],
+    "intervals": ["1P", "3m", "5d", "7M", "9m", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "minor 9 b 13 11 major 7",
+    "name": "Minor 9 (b13,#11,major7)",
     "symbol": "-9 (b13,#11,∆7)",
     "notes": "C Eb G B D F# Ab",
-    "semitones": [
-      0,
-      3,
-      7,
-      11,
-      14,
-      6,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7M",
-      "9M",
-      "11A",
-      "13m"
-    ],
+    "semitones": [0, 3, 7, 11, 14, 6, 8],
+    "intervals": ["1P", "3m", "5P", "7M", "9M", "11A", "13m"],
     "category": "13 th"
   },
   {
-    "name": "minor b 13 11 b 9 major 7",
+    "name": "Minor  (b13,#11,b9,major7)",
     "symbol": "- (b13,#11,b9,∆7)",
     "notes": "C Eb G B Db F# Ab",
-    "semitones": [
-      0,
-      3,
-      7,
-      11,
-      13,
-      6,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7M",
-      "9m",
-      "11A",
-      "13m"
-    ],
+    "semitones": [0, 3, 7, 11, 13, 6, 8],
+    "intervals": ["1P", "3m", "5P", "7M", "9m", "11A", "13m"],
     "category": "13 th"
   },
   {
-    "name": "minor 11 b 13",
+    "name": "Minor 11 (b13)",
     "symbol": "-11 (b13)",
     "notes": "C Eb G Bb D F Ab",
-    "semitones": [
-      0,
-      3,
-      7,
-      10,
-      14,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7m",
-      "9M",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 3, 7, 10, 14, 5, 8],
+    "intervals": ["1P", "3m", "5P", "7m", "9M", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "minor 11 b 13 b 5",
+    "name": "Minor 11 (b13,b5)",
     "symbol": "-11 (b13,b5)",
     "notes": "C Eb Gb Bb D F Ab",
-    "semitones": [
-      0,
-      3,
-      6,
-      10,
-      14,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7m",
-      "9M",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 3, 6, 10, 14, 5, 8],
+    "intervals": ["1P", "3m", "5d", "7m", "9M", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "minor 11 b 13 b 9",
+    "name": "Minor 11 (b13,b9)",
     "symbol": "-11 (b13,b9)",
     "notes": "C Eb G Bb Db F Ab",
-    "semitones": [
-      0,
-      3,
-      7,
-      10,
-      13,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7m",
-      "9m",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 3, 7, 10, 13, 5, 8],
+    "intervals": ["1P", "3m", "5P", "7m", "9m", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "minor 11 b 13 b 9 b 5",
+    "name": "Minor 11 (b13,b9,b5)",
     "symbol": "-11 (b13,b9,b5)",
     "notes": "C Eb Gb Bb Db F Ab",
-    "semitones": [
-      0,
-      3,
-      6,
-      10,
-      13,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7m",
-      "9m",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 3, 6, 10, 13, 5, 8],
+    "intervals": ["1P", "3m", "5d", "7m", "9m", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "minor 9 b 13 11",
+    "name": "Minor 9 (b13,#11)",
     "symbol": "-9 (b13,#11)",
     "notes": "C Eb G Bb D F# Ab",
-    "semitones": [
-      0,
-      3,
-      7,
-      10,
-      14,
-      6,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7m",
-      "9M",
-      "11A",
-      "13m"
-    ],
+    "semitones": [0, 3, 7, 10, 14, 6, 8],
+    "intervals": ["1P", "3m", "5P", "7m", "9M", "11A", "13m"],
     "category": "13 th"
   },
   {
-    "name": "minor b 13 11 b 9",
+    "name": "Minor  (b13,#11,b9)",
     "symbol": "- (b13,#11,b9)",
     "notes": "C Eb G Bb Db F# Ab",
-    "semitones": [
-      0,
-      3,
-      7,
-      10,
-      13,
-      6,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5P",
-      "7m",
-      "9m",
-      "11A",
-      "13m"
-    ],
+    "semitones": [0, 3, 7, 10, 13, 6, 8],
+    "intervals": ["1P", "3m", "5P", "7m", "9m", "11A", "13m"],
     "category": "13 th"
   },
   {
-    "name": "diminished 11 b 13",
+    "name": "Diminished 11 (b13)",
     "symbol": "°11 (b13)",
     "notes": "C Eb Gb Bbb D F Ab",
-    "semitones": [
-      0,
-      3,
-      6,
-      9,
-      14,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7d",
-      "9M",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 3, 6, 9, 14, 5, 8],
+    "intervals": ["1P", "3m", "5d", "7d", "9M", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "diminished 11 b 13 b 9",
+    "name": "Diminished 11 (b13,b9)",
     "symbol": "°11 (b13,b9)",
     "notes": "C Eb Gb Bbb Db F Ab",
-    "semitones": [
-      0,
-      3,
-      6,
-      9,
-      13,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7d",
-      "9m",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 3, 6, 9, 13, 5, 8],
+    "intervals": ["1P", "3m", "5d", "7d", "9m", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "diminished 11 b 13 major 7 bb 7",
+    "name": "Diminished 11 (b13,major7,bb7)",
     "symbol": "°11 (b13,∆7,bb7)",
     "notes": "C Eb Gb Bbb B D F Ab",
-    "semitones": [
-      0,
-      3,
-      6,
-      9,
-      11,
-      14,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7d",
-      "7M",
-      "9M",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 3, 6, 9, 11, 14, 5, 8],
+    "intervals": ["1P", "3m", "5d", "7d", "7M", "9M", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "diminished 11 b 13 major 7",
+    "name": "Diminished 11 (b13,major7)",
     "symbol": "°11 (b13,∆7)",
     "notes": "C Eb Gb B D F Ab",
-    "semitones": [
-      0,
-      3,
-      6,
-      11,
-      14,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7M",
-      "9M",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 3, 6, 11, 14, 5, 8],
+    "intervals": ["1P", "3m", "5d", "7M", "9M", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "diminished 11 b 13 b 9 major 7",
+    "name": "Diminished 11 (b13,b9,major7)",
     "symbol": "°11 (b13,b9,∆7)",
     "notes": "C Eb Gb B Db F Ab",
-    "semitones": [
-      0,
-      3,
-      6,
-      11,
-      13,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7M",
-      "9m",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 3, 6, 11, 13, 5, 8],
+    "intervals": ["1P", "3m", "5d", "7M", "9m", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "diminished 11 b 13 major 7 bb 7",
+    "name": "Diminished 11 (b13,major7,bb7)",
     "symbol": "°11 (b13,∆7,bb7)",
     "notes": "C Eb Gb Bbb B D F Ab",
-    "semitones": [
-      0,
-      3,
-      6,
-      9,
-      11,
-      14,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7d",
-      "7M",
-      "9M",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 3, 6, 9, 11, 14, 5, 8],
+    "intervals": ["1P", "3m", "5d", "7d", "7M", "9M", "11P", "13m"],
     "category": "13 th"
   },
   {
-    "name": "diminished 11 b 13 b 9 major 7 bb 7",
+    "name": "Diminished 11 (b13,b9,major7,bb7)",
     "symbol": "°11 (b13,b9,∆7,bb7)",
     "notes": "C Eb Gb Bbb B Db F Ab",
-    "semitones": [
-      0,
-      3,
-      6,
-      9,
-      11,
-      13,
-      5,
-      8
-    ],
-    "intervals": [
-      "1P",
-      "3m",
-      "5d",
-      "7d",
-      "7M",
-      "9m",
-      "11P",
-      "13m"
-    ],
+    "semitones": [0, 3, 6, 9, 11, 13, 5, 8],
+    "intervals": ["1P", "3m", "5d", "7d", "7M", "9m", "11P", "13m"],
     "category": "13 th"
   }
 ]

@@ -289,7 +289,7 @@ const getData = () => {
         return null
       }
       return {
-        name: _.lowerCase(name),
+        name,
         symbol,
         notes,
         semitones: getSemitones(notes),
