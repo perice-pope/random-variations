@@ -3,12 +3,11 @@ import * as _ from 'lodash'
 import { transpose } from 'tonal-distance'
 import * as tonal from 'tonal'
 
-import { default as MuButton } from '@material-ui/core/Button'
+import Button, { default as MuButton } from '@material-ui/core/Button'
 
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
-import DialogTitle from '@material-ui/core/DialogTitle'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 
 import FormControl from '@material-ui/core/FormControl'
@@ -392,6 +391,10 @@ class ArpeggioModifierModal extends React.Component<
     this.handlePatternChange(newPattern)
   }
 
+  handleSelectRandomChordType = () => {
+    this.handleChordTypeSelected(_.sample(chordTypeOptions) as ChordTypeOption)
+  }
+
   render() {
     if (!this.props.isOpen) {
       return null
@@ -412,40 +415,84 @@ class ArpeggioModifierModal extends React.Component<
         onClose={this.handleSubmit}
         aria-labelledby="arpeggio-modifier-dialog"
       >
-        <DialogTitle id="arpeggio-modifier-dialog">
-          <Typography variant="h4">Chords</Typography>
-        </DialogTitle>
-
         <DialogContent id="arpeggio-modifier-dialog-content">
           <Box>
             <Typography variant="h5">Chord type</Typography>
             <Box mt={2}>
-              <InputSelect
-                textFieldProps={{
-                  InputLabelProps: {
-                    shrink: true,
-                  },
-                }}
-                value={
-                  this.state.values.chordType
-                    ? chordTypeToChordTypeOptionMap[this.state.values.chordType]
-                    : undefined
+              <div
+                className={css(`
+                display: flex;
+                flex-direction: row;
+                align-items: flex-start;
+                
+                @media screen and (max-width: 500px) {
+                  flex-direction: column;
+                  align-items: stretch;
                 }
-                onChange={this.handleChordTypeSelected}
-                name="chordType"
-                options={chordTypeOptionsGrouped}
-              />
-              {chord.notes && (
-                <FormHelperText>
-                  {`Notes in key of C:  `}
-                  <span
-                    className={css({
-                      fontSize: '0.8rem',
-                      fontWeight: 'bold',
-                    })}
-                  >{`${chord.notes.split(' ').join(', ')}`}</span>
-                </FormHelperText>
-              )}
+              `)}
+              >
+                <div className={css(`flex: 1; margin-top: 7px;`)}>
+                  <InputSelect
+                    classes={{
+                      singleValue: css(`overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;`),
+                      valueContainer: css(`flex-wrap: nowrap;`),
+                    }}
+                    textFieldProps={{
+                      InputLabelProps: {
+                        shrink: true,
+                      },
+                    }}
+                    value={
+                      this.state.values.chordType
+                        ? chordTypeToChordTypeOptionMap[
+                            this.state.values.chordType
+                          ]
+                        : undefined
+                    }
+                    onChange={this.handleChordTypeSelected}
+                    name="chordType"
+                    options={chordTypeOptionsGrouped}
+                  />
+
+                  {chord.notes && (
+                    <FormHelperText>
+                      {`Notes in key of C:  `}
+                      <span
+                        className={css({
+                          fontSize: '0.8rem',
+                          fontWeight: 'bold',
+                        })}
+                      >{`${chord.notes.split(' ').join(', ')}`}</span>
+                    </FormHelperText>
+                  )}
+                </div>
+
+                <Tooltip
+                  title="Choose random chord"
+                  disableFocusListener={true}
+                >
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={this.handleSelectRandomChordType}
+                    className={css(`
+                      margin-left: 0.5rem;
+                      @media screen and (max-width: 500px) {
+                        margin-left: 0;
+                        margin-top: 0.5rem;
+                      }
+                    `)}
+                  >
+                    <ArrowsIcon
+                      fontSize="small"
+                      className={css(`margin-right: 0.5rem;`)}
+                    />
+                    Random
+                  </Button>
+                </Tooltip>
+              </div>
             </Box>
 
             <Flex mt={2} mb={2}>
@@ -530,9 +577,8 @@ class ArpeggioModifierModal extends React.Component<
                   >
                     <MuButton
                       color="primary"
-                      variant="extendedFab"
+                      variant="outlined"
                       className={css({ minWidth: '40px' })}
-                      size="small"
                       aria-label="Randomize pattern"
                       disabled={this.state.values.pattern.items.length < 1}
                       onClick={this.handleRandomizePattern}
