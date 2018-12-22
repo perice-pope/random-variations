@@ -4,7 +4,7 @@ import { ButtonProps } from '@material-ui/core/Button'
 
 type Props = {
   closeAfterClick?: boolean
-  renderMenu: (props: MenuProps) => React.ReactNode
+  renderMenu: (props: MenuProps & { onClose: () => any }) => React.ReactNode
   renderButton: (props: ButtonProps) => React.ReactNode
 }
 

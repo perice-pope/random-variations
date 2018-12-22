@@ -1419,7 +1419,10 @@ class App extends React.Component<
         renderMenu={props => (
           <Menu {...props}>
             <MenuItem
-              onClick={this.handleShuffleClick}
+              onClick={() => {
+                this.handleShuffleClick()
+                props.onClose()
+              }}
               disabled={noteCards.length < 3}
             >
               <ListItemIcon>
@@ -1428,7 +1431,10 @@ class App extends React.Component<
               Randomize session
             </MenuItem>
             <MenuItem
-              onClick={this.handleRemoveAllNotes}
+              onClick={() => {
+                this.handleRemoveAllNotes()
+                props.onClose()
+              }}
               disabled={noteCards.length === 0}
             >
               <ListItemIcon>
@@ -1478,31 +1484,46 @@ class App extends React.Component<
 
             <Divider />
 
-            <MenuItem onClick={() => this.handleShareSession()}>
+            <MenuItem onClick={() => {
+              this.handleShareSession()
+              props.onClose()
+            }}>
               <ListItemIcon>
                 <ShareIcon color="action" />
               </ListItemIcon>
               {' Share'}
             </MenuItem>
-            <MenuItem onClick={() => this.downloadAsMidi()}>
+            <MenuItem onClick={() => {
+              this.downloadAsMidi()
+              props.onClose()
+            }}>
               <ListItemIcon>
                 <CloudDownloadIcon color="action" />
               </ListItemIcon>
               {' Download as MIDI'}
             </MenuItem>
-            <MenuItem onClick={() => this.handleSaveSessionAs()}>
+            <MenuItem onClick={() => {
+              this.handleSaveSessionAs()
+              props.onClose()
+              }}>
               <ListItemIcon>
                 <SaveIcon color="action" />
               </ListItemIcon>
               {' Save as...'}
             </MenuItem>
-            <MenuItem onClick={() => this.handleRenameSession()}>
+            <MenuItem onClick={() => {
+              this.handleRenameSession()
+              props.onClose()
+            }}>
               <ListItemIcon>
                 <EditIcon color="action" />
               </ListItemIcon>
               {' Rename'}
             </MenuItem>
-            <MenuItem onClick={() => this.handleDeleteSession()}>
+            <MenuItem onClick={() => {
+              this.handleDeleteSession()
+              props.onClose()
+            }}>
               <ListItemIcon>
                 <DeleteIcon color="action" />
               </ListItemIcon>
