@@ -77,7 +77,7 @@ import {
   Scale,
   SessionNoteCard,
 } from '../types'
-import PickNoteModal from './PickNoteModal'
+
 import ArpeggioModifierModal, {
   SubmitValuesType as ArpeggioModifierModalSubmitValues,
 } from './ArpeggioModifierModal'
@@ -208,7 +208,6 @@ type AppState = {
   intervalsModalIsOpen: boolean
   directionsModalIsOpen: boolean
 
-  noteAddingModalIsOpen: boolean
   toneRowAddingModalIsOpen: boolean
   noteSequenceAddingModalIsOpen: boolean
 }
@@ -400,7 +399,6 @@ class App extends React.Component<
       scalesModalIsOpen: false,
       intervalsModalIsOpen: false,
       directionsModalIsOpen: false,
-      noteAddingModalIsOpen: false,
       toneRowAddingModalIsOpen: false,
       noteSequenceAddingModalIsOpen: false,
 
@@ -1012,11 +1010,6 @@ class App extends React.Component<
     })
   }
 
-  private closeNoteAddingModal = () =>
-    this.setState({ noteAddingModalIsOpen: false })
-  private openNoteAddingModal = () =>
-    this.setState({ noteAddingModalIsOpen: true })
-
   private closeToneRowAddingModal = () =>
     this.setState({ toneRowAddingModalIsOpen: false })
   private openToneRowAddingModal = () =>
@@ -1210,19 +1203,6 @@ class App extends React.Component<
       level: 'success',
       autohide: 6000,
     })
-  }
-
-  private handleAddNoteModalSubmit = ({ noteName }) => {
-    if (sessionStore.activeSession) {
-      sessionStore.activeSession.noteCards = [
-        ...sessionStore.activeSession.noteCards,
-        {
-          noteName,
-          id: uuid(),
-        } as SessionNoteCard,
-      ]
-    }
-    this.closeNoteAddingModal()
   }
 
   private addNotesToSession = noteNames => {
@@ -2244,7 +2224,6 @@ class App extends React.Component<
                                 !(isMobile && this.state.isMenuOpen)
                               }
                               enableOnlyNote={noteCards.length === 0}
-                              onAddSingleNoteClick={this.openNoteAddingModal}
                               onAddToneRowClick={this.openToneRowAddingModal}
                               onAddNoteSequenceClick={
                                 this.openNoteSequenceAddingModal
@@ -2254,9 +2233,6 @@ class App extends React.Component<
                               onAddScaleClick={this.openScalesModal}
                               onAddEnclosuresClick={this.openEnclosuresModal}
                               onAddIntervalsClick={this.openIntervalsModal}
-                              disableSingleNote={
-                                noteCards.length >= MaxNoteCards
-                              }
                               disableToneRow={noteCards.length >= MaxNoteCards}
                               disableNoteSequence={noteCards.length > 0}
                               disableDirections={
@@ -2527,12 +2503,6 @@ class App extends React.Component<
             onClose={this.closeDirectionsModal}
             onSubmit={this.handleDirectionsModifierModalConfirm}
             initialValues={modifiers.directions}
-          />
-
-          <PickNoteModal
-            isOpen={this.state.noteAddingModalIsOpen}
-            onClose={this.closeNoteAddingModal}
-            onSubmit={this.handleAddNoteModalSubmit}
           />
 
           <Dialog

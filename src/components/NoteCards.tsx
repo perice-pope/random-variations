@@ -24,13 +24,23 @@ import PickNoteModal from './PickNoteModal'
 import { observer } from 'mobx-react'
 import settingsStore from '../services/settingsStore'
 
-const FlipperStyled = styled(Flipper)`
+const FlipperAlignCenter = styled(Flipper)`
   width: 100%;
   height: 100%;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-content: center;
+  align-items: center;
+`
+
+const FlipperAlignTop = styled(Flipper)`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: flex-start;
   align-items: center;
 `
 
@@ -258,6 +268,7 @@ const SortableNotesContainer = SortableContainer(
       onEditNote,
       onMouseOver,
       onMouseLeave,
+      verticalAlign,
     }) => {
       let backgroundColor = 'transparent'
       if (isDraggingOutOfContainer) {
@@ -265,6 +276,9 @@ const SortableNotesContainer = SortableContainer(
       } else if (isDragging) {
         backgroundColor = '#eff8ff'
       }
+
+      let FlipperComponent =
+        verticalAlign === 'top' ? FlipperAlignTop : FlipperAlignCenter
 
       return (
         <div
@@ -276,7 +290,7 @@ const SortableNotesContainer = SortableContainer(
           background-color: ${backgroundColor}
       `)}
         >
-          <FlipperStyled flipKey={items}>
+          <FlipperComponent flipKey={items}>
             {items.map(({ noteName, id }, index) => (
               <SortableNoteCard
                 noteName={noteName}
@@ -317,7 +331,7 @@ const SortableNotesContainer = SortableContainer(
               </SortableNoteCard>
             ))}
             {children}
-          </FlipperStyled>
+          </FlipperComponent>
         </div>
       )
     },
@@ -337,6 +351,7 @@ type NoteCardsProps = {
   disableRemoving?: boolean
   hideContextMenu?: boolean
   zIndex?: number
+  verticalAlign?: 'top' | 'center'
   perLineCount?: number
   activeNoteCardIndex?: number
   onMouseOver?: (index: number) => any
@@ -442,6 +457,7 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
       perLineCount,
       hideContextMenu,
       disableRemoving,
+      verticalAlign,
     } = this.props
 
     return (
@@ -457,6 +473,7 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
           transitionDuration={DRAG_AND_DROP_TRANSITION_DURATION_MS}
           activeNoteCardIndex={activeNoteCardIndex}
           items={notes}
+          verticalAlign={verticalAlign || 'center'}
           perLineCount={perLineCount || 4}
           zIndex={zIndex || 1000}
           onMouseOver={onMouseOver}

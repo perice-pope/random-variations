@@ -10,7 +10,6 @@ import { Hidden, Divider } from '@material-ui/core'
 import ButtonWithMenu from './ButtonWithMenu'
 
 type AddEntityButtonProps = {
-  onAddSingleNoteClick: () => any
   onAddToneRowClick: () => any
   onAddNoteSequenceClick: () => any
   onAddIntervalsClick: () => any
@@ -20,7 +19,6 @@ type AddEntityButtonProps = {
   onAddDirectionsClick: () => any
   buttonProps?: ButtonProps
   enableOnlyNote?: boolean
-  disableSingleNote?: boolean
   showHelpTooltip?: boolean
   disableChords?: boolean
   disableToneRow?: boolean
@@ -44,7 +42,6 @@ export default class AddEntityButton extends React.Component<
       disableIntervals,
       disableChords,
       disableScales,
-      disableSingleNote,
       disableToneRow,
       disableNoteSequence,
       disableEnclosures,
@@ -53,7 +50,6 @@ export default class AddEntityButton extends React.Component<
     } = this.props
 
     const allOptionsAreDisabled =
-      disableSingleNote &&
       disableChords &&
       disableEnclosures &&
       disableScales &&
@@ -104,17 +100,10 @@ export default class AddEntityButton extends React.Component<
         renderMenu={props => (
           <Menu id="add-entity-menu" {...props}>
             <MenuItem
-              onClick={this.props.onAddSingleNoteClick}
-              disabled={disableSingleNote}
-            >
-              Note
-            </MenuItem>
-
-            <MenuItem
               onClick={this.props.onAddToneRowClick}
               disabled={disableToneRow}
             >
-              Tone row
+              Note(-s)
             </MenuItem>
 
             <MenuItem

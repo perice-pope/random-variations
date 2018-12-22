@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as _ from 'lodash'
 import * as tonal from 'tonal'
+import pluralize from 'pluralize'
 
 import PianoKeyboard from './PianoKeyboard'
 
@@ -12,7 +13,6 @@ import Slider from '@material-ui/lab/Slider'
 import ArrowsIcon from '@material-ui/icons/Cached'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
-import DialogTitle from '@material-ui/core/DialogTitle'
 import PlusIcon from '@material-ui/icons/Add'
 import MinusIcon from '@material-ui/icons/Remove'
 import { observer } from 'mobx-react'
@@ -31,7 +31,7 @@ import {
   WithAudioEngineInjectedProps,
 } from './withAudioEngine'
 import { NoteNamesWithSharps } from '../musicUtils'
-import { Typography, IconButton } from '@material-ui/core'
+import { Typography, IconButton, Hidden } from '@material-ui/core'
 import settingsStore from '../services/settingsStore'
 import NoteCards, { NoteCardNote } from './NoteCards'
 import { ChromaticNoteSharps } from '../types'
@@ -99,6 +99,18 @@ class ToneRowModal extends React.Component<
     }
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.isOpen !== this.props.isOpen && this.props.isOpen) {
+      this.setState({
+        notes: generateRandomNotes(
+          this.props.defaultNotesCount,
+          this.state.octave,
+          this.props.noteName,
+        ),
+      })
+    }
+  }
+
   getNoteRange = octave => {
     const firstNote = octave === 1 ? `C${octave}` : `A${octave - 1}`
     const lastNote = octave === 6 ? `B${octave}` : `D${octave + 1}`
@@ -122,8 +134,13 @@ class ToneRowModal extends React.Component<
     })
   }
 
-  setNoteNameMouseOver = noteName =>
-    this.setState({ noteNameMouseOver: noteName })
+  handleNoteCardMouseOver = index => {
+    this.setState({ noteNameMouseOver: this.state.notes[index].noteName })
+  }
+
+  handleNoteCardMouseLeave = () => {
+    this.setState({ noteNameMouseOver: undefined })
+  }
 
   handleIncreaseOctave = () => {
     this.setOctave(this.state.octave != null ? this.state.octave + 1 : 1)
@@ -171,7 +188,7 @@ class ToneRowModal extends React.Component<
     })
   }
 
-  onNoteSelected = (noteName?: string, skipPlayingNote?: boolean) => {
+  onKeyboardNotePlayed = (noteName?: string) => {
     if (!noteName) {
       this.setState({
         noteName: undefined,
@@ -188,16 +205,6 @@ class ToneRowModal extends React.Component<
         this.setState({ range: this.getNoteRange(tonal.Note.oct(noteName)) }),
       100,
     )
-
-    if (!skipPlayingNote) {
-      this.props.audioEngine.playNote(
-        {
-          midi: tonal.Note.midi(noteName)!,
-        },
-        0,
-        0.5,
-      )
-    }
 
     if (noteName !== noteEnharmonicName && this.state.noteName === noteName) {
       // This is a second click on a card with "enharmonic-capable" note...
@@ -218,7 +225,6 @@ class ToneRowModal extends React.Component<
 
       this.setState({
         noteName: noteEnharmonicName!,
-        octave: tonal.Note.oct(noteEnharmonicName)!,
       })
 
       return
@@ -227,7 +233,6 @@ class ToneRowModal extends React.Component<
     this.setState(
       {
         noteName: noteName,
-        octave: tonal.Note.oct(noteName)!,
       },
       () => {
         if (this.state.notes.length < this.props.maxNotesCount) {
@@ -237,16 +242,25 @@ class ToneRowModal extends React.Component<
     )
   }
 
-  private handleNotesCountChange = (event, count) =>
-    this.setState({
-      notes: generateRandomNotes(
-        count,
-        this.state.octave,
-        this.state.notes.length > 0 && count > 0
-          ? this.state.notes[0].noteName
-          : undefined,
-      ),
-    })
+  private handleNotesCountChange = (event, count) => {
+    const commonPrefixLength = Math.min(count, this.state.notes.length)
+    const newRandomNotes = generateRandomNotes(
+      count,
+      this.state.octave,
+      this.state.notes.length > 0 && count > 0
+        ? this.state.notes[0].noteName
+        : undefined,
+    )
+
+    let notes = newRandomNotes
+    if (commonPrefixLength > 0) {
+      notes = [
+        ...this.state.notes.slice(0, commonPrefixLength),
+        ...newRandomNotes.slice(commonPrefixLength),
+      ]
+    }
+    this.setState({ notes })
+  }
 
   private handleChangeNoteCardToEnharmonicClick = (index: number) =>
     this.setState({
@@ -300,21 +314,23 @@ class ToneRowModal extends React.Component<
       <Dialog
         fullScreen={this.props.fullScreen}
         fullWidth={true}
-        maxWidth="md"
+        maxWidth="sm"
         scroll="paper"
         open={this.props.isOpen}
         onClose={this.submit}
         aria-labelledby="pick-note-dialog"
       >
-        <DialogTitle id="pick-note-dialog">
-          <Typography variant="h4">Add a tone row</Typography>
-        </DialogTitle>
-
         <DialogContent className={css(`overflow-x: hidden;`)}>
-          <Box>
+          <Flex flexDirection="column" height="100%">
+            <Hidden mdDown>
+              <Box mb={3}>
+                <Typography variant="h4">Add a tone row</Typography>
+              </Box>
+            </Hidden>
+
             <Box mb={2}>
               <Typography id="slider-label" className={css(`font-size: 20px;`)}>
-                Notes count: {notes.length}
+                Add notes: {notes.length} {pluralize('notes', notes.length)}
               </Typography>
               <Slider
                 classes={{
@@ -330,12 +346,11 @@ class ToneRowModal extends React.Component<
             </Box>
 
             <Flex width={1} justifyContent="center">
-              <Tooltip title="Randomize notes" disableFocusListener={true}>
+              <Tooltip title="Randomize notes" disableFocusListener>
                 <Button
                   color="primary"
-                  variant="extendedFab"
+                  variant="outlined"
                   className={css({ minWidth: '40px', marginRight: '0.5rem' })}
-                  size="small"
                   aria-label="Randomize notes"
                   disabled={this.state.notes.length < 2}
                   onClick={this.randomizeNotes}
@@ -362,26 +377,10 @@ class ToneRowModal extends React.Component<
                     fontSize="small"
                     className={css({ margin: '0 0.5rem' })}
                   />
-                  Clear all
+                  Clear
                 </Button>
               </Tooltip>
             </Flex>
-
-            <div className={css(`min-height: 180px;`)}>
-              <Flex flexWrap="wrap" flex={1} mt={4} mb={3}>
-                <NoteCards
-                  zIndex={10000000}
-                  notes={this.state.notes}
-                  onCardsReorder={this.handleCardsReorder}
-                  onCardDraggedOut={this.deleteNoteCard}
-                  onEditNote={this.handleEditNote}
-                  onChangeToEnharmonicClick={
-                    this.handleChangeNoteCardToEnharmonicClick
-                  }
-                  onDeleteClick={this.deleteNoteCard}
-                />
-              </Flex>
-            </div>
 
             <Flex alignItems="center" justifyContent="center">
               <IconButton
@@ -391,6 +390,7 @@ class ToneRowModal extends React.Component<
               >
                 <MinusIcon fontSize="large" />
               </IconButton>
+
               <TextField
                 className={css({
                   maxWidth: '80px',
@@ -436,29 +436,56 @@ class ToneRowModal extends React.Component<
                     ? tonal.Note.enharmonic(noteNameWithSharp)!
                     : noteNameWithSharp
 
-                  this.onNoteSelected(noteName, true)
+                  this.onKeyboardNotePlayed(noteName)
                 }}
                 primaryNotesMidi={
-                  this.state.noteName
-                    ? [tonal.Note.midi(this.state.noteName)]
-                    : undefined
-                }
-                secondaryNotesMidi={
                   this.state.noteNameMouseOver
                     ? [tonal.Note.midi(this.state.noteNameMouseOver)]
                     : undefined
                 }
                 notesColor={
-                  this.state.noteName || this.state.noteNameMouseOver
+                  this.state.noteNameMouseOver
                     ? getNoteCardColorByNoteName(
                         // @ts-ignore
-                        this.state.noteName || this.state.noteNameMouseOver,
+                        this.state.noteNameMouseOver,
                       )
                     : undefined
                 }
               />
             </Box>
-          </Box>
+
+            <div
+              className={css(`
+              flex: 1;
+              display: flex;
+              flex-wrap: wrap;
+              justify-content: flex-start;
+              
+              margin-top: 25px;
+              max-height: 250px;
+              
+              @media screen and (min-width: 601px) {
+                margin-top: 32px;
+                min-height: 250px;
+              }
+            `)}
+            >
+              <NoteCards
+                zIndex={10000000}
+                verticalAlign="top"
+                notes={this.state.notes}
+                onMouseOver={this.handleNoteCardMouseOver}
+                onMouseLeave={this.handleNoteCardMouseLeave}
+                onCardsReorder={this.handleCardsReorder}
+                onCardDraggedOut={this.deleteNoteCard}
+                onEditNote={this.handleEditNote}
+                onChangeToEnharmonicClick={
+                  this.handleChangeNoteCardToEnharmonicClick
+                }
+                onDeleteClick={this.deleteNoteCard}
+              />
+            </div>
+          </Flex>
         </DialogContent>
 
         <DialogActions>
