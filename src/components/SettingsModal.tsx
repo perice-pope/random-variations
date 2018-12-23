@@ -127,6 +127,10 @@ class SettingsModal extends React.Component<
   }
 
   render() {
+    if (!this.props.isOpen) {
+      return null
+    }
+
     return (
       <Dialog
         fullWidth={true}

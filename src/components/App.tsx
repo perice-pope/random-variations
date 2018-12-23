@@ -3,6 +3,8 @@ import { ThemeProvider } from 'emotion-theming'
 import { css, cx } from 'react-emotion'
 import _ from 'lodash'
 import * as tonal from 'tonal'
+import memoizeOne from 'memoize-one'
+import { transpose } from 'tonal-distance'
 import { RouteComponentProps } from 'react-router'
 import { withRouter } from 'react-router-dom'
 import uuid from 'uuid/v4'
@@ -150,7 +152,7 @@ import Slider from '@material-ui/lab/Slider'
 import DirectionsModifierModal, {
   SubmitValuesType as DirectionsModifierModalSubmitValues,
 } from './DirectionsModifierModal'
-import shortenString from '../utils/shortenString';
+import shortenString from '../utils/shortenString'
 
 globalStyles()
 smoothscroll.polyfill()
@@ -1324,11 +1326,20 @@ class App extends React.Component<
     sessionStore.activeSession.noteCards = sessionStore.activeSession.noteCards.map(
       nc => {
         let noteName = nc.noteName
-        const midi = tonal.Note.midi(noteName)
-        if (midi + semitones < 96 && midi + semitones >= 24) {
-          // "C7" and C0"
-          noteName = tonal.Note.fromMidi(midi + semitones, true)
+
+        if (semitones === 12 || semitones === -12) {
+          noteName = transpose(
+            noteName,
+            tonal.Interval.fromSemitones(semitones),
+          )
+        } else {
+          const midi = tonal.Note.midi(noteName)
+          if (midi + semitones < 96 && midi + semitones >= 24) {
+            // "C7" and C0"
+            noteName = tonal.Note.fromMidi(midi + semitones, true)
+          }
         }
+
         return {
           ...nc,
           noteName,
@@ -1341,6 +1352,16 @@ class App extends React.Component<
   private handleOctaveDownClick = () => this.transposeAllCards(-12)
   private handleSemitoneUpClick = () => this.transposeAllCards(1)
   private handleSemitoneDownClick = () => this.transposeAllCards(-1)
+
+  private getHighestNoteWithinSession = memoizeOne((staffTicks: StaffTick[]) => _.maxBy(
+    _.flatten(staffTicks.map(tick => tick.notes)),
+    note => tonal.Note.midi(note.noteName),
+  ))
+
+  private getLowestNoteWithinSession = memoizeOne((staffTicks: StaffTick[]) => _.minBy(
+    _.flatten(staffTicks.map(tick => tick.notes)),
+    note => tonal.Note.midi(note.noteName),
+  ))
 
   private renderApp = () => {
     if (!sessionStore.activeSession) {
@@ -1389,6 +1410,22 @@ class App extends React.Component<
     const noteCardWithMouseOverStaffTicks = noteCardWithMouseOver
       ? staffTicksPerCard[noteCardWithMouseOver.id]
       : undefined
+
+    const highestNote = this.getHighestNoteWithinSession(this.state.staffTicks)
+    const lowestNote = this.getLowestNoteWithinSession(this.state.staffTicks)
+
+    const shouldDisableTransposeOctaveUp = highestNote
+      ? (tonal.Note.oct(highestNote.noteName) as number) > 5
+      : true
+    const shouldDisableTransposeOctaveDown = lowestNote
+      ? (tonal.Note.oct(lowestNote.noteName) as number) < 2
+      : true
+    const shouldDisableTransposeHalfStepUp = highestNote
+      ? (tonal.Note.midi(highestNote.noteName) as number) >= (tonal.Note.midi('B6') as number)
+      : true
+    const shouldDisableTransposeHalfStepDown = lowestNote
+      ? (tonal.Note.midi(lowestNote.noteName) as number) <= (tonal.Note.midi('C1') as number)
+      : true
 
     const currentUser = firebase.auth().currentUser
 
@@ -1448,7 +1485,9 @@ class App extends React.Component<
 
             <MenuItem
               onClick={this.handleOctaveUpClick}
-              disabled={noteCards.length === 0}
+              disabled={
+                noteCards.length === 0 || shouldDisableTransposeOctaveUp
+              }
             >
               <ListItemIcon>
                 <PlusIcon />
@@ -1457,7 +1496,9 @@ class App extends React.Component<
             </MenuItem>
             <MenuItem
               onClick={this.handleOctaveDownClick}
-              disabled={noteCards.length === 0}
+              disabled={
+                noteCards.length === 0 || shouldDisableTransposeOctaveDown
+              }
             >
               <ListItemIcon>
                 <MinusIcon />
@@ -1466,7 +1507,9 @@ class App extends React.Component<
             </MenuItem>
             <MenuItem
               onClick={this.handleSemitoneUpClick}
-              disabled={noteCards.length === 0}
+              disabled={
+                noteCards.length === 0 || shouldDisableTransposeHalfStepUp
+              }
             >
               <ListItemIcon>
                 <Plus1Icon />
@@ -1475,7 +1518,9 @@ class App extends React.Component<
             </MenuItem>
             <MenuItem
               onClick={this.handleSemitoneDownClick}
-              disabled={noteCards.length === 0}
+              disabled={
+                noteCards.length === 0 || shouldDisableTransposeHalfStepDown
+              }
             >
               <ListItemIcon>
                 <Minus1Icon />
@@ -1485,46 +1530,56 @@ class App extends React.Component<
 
             <Divider />
 
-            <MenuItem onClick={() => {
-              this.handleShareSession()
-              props.onClose()
-            }}>
+            <MenuItem
+              onClick={() => {
+                this.handleShareSession()
+                props.onClose()
+              }}
+            >
               <ListItemIcon>
                 <ShareIcon color="action" />
               </ListItemIcon>
               {' Share'}
             </MenuItem>
-            <MenuItem onClick={() => {
-              this.downloadAsMidi()
-              props.onClose()
-            }}>
+            <MenuItem
+              onClick={() => {
+                this.downloadAsMidi()
+                props.onClose()
+              }}
+            >
               <ListItemIcon>
                 <CloudDownloadIcon color="action" />
               </ListItemIcon>
               {' Download as MIDI'}
             </MenuItem>
-            <MenuItem onClick={() => {
-              this.handleSaveSessionAs()
-              props.onClose()
-              }}>
+            <MenuItem
+              onClick={() => {
+                this.handleSaveSessionAs()
+                props.onClose()
+              }}
+            >
               <ListItemIcon>
                 <SaveIcon color="action" />
               </ListItemIcon>
               {' Save as...'}
             </MenuItem>
-            <MenuItem onClick={() => {
-              this.handleRenameSession()
-              props.onClose()
-            }}>
+            <MenuItem
+              onClick={() => {
+                this.handleRenameSession()
+                props.onClose()
+              }}
+            >
               <ListItemIcon>
                 <EditIcon color="action" />
               </ListItemIcon>
               {' Rename'}
             </MenuItem>
-            <MenuItem onClick={() => {
-              this.handleDeleteSession()
-              props.onClose()
-            }}>
+            <MenuItem
+              onClick={() => {
+                this.handleDeleteSession()
+                props.onClose()
+              }}
+            >
               <ListItemIcon>
                 <DeleteIcon color="action" />
               </ListItemIcon>
@@ -1793,7 +1848,11 @@ class App extends React.Component<
     const ModifierChips = (
       <>
         {modifiers.chords.enabled && (
-          <Tooltip title="Change chords settings" disableFocusListener disableTouchListener>
+          <Tooltip
+            title="Change chords settings"
+            disableFocusListener
+            disableTouchListener
+          >
             <Chip
               {...chipsProps}
               label={`Chords: ${shortenString(modifiers.chords.chordType, 20)}`}
@@ -1808,12 +1867,17 @@ class App extends React.Component<
           </Tooltip>
         )}
         {modifiers.scales.enabled && (
-          <Tooltip title="Change scales settings" disableFocusListener disableTouchListener>
+          <Tooltip
+            title="Change scales settings"
+            disableFocusListener
+            disableTouchListener
+          >
             <Chip
               {...chipsProps}
-              label={`Scale: ${
-                shortenString((scaleByScaleType[modifiers.scales.scaleType] as Scale).title, 20)
-              }`}
+              label={`Scale: ${shortenString(
+                (scaleByScaleType[modifiers.scales.scaleType] as Scale).title,
+                20,
+              )}`}
               onClick={this.openScalesModal}
               onDelete={this.handleRemoveScalesClick}
               deleteIcon={
@@ -1871,7 +1935,10 @@ class App extends React.Component<
           <Tooltip title="Change pattern directions" disableFocusListener>
             <Chip
               {...chipsProps}
-              label={`Direction: ${modifiers.directions.direction.title.split(' / ').map(x => x[0]).join(', ')}`}
+              label={`Direction: ${modifiers.directions.direction.title
+                .split(' / ')
+                .map(x => x[0])
+                .join(', ')}`}
               onClick={this.openDirectionsModal}
               onDelete={this.handleRemoveDirectionsClick}
               deleteIcon={
