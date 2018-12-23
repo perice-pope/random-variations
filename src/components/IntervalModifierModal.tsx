@@ -3,12 +3,13 @@ import * as _ from 'lodash'
 import { transpose } from 'tonal-distance'
 import * as tonal from 'tonal'
 
-import { default as MuButton } from '@material-ui/core/Button'
+import Button, { default as MuButton } from '@material-ui/core/Button'
 
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
+import ArrowsIcon from '@material-ui/icons/Cached'
 
 import FormControl from '@material-ui/core/FormControl'
 import NativeSelect from '@material-ui/core/NativeSelect'
@@ -33,6 +34,7 @@ import { Box } from './ui'
 import NotesStaff from './NotesStaff'
 import { Omit } from '../utils'
 import settingsStore from '../services/settingsStore'
+import Tooltip from './ui/Tooltip'
 
 export type SubmitValuesType = Omit<IntervalsModifier, 'enabled'>
 
@@ -113,6 +115,16 @@ class IntervalModifierModal extends React.Component<
   handleIntervalTypeSelected = (e: ChangeEvent<HTMLSelectElement>) => {
     const interval = e.target.value as IntervalType
 
+    this.setState({
+      values: {
+        ...this.state.values,
+        interval,
+      },
+    })
+  }
+
+  handleSelectRandomIntervalType = () => {
+    const interval = _.sample(intervalOptions)!.value as IntervalType
     this.setState({
       values: {
         ...this.state.values,
@@ -210,22 +222,57 @@ class IntervalModifierModal extends React.Component<
           <Box>
             <Typography variant="h5">Interval type</Typography>
             <Box mt={2} mb={2}>
-              <Flex flexDirection="row">
-                <FormControl className={css({ flex: 1 })}>
-                  <NativeSelect
-                    value={interval}
-                    onChange={this.handleIntervalTypeSelected}
-                    name="interval"
-                    input={<Input id="interval-type" />}
+              <div
+                className={css(`
+                display: flex;
+                flex-direction: row;
+                align-items: flex-start;
+                
+                @media screen and (max-width: 500px) {
+                  flex-direction: column;
+                  align-items: stretch;
+                }
+              `)}
+              >
+                <div className={css(`flex: 1; margin-top: 7px;`)}>
+                  <FormControl className={css({ flex: 1 })} fullWidth>
+                    <NativeSelect
+                      fullWidth
+                      value={interval}
+                      onChange={this.handleIntervalTypeSelected}
+                      name="interval"
+                      input={<Input id="interval-type" />}
+                    >
+                      {intervalOptions.map(({ title, value }) => (
+                        <option key={value} value={value}>
+                          {title}
+                        </option>
+                      ))}
+                    </NativeSelect>
+                  </FormControl>
+                </div>
+
+                <Tooltip title="Choose random interval">
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={this.handleSelectRandomIntervalType}
+                    className={css(`
+                      margin-left: 0.5rem;
+                      @media screen and (max-width: 500px) {
+                        margin-left: 0;
+                        margin-top: 0.5rem;
+                      }
+                    `)}
                   >
-                    {intervalOptions.map(({ title, value }) => (
-                      <option key={value} value={value}>
-                        {title}
-                      </option>
-                    ))}
-                  </NativeSelect>
-                </FormControl>
-              </Flex>
+                    <ArrowsIcon
+                      fontSize="small"
+                      className={css(`margin-right: 0.5rem;`)}
+                    />
+                    Random
+                  </Button>
+                </Tooltip>
+              </div>
 
               <Flex>
                 <FormControl component="fieldset">

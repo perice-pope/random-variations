@@ -366,7 +366,6 @@ class ToneRowModal extends React.Component<
               <Tooltip
                 title="Clear all notes"
                 variant="gray"
-                disableFocusListener
               >
                 <Button
                   disabled={this.state.notes.length === 0}

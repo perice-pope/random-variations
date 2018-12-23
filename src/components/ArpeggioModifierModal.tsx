@@ -471,10 +471,7 @@ class ArpeggioModifierModal extends React.Component<
                   )}
                 </div>
 
-                <Tooltip
-                  title="Choose random chord"
-                  disableFocusListener={true}
-                >
+                <Tooltip title="Choose random chord">
                   <Button
                     variant="outlined"
                     color="primary"
@@ -575,7 +572,6 @@ class ArpeggioModifierModal extends React.Component<
                 {isMelodic && (
                   <Tooltip
                     title="Randomize pattern"
-                    disableFocusListener={true}
                   >
                     <MuButton
                       color="primary"

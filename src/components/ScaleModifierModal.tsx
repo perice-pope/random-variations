@@ -421,7 +421,6 @@ class ScaleModifierModal extends React.Component<
 
                 <Tooltip
                   title="Choose random scale"
-                  disableFocusListener={true}
                 >
                   <Button
                     variant="outlined"

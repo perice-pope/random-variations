@@ -4,12 +4,13 @@ import { css } from 'react-emotion'
 import * as tonal from 'tonal'
 import memoize from 'memoize-one'
 
-import { default as MuButton } from '@material-ui/core/Button'
+import Button, { default as MuButton } from '@material-ui/core/Button'
 
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
+import ArrowsIcon from '@material-ui/icons/Cached'
 
 import PlayIcon from '@material-ui/icons/PlayArrow'
 import StopIcon from '@material-ui/icons/Stop'
@@ -34,6 +35,7 @@ import {
 } from './withAudioEngine'
 
 import AudioEngine, { AnimationCallback } from '../services/audioEngine'
+import Tooltip from './ui/Tooltip'
 
 const audioEngine = new AudioEngine()
 
@@ -92,7 +94,6 @@ class EnclosuresModifierModal extends React.Component<
 
   handleTypeSelected = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const type = e.target.value as EnclosuresType
-    console.log('type = ', type)
     this.setState({ type }, this.setPlaybackLoop)
   }
 
@@ -179,6 +180,11 @@ class EnclosuresModifierModal extends React.Component<
     }
   }
 
+  handleSelectRandomType = () => {
+    const type = _.sample(enclosureOptions)!.type as EnclosuresType
+    this.setState({ type }, this.setPlaybackLoop)
+  }
+
   render() {
     return (
       <Dialog
@@ -198,23 +204,63 @@ class EnclosuresModifierModal extends React.Component<
             </Typography>
 
             <Box mt={3}>
-              <FormControl className={css({ flex: 1, marginRight: '1rem' })}>
-                <InputLabel htmlFor="enclosure-type-preset">
-                  Enclosure type
-                </InputLabel>
-                <NativeSelect
-                  value={this.state.type}
-                  onChange={this.handleTypeSelected}
-                  name="type"
-                  input={<Input id="enclosure-type-preset" />}
-                >
-                  {EnclosuresOptions.map(({ title, value }) => (
-                    <option key={value} value={value}>
-                      {title}
-                    </option>
-                  ))}
-                </NativeSelect>
-              </FormControl>
+              <div
+                className={css(`
+                display: flex;
+                flex-direction: row;
+                align-items: flex-end;
+                
+                @media screen and (max-width: 500px) {
+                  flex-direction: column;
+                  align-items: stretch;
+                }
+              `)}
+              >
+                <div className={css(`flex: 1; margin-top: 7px;`)}>
+                  <FormControl
+                    fullWidth
+                    className={css({ flex: 1, marginRight: '1rem' })}
+                  >
+                    <InputLabel htmlFor="enclosure-type-preset">
+                      Enclosure type
+                    </InputLabel>
+                    <NativeSelect
+                      fullWidth
+                      value={this.state.type}
+                      onChange={this.handleTypeSelected}
+                      name="type"
+                      input={<Input id="enclosure-type-preset" />}
+                    >
+                      {EnclosuresOptions.map(({ title, value }) => (
+                        <option key={value} value={value}>
+                          {title}
+                        </option>
+                      ))}
+                    </NativeSelect>
+                  </FormControl>
+                </div>
+
+                <Tooltip title="Choose random enclosure">
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={this.handleSelectRandomType}
+                    className={css(`
+                      margin-left: 0.5rem;
+                      @media screen and (max-width: 500px) {
+                        margin-left: 0;
+                        margin-top: 0.5rem;
+                      }
+                    `)}
+                  >
+                    <ArrowsIcon
+                      fontSize="small"
+                      className={css(`margin-right: 0.5rem;`)}
+                    />
+                    Random
+                  </Button>
+                </Tooltip>
+              </div>
             </Box>
 
             <Box>
