@@ -164,7 +164,6 @@ console.log('All supported audio fonts: ', _.map(AudioFontsConfig, 'title'))
 
 const uiState = observable({
   isFullScreen: false,
-  isControlsShown: false,
   isTempoModalShown: false,
 })
 
@@ -1392,8 +1391,7 @@ class App extends React.Component<
 
     const isPhone = this.props.width === 'xs'
     const isMobile = this.props.width === 'xs' || this.props.width === 'sm'
-    const shouldShowDesktopSessionControls =
-      this.state.height > 600 && this.state.width > 600
+    const shouldShowPlayButtonInContentContainer = this.state.width >= 400
 
     const activeNoteCard =
       isPlaying && activeNoteCardId != null
@@ -1779,7 +1777,7 @@ class App extends React.Component<
 
         <Flex flex={1} justifyContent="center">
           <Flex maxWidth={MaxLayoutWidth} width={1} alignItems="center">
-            {!shouldShowDesktopSessionControls && TogglePlaybackButton}
+            {!shouldShowPlayButtonInContentContainer && TogglePlaybackButton}
 
             {isSignedIn &&
               sessionStore.activeSessionType === 'shared' && (
@@ -1797,23 +1795,6 @@ class App extends React.Component<
               )}
 
             <Box className={css({ flexGrow: 1 })} />
-
-            {!shouldShowDesktopSessionControls ? (
-              <IconButton
-                color="inherit"
-                aria-label={
-                  uiState.isControlsShown
-                    ? 'Hide session controls'
-                    : 'Show session controls'
-                }
-                onClick={() => {
-                  uiState.isControlsShown = !uiState.isControlsShown
-                }}
-                className={cx(classes.menuButton)}
-              >
-                <SettingsIcon />
-              </IconButton>
-            ) : null}
 
             {!isSignedIn ? (
               <Button m={[1, 2]} bg="#f50057" onClick={this.openSignInModal}>
@@ -2235,30 +2216,29 @@ class App extends React.Component<
                   width={1}
                   id="app-content"
                 >
-                  {uiState.isControlsShown ||
-                  shouldShowDesktopSessionControls ? (
+                  {this.state.isPlaying && isPhone ? null : (
                     <Flex
                       alignItems="center"
-                      flexDirection="row"
                       mb={3}
                       width={1}
                       flexWrap="wrap"
                       justifyContent="center"
                     >
+                      {shouldShowPlayButtonInContentContainer && TogglePlaybackButton}
+
+                      <Box flex="1">
+                        {SessionControls}
+                      </Box>
+
                       <Box
-                        flex="1"
                         className={css({ whiteSpace: 'nowrap' })}
                         mb={1}
                         mr={2}
                       >
-                        {shouldShowDesktopSessionControls &&
-                          TogglePlaybackButton}
                         {SessionActionsButton}
                       </Box>
-
-                      {SessionControls}
                     </Flex>
-                  ) : null}
+                  )}
 
                   <Flex
                     alignItems="center"
