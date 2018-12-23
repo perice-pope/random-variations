@@ -9,7 +9,6 @@ import { default as MuButton } from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
-import DialogTitle from '@material-ui/core/DialogTitle'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 
 import PlayIcon from '@material-ui/icons/PlayArrow'
@@ -21,9 +20,9 @@ import {
   FormControl,
   NativeSelect,
   Input,
-  InputLabel,
   IconButton,
   Typography,
+  InputLabel,
 } from '@material-ui/core'
 import NotesStaff from './NotesStaff'
 import { Flex, Box } from './ui'
@@ -191,13 +190,14 @@ class EnclosuresModifierModal extends React.Component<
         onClose={this.handleSubmit}
         aria-labelledby="chromatic-approach-modifier-dialog"
       >
-        <DialogTitle id="chromatic-approach-modifier-dialog">
-          <Typography variant="h4">Enclosures</Typography>
-        </DialogTitle>
-
         <DialogContent>
           <Box>
-            <Box>
+            <Typography variant="h5">Enclosures</Typography>
+            <Typography variant="subtitle2">
+              Add enclosure notes for the base note in each measure
+            </Typography>
+
+            <Box mt={3}>
               <FormControl className={css({ flex: 1, marginRight: '1rem' })}>
                 <InputLabel htmlFor="enclosure-type-preset">
                   Enclosure type

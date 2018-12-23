@@ -22,6 +22,7 @@ type PatternEditorProps = {
   getSortableContainer?: () => any
   useLetters?: boolean
   value: ArpeggioPattern
+  className?: string
   onChange: (pattern: ArpeggioPattern) => any
   min: number
   max: number
@@ -91,7 +92,7 @@ const SortablePatternElement = SortableElement(
             flexDirection="column"
             zIndex={5000}
             alignItems="center"
-            mx={[1]}
+            mx={0}
             my={[1, 1, 1]}
             maxWidth={50}
           >
@@ -127,6 +128,7 @@ const SortablePatternElement = SortableElement(
                   fontSize: '1.4rem',
                   lineHeight: '1.4rem',
                   padding: '1rem !important',
+                  borderRadius: '0 !important',
                 }),
                 itemsCount >= 6 &&
                   css({
@@ -260,13 +262,19 @@ class PatternEditor extends React.Component<PatternEditorProps> {
       min,
       max,
       value: pattern,
+      className,
     } = this.props
     return (
-      <Flex
-        alignItems="center"
-        justifyContent="center"
-        flex={1}
-        flexWrap="wrap"
+      <div
+        className={cx(
+          css(`
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+          `),
+          className,
+        )}
       >
         <SortablePatternElements
           // @ts-ignore
@@ -300,7 +308,7 @@ class PatternEditor extends React.Component<PatternEditorProps> {
             </Button>
           </Tooltip>
         )}
-      </Flex>
+      </div>
     )
   }
 }

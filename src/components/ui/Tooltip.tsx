@@ -9,6 +9,8 @@ const Tooltip: React.SFC<TooltipProps & { variant?: 'primary' | 'gray' }> = ({
 }) => (
   <MuTooltip
     {...props}
+    disableTouchListener
+    disableFocusListener
     classes={{
       tooltip: css({
         fontSize: '1rem',

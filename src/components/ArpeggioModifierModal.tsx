@@ -417,8 +417,8 @@ class ArpeggioModifierModal extends React.Component<
       >
         <DialogContent id="arpeggio-modifier-dialog-content">
           <Box>
-            <Typography variant="h5">Chord type</Typography>
-            <Box mt={2}>
+            <Typography variant="h6">Chord type</Typography>
+            <Box mt={1}>
               <div
                 className={css(`
                 display: flex;
@@ -434,9 +434,11 @@ class ArpeggioModifierModal extends React.Component<
                 <div className={css(`flex: 1; margin-top: 7px;`)}>
                   <InputSelect
                     classes={{
-                      singleValue: css(`overflow: hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;`),
+                      singleValue: css(`
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                      `),
                       valueContainer: css(`flex-wrap: nowrap;`),
                     }}
                     textFieldProps={{
@@ -521,14 +523,14 @@ class ArpeggioModifierModal extends React.Component<
             <Divider light />
 
             <Flex mb={3} mt={3} flexDirection="column">
-              <Typography variant="h5">
+              <Typography variant="h6">
                 {isMelodic ? 'Pattern' : 'Inversion'}
               </Typography>
               <Flex
                 flexWrap="wrap"
                 flexDirection="row"
                 alignItems="center"
-                mt={2}
+                mt={1}
               >
                 {isMelodic && (
                   <FormControl
@@ -613,9 +615,7 @@ class ArpeggioModifierModal extends React.Component<
 
             <Divider light />
 
-            <Box mt={3}>
-              <Typography variant="h5">Preview</Typography>
-
+            <Box mt={2}>
               <Flex flexDirection="row" alignItems="center">
                 <IconButton
                   color="secondary"

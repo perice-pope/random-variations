@@ -6,7 +6,6 @@ import { default as MuButton } from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
-import DialogTitle from '@material-ui/core/DialogTitle'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 
 import FormControl from '@material-ui/core/FormControl'
@@ -14,7 +13,7 @@ import NativeSelect from '@material-ui/core/NativeSelect'
 
 import { DirectionsModifier } from '../types'
 import { ChangeEvent } from 'react'
-import { Input, Typography } from '@material-ui/core'
+import { Input, Typography, InputLabel } from '@material-ui/core'
 import { css } from 'react-emotion'
 import { patternDirectionOptions, patternDirectionByType } from '../musicUtils'
 import { Flex } from './ui/Flex'
@@ -104,19 +103,19 @@ class DirectionsModifierModal extends React.Component<
         onClose={this.handleSubmit}
         aria-labelledby="direction-modifier-dialog"
       >
-        <DialogTitle id="direction-modifier-dialog">
-          <Typography variant="h4">Directions</Typography>
-          <Typography variant="subtitle1">
+        <DialogContent id="direction-modifier-dialog-content">
+          <Typography variant="h5">Directions</Typography>
+          <Typography variant="subtitle2">
             Change direction of note patterns in each measure
           </Typography>
-        </DialogTitle>
-
-        <DialogContent id="direction-modifier-dialog-content">
           <Box>
-            <Typography variant="h5">Pattern direction</Typography>
-            <Box mt={2} mb={2}>
+            <Box mt={3} mb={2}>
+              {/* <Typography variant="overline">Pattern direction</Typography> */}
               <Flex flexDirection="row">
                 <FormControl className={css({ flex: 1 })}>
+                  <InputLabel htmlFor="direction-type">
+                    Pattern direction
+                  </InputLabel>
                   <NativeSelect
                     value={direction.type}
                     onChange={this.handleDirectionTypeSelected}

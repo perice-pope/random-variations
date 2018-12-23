@@ -150,6 +150,7 @@ import Slider from '@material-ui/lab/Slider'
 import DirectionsModifierModal, {
   SubmitValuesType as DirectionsModifierModalSubmitValues,
 } from './DirectionsModifierModal'
+import shortenString from '../utils/shortenString';
 
 globalStyles()
 smoothscroll.polyfill()
@@ -1792,10 +1793,10 @@ class App extends React.Component<
     const ModifierChips = (
       <>
         {modifiers.chords.enabled && (
-          <Tooltip title="Change chords settings" disableFocusListener>
+          <Tooltip title="Change chords settings" disableFocusListener disableTouchListener>
             <Chip
               {...chipsProps}
-              label={`Chords: ${modifiers.chords.chordType}`}
+              label={`Chords: ${shortenString(modifiers.chords.chordType, 20)}`}
               onClick={this.openArpeggioAddingModal}
               onDelete={this.handleRemoveArpeggioClick}
               deleteIcon={
@@ -1807,11 +1808,11 @@ class App extends React.Component<
           </Tooltip>
         )}
         {modifiers.scales.enabled && (
-          <Tooltip title="Change scales settings" disableFocusListener>
+          <Tooltip title="Change scales settings" disableFocusListener disableTouchListener>
             <Chip
               {...chipsProps}
               label={`Scale: ${
-                (scaleByScaleType[modifiers.scales.scaleType] as Scale).title
+                shortenString((scaleByScaleType[modifiers.scales.scaleType] as Scale).title, 20)
               }`}
               onClick={this.openScalesModal}
               onDelete={this.handleRemoveScalesClick}

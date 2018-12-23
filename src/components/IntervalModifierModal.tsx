@@ -8,7 +8,6 @@ import { default as MuButton } from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
-import DialogTitle from '@material-ui/core/DialogTitle'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 
 import FormControl from '@material-ui/core/FormControl'
@@ -207,10 +206,6 @@ class IntervalModifierModal extends React.Component<
         onClose={this.handleSubmit}
         aria-labelledby="interval-modifier-dialog"
       >
-        <DialogTitle id="interval-modifier-dialog">
-          <Typography variant="h4">Intervals</Typography>
-        </DialogTitle>
-
         <DialogContent id="interval-modifier-dialog-content">
           <Box>
             <Typography variant="h5">Interval type</Typography>
@@ -244,12 +239,12 @@ class IntervalModifierModal extends React.Component<
                     <FormControlLabel
                       value="broken"
                       control={<Radio />}
-                      label="Broken interval"
+                      label="Broken"
                     />
                     <FormControlLabel
                       value="stacked"
                       control={<Radio />}
-                      label="Stacked interval"
+                      label="Stacked"
                     />
                   </RadioGroup>
                 </FormControl>
@@ -281,8 +276,7 @@ class IntervalModifierModal extends React.Component<
 
             <Divider light />
 
-            <Box mt={3}>
-              <Typography variant="h5">Preview</Typography>
+            <Box mt={2}>
               <Box>
                 <NotesStaff
                   id="interval-preview"

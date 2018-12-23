@@ -30,6 +30,7 @@ type NotesStaffProps = {
   showEnd?: boolean
   activeTickIndex?: number
   staveHeight: number
+  topOffset: number
   containerProps?: any
 }
 
@@ -42,6 +43,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     maxLines: 1,
     scale: 1,
     staveHeight: 140,
+    topOffset: 50,
     clef: 'treble',
   }
 
@@ -110,7 +112,8 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
   private getHeight = () => {
     return (
-      (50 + this.getLinesCount() * this.props.staveHeight) * this.props.scale!
+      (this.props.topOffset + this.getLinesCount() * this.props.staveHeight) *
+      this.props.scale!
     )
   }
 
@@ -239,14 +242,18 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
   private drawStaveAndClef = () => {
     console.log('NotesStaff -> drawStaveAndClef')
-    const { staveHeight, scale } = this.props
+    const { staveHeight, scale, topOffset } = this.props
     const linesCount = this.getLinesCount()
     const width = this.state.boxWidth / (scale || 1.0)
 
     // Create a stave of at position 0, 0 on the canvas.
     this.staves = []
     for (let i = 0; i < linesCount; ++i) {
-      this.staves[i] = new Vex.Flow.Stave(0, 40 + staveHeight * i, width)
+      this.staves[i] = new Vex.Flow.Stave(
+        0,
+        topOffset - 10 + staveHeight * i,
+        width,
+      )
       if (i === 0) {
         // Add a clef and time signature.
         this.staves[i].addClef(this.props.clef)

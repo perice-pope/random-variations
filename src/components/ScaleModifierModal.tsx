@@ -2,12 +2,11 @@ import * as React from 'react'
 import * as _ from 'lodash'
 import * as tonal from 'tonal'
 
-import { default as MuButton } from '@material-ui/core/Button'
+import Button, { default as MuButton } from '@material-ui/core/Button'
 
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
-import DialogTitle from '@material-ui/core/DialogTitle'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 
 import FormHelperText from '@material-ui/core/FormHelperText'
@@ -343,6 +342,10 @@ class ScaleModifierModal extends React.Component<
     }
   }
 
+  handleSelectRandomScaleType = () => {
+    this.handleScaleTypeSelected(_.sample(scaleTypeOptions) as ScaleTypeOption)
+  }
+
   render() {
     if (!this.props.isOpen) {
       return null
@@ -360,52 +363,93 @@ class ScaleModifierModal extends React.Component<
         onClose={this.handleSubmit}
         aria-labelledby="scale-modifier-dialog"
       >
-        <DialogTitle id="scale-modifier-dialog">
-          <Typography variant="h4">Scales</Typography>
-        </DialogTitle>
-
         <DialogContent id="scale-modifier-dialog-content">
           <Box>
-            <Typography variant="h5">Scale type</Typography>
-            <Box mt={2} mb={2}>
-              <InputSelect
-                textFieldProps={{
-                  InputLabelProps: {
-                    shrink: true,
-                  },
-                }}
-                value={
-                  this.state.values.scaleType
-                    ? scaleTypeToScaleTypeOptionMap[this.state.values.scaleType]
-                    : undefined
+            <Typography variant="h6">Scale type</Typography>
+
+            <Box mb={3}>
+              <div
+                className={css(`
+                display: flex;
+                flex-direction: row;
+                align-items: flex-start;
+                
+                @media screen and (max-width: 500px) {
+                  flex-direction: column;
+                  align-items: stretch;
                 }
-                onChange={this.handleScaleTypeSelected}
-                name="chordType"
-                options={scaleTypeOptionsGrouped}
-              />
-              {scale.notes && (
-                <FormHelperText>
-                  {`Notes in key of C:  `}
-                  <span
-                    className={css({
-                      fontSize: '0.8rem',
-                      fontWeight: 'bold',
-                    })}
-                  >{`${scale.notes.split(' ').join(', ')}`}</span>
-                </FormHelperText>
-              )}
+              `)}
+              >
+                <div className={css(`flex: 1; margin-top: 7px;`)}>
+                  <InputSelect
+                    classes={{
+                      singleValue: css(`
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                      `),
+                      valueContainer: css(`flex-wrap: nowrap;`),
+                    }}
+                    textFieldProps={{
+                      InputLabelProps: {
+                        shrink: true,
+                      },
+                    }}
+                    value={
+                      this.state.values.scaleType
+                        ? scaleTypeToScaleTypeOptionMap[
+                            this.state.values.scaleType
+                          ]
+                        : undefined
+                    }
+                    onChange={this.handleScaleTypeSelected}
+                    name="chordType"
+                    options={scaleTypeOptionsGrouped}
+                  />
+                  {scale.notes && (
+                    <FormHelperText>
+                      {`Notes in key of C:  `}
+                      <span
+                        className={css({
+                          fontSize: '0.8rem',
+                          fontWeight: 'bold',
+                        })}
+                      >{`${scale.notes.split(' ').join(', ')}`}</span>
+                    </FormHelperText>
+                  )}
+                </div>
+
+                <Tooltip
+                  title="Choose random scale"
+                  disableFocusListener={true}
+                >
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={this.handleSelectRandomScaleType}
+                    className={css(`
+                      margin-left: 0.5rem;
+                      @media screen and (max-width: 500px) {
+                        margin-left: 0;
+                        margin-top: 0.5rem;
+                      }
+                    `)}
+                  >
+                    <ArrowsIcon
+                      fontSize="small"
+                      className={css(`margin-right: 0.5rem;`)}
+                    />
+                    Random
+                  </Button>
+                </Tooltip>
+              </div>
             </Box>
 
             <Divider light />
 
-            <Flex mt={3} mb={3} flexDirection="column">
-              <Typography variant="h5">Pattern</Typography>
-              <Flex
-                mt={2}
-                flexWrap="wrap"
-                flexDirection="row"
-                alignItems="center"
-              >
+            <Flex mt={2} mb={3} flexDirection="column">
+              <Typography variant="h6">Pattern</Typography>
+              <Flex flexWrap="wrap" flexDirection="row" alignItems="center">
                 <FormControl className={css({ flex: 1, marginRight: '1rem' })}>
                   <NativeSelect
                     value={this.state.values.patternPreset}
@@ -424,9 +468,8 @@ class ScaleModifierModal extends React.Component<
                 <Tooltip title="Randomize pattern" disableFocusListener={true}>
                   <MuButton
                     className={css({ minWidth: '40px' })}
-                    size="small"
                     color="primary"
-                    variant="extendedFab"
+                    variant="outlined"
                     aria-label="Randomize pattern"
                     disabled={this.state.values.pattern.items.length < 1}
                     onClick={this.handleRandomizePattern}
@@ -440,7 +483,15 @@ class ScaleModifierModal extends React.Component<
                 </Tooltip>
               </Flex>
 
-              <Box width={1} mt={3}>
+              <div
+                className={css(`
+                margin-top: 16px;
+                      @media screen and (max-width: 600px) {
+                        margin-left: -15px;
+                        margin-right: -15px;
+                      }
+                  `)}
+              >
                 <PatternEditor
                   value={this.state.values.pattern}
                   onChange={this.handlePatternChange}
@@ -450,14 +501,12 @@ class ScaleModifierModal extends React.Component<
                     document.getElementById('scale-modifier-dialog-content')
                   }
                 />
-              </Box>
+              </div>
             </Flex>
 
             <Divider light />
 
-            <Box mt={3}>
-              <Typography variant="h5">Preview</Typography>
-
+            <Box mt={2}>
               <Flex flexDirection="row" alignItems="center">
                 <IconButton
                   color="secondary"
@@ -479,6 +528,8 @@ class ScaleModifierModal extends React.Component<
                       ? this.state.activeTickIndex
                       : undefined
                   }
+                  topOffset={30}
+                  staveHeight={120}
                   ticks={this.generateStaffTicks(this.state.values)}
                   isPlaying={this.state.isPlaying}
                   showBreaks
