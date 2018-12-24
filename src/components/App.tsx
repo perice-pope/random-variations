@@ -2496,7 +2496,12 @@ class App extends React.Component<
                 </Flex>
               </div>
 
-              <Box mt={[2, 3, 3]} className={css(`position: fixed; bottom: 0; left: 0; right: 0;`)}>
+              <div
+                className={cx(
+                  css(`position: fixed; bottom: 0;`),
+                  !isMobile && this.state.isMenuOpen && css(`margin-left: ${MenuWidth}px`),
+                )}
+              >
                 <PianoKeyboard
                   width={
                     this.state.width -
@@ -2534,7 +2539,7 @@ class App extends React.Component<
                         : undefined
                   }
                 />
-              </Box>
+              </div>
             </div>
           </Fade>
 
