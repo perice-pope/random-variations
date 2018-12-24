@@ -8,6 +8,8 @@ import { darken, getLuminance } from 'polished'
 import { Box } from './ui'
 import { StaffTick, ClefType } from '../types'
 import MeasureScreenSize from './MeasureScreenSize'
+import settingsStore from '../services/settingsStore'
+import { instrumentTransposingOptionsByType } from '../musicUtils'
 
 const activeNoteClasses = {
   base: css({
@@ -143,6 +145,39 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     this.updateActiveNoteLine()
   }
 
+  private getTicksTransformed = () => {
+    const { ticks } = this.props
+    if (!ticks) {
+      return ticks
+    }
+
+    return ticks.map(tick => ({
+      ...tick,
+      notes: tick.notes.map(note => {
+        let noteName = note.noteName
+
+        // Apply instrument transposing
+        if (settingsStore.instrumentTransposing !== 'C') {
+          const transposingConfig =
+            instrumentTransposingOptionsByType[
+              settingsStore.instrumentTransposing
+            ]
+          if (transposingConfig) {
+            noteName = tonal.transpose(
+              noteName,
+              transposingConfig.interval,
+            ) as string
+          }
+        }
+
+        return {
+          ...note,
+          noteName,
+        }
+      }),
+    }))
+  }
+
   private drawActiveNoteLine = () => {
     console.log('NotesStaff -> drawActiveNoteLine')
     const { staves } = this
@@ -159,7 +194,9 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     // @ts-ignore
     this.activeLineEl = this.renderContext.openGroup() as SVGElement
 
-    const { activeTickIndex, ticks } = this.props
+    const { activeTickIndex } = this.props
+    const ticks = this.getTicksTransformed()
+
     const { notesPerTick } = this
     let noteHeadX = 0
     if (
@@ -271,7 +308,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
   private drawNotes = () => {
     console.log('NotesStaff -> drawNotes')
-    const { ticks } = this.props
+    const ticks = this.getTicksTransformed()
     const { staves, renderContext } = this
     const linesCount = this.getLinesCount()
 
@@ -299,7 +336,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
       tickIndexToCardId[index] = ticks[index].noteCardId
 
-      const tickNoteKeys = tick.notes.map(noteConfig => {
+      const tickNoteKeysForVexFlow = tick.notes.map(noteConfig => {
         const [letter, accidental, octave] = tonal.Note.tokenize(
           noteConfig.noteName,
         )
@@ -320,7 +357,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
       } else {
         vexFlowTickConfig = {
           clef: this.props.clef,
-          keys: tickNoteKeys,
+          keys: tickNoteKeysForVexFlow,
           duration: 'q',
         }
       }
@@ -473,7 +510,8 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     if (!isPlaying) {
       return
     }
-    const { ticks, staveHeight } = this.props
+    const { staveHeight } = this.props
+    const ticks = this.getTicksTransformed()
     const { notesPerTick } = this
 
     if (
@@ -524,7 +562,8 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
   // TODO: memoize this function
   private getCardsToLinesMapping = () => {
-    const { ticks, maxLines, scale } = this.props
+    const { maxLines, scale } = this.props
+    const ticks = this.getTicksTransformed()
     const { boxWidth } = this.state
     const tickIndexes = _.range(0, ticks.length)
     const cardIdToTickIndexes = _.groupBy(tickIndexes, i => ticks[i].noteCardId)
@@ -566,7 +605,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
       // @ts-ignore
       <div
         {...containerProps}
-        className={cx(css(`width: 100%;`), containerProps.className)}
+        className={cx(css(`width: 100%;`), (containerProps || {}).className)}
         // @ts-ignore
         ref={this.boxRef}
       >

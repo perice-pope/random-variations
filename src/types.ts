@@ -190,6 +190,14 @@ export interface DirectionsModifier {
   direction: PatternDirection
 }
 
+export type InstrumentTransposingType = 'C' | 'Bb' | 'Eb' | 'F'
+
+export interface InstrumentTransposingOption {
+  type: InstrumentTransposingType
+  title: string
+  interval: IntervalType
+}
+
 export interface IntervalsModifier {
   enabled: boolean
   // See https://danigb.github.io/tonal/api/module-Distance.html#.interval

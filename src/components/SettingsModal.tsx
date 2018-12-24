@@ -7,11 +7,10 @@ import { default as MuButton } from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
-import DialogTitle from '@material-ui/core/DialogTitle'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 
 import AudioFontConfig, { AudioFontId } from '../audioFontsConfig'
-import { ClefType } from '../types'
+import { ClefType, InstrumentTransposingType } from '../types'
 import {
   FormControl,
   InputLabel,
@@ -19,14 +18,21 @@ import {
   Input,
   Switch,
   FormControlLabel,
-  Divider,
   Typography,
+  Divider,
+  FormHelperText,
 } from '@material-ui/core'
 import { Box } from './ui'
+import {
+  instrumentTransposingOptions,
+  instrumentTransposingOptionsByType,
+  SemitonesToIntervalNameMap,
+} from '../musicUtils'
 
 export type SettingsFormValues = {
   audioFontId: AudioFontId
   clefType: ClefType
+  instrumentTransposing: InstrumentTransposingType
   showNoteNamesAboveStaff: boolean
   showNoteOctaves: boolean
 }
@@ -112,6 +118,14 @@ class SettingsModal extends React.Component<
     this.setState({ values: { ...this.state.values, clefType } })
   }
 
+  handleInstrumentTransposingSelected = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const instrumentTransposing = event.target
+      .value as InstrumentTransposingType
+    this.setState({ values: { ...this.state.values, instrumentTransposing } })
+  }
+
   handleChangeShownNoteNamesAboveStaff = event => {
     const value = event.target.checked
     this.setState({
@@ -141,12 +155,10 @@ class SettingsModal extends React.Component<
         onClose={this.handleSubmit}
         aria-labelledby="settings-dialog"
       >
-        <DialogTitle id="settings-dialog">
-          <Typography variant="h4">Settings</Typography>
-        </DialogTitle>
-
         <DialogContent>
-          <Box mb={3}>
+          <Typography variant="h5">Settings</Typography>
+
+          <Box mt={2}>
             <FormControlLabel
               control={
                 <Switch
@@ -160,36 +172,66 @@ class SettingsModal extends React.Component<
             />
           </Box>
 
-          <Divider light />
-
-          <Box mb={3} mt={3}>
-            <Typography variant="h5">Instrument sound</Typography>
-
-            <Box mt={2}>
-              <FormControl className={css({ marginBottom: '1rem' })}>
-                <NativeSelect
-                  value={this.state.values.audioFontId}
-                  onChange={this.handleAudioFontSelected}
-                  name="audioFontId"
-                  input={<Input id="instrument-sound" />}
-                >
-                  {AudioFontOptions.map(({ title, value }) => (
-                    <option key={value} value={value}>
-                      {title}
-                    </option>
-                  ))}
-                </NativeSelect>
-              </FormControl>
-            </Box>
+          <Box mt={2} mb={3}>
+            <FormControl fullWidth className={css({ marginBottom: '1rem' })}>
+              <InputLabel htmlFor="instrument-sound">
+                Instrument sound
+              </InputLabel>
+              <NativeSelect
+                value={this.state.values.audioFontId}
+                onChange={this.handleAudioFontSelected}
+                name="audioFontId"
+                input={<Input id="instrument-sound" />}
+              >
+                {AudioFontOptions.map(({ title, value }) => (
+                  <option key={value} value={value}>
+                    {title}
+                  </option>
+                ))}
+              </NativeSelect>
+            </FormControl>
           </Box>
 
           <Divider light />
 
           <Box mt={3}>
-            <Typography variant="h5">Notes staff</Typography>
+            <Typography variant="h6">Notes staff</Typography>
 
             <Box mt={2}>
-              <FormControl className={css({ marginBottom: '1rem' })}>
+              <FormControl fullWidth className={css({ marginBottom: '1rem' })}>
+                <InputLabel htmlFor="instrument-transposing">
+                  Instrument transposing
+                </InputLabel>
+                <NativeSelect
+                  value={this.state.values.instrumentTransposing}
+                  onChange={this.handleInstrumentTransposingSelected}
+                  name="instrumentTransposing"
+                  input={<Input id="instrument-transposing" />}
+                >
+                  {instrumentTransposingOptions.map(({ title, type }) => (
+                    <option key={type} value={type}>
+                      {title}
+                    </option>
+                  ))}
+                </NativeSelect>
+                {this.state.values.instrumentTransposing !== 'C' && (
+                  <FormHelperText>
+                    Staff notes will be transposed by a{' '}
+                    {_.lowerCase(
+                      SemitonesToIntervalNameMap[
+                        instrumentTransposingOptionsByType[
+                          this.state.values.instrumentTransposing
+                        ].interval
+                      ],
+                    )}{' '}
+                    from the concert pitch.
+                  </FormHelperText>
+                )}
+              </FormControl>
+            </Box>
+
+            <Box mt={2}>
+              <FormControl fullWidth className={css({ marginBottom: '1rem' })}>
                 <InputLabel htmlFor="clef-type">Clef type</InputLabel>
                 <NativeSelect
                   value={this.state.values.clefType}

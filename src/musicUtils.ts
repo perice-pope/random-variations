@@ -34,6 +34,8 @@ import {
   ScaleType,
   PatternDirection,
   PatternDirectionType,
+  InstrumentTransposingOption,
+  InstrumentTransposingType,
 } from './types'
 
 export const NoteNamesWithSharps = [
@@ -258,6 +260,56 @@ const getAllScaleOptions: () => Scale[] = memoize(() => {
     'type',
   )
 })
+
+const getAllInstrumentTransposingOptions: () => InstrumentTransposingOption[] = memoize(
+  () => {
+    return [
+      {
+        type: 'C',
+        title: 'C (no transposing)',
+        interval: '1P',
+      },
+      {
+        type: 'Bb',
+        title: 'Bb (written D, sounds C)',
+        interval: '2M',
+      },
+      {
+        type: 'A',
+        title: 'A (written Eb, sounds C)',
+        interval: '3m',
+      },
+      {
+        type: 'G',
+        title: 'G (written F, sounds C)',
+        interval: '4P',
+      },
+      {
+        type: 'F',
+        title: 'F (written G, sounds C)',
+        interval: '5P',
+      },
+      {
+        type: 'Eb',
+        title: 'Eb (written A, sounds C)',
+        interval: '6M',
+      },
+      // TODO: add more insturments
+    ].map(
+      ito =>
+        ({
+          ...ito,
+          title: ito.title || ito.type,
+        } as InstrumentTransposingOption),
+    )
+  },
+)
+
+export const instrumentTransposingOptions = getAllInstrumentTransposingOptions()
+export const instrumentTransposingOptionsByType = _.keyBy(
+  instrumentTransposingOptions,
+  'type',
+) as { [type in InstrumentTransposingType]: InstrumentTransposingOption }
 
 export const chordOptions = getAllChordOptions()
 export const chordsByChordType = _.keyBy(chordOptions, 'type') as {

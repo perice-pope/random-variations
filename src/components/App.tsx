@@ -1651,7 +1651,7 @@ class App extends React.Component<
           </span>
           <span
             className={css(
-              `margin-right: 1rem; display: flex; align-items: center; `,
+              `margin-right: 1rem; display: flex; align-items: center; white-space: nowrap;`,
             )}
           >
             <MetronomeIcon
@@ -2517,6 +2517,7 @@ class App extends React.Component<
             defaultValues={{
               audioFontId: settingsStore.audioFontId,
               clefType: settingsStore.clefType,
+              instrumentTransposing: settingsStore.instrumentTransposing,
               showNoteNamesAboveStaff: settingsStore.showNoteNamesAboveStaff,
               showNoteOctaves: settingsStore.showNoteOctaves,
             }}
