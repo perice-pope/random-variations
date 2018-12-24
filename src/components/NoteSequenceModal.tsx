@@ -271,14 +271,23 @@ class NoteSequenceModal extends React.Component<
         aria-labelledby="pick-note-dialog"
       >
         <DialogContent className={css(`overflow-x: hidden;`)}>
-          <Typography variant="h4">Add note sequence</Typography>
-          <Typography variant="subtitle1">
+          <Typography variant="h5">Add note sequence</Typography>
+          <Typography variant="subtitle2">
             A number of notes with equal intervals in between
           </Typography>
 
           <Box mt={3}>
-            <Typography variant="h5">Starting note</Typography>
-            <Flex flexDirection="column" mb={3}>
+            <Typography
+              variant="h6"
+              className={css(`display: inline-block; margin-right: 10px;`)}
+            >
+              Starting note:
+            </Typography>
+            <div
+              className={css(
+                `display: inline-flex; margin-bottom: 15px; min-width: 100px;`,
+              )}
+            >
               <Flex flexWrap="wrap" flex={1} mt={2} maxWidth={300} width={1}>
                 <NoteCards
                   disableRemoving
@@ -293,13 +302,13 @@ class NoteSequenceModal extends React.Component<
                   onEditNote={this.handleStartNoteChange}
                 />
               </Flex>
-            </Flex>
+            </div>
 
-            <Typography variant="h5">Interval between notes</Typography>
+            <Typography variant="h6">Interval between notes</Typography>
             <Flex mb={2} mt={2} width={1} flexDirection="row" flexWrap="wrap">
               <FormControl
                 className={css(
-                  `width: 100%; max-width: 210px; margin-right: 20px;`,
+                  `width: 100%; max-width: 210px; margin-right: 20px; margin-bottom: 10px;`,
                 )}
               >
                 <InputLabel htmlFor="select-interval">Step interval</InputLabel>
@@ -316,7 +325,11 @@ class NoteSequenceModal extends React.Component<
                 </NativeSelect>
               </FormControl>
 
-              <FormControl className={css(`width: 100%; max-width: 150px`)}>
+              <FormControl
+                className={css(
+                  `width: 100%; max-width: 150px;  margin-bottom: 10px;`,
+                )}
+              >
                 <InputLabel htmlFor="select-direction">
                   Step direction
                 </InputLabel>
