@@ -2364,14 +2364,17 @@ class App extends React.Component<
                   </Flex>
 
                   <div
-                    className={css(`
-                    display: flex;
-                    flex-direction: column;
-                    flex: 1;
-                    @media screen and (max-height: 600px) and (min-width: 500px) {
-                      flex-direction: row-reverse;
-                    }
-                  `)}
+                    className={cx(
+                      css(`
+                        display: flex;
+                        flex-direction: column;
+                        flex: 1;
+                        @media screen and (max-height: 600px) and (min-width: 500px) {
+                          flex-direction: row-reverse;
+                        }
+                      `),
+                      this.state.isPlaying && isPhone && css(`margin-top: 15px;`),
+                    )}
                   >
                     <div
                       className={cx(
@@ -2438,11 +2441,29 @@ class App extends React.Component<
 
                     <NotesStaff
                       containerProps={{
-                        className: css(
-                          `width: 100%; flex: 1; overflow-y: auto; min-height: 100px; position: relative;`,
-                        ),
+                        className: css(`
+                          width: 100%; 
+                          flex: 1; 
+                          overflow-y: auto;
+                          min-height: 100px; 
+                          position: relative;
+
+                          -ms-overflow-style: none;  /* IE 10+ */
+                          overflow: -moz-scrollbars-none; /* should hide scroll bar */
+
+                        /* no scroll bar for Safari and Chrome */
+                        &::-webkit-scrollbar,
+                        &::-webkit-scrollbar {
+                          display: none; /*  might be enought */
+                          background: transparent;
+                          visibility: hidden;
+                          width: 0px;
+                        }
+                        `),
                       }}
-                      innerContainerClassName={css(`position: absolute;`)}
+                      innerContainerClassName={css(`
+                        position: absolute;
+                      `)}
                       scale={notesStaffScaleFactor}
                       clef={settingsStore.clefType}
                       maxLines={notesStaffMaxLines}
