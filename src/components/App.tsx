@@ -1352,15 +1352,17 @@ class App extends React.Component<
   private handleSemitoneUpClick = () => this.transposeAllCards(1)
   private handleSemitoneDownClick = () => this.transposeAllCards(-1)
 
-  private getHighestNoteWithinSession = memoizeOne((staffTicks: StaffTick[]) => _.maxBy(
-    _.flatten(staffTicks.map(tick => tick.notes)),
-    note => tonal.Note.midi(note.noteName),
-  ))
+  private getHighestNoteWithinSession = memoizeOne((staffTicks: StaffTick[]) =>
+    _.maxBy(_.flatten(staffTicks.map(tick => tick.notes)), note =>
+      tonal.Note.midi(note.noteName),
+    ),
+  )
 
-  private getLowestNoteWithinSession = memoizeOne((staffTicks: StaffTick[]) => _.minBy(
-    _.flatten(staffTicks.map(tick => tick.notes)),
-    note => tonal.Note.midi(note.noteName),
-  ))
+  private getLowestNoteWithinSession = memoizeOne((staffTicks: StaffTick[]) =>
+    _.minBy(_.flatten(staffTicks.map(tick => tick.notes)), note =>
+      tonal.Note.midi(note.noteName),
+    ),
+  )
 
   private renderApp = () => {
     if (!sessionStore.activeSession) {
@@ -1419,10 +1421,12 @@ class App extends React.Component<
       ? (tonal.Note.oct(lowestNote.noteName) as number) < 2
       : true
     const shouldDisableTransposeHalfStepUp = highestNote
-      ? (tonal.Note.midi(highestNote.noteName) as number) >= (tonal.Note.midi('B6') as number)
+      ? (tonal.Note.midi(highestNote.noteName) as number) >=
+        (tonal.Note.midi('B6') as number)
       : true
     const shouldDisableTransposeHalfStepDown = lowestNote
-      ? (tonal.Note.midi(lowestNote.noteName) as number) <= (tonal.Note.midi('C1') as number)
+      ? (tonal.Note.midi(lowestNote.noteName) as number) <=
+        (tonal.Note.midi('C1') as number)
       : true
 
     const currentUser = firebase.auth().currentUser
@@ -1445,6 +1449,7 @@ class App extends React.Component<
             <Button
               className={css(`margin-left: 1rem;`)}
               color="default"
+              variant="outlined"
               {...props}
             >
               <MenuIcon className={css(`margin-right: 0.5rem;`)} />
@@ -2205,12 +2210,14 @@ class App extends React.Component<
                   classes.content,
                   !isMobile && classes.contentShifted,
                   !isMobile && this.state.isMenuOpen && classes.contentShift,
+                  css(`margin-bottom: ${this.getPianoHeight() + 10}px !important;`)
                 )}
               >
                 <Flex
                   pt={[3, 3, 4]}
                   flexDirection="column"
                   flex={1}
+                  height={1}
                   px={[3, 4, 4]}
                   maxWidth={MaxLayoutWidth}
                   width={1}
@@ -2224,11 +2231,10 @@ class App extends React.Component<
                       flexWrap="wrap"
                       justifyContent="center"
                     >
-                      {shouldShowPlayButtonInContentContainer && TogglePlaybackButton}
+                      {shouldShowPlayButtonInContentContainer &&
+                        TogglePlaybackButton}
 
-                      <Box flex="1">
-                        {SessionControls}
-                      </Box>
+                      <Box flex="1">{SessionControls}</Box>
 
                       <Box
                         className={css({ whiteSpace: 'nowrap' })}
@@ -2433,9 +2439,10 @@ class App extends React.Component<
                     <NotesStaff
                       containerProps={{
                         className: css(
-                          `width: 100%; flex: 1; overflow-y: auto; min-height: 100px`,
+                          `width: 100%; flex: 1; overflow-y: auto; min-height: 100px; position: relative;`,
                         ),
                       }}
+                      innerContainerClassName={css(`position: absolute;`)}
                       scale={notesStaffScaleFactor}
                       clef={settingsStore.clefType}
                       maxLines={notesStaffMaxLines}
@@ -2455,47 +2462,47 @@ class App extends React.Component<
                     />
                   </div>
                 </Flex>
+              </div>
 
-                <Box mt={[2, 3, 3]}>
-                  <PianoKeyboard
-                    width={
-                      this.state.width -
-                      (!isMobile && this.state.isMenuOpen ? MenuWidth : 0)
-                    }
-                    noteRange={this.getPianoNoteRange()}
-                    height={this.getPianoHeight()}
-                    secondaryNotesMidi={
-                      activeNoteCardStaffTicks
+              <Box mt={[2, 3, 3]} className={css(`position: fixed; bottom: 0; left: 0; right: 0;`)}>
+                <PianoKeyboard
+                  width={
+                    this.state.width -
+                    (!isMobile && this.state.isMenuOpen ? MenuWidth : 0)
+                  }
+                  noteRange={this.getPianoNoteRange()}
+                  height={this.getPianoHeight()}
+                  secondaryNotesMidi={
+                    activeNoteCardStaffTicks
+                      ? _.flatten(
+                          activeNoteCardStaffTicks.map(t =>
+                            t.notes.map(n => n.midi),
+                          ),
+                        )
+                      : noteCardWithMouseOverStaffTicks
                         ? _.flatten(
-                            activeNoteCardStaffTicks.map(t =>
+                            noteCardWithMouseOverStaffTicks.map(t =>
                               t.notes.map(n => n.midi),
                             ),
                           )
-                        : noteCardWithMouseOverStaffTicks
-                          ? _.flatten(
-                              noteCardWithMouseOverStaffTicks.map(t =>
-                                t.notes.map(n => n.midi),
-                              ),
-                            )
-                          : undefined
-                    }
-                    primaryNotesMidi={
-                      activeStaffTick
-                        ? activeStaffTick.notes.map(n => n.midi)
-                        : noteCardWithMouseOver
-                          ? [noteCardWithMouseOver.midi]
-                          : undefined
-                    }
-                    notesColor={
-                      activeNoteCard
-                        ? activeNoteCard.color
-                        : noteCardWithMouseOver
-                          ? noteCardWithMouseOver.color
-                          : undefined
-                    }
-                  />
-                </Box>
-              </div>
+                        : undefined
+                  }
+                  primaryNotesMidi={
+                    activeStaffTick
+                      ? activeStaffTick.notes.map(n => n.midi)
+                      : noteCardWithMouseOver
+                        ? [noteCardWithMouseOver.midi]
+                        : undefined
+                  }
+                  notesColor={
+                    activeNoteCard
+                      ? activeNoteCard.color
+                      : noteCardWithMouseOver
+                        ? noteCardWithMouseOver.color
+                        : undefined
+                  }
+                />
+              </Box>
             </div>
           </Fade>
 

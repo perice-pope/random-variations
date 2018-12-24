@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as _ from 'lodash'
 import * as tonal from 'tonal'
 import * as Vex from 'vexflow'
-import { css } from 'react-emotion'
+import { css, cx } from 'react-emotion'
 import { darken, getLuminance } from 'polished'
 
 import { Box } from './ui'
@@ -32,6 +32,7 @@ type NotesStaffProps = {
   staveHeight: number
   topOffset: number
   containerProps?: any
+  innerContainerClassName?: string
 }
 
 type NotesStaffState = {
@@ -558,14 +559,14 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
   }
 
   public render() {
-    const { id, containerProps } = this.props
+    const { id, containerProps, innerContainerClassName } = this.props
     const height = this.getHeight()
 
     const content = (
       // @ts-ignore
       <div
-        className={css(`width: 100%`)}
         {...containerProps}
+        className={cx(css(`width: 100%;`), containerProps.className)}
         // @ts-ignore
         ref={this.boxRef}
       >
@@ -573,13 +574,16 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
           height={height}
           width={1}
           id={id}
-          className={css(`
-          svg {
-            * {
-              user-select: none;
+          className={cx(
+            css(`
+            svg {
+              * {
+                user-select: none;
+              }
             }
-          }
-        `)}
+          `),
+            innerContainerClassName,
+          )}
         />
       </div>
     )
