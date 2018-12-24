@@ -500,6 +500,19 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     this.updateActiveNoteLine()
   }
 
+  scrollToDebounced = _.debounce(
+    top => {
+      if (this.boxRef && this.boxRef.current) {
+        this.boxRef.current.scrollTo({
+          top,
+          behavior: 'smooth',
+        })
+      }
+    },
+    300,
+    { leading: true, trailing: false },
+  )
+
   updateActiveNoteLine = () => {
     // console.log('updateActiveNoteLine')
     if (!this.activeLineEl) {
@@ -532,12 +545,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         const activeLineXNew = noteHeadX
         const activeLineYNew = this.tickToLine[activeTickIndex] * staveHeight
 
-        if (this.boxRef && this.boxRef.current) {
-          this.boxRef.current.scrollTo({
-            top: activeLineYNew * (this.props.scale || 1.0),
-            behavior: 'smooth',
-          })
-        }
+        this.scrollToDebounced(activeLineYNew * (this.props.scale || 1.0))
 
         // @ts-ignore
         this.activeLineEl.style = `transform: translateX(${activeLineXNew}px) translateY(${activeLineYNew}px);`
