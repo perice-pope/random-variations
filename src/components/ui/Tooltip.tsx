@@ -3,6 +3,7 @@ import { css } from 'emotion'
 
 import MuTooltip, { TooltipProps } from '@material-ui/core/Tooltip'
 import withWidth, { WithWidth } from '@material-ui/core/withWidth'
+import _ from 'lodash'
 
 const Tooltip: React.SFC<
   TooltipProps & WithWidth & { variant?: 'primary' | 'gray' }
@@ -21,7 +22,7 @@ const Tooltip: React.SFC<
       {...props}
     />
   ) : (
-    props.children
+    React.cloneElement(props.children, _.omit(props, 'children'))
   )
 
 export default withWidth()(Tooltip)
