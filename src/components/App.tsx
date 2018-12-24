@@ -1404,7 +1404,7 @@ class App extends React.Component<
 
     const isPhone = this.props.width === 'xs'
     const isMobile = this.props.width === 'xs' || this.props.width === 'sm'
-    const shouldShowPlayButtonInContentContainer = this.state.width >= 400
+    const shouldShowPlayButtonInContentContainer = !isPhone
 
     const activeNoteCard =
       isPlaying && activeNoteCardId != null
