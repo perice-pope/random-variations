@@ -226,47 +226,6 @@ class PickNoteModal extends React.Component<
 
         <DialogContent>
           <Box width={1} flex={1}>
-            <Flex flexWrap="wrap" flex={1}>
-              {noteNames.map(noteNameWithSharp => {
-                const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)!
-
-                const shouldUseFlat =
-                  settingsStore.enharmonicFlatsMap[notePitchWithSharp] === true
-
-                const noteName = shouldUseFlat
-                  ? tonal.Note.enharmonic(noteNameWithSharp)
-                  : noteNameWithSharp
-
-                const notePitch = tonal.Note.pc(noteName)
-
-                const isSelected = notePitch === this.state.notePitchName
-                const bgColor = getNoteCardColorByNoteName(noteName)
-
-                return (
-                  <Box key={noteNameWithSharp} width={1 / 4} p={[1, 2, 2]}>
-                    <NoteButton
-                      // @ts-ignore
-                      component={Paper}
-                      active={isSelected}
-                      fontWeight="bold"
-                      fontSize={[2, 3, 3]}
-                      p={[2, 2, 3]}
-                      bg={bgColor}
-                      onMouseOver={() => this.setNoteNameMouseOver(noteName)}
-                      onMouseLeave={() => this.setNoteNameMouseOver(undefined)}
-                      hoverBg={isSelected ? bgColor : undefined}
-                      width={1}
-                      onClick={() => {
-                        this.onNoteSelected(noteName)
-                      }}
-                    >
-                      {notePitch}
-                    </NoteButton>
-                  </Box>
-                )
-              })}
-            </Flex>
-
             <Flex alignItems="center" width={1} justifyContent="center">
               <IconButton
                 color="default"
@@ -307,7 +266,7 @@ class PickNoteModal extends React.Component<
               </IconButton>
             </Flex>
 
-            <Box mt={4} width={1}>
+            <Box mt={3} mb={4} width={1}>
               <PianoKeyboard
                 height={70}
                 noteRange={this.state.range}
@@ -342,6 +301,47 @@ class PickNoteModal extends React.Component<
                 }
               />
             </Box>
+
+            <Flex flexWrap="wrap" flex={1}>
+              {noteNames.map(noteNameWithSharp => {
+                const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)!
+
+                const shouldUseFlat =
+                  settingsStore.enharmonicFlatsMap[notePitchWithSharp] === true
+
+                const noteName = shouldUseFlat
+                  ? tonal.Note.enharmonic(noteNameWithSharp)
+                  : noteNameWithSharp
+
+                const notePitch = tonal.Note.pc(noteName)
+
+                const isSelected = notePitch === this.state.notePitchName
+                const bgColor = getNoteCardColorByNoteName(noteName)
+
+                return (
+                  <Box key={noteNameWithSharp} width={1 / 4} p={[1, 2, 2]}>
+                    <NoteButton
+                      // @ts-ignore
+                      component={Paper}
+                      active={isSelected}
+                      fontWeight="bold"
+                      fontSize={[2, 3, 3]}
+                      p={[2, 2, 3]}
+                      bg={bgColor}
+                      onMouseOver={() => this.setNoteNameMouseOver(noteName)}
+                      onMouseLeave={() => this.setNoteNameMouseOver(undefined)}
+                      hoverBg={isSelected ? bgColor : undefined}
+                      width={1}
+                      onClick={() => {
+                        this.onNoteSelected(noteName)
+                      }}
+                    >
+                      {notePitch}
+                    </NoteButton>
+                  </Box>
+                )
+              })}
+            </Flex>
           </Box>
         </DialogContent>
 
