@@ -6,9 +6,10 @@ import withWidth, { WithWidth } from '@material-ui/core/withWidth'
 import _ from 'lodash'
 
 const Tooltip: React.SFC<
-  TooltipProps & WithWidth & { variant?: 'primary' | 'gray' }
-> = ({ variant, width, ...props }) =>
-  width === 'lg' || width === 'xl' || width === 'md' ? (
+  TooltipProps &
+    WithWidth & { showOnMobile?: boolean; variant?: 'primary' | 'gray' }
+> = ({ variant, showOnMobile, width, ...props }) =>
+  showOnMobile || width === 'lg' || width === 'xl' || width === 'md' ? (
     <MuTooltip
       disableTouchListener
       disableFocusListener

@@ -66,6 +66,7 @@ export default class AddEntityButton extends React.Component<
           <Tooltip
             key={showHelpTooltip === true ? 'on' : 'off'}
             open={showHelpTooltip || undefined}
+            showOnMobile
             title={
               showHelpTooltip
                 ? 'Start here!'
