@@ -766,10 +766,21 @@ class App extends React.Component<
     }
   }
 
-  private handleRemoveAllNotes = () => {
+  private handleClearSessionClick = () => {
+    const activeSession = sessionStore.activeSession
+    if (!activeSession) {
+      return
+    }
+
     if (confirm('Do you really want to remove all notes from the session?')) {
-      if (sessionStore.activeSession) {
-        sessionStore.activeSession.noteCards = []
+      activeSession.noteCards = []
+
+      const { modifiers } = activeSession
+      const hasAtLeastOnceModifer = _.some(Object.keys(modifiers).map(modifierKey => modifiers[modifierKey].enabled))
+      if (hasAtLeastOnceModifer && confirm('Do you also want to clear all modifiers (scales, chords, intervals, directions, etc)?')) {
+        Object.keys(modifiers).forEach(modifierKey => {
+          modifiers[modifierKey].enabled = false
+        })
       }
     }
   }
@@ -1473,7 +1484,7 @@ class App extends React.Component<
             </MenuItem>
             <MenuItem
               onClick={() => {
-                this.handleRemoveAllNotes()
+                this.handleClearSessionClick()
                 props.onClose()
               }}
               disabled={noteCards.length === 0}
