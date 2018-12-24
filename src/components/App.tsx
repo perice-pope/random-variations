@@ -2290,7 +2290,7 @@ class App extends React.Component<
                         px={[1, 2, 2]}
                         width={1}
                         display={
-                          this.state.isPlaying && isPhone ? 'none' : 'block'
+                          this.state.isPlaying ? 'none' : 'block'
                         }
                       >
                         <Flex
@@ -2384,7 +2384,7 @@ class App extends React.Component<
                           flex-direction: row-reverse;
                         }
                       `),
-                      this.state.isPlaying && isPhone && css(`margin-top: 15px;`),
+                      this.state.isPlaying && css(`margin-top: 15px;`),
                     )}
                   >
                     <div
@@ -2412,7 +2412,6 @@ class App extends React.Component<
                       }
                     `),
                         this.state.isPlaying &&
-                          isPhone &&
                           css(`display: none;`),
                       )}
                     >
