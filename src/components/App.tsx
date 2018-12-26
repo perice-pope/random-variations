@@ -78,6 +78,7 @@ import {
   Session,
   Scale,
   SessionNoteCard,
+  ClefType,
 } from '../types'
 
 import ArpeggioModifierModal, {
@@ -776,8 +777,17 @@ class App extends React.Component<
       activeSession.noteCards = []
 
       const { modifiers } = activeSession
-      const hasAtLeastOnceModifer = _.some(Object.keys(modifiers).map(modifierKey => modifiers[modifierKey].enabled))
-      if (hasAtLeastOnceModifer && confirm('Do you also want to clear all modifiers (scales, chords, intervals, directions, etc)?')) {
+      const hasAtLeastOnceModifer = _.some(
+        Object.keys(modifiers).map(
+          modifierKey => modifiers[modifierKey].enabled,
+        ),
+      )
+      if (
+        hasAtLeastOnceModifer &&
+        confirm(
+          'Do you also want to clear all modifiers (scales, chords, intervals, directions, etc)?',
+        )
+      ) {
         Object.keys(modifiers).forEach(modifierKey => {
           modifiers[modifierKey].enabled = false
         })
@@ -1001,6 +1011,57 @@ class App extends React.Component<
   }: {
     values: SettingsFormValues
   }) => {
+    if (!!values.clefType && values.clefType !== settingsStore.clefType) {
+      // Clef has been changed. Suggest to transpose all notes up/down an octave
+
+      const clefFrom = settingsStore.clefType
+      const clefTo = values.clefType
+
+      const highClefs = [
+        'treble',
+        'alto',
+        'soprano',
+        'mezzo-soprano',
+        'french',
+      ] as ClefType[]
+
+      const lowClefs = [
+        'bass',
+        'tenor',
+        'baritone-c',
+        'baritone-f',
+        'subbass',
+      ] as ClefType[]
+
+      if (
+        _.includes(highClefs, clefFrom) &&
+        _.includes(lowClefs, clefTo) &&
+        this.canTransposeAllCardsDownOctave()
+      ) {
+        // Suggest to transpose an octave DOWN
+        if (
+          confirm(
+            'Clef has been changed. Do you want to transpose all notes an octave down?',
+          )
+        ) {
+          this.transposeAllCards(-12)
+        }
+      } else if (
+        _.includes(lowClefs, clefFrom) &&
+        _.includes(highClefs, clefTo) &&
+        this.canTransposeAllCardsUpOctave()
+      ) {
+        // Suggest to transpose an octave UP
+        if (
+          confirm(
+            'Clef has been changed. Do you want to transpose all notes an octave up?',
+          )
+        ) {
+          this.transposeAllCards(12)
+        }
+      }
+    }
+
     Object.keys(values).forEach(key => {
       settingsStore[key] = values[key]
     })
@@ -1375,6 +1436,20 @@ class App extends React.Component<
     ),
   )
 
+  private canTransposeAllCardsUpOctave = () => {
+    const highestNote = this.getHighestNoteWithinSession(this.state.staffTicks)
+    return highestNote
+      ? (tonal.Note.oct(highestNote.noteName) as number) <= 5
+      : false
+  }
+
+  private canTransposeAllCardsDownOctave = () => {
+    const lowestNote = this.getLowestNoteWithinSession(this.state.staffTicks)
+    return lowestNote
+      ? (tonal.Note.oct(lowestNote.noteName) as number) >= 2
+      : false
+  }
+
   private renderApp = () => {
     if (!sessionStore.activeSession) {
       return
@@ -1425,12 +1500,9 @@ class App extends React.Component<
     const highestNote = this.getHighestNoteWithinSession(this.state.staffTicks)
     const lowestNote = this.getLowestNoteWithinSession(this.state.staffTicks)
 
-    const shouldDisableTransposeOctaveUp = highestNote
-      ? (tonal.Note.oct(highestNote.noteName) as number) > 5
-      : true
-    const shouldDisableTransposeOctaveDown = lowestNote
-      ? (tonal.Note.oct(lowestNote.noteName) as number) < 2
-      : true
+    const shouldDisableTransposeOctaveUp = !this.canTransposeAllCardsUpOctave()
+    const shouldDisableTransposeOctaveDown = !this.canTransposeAllCardsDownOctave()
+
     const shouldDisableTransposeHalfStepUp = highestNote
       ? (tonal.Note.midi(highestNote.noteName) as number) >=
         (tonal.Note.midi('B6') as number)
@@ -2221,7 +2293,10 @@ class App extends React.Component<
                   classes.content,
                   !isMobile && classes.contentShifted,
                   !isMobile && this.state.isMenuOpen && classes.contentShift,
-                  css(`margin-bottom: ${this.getPianoHeight() + 10}px !important;`)
+                  css(
+                    `margin-bottom: ${this.getPianoHeight() +
+                      10}px !important;`,
+                  ),
                 )}
               >
                 <Flex
@@ -2289,9 +2364,7 @@ class App extends React.Component<
                       <Box
                         px={[1, 2, 2]}
                         width={1}
-                        display={
-                          this.state.isPlaying ? 'none' : 'block'
-                        }
+                        display={this.state.isPlaying ? 'none' : 'block'}
                       >
                         <Flex
                           id="modifiers-container"
@@ -2411,8 +2484,7 @@ class App extends React.Component<
                         margin-left: 0.5rem;
                       }
                     `),
-                        this.state.isPlaying &&
-                          css(`display: none;`),
+                        this.state.isPlaying && css(`display: none;`),
                       )}
                     >
                       <span>{`x ${settingsStore.scaleZoomFactor}`}</span>
@@ -2498,7 +2570,9 @@ class App extends React.Component<
               <div
                 className={cx(
                   css(`position: fixed; bottom: 0;`),
-                  !isMobile && this.state.isMenuOpen && css(`margin-left: ${MenuWidth}px`),
+                  !isMobile &&
+                    this.state.isMenuOpen &&
+                    css(`margin-left: ${MenuWidth}px`),
                 )}
               >
                 <PianoKeyboard
