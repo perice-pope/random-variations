@@ -585,7 +585,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
         const firstNote = notes[0]
         const y = firstNote.getYForTopText(1)
-        const x = firstNote.getAbsoluteX()
+        const x = firstNote.getBoundingBox().getX()
 
         this.renderContext
           .setFont('Sans-Serif', fontSize, 900)
