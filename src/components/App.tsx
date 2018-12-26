@@ -514,13 +514,24 @@ class App extends React.Component<
         rests: session.rests,
       })
 
+      let wait = 0
       ticks.forEach(tick => {
-        track.addEvent(
-          new MidiWriter.NoteEvent({
-            pitch: tick.notes.map(n => n.midi),
-            duration: '4',
-          }),
-        )
+        if (tick.notes.length > 0) {
+          // It's a non-break tick, e.g. a tick with at least one note to be played
+          track.addEvent(
+            new MidiWriter.NoteEvent({
+              wait,
+              pitch: tick.notes.map(n => n.midi),
+              duration: '4',
+            })
+          )
+          wait = 0
+        } else {
+          // This tick is a break (doesn't contain any notes to be played) 
+          // increment wait so that the next non-break note will be delayed by the
+          // current "wait" value
+          wait += 4
+        }
       })
 
       // Generate a data URI
