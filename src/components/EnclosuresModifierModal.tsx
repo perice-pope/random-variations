@@ -48,6 +48,7 @@ type EnclosuresModifierModalProps = {
   onClose: () => any
   onSubmit: (args: SubmitArgsType) => any
   defaultType?: EnclosuresType
+  baseNote?: string
 }
 
 type State = {
@@ -75,6 +76,10 @@ class EnclosuresModifierModal extends React.Component<
   } & WithAudioEngineInjectedProps,
   State
 > {
+  static defaultProps: Partial<EnclosuresModifierModalProps> = {
+    baseNote: 'C4',
+  }
+
   state: State = {
     type: this.props.defaultType || 'one down, one up',
     isPlaying: false,
@@ -97,13 +102,11 @@ class EnclosuresModifierModal extends React.Component<
     this.setState({ type }, this.setPlaybackLoop)
   }
 
-  generateStaffTicks = memoize(type => {
+  generateStaffTicks = memoize((type, baseNote) => {
     const enclosureToUse =
       type === 'random'
         ? _.sample(enclosureOptions)!
         : enclosureByEnclosureType[type]
-
-    const baseNote = 'C4'
 
     const enclosureNotes = enclosureToUse.semitones.map(semitoneStep => {
       // For notes above the base note, use flats
@@ -152,7 +155,7 @@ class EnclosuresModifierModal extends React.Component<
 
   setPlaybackLoop = () => {
     const ticks: StaffTick[] = [
-      ...this.generateStaffTicks(this.state.type),
+      ...this.generateStaffTicks(this.state.type, this.props.baseNote),
       {
         id: 'rest',
         notes: [],
@@ -288,7 +291,10 @@ class EnclosuresModifierModal extends React.Component<
                       ? this.state.activeTickIndex
                       : undefined
                   }
-                  ticks={this.generateStaffTicks(this.state.type)}
+                  ticks={this.generateStaffTicks(
+                    this.state.type,
+                    this.props.baseNote,
+                  )}
                   isPlaying={this.state.isPlaying}
                   showBreaks
                   containerProps={{ flex: '1' }}

@@ -152,6 +152,7 @@ class ScaleModifierModal extends React.Component<
   ScaleModifierModalState
 > {
   static defaultProps: Partial<ScaleModifierModalProps> = {
+    baseNote: 'C4',
     initialValues: {
       scaleType: DEFAULT_SCALE_NAME,
       patternPreset: 'up',
@@ -262,15 +263,14 @@ class ScaleModifierModal extends React.Component<
     )
   }
 
-  generateStaffTicks = memoize(values => {
-    const { scaleType } = this.state.values
+  generateStaffTicks = memoize((values, baseNote) => {
+    const { scaleType } = values
     const scale = scaleByScaleType[scaleType]
     const { intervals = [] } = scale
-    const baseNote = this.props.baseNote || 'C4'
 
     let staffTicks: StaffTick[]
 
-    staffTicks = this.state.values.pattern.items.map((item, index) => {
+    staffTicks = values.pattern.items.map((item, index) => {
       const interval =
         item && !item.muted ? intervals[item.note - 1] || '1P ' : '1P'
       const note = item.muted
@@ -320,7 +320,7 @@ class ScaleModifierModal extends React.Component<
 
   setPlaybackLoop = () => {
     const ticks: StaffTick[] = [
-      ...this.generateStaffTicks(this.state.values),
+      ...this.generateStaffTicks(this.state.values, this.props.baseNote),
       {
         id: 'rest',
         notes: [],
@@ -419,9 +419,7 @@ class ScaleModifierModal extends React.Component<
                   )}
                 </div>
 
-                <Tooltip
-                  title="Choose random scale"
-                >
+                <Tooltip title="Choose random scale">
                   <Button
                     variant="outlined"
                     color="primary"
@@ -529,7 +527,10 @@ class ScaleModifierModal extends React.Component<
                   }
                   topOffset={30}
                   staveHeight={120}
-                  ticks={this.generateStaffTicks(this.state.values)}
+                  ticks={this.generateStaffTicks(
+                    this.state.values,
+                    this.props.baseNote,
+                  )}
                   isPlaying={this.state.isPlaying}
                   showBreaks
                   containerProps={{ flex: '1' }}

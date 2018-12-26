@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as _ from 'lodash'
 import { transpose } from 'tonal-distance'
 import * as tonal from 'tonal'
+import memoize from 'memoize-one'
 
 import Button, { default as MuButton } from '@material-ui/core/Button'
 
@@ -70,6 +71,7 @@ class IntervalModifierModal extends React.Component<
   IntervalModifierModalState
 > {
   static defaultProps: Partial<IntervalModifierModalProps> = {
+    baseNote: 'C4',
     initialValues: {
       type: 'broken',
       direction: 'ascending',
@@ -133,10 +135,9 @@ class IntervalModifierModal extends React.Component<
     })
   }
 
-  generateStaffTicks = () => {
-    const { interval, type, direction } = this.state.values
+  generateStaffTicks = memoize((values, baseNote) => {
+    const { interval, type, direction } = values
 
-    const baseNote = this.props.baseNote || 'C4'
     const intervalNote = transpose(
       baseNote,
       `${direction === 'ascending' ? '' : '-'}${interval}`,
@@ -199,7 +200,7 @@ class IntervalModifierModal extends React.Component<
     }
 
     return staffTicks
-  }
+  })
 
   render() {
     if (!this.props.isOpen) {
@@ -328,7 +329,7 @@ class IntervalModifierModal extends React.Component<
                 <NotesStaff
                   id="interval-preview"
                   clef={settingsStore.clefType}
-                  ticks={this.generateStaffTicks()}
+                  ticks={this.generateStaffTicks(this.state.values, this.props.baseNote)}
                   isPlaying={false}
                   showBreaks
                   activeTickIndex={undefined}

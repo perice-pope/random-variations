@@ -143,6 +143,7 @@ class ArpeggioModifierModal extends React.Component<
   ArpeggioModifierModalState
 > {
   static defaultProps: Partial<ArpeggioModifierModalProps> = {
+    baseNote: 'C4',
     initialValues: {
       chordType: DEFAULT_CHORD_NAME,
       isMelodic: true,
@@ -286,18 +287,17 @@ class ArpeggioModifierModal extends React.Component<
     )
   }
 
-  generateStaffTicks = memoize(values => {
-    const { chordType, chordInversion } = this.state.values
+  generateStaffTicks = memoize((values, baseNote) => {
+    const { chordType, chordInversion } = values
     const chord =
       chordsByChordType[chordType] || chordsByChordType[DEFAULT_CHORD_NAME]
     const { intervals } = chord
-    const baseNote = this.props.baseNote || 'C4'
 
     let staffTicks: StaffTick[]
 
     // TODO: reuse similar logic from musicUtils module
-    if (this.state.values.isMelodic) {
-      staffTicks = this.state.values.pattern.items.map((item, index) => {
+    if (values.isMelodic) {
+      staffTicks = values.pattern.items.map((item, index) => {
         const note = item.muted
           ? undefined
           : transpose(baseNote, intervals[item.note - 1] || '1P')
@@ -357,7 +357,7 @@ class ArpeggioModifierModal extends React.Component<
 
   setPlaybackLoop = () => {
     const ticks: StaffTick[] = [
-      ...this.generateStaffTicks(this.state.values),
+      ...this.generateStaffTicks(this.state.values, this.props.baseNote),
       {
         id: 'rest',
         notes: [],
@@ -570,9 +570,7 @@ class ArpeggioModifierModal extends React.Component<
                 )}
 
                 {isMelodic && (
-                  <Tooltip
-                    title="Randomize pattern"
-                  >
+                  <Tooltip title="Randomize pattern">
                     <MuButton
                       color="primary"
                       variant="outlined"
@@ -632,7 +630,10 @@ class ArpeggioModifierModal extends React.Component<
                       ? this.state.activeTickIndex
                       : undefined
                   }
-                  ticks={this.generateStaffTicks(this.state.values)}
+                  ticks={this.generateStaffTicks(
+                    this.state.values,
+                    this.props.baseNote,
+                  )}
                   tickLabels={[
                     `${tonal.Note.pc(this.props.baseNote || 'C4')}${
                       this.state.values.chordType

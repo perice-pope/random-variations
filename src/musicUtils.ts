@@ -36,6 +36,7 @@ import {
   PatternDirectionType,
   InstrumentTransposingOption,
   InstrumentTransposingType,
+  ClefType,
 } from './types'
 
 export const NoteNamesWithSharps = [
@@ -83,6 +84,19 @@ export const SemitonesToIntervalNameMap: { [k in IntervalType]: string } = {
   '7m': 'Minor 7th',
   '7M': 'Major 7th',
   '8P': 'Octave',
+}
+
+export const ClefTypeToDefaultOctave: { [k in ClefType]: number } = {
+  treble: 4,
+  soprano: 4,
+  'mezzo-soprano': 4,
+  french: 4,
+  tenor: 3,
+  alto: 3,
+  'baritone-c': 3,
+  'baritone-f': 3,
+  bass: 2,
+  subbass: 2,
 }
 
 export const SemitonesToIntervalShortNameMap: {
@@ -334,8 +348,6 @@ export const patternDirectionByType = _.keyBy(
   [type: string]: PatternDirection
 }
 
-console.log(patternDirectionOptions, patternDirectionByType)
-
 export const generateChordPatternFromPreset = ({
   chord,
   patternPreset,
@@ -429,7 +441,6 @@ export const generateScalePatternFromPreset = ({
     }
     case 'up, skip 1': {
       items = ladderUp(1, scale.notesCount).map(note => ({ note }))
-      console.log('items = ', items)
       mainNoteIndex = 0
       break
     }
@@ -840,7 +851,6 @@ export const generateStaffTicks = ({
   // Number of rests to add after each note card
   rests: number
 }): { ticks: StaffTick[]; tickLabels: { [tickIndex: number]: string } } => {
-  console.log('generateStaffTicks', rests)
   const ticksPerCard: StaffTick[][] = []
   const tickLabels: { [tickIndex: number]: string } = {}
 

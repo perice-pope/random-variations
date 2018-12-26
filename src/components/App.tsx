@@ -107,6 +107,7 @@ import {
   scaleByScaleType,
   SemitonesToIntervalShortNameMap,
   enclosureByEnclosureType,
+  ClefTypeToDefaultOctave,
 } from '../musicUtils'
 import AudioFontsConfig, { AudioFontId } from '../audioFontsConfig'
 import AudioEngine, { AnimationCallback } from '../services/audioEngine'
@@ -1492,6 +1493,8 @@ class App extends React.Component<
     const isMobile = this.props.width === 'xs' || this.props.width === 'sm'
     const shouldShowPlayButtonInContentContainer = !isPhone
 
+    const baseNoteForPatternPreviewInDialogWindows = `C${ClefTypeToDefaultOctave[settingsStore.clefType] || 4}`
+
     const activeNoteCard =
       isPlaying && activeNoteCardId != null
         ? noteCardsById[activeNoteCardId]
@@ -2657,6 +2660,7 @@ class App extends React.Component<
             onClose={this.closeArpeggioAddingModal}
             onSubmit={this.handleArpeggioModifierModalConfirm}
             initialValues={modifiers.chords}
+            baseNote={baseNoteForPatternPreviewInDialogWindows}
           />
 
           <IntervalModifierModal
@@ -2664,6 +2668,7 @@ class App extends React.Component<
             onClose={this.closeIntervalsModal}
             onSubmit={this.handleIntervalsModifierModalConfirm}
             initialValues={modifiers.intervals}
+            baseNote={baseNoteForPatternPreviewInDialogWindows}
           />
 
           <ScaleModifierModal
@@ -2671,6 +2676,7 @@ class App extends React.Component<
             onClose={this.closeScalesModal}
             onSubmit={this.handleScaleModifierModalConfirm}
             initialValues={modifiers.scales}
+            baseNote={baseNoteForPatternPreviewInDialogWindows}
           />
 
           <EnclosuresModifierModal
@@ -2678,6 +2684,7 @@ class App extends React.Component<
             onClose={this.closeEnclosuresModal}
             onSubmit={this.handleEnclosureModifierModalConfirm}
             defaultType={modifiers.enclosures.enclosure.type}
+            baseNote={baseNoteForPatternPreviewInDialogWindows}
           />
 
           <ToneRowModal
