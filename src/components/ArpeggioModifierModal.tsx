@@ -36,6 +36,7 @@ import {
   FormHelperText,
   Typography,
   Divider,
+  Switch,
 } from '@material-ui/core'
 import { css } from 'react-emotion'
 import Tooltip from './ui/Tooltip'
@@ -90,6 +91,7 @@ export type SubmitValuesType = {
   chordType: ChordType
   patternPreset: ArpeggioPatternPreset
   pattern: ArpeggioPattern
+  customPatternAllowRepeatedNotes: boolean
   chordInversion: number
   isMelodic: boolean
 }
@@ -153,6 +155,7 @@ class ArpeggioModifierModal extends React.Component<
         chord: chordsByChordType[DEFAULT_CHORD_NAME],
         patternPreset: 'ascending',
       }),
+      customPatternAllowRepeatedNotes: false,
     },
   }
 
@@ -379,20 +382,66 @@ class ArpeggioModifierModal extends React.Component<
     }
   }
 
-  handleRandomizePattern = () => {
+  buildRandomPattern = () => {
     const chord = chordsByChordType[this.state.values.chordType]
-    const { pattern } = this.state.values
+    const { pattern, customPatternAllowRepeatedNotes } = this.state.values
+
+    let newPatternLength = this.state.values.pattern.items.length
+    if (!customPatternAllowRepeatedNotes) {
+      newPatternLength = Math.min(newPatternLength, chord.notesCount)
+    }
+
     const newPattern = {
       ...pattern,
-      items: pattern.items.map(() => ({
-        note: _.random(1, chord.notesCount),
-      })),
+      items: customPatternAllowRepeatedNotes
+        ? pattern.items.map(() => ({
+            note: _.random(1, chord.notesCount),
+          }))
+        : _.sampleSize(_.range(1, chord.notesCount + 1), newPatternLength).map(
+            note => ({
+              note,
+              muted: false,
+            }),
+          ),
+    }
+
+    return newPattern
+  }
+
+  handleRandomizePattern = () => {
+    let newPattern = this.buildRandomPattern()
+    if (newPattern.items.length > 1) {
+      // Ensure that the new pattern will be different from the old one
+      let triesCount = 0
+      while (
+        _.isEqual(newPattern, this.state.values.pattern) &&
+        triesCount < 20
+      ) {
+        newPattern = this.buildRandomPattern()
+        triesCount += 1
+      }
     }
     this.handlePatternChange(newPattern)
   }
 
   handleSelectRandomChordType = () => {
     this.handleChordTypeSelected(_.sample(chordTypeOptions) as ChordTypeOption)
+  }
+
+  handleChangeAllowRepeatedNotes = (e, checked) => {
+    this.setState(
+      {
+        values: {
+          ...this.state.values,
+          customPatternAllowRepeatedNotes: Boolean(checked),
+        },
+      },
+      () => {
+        if (this.state.values.patternPreset === 'custom') {
+          this.handleRandomizePattern()
+        }
+      },
+    )
   }
 
   render() {
@@ -589,6 +638,21 @@ class ArpeggioModifierModal extends React.Component<
                 )}
               </Flex>
 
+              {this.state.values.patternPreset === 'custom' && (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      onChange={this.handleChangeAllowRepeatedNotes}
+                      checked={
+                        this.state.values.customPatternAllowRepeatedNotes
+                      }
+                      color="primary"
+                    />
+                  }
+                  label="Allow pattern notes to repeat"
+                />
+              )}
+
               {isMelodic && (
                 <Box width={1} mt={3}>
                   <PatternEditor
@@ -597,6 +661,11 @@ class ArpeggioModifierModal extends React.Component<
                     onChange={this.handlePatternChange}
                     min={1}
                     max={chord.notesCount}
+                    maxPatternLength={
+                      this.state.values.customPatternAllowRepeatedNotes
+                        ? 16
+                        : chord.notesCount
+                    }
                     getSortableContainer={() =>
                       document.getElementById(
                         'arpeggio-modifier-dialog-content',

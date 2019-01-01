@@ -26,6 +26,7 @@ type PatternEditorProps = {
   onChange: (pattern: ArpeggioPattern) => any
   min: number
   max: number
+  maxPatternLength?: number
 }
 
 const numberToLetter = (value: number) =>
@@ -261,6 +262,7 @@ class PatternEditor extends React.Component<PatternEditorProps> {
       getSortableContainer,
       min,
       max,
+      maxPatternLength,
       value: pattern,
       className,
     } = this.props
@@ -294,7 +296,7 @@ class PatternEditor extends React.Component<PatternEditorProps> {
           lockToContainerEdges
           getContainer={getSortableContainer}
         />
-        {pattern.items.length < 16 && (
+        {pattern.items.length < (maxPatternLength || 16) && (
           <Tooltip title="Add note">
             <Button
               className={css({ minWidth: '40px', marginLeft: '1rem' })}
