@@ -267,6 +267,7 @@ const SortableNotesContainer = SortableContainer(
       onDeleteClick,
       onEditNote,
       onMouseOver,
+      showOctaves,
       onMouseLeave,
       verticalAlign,
     }) => {
@@ -325,7 +326,7 @@ const SortableNotesContainer = SortableContainer(
                   }
                 }}
               >
-                {settingsStore.showNoteOctaves
+                {(settingsStore.showNoteOctaves || showOctaves)
                   ? noteName
                   : tonal.Note.pc(noteName)}
               </SortableNoteCard>
@@ -350,6 +351,7 @@ type NoteCardsProps = {
   draggable?: boolean
   disableRemoving?: boolean
   hideContextMenu?: boolean
+  showOctaves?: boolean
   zIndex?: number
   verticalAlign?: 'top' | 'center'
   perLineCount?: number
@@ -456,6 +458,7 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
       zIndex,
       perLineCount,
       hideContextMenu,
+      showOctaves,
       disableRemoving,
       verticalAlign,
     } = this.props
@@ -478,6 +481,7 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
           zIndex={zIndex || 1000}
           onMouseOver={onMouseOver}
           onEditNote={this.handleEditNote}
+          showOctaves={showOctaves}
           onMouseLeave={onMouseLeave}
           onSortEnd={this.handleSortEnd}
           onSortMove={this.handleSortMove}

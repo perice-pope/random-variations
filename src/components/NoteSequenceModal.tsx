@@ -290,6 +290,7 @@ class NoteSequenceModal extends React.Component<
             >
               <Flex flexWrap="wrap" flex={1} mt={2} maxWidth={300} width={1}>
                 <NoteCards
+                  showOctaves
                   disableRemoving
                   zIndex={10000000}
                   perLineCount={1}
