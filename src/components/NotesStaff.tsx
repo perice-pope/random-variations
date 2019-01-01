@@ -39,6 +39,7 @@ type NotesStaffProps = {
 
 type NotesStaffState = {
   boxWidth: number
+  scrollingTop: number
 }
 
 class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
@@ -52,6 +53,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
   state: NotesStaffState = {
     boxWidth: 0,
+    scrollingTop: 0,
   }
 
   // @ts-ignore
@@ -601,14 +603,19 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
   scrollToDebounced = _.debounce(
     top => {
-      if (this.boxRef && this.boxRef.current) {
+      if (
+        this.boxRef &&
+        this.boxRef.current &&
+        this.state.scrollingTop !== top
+      ) {
+        this.setState({ scrollingTop: top })
         this.boxRef.current.scrollTo({
           top,
           behavior: 'smooth',
         })
       }
     },
-    300,
+    30,
     { leading: true, trailing: false },
   )
 
