@@ -31,8 +31,10 @@ import {
 import styled from 'react-emotion'
 import settingsStore from '../services/settingsStore'
 import { IconButton, Typography } from '@material-ui/core'
+import { normalizeNoteName } from '../musicUtils';
 
 type PickNoteModalProps = {
+  disabledNoteNames?: string[]
   isOpen: boolean
   onClose: () => any
   onSubmit: (args: { noteName: string }) => any
@@ -210,6 +212,13 @@ class PickNoteModal extends React.Component<
       true,
     )
 
+    let disabledNoteNamesMap = {}
+    if (this.props.disabledNoteNames) {
+      this.props.disabledNoteNames.forEach(n => {
+        disabledNoteNamesMap[n] = true
+      })
+    }
+
     return (
       <Dialog
         fullWidth={true}
@@ -234,6 +243,7 @@ class PickNoteModal extends React.Component<
               >
                 <MinusIcon fontSize="large" />
               </IconButton>
+
               <TextField
                 className={css({
                   maxWidth: '80px',
@@ -281,6 +291,7 @@ class PickNoteModal extends React.Component<
 
                   this.onNoteSelected(noteName, true)
                 }}
+                disabledNoteNames={this.props.disabledNoteNames}
                 primaryNotesMidi={
                   this.state.noteName
                     ? [tonal.Note.midi(this.state.noteName)]
@@ -318,6 +329,9 @@ class PickNoteModal extends React.Component<
                 const isSelected = notePitch === this.state.notePitchName
                 const bgColor = getNoteCardColorByNoteName(noteName)
 
+                const isDisabled =
+                  disabledNoteNamesMap[normalizeNoteName(noteName)] === true
+
                 return (
                   <Box key={noteNameWithSharp} width={1 / 4} p={[1, 2, 2]}>
                     <NoteButton
@@ -327,12 +341,21 @@ class PickNoteModal extends React.Component<
                       fontWeight="bold"
                       fontSize={[2, 3, 3]}
                       p={[2, 2, 3]}
-                      bg={bgColor}
+                      bg={isDisabled ? '#cfcfcf' : bgColor}
                       onMouseOver={() => this.setNoteNameMouseOver(noteName)}
                       onMouseLeave={() => this.setNoteNameMouseOver(undefined)}
-                      hoverBg={isSelected ? bgColor : undefined}
+                      hoverBg={
+                        isDisabled
+                          ? '#cfcfcf'
+                          : isSelected
+                            ? bgColor
+                            : undefined
+                      }
                       width={1}
                       onClick={() => {
+                        if (isDisabled) {
+                          return
+                        }
                         this.onNoteSelected(noteName)
                       }}
                     >

@@ -10,6 +10,7 @@ import { Box } from './ui'
 import { withAudioEngine } from './withAudioEngine'
 import AudioEngine from '../services/audioEngine'
 import { AudioFontId } from '../audioFontsConfig'
+import { normalizeNoteName } from '../musicUtils'
 
 export const pianoNoteRangeWide: MidiNoteRange = {
   first: tonal.Note.midi('C3') as number,
@@ -44,6 +45,7 @@ type PianoKeyboardProps = {
   width: number
   height: number
   noteRange?: MidiNoteRange
+  disabledNoteNames: string[]
   primaryNotesMidi?: number[]
   secondaryNotesMidi?: number[]
   notesColor?: string
@@ -78,6 +80,16 @@ class PianoKeyboard extends React.Component<
   }
 
   private onPlayNote = noteMidi => {
+    const normalizedNoteName = normalizeNoteName(tonal.Note.fromMidi(noteMidi))
+
+    const isDisabled =
+      !!this.props.disabledNoteNames &&
+      !!this.props.disabledNoteNames.find(n => n === normalizedNoteName)
+
+    if (isDisabled) {
+      return
+    }
+
     if (this.props.onPlayNote) {
       this.props.onPlayNote(noteMidi)
     }
@@ -140,10 +152,19 @@ class PianoKeyboard extends React.Component<
       ? this.props.secondaryNotesMidi.findIndex(n => n === midiNumber) >= 0
       : false
 
+    const normalizedNoteName = normalizeNoteName(
+      tonal.Note.fromMidi(midiNumber),
+    )
+
+    const isDisabled =
+      !!this.props.disabledNoteNames &&
+      !!this.props.disabledNoteNames.find(n => n === normalizedNoteName)
+
     return (
       <>
         <span
           className={cx(
+            isDisabled && '--disabled',
             isPrimary ? '--primary' : undefined,
             !isPrimary && isSecondary ? '--secondary' : undefined,
             'vf-key-overlay',
@@ -314,6 +335,15 @@ class PianoKeyboard extends React.Component<
                         accidentalColor,
                         0.5,
                       )} !important;
+                    }
+                  }
+                }
+
+                &.ReactPiano__Key--accidental,&.ReactPiano__Key--natural {
+                  .vf-key-overlay {
+                    &.--disabled {
+                      cursor: default !important;
+                      background-color: #cfcfcf !important;
                     }
                   }
                 }

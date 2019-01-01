@@ -30,8 +30,14 @@ import {
   withAudioEngine,
   WithAudioEngineInjectedProps,
 } from './withAudioEngine'
-import { NoteNamesWithSharps } from '../musicUtils'
-import { Typography, IconButton, Hidden } from '@material-ui/core'
+import { NoteNamesWithSharps, normalizeNoteName } from '../musicUtils'
+import {
+  Typography,
+  IconButton,
+  Hidden,
+  FormControlLabel,
+  Switch,
+} from '@material-ui/core'
 import settingsStore from '../services/settingsStore'
 import NoteCards, { NoteCardNote } from './NoteCards'
 import { ChromaticNoteSharps } from '../types'
@@ -39,6 +45,7 @@ import { ChromaticNoteSharps } from '../types'
 type ToneRowModalProps = {
   isOpen: boolean
   maxNotesCount: number
+  notesUsedInSession: string[]
   defaultNotesCount: number
   onClose: () => any
   onSubmit: (args: { noteNames: string[] }) => any
@@ -53,19 +60,36 @@ type ToneRowModalState = {
   noteEditingModalIsOpen: boolean
   noteEditingModalNoteIndex?: number
 
+  allowRepeatingNotes: boolean
+
   noteNameMouseOver?: string
 
   notes: NoteCardNote[]
 }
 
+const sampleRepeating = (array, count) =>
+  _.range(count).map(() => _.sample(array))
+const sampleNonRepeating = (array, count) => _.sampleSize(array, count)
+
 const generateRandomNotes = (
+  availableNotes: string[],
+  allowRepeatingNotes: boolean,
   count,
   octave: number = 4,
   firstNoteName?: string,
 ) =>
   (firstNoteName
-    ? [firstNoteName, ..._.sampleSize(NoteNamesWithSharps, count - 1)]
-    : _.sampleSize(NoteNamesWithSharps, count)
+    ? [
+        firstNoteName,
+        ...(allowRepeatingNotes ? sampleRepeating : sampleNonRepeating)(
+          _.difference(availableNotes, [normalizeNoteName(firstNoteName)]),
+          count - 1,
+        ),
+      ]
+    : (allowRepeatingNotes ? sampleRepeating : sampleNonRepeating)(
+        availableNotes,
+        count,
+      )
   ).map(
     (name, index) =>
       ({
@@ -90,24 +114,26 @@ class ToneRowModal extends React.Component<
       octave: octave,
 
       noteEditingModalIsOpen: false,
+      allowRepeatingNotes: false,
 
-      notes: generateRandomNotes(
-        props.defaultNotesCount,
-        octave,
-        props.noteName,
-      ),
+      notes: _.range(props.defaultNotesCount).map(() => ({
+        noteName: 'C4',
+      })) as NoteCardNote[],
     }
+
+    this.setRandomPatternWithFirstNotePreserved()
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps.isOpen !== this.props.isOpen && this.props.isOpen) {
-      this.setState({
-        notes: generateRandomNotes(
-          this.props.defaultNotesCount,
-          this.state.octave,
-          this.props.noteName,
-        ),
-      })
+      this.setState(
+        {
+          notes: _.range(this.props.defaultNotesCount).map(() => ({
+            noteName: 'C4',
+          })) as NoteCardNote[],
+        },
+        this.setRandomPatternWithFirstNotePreserved,
+      )
     }
   }
 
@@ -121,15 +147,35 @@ class ToneRowModal extends React.Component<
     return noteRange
   }
 
-  randomizeNotes = () => {
+  setRandomPatternWithFirstNotePreserved = () => {
     if (this.state.notes.length === 0) {
       return
     }
+
+    const availableNotes = this.getAvailableNoteNamesWithSharps()
+
+    let firstNoteName =
+      this.state.notes.length > 0 ? this.state.notes[0].noteName : undefined
+
+    if (
+      firstNoteName &&
+      !_.includes(availableNotes, normalizeNoteName(firstNoteName))
+    ) {
+      firstNoteName = _.sample(availableNotes)
+    }
+
+    let count = this.state.notes.length
+    if (this.state.allowRepeatingNotes && count > availableNotes.length) {
+      count = availableNotes.length
+    }
+
     this.setState({
       notes: generateRandomNotes(
-        this.state.notes.length,
+        availableNotes,
+        this.state.allowRepeatingNotes,
+        count,
         this.state.octave,
-        this.state.notes.length > 0 ? this.state.notes[0].noteName : undefined,
+        firstNoteName,
       ),
     })
   }
@@ -173,7 +219,6 @@ class ToneRowModal extends React.Component<
         }
       }
     } finally {
-      console.log('TCL: octaveValue', octaveValue)
       this.setOctave(octaveValue)
     }
   }
@@ -197,7 +242,6 @@ class ToneRowModal extends React.Component<
       return
     }
 
-    console.log('TCL: onNoteSelected -> noteName', noteName)
     const noteEnharmonicName = tonal.Note.enharmonic(noteName) as string
 
     setTimeout(
@@ -235,7 +279,7 @@ class ToneRowModal extends React.Component<
         noteName: noteName,
       },
       () => {
-        if (this.state.notes.length < this.props.maxNotesCount) {
+        if (this.state.notes.length < this.getMaxNumberOfNotesToAdd()) {
           this.addNote(noteName)
         }
       },
@@ -244,19 +288,30 @@ class ToneRowModal extends React.Component<
 
   private handleNotesCountChange = (event, count) => {
     const commonPrefixLength = Math.min(count, this.state.notes.length)
-    const newRandomNotes = generateRandomNotes(
-      count,
-      this.state.octave,
-      this.state.notes.length > 0 && count > 0
-        ? this.state.notes[0].noteName
-        : undefined,
+
+    const notesInUseWithSharps = this.state.notes.map(n =>
+      normalizeNoteName(n.noteName),
     )
+    let availableNotes = this.getAvailableNoteNamesWithSharps()
+    if (!this.state.allowRepeatingNotes) {
+      availableNotes = _.difference(availableNotes, notesInUseWithSharps)
+    }
+
+    const newRandomNotes =
+      count > this.state.notes.length
+        ? generateRandomNotes(
+            availableNotes,
+            this.state.allowRepeatingNotes,
+            count - commonPrefixLength,
+            this.state.octave,
+          )
+        : []
 
     let notes = newRandomNotes
     if (commonPrefixLength > 0) {
       notes = [
         ...this.state.notes.slice(0, commonPrefixLength),
-        ...newRandomNotes.slice(commonPrefixLength),
+        ...newRandomNotes,
       ]
     }
     this.setState({ notes })
@@ -304,6 +359,64 @@ class ToneRowModal extends React.Component<
     this.setState({ notes: [] })
   }
 
+  private handleChangeAllowRepeatedNotes = (e, checked) => {
+    this.setState(
+      {
+        allowRepeatingNotes: Boolean(checked),
+      },
+      () => {
+        if (
+          !this.state.allowRepeatingNotes &&
+          this.state.notes.length > this.getMaxNumberOfNotesToAdd()
+        ) {
+          this.handleNotesCountChange(
+            undefined,
+            this.getMaxNumberOfNotesToAdd(),
+          )
+        }
+
+        this.setRandomPatternWithFirstNotePreserved()
+      },
+    )
+  }
+
+  private getAvailableNoteNamesWithSharps = () => {
+    if (this.state.allowRepeatingNotes) {
+      return NoteNamesWithSharps
+    }
+
+    const noteNamesUsedInSession = _.uniq(
+      this.props.notesUsedInSession.map(normalizeNoteName),
+    )
+
+    return _.difference(NoteNamesWithSharps, noteNamesUsedInSession) as string[]
+  }
+
+  private getDisabledNotes = () => {
+    if (this.state.allowRepeatingNotes) {
+      return []
+    }
+
+    const notesInUseWithSharps = this.state.notes.map(n =>
+      normalizeNoteName(n.noteName),
+    )
+    const noteNamesUsedInSession = _.uniq(
+      this.props.notesUsedInSession.map(normalizeNoteName),
+    )
+    return _.uniq(_.union(notesInUseWithSharps, noteNamesUsedInSession))
+  }
+
+  private getMaxNumberOfNotesToAdd = () => {
+    if (this.state.allowRepeatingNotes) {
+      return this.props.maxNotesCount
+    }
+
+    return Math.min(
+      this.props.maxNotesCount,
+      this.getAvailableNoteNamesWithSharps().length,
+    )
+  }
+
   render() {
     const { notes } = this.state
     if (!this.props.isOpen) {
@@ -338,7 +451,7 @@ class ToneRowModal extends React.Component<
                 }}
                 value={notes.length}
                 min={0}
-                max={this.props.maxNotesCount}
+                max={this.getMaxNumberOfNotesToAdd()}
                 step={1}
                 aria-labelledby="slider-label"
                 onChange={this.handleNotesCountChange}
@@ -346,39 +459,54 @@ class ToneRowModal extends React.Component<
             </Box>
 
             <Flex width={1} justifyContent="center">
-              <Tooltip title="Randomize notes" disableFocusListener>
-                <Button
-                  color="primary"
-                  variant="outlined"
-                  className={css({ minWidth: '40px', marginRight: '0.5rem' })}
-                  aria-label="Randomize notes"
-                  disabled={this.state.notes.length < 2}
-                  onClick={this.randomizeNotes}
-                >
-                  <ArrowsIcon
-                    fontSize="small"
-                    className={css({ marginRight: '0.5rem' })}
-                  />{' '}
-                  Randomize
-                </Button>
-              </Tooltip>
+              <div>
+                <Tooltip title="Randomize notes" disableFocusListener>
+                  <Button
+                    color="primary"
+                    variant="outlined"
+                    className={css({ minWidth: '40px', marginRight: '0.5rem' })}
+                    aria-label="Randomize notes"
+                    disabled={this.state.notes.length < 2}
+                    onClick={this.setRandomPatternWithFirstNotePreserved}
+                  >
+                    <ArrowsIcon
+                      fontSize="small"
+                      className={css({ marginRight: '0.5rem' })}
+                    />{' '}
+                    Randomize
+                  </Button>
+                </Tooltip>
 
-              <Tooltip
-                title="Clear all notes"
-                variant="gray"
-              >
-                <Button
-                  disabled={this.state.notes.length === 0}
-                  color="secondary"
-                  onClick={this.clearAllNotes}
-                >
-                  <DeleteIcon
-                    fontSize="small"
-                    className={css({ margin: '0 0.5rem' })}
+                <Tooltip title="Clear all notes" variant="gray">
+                  <Button
+                    disabled={this.state.notes.length === 0}
+                    color="secondary"
+                    onClick={this.clearAllNotes}
+                  >
+                    <DeleteIcon
+                      fontSize="small"
+                      className={css({ margin: '0 0.5rem' })}
+                    />
+                    Clear
+                  </Button>
+                </Tooltip>
+              </div>
+            </Flex>
+
+            <Flex width={1} justifyContent="center">
+              <FormControlLabel
+                classes={{
+                  label: css(`user-select: none;`),
+                }}
+                control={
+                  <Switch
+                    onChange={this.handleChangeAllowRepeatedNotes}
+                    checked={this.state.allowRepeatingNotes}
+                    color="primary"
                   />
-                  Clear
-                </Button>
-              </Tooltip>
+                }
+                label="Allow repeating notes"
+              />
             </Flex>
 
             <Flex alignItems="center" justifyContent="center">
@@ -437,6 +565,7 @@ class ToneRowModal extends React.Component<
 
                   this.onKeyboardNotePlayed(noteName)
                 }}
+                disabledNoteNames={this.getDisabledNotes()}
                 primaryNotesMidi={
                   this.state.noteNameMouseOver
                     ? [tonal.Note.midi(this.state.noteNameMouseOver)]
@@ -473,6 +602,7 @@ class ToneRowModal extends React.Component<
                 zIndex={10000000}
                 verticalAlign="top"
                 notes={this.state.notes}
+                disabledNoteNames={this.getDisabledNotes()}
                 onMouseOver={this.handleNoteCardMouseOver}
                 onMouseLeave={this.handleNoteCardMouseLeave}
                 onCardsReorder={this.handleCardsReorder}

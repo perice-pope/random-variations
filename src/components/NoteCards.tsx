@@ -23,6 +23,7 @@ import { getNoteCardColorByNoteName } from '../utils'
 import PickNoteModal from './PickNoteModal'
 import { observer } from 'mobx-react'
 import settingsStore from '../services/settingsStore'
+import { normalizeNoteName } from '../musicUtils'
 
 const FlipperAlignCenter = styled(Flipper)`
   width: 100%;
@@ -139,6 +140,7 @@ const SortableNoteCard = SortableElement(
         zIndex,
         hideContextMenu,
         disableRemoving,
+        disabledNoteNames,
         ...props
       } = this.props
       const menuId = `note-card-menu-${id}`
@@ -147,6 +149,25 @@ const SortableNoteCard = SortableElement(
       const octave = tonal.Note.oct(noteName) as number
       const enharmonicNoteName = tonal.Note.enharmonic(noteName)
       const shouldShowChangeToEnharmonic = enharmonicNoteName !== noteName
+
+      const noteNameHalfStepUp = normalizeNoteName(
+        tonal.Note.fromMidi(midi + 1),
+      )
+      const noteNameHalfStepDown = normalizeNoteName(
+        tonal.Note.fromMidi(midi - 1),
+      )
+
+      let disabledNoteNamesMap = {}
+      if (disabledNoteNames) {
+        disabledNoteNames.forEach(n => {
+          disabledNoteNamesMap[n] = true
+        })
+      }
+
+      const shouldDisableHalfStepUp =
+        midi >= 95 || disabledNoteNamesMap[noteNameHalfStepUp]
+      const shouldDisableHalfStepDown =
+        midi <= 24 || disabledNoteNamesMap[noteNameHalfStepDown]
 
       return (
         <Flipped flipId={id} shouldFlip={shouldFlip}>
@@ -185,7 +206,7 @@ const SortableNoteCard = SortableElement(
                 </MenuItem>
 
                 <MenuItem
-                  disabled={midi >= 95} // "B6"
+                  disabled={shouldDisableHalfStepUp} // "B6"
                   onClick={this.handleSemitoneUpClick}
                 >
                   <ListItemIcon>
@@ -194,7 +215,7 @@ const SortableNoteCard = SortableElement(
                   Half-step up
                 </MenuItem>
                 <MenuItem
-                  disabled={midi <= 24} // "C1"
+                  disabled={shouldDisableHalfStepDown} // "C1"
                   onClick={this.handleSemitoneDownClick}
                 >
                   <ListItemIcon>
@@ -270,6 +291,7 @@ const SortableNotesContainer = SortableContainer(
       showOctaves,
       onMouseLeave,
       verticalAlign,
+      disabledNoteNames,
     }) => {
       let backgroundColor = 'transparent'
       if (isDraggingOutOfContainer) {
@@ -292,45 +314,48 @@ const SortableNotesContainer = SortableContainer(
       `)}
         >
           <FlipperComponent flipKey={items}>
-            {items.map(({ noteName, id }, index) => (
-              <SortableNoteCard
-                noteName={noteName}
-                // @ts-ignore
-                shouldFlip={shouldFlip}
-                id={id}
-                key={id}
-                index={index}
-                // @ts-ignore
-                bgColor={getNoteCardColorByNoteName(noteName)}
-                tabIndex={-1}
-                perLineCount={perLineCount}
-                hideContextMenu={hideContextMenu}
-                disableRemoving={disableRemoving}
-                width={1}
-                zIndex={zIndex}
-                active={activeNoteCardIndex === index}
-                onEditClick={() => onEditClick(index)}
-                onNoteEdited={noteName => onEditNote(index, noteName)}
-                onChangeToEnharmonicClick={() =>
-                  onChangeToEnharmonicClick(index)
-                }
-                onDeleteClick={() => onDeleteClick(index)}
-                onMouseOver={() => {
-                  if (onMouseOver) {
-                    onMouseOver(index)
+            {items.map(({ noteName, id }, index) => {
+              return (
+                <SortableNoteCard
+                  noteName={noteName}
+                  // @ts-ignore
+                  shouldFlip={shouldFlip}
+                  id={id}
+                  key={id}
+                  index={index}
+                  // @ts-ignore
+                  bgColor={getNoteCardColorByNoteName(noteName)}
+                  tabIndex={-1}
+                  perLineCount={perLineCount}
+                  hideContextMenu={hideContextMenu}
+                  disableRemoving={disableRemoving}
+                  disabledNoteNames={disabledNoteNames}
+                  width={1}
+                  zIndex={zIndex}
+                  active={activeNoteCardIndex === index}
+                  onEditClick={() => onEditClick(index)}
+                  onNoteEdited={noteName => onEditNote(index, noteName)}
+                  onChangeToEnharmonicClick={() =>
+                    onChangeToEnharmonicClick(index)
                   }
-                }}
-                onMouseLeave={() => {
-                  if (onMouseLeave) {
-                    onMouseLeave(index)
-                  }
-                }}
-              >
-                {(settingsStore.showNoteOctaves || showOctaves)
-                  ? noteName
-                  : tonal.Note.pc(noteName)}
-              </SortableNoteCard>
-            ))}
+                  onDeleteClick={() => onDeleteClick(index)}
+                  onMouseOver={() => {
+                    if (onMouseOver) {
+                      onMouseOver(index)
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    if (onMouseLeave) {
+                      onMouseLeave(index)
+                    }
+                  }}
+                >
+                  {settingsStore.showNoteOctaves || showOctaves
+                    ? noteName
+                    : tonal.Note.pc(noteName)}
+                </SortableNoteCard>
+              )
+            })}
             {children}
           </FlipperComponent>
         </div>
@@ -348,6 +373,7 @@ export interface NoteCardNote {
 
 type NoteCardsProps = {
   notes: NoteCardNote[]
+  disabledNoteNames?: string[]
   draggable?: boolean
   disableRemoving?: boolean
   hideContextMenu?: boolean
@@ -461,6 +487,7 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
       showOctaves,
       disableRemoving,
       verticalAlign,
+      disabledNoteNames,
     } = this.props
 
     return (
@@ -491,10 +518,22 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
           onChangeToEnharmonicClick={onChangeToEnharmonicClick}
           axis="xy"
           children={children}
+          disabledNoteNames={disabledNoteNames || []}
         />
         {this.state.noteEditingModalIsOpen && (
           <PickNoteModal
             isOpen
+            disabledNoteNames={_.difference(
+              disabledNoteNames || [],
+              this.state.noteEditingModalNoteIndex
+                ? [
+                    normalizeNoteName(
+                      this.props.notes[this.state.noteEditingModalNoteIndex]
+                        .noteName,
+                    ),
+                  ]
+                : [],
+            )}
             noteName={
               this.state.noteEditingModalNoteIndex
                 ? this.props.notes[this.state.noteEditingModalNoteIndex]

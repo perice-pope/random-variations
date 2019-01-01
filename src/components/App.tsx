@@ -524,11 +524,11 @@ class App extends React.Component<
               wait,
               pitch: tick.notes.map(n => n.midi),
               duration: '4',
-            })
+            }),
           )
           wait = 0
         } else {
-          // This tick is a break (doesn't contain any notes to be played) 
+          // This tick is a break (doesn't contain any notes to be played)
           // increment wait so that the next non-break note will be delayed by the
           // current "wait" value
           wait += 4
@@ -1493,7 +1493,9 @@ class App extends React.Component<
     const isMobile = this.props.width === 'xs' || this.props.width === 'sm'
     const shouldShowPlayButtonInContentContainer = !isPhone
 
-    const baseNoteForPatternPreviewInDialogWindows = `C${ClefTypeToDefaultOctave[settingsStore.clefType] || 4}`
+    const baseNoteForPatternPreviewInDialogWindows = `C${ClefTypeToDefaultOctave[
+      settingsStore.clefType
+    ] || 4}`
 
     const activeNoteCard =
       isPlaying && activeNoteCardId != null
@@ -2690,6 +2692,11 @@ class App extends React.Component<
           <ToneRowModal
             defaultNotesCount={Math.min(4, MaxNoteCards - noteCards.length)}
             maxNotesCount={MaxNoteCards - noteCards.length}
+            notesUsedInSession={
+              !!sessionStore.activeSession
+                ? sessionStore.activeSession.noteCards.map(nc => nc.noteName)
+                : []
+            }
             isOpen={this.state.toneRowAddingModalIsOpen}
             onClose={this.closeToneRowAddingModal}
             onSubmit={this.handleAddToneRowModalSubmit}

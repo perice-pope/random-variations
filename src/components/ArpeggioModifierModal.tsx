@@ -637,6 +637,9 @@ class ArpeggioModifierModal extends React.Component<
 
               {this.state.values.patternPreset === 'custom' && (
                 <FormControlLabel
+                  classes={{
+                    label: css(`user-select: none;`),
+                  }}
                   control={
                     <Switch
                       onChange={this.handleChangeAllowRepeatedNotes}

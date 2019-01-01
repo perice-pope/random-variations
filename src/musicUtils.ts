@@ -39,6 +39,14 @@ import {
   ClefType,
 } from './types'
 
+export const normalizeNoteName = (noteName: string) => {
+  const pc = tonal.Note.pc(noteName) as string
+  if (pc.includes('b')) {
+    return tonal.Note.enharmonic(pc) as string
+  }
+  return pc
+}
+
 export const NoteNamesWithSharps = [
   'A',
   'A#',
