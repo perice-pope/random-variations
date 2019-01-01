@@ -25,6 +25,7 @@ import {
   ChordType,
   StaffTick,
   Chord,
+  ChordModifier,
 } from '../types'
 import { ChangeEvent } from 'react'
 import {
@@ -55,6 +56,7 @@ import {
   WithAudioEngineInjectedProps,
 } from './withAudioEngine'
 import AudioEngine, { AnimationCallback } from '../services/audioEngine'
+import { Omit } from '../utils'
 
 const audioEngine = new AudioEngine()
 
@@ -87,13 +89,8 @@ const chordTypeOptionsGrouped = Object.keys(chordTypeOptionsByGroup).map(
 
 const chordTypeToChordTypeOptionMap = _.keyBy(chordTypeOptions, 'value')
 
-export type SubmitValuesType = {
-  chordType: ChordType
-  patternPreset: ArpeggioPatternPreset
-  pattern: ArpeggioPattern
+export type SubmitValuesType = Omit<ChordModifier, 'enabled'> & {
   customPatternAllowRepeatedNotes: boolean
-  chordInversion: number
-  isMelodic: boolean
 }
 
 type ArpeggioModifierModalProps = {

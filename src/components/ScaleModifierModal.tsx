@@ -28,7 +28,14 @@ import {
   ScaleModifier,
 } from '../types'
 import { ChangeEvent } from 'react'
-import { Input, IconButton, Typography, Divider } from '@material-ui/core'
+import {
+  Input,
+  IconButton,
+  Typography,
+  Divider,
+  FormControlLabel,
+  Switch,
+} from '@material-ui/core'
 import { css } from 'react-emotion'
 import Tooltip from './ui/Tooltip'
 import {
@@ -51,7 +58,9 @@ import AudioEngine, { AnimationCallback } from '../services/audioEngine'
 
 const audioEngine = new AudioEngine()
 
-export type SubmitValuesType = Omit<ScaleModifier, 'enabled'>
+export type SubmitValuesType = Omit<ScaleModifier, 'enabled'> & {
+  customPatternAllowRepeatedNotes: boolean
+}
 
 type ScaleModifierModalProps = {
   isOpen: boolean
@@ -160,6 +169,7 @@ class ScaleModifierModal extends React.Component<
         scale: scaleByScaleType[DEFAULT_SCALE_NAME],
         patternPreset: 'up',
       }),
+      customPatternAllowRepeatedNotes: false,
     },
   }
 
@@ -299,14 +309,44 @@ class ScaleModifierModal extends React.Component<
     return staffTicks
   })
 
-  handleRandomizePattern = () => {
+  buildRandomPattern = () => {
     const scale = scaleByScaleType[this.state.values.scaleType]
-    const { pattern } = this.state.values
+    const { pattern, customPatternAllowRepeatedNotes } = this.state.values
+
+    let newPatternLength = this.state.values.pattern.items.length
+    if (!customPatternAllowRepeatedNotes) {
+      newPatternLength = Math.min(newPatternLength, scale.notesCount)
+    }
+
     const newPattern = {
       ...pattern,
-      items: pattern.items.map(() => ({
-        note: _.random(1, scale.notesCount),
-      })),
+      items: customPatternAllowRepeatedNotes
+        ? pattern.items.map(() => ({
+            note: _.random(1, scale.notesCount),
+          }))
+        : _.sampleSize(_.range(1, scale.notesCount + 1), newPatternLength).map(
+            note => ({
+              note,
+              muted: false,
+            }),
+          ),
+    }
+
+    return newPattern
+  }
+
+  handleRandomizePattern = () => {
+    let newPattern = this.buildRandomPattern()
+    if (newPattern.items.length > 1) {
+      // Ensure that the new pattern will be different from the old one
+      let triesCount = 0
+      while (
+        _.isEqual(newPattern, this.state.values.pattern) &&
+        triesCount < 20
+      ) {
+        newPattern = this.buildRandomPattern()
+        triesCount += 1
+      }
     }
     this.handlePatternChange(newPattern)
   }
@@ -344,6 +384,22 @@ class ScaleModifierModal extends React.Component<
 
   handleSelectRandomScaleType = () => {
     this.handleScaleTypeSelected(_.sample(scaleTypeOptions) as ScaleTypeOption)
+  }
+
+  handleChangeAllowRepeatedNotes = (e, checked) => {
+    this.setState(
+      {
+        values: {
+          ...this.state.values,
+          customPatternAllowRepeatedNotes: Boolean(checked),
+        },
+      },
+      () => {
+        if (this.state.values.patternPreset === 'custom') {
+          this.handleRandomizePattern()
+        }
+      },
+    )
   }
 
   render() {
@@ -480,20 +536,40 @@ class ScaleModifierModal extends React.Component<
                 </Tooltip>
               </Flex>
 
+              {this.state.values.patternPreset === 'custom' && (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      onChange={this.handleChangeAllowRepeatedNotes}
+                      checked={
+                        this.state.values.customPatternAllowRepeatedNotes
+                      }
+                      color="primary"
+                    />
+                  }
+                  label="Allow pattern notes to repeat"
+                />
+              )}
+
               <div
                 className={css(`
-                margin-top: 16px;
-                      @media screen and (max-width: 600px) {
-                        margin-left: -15px;
-                        margin-right: -15px;
-                      }
-                  `)}
+                  margin-top: 16px;
+                  @media screen and (max-width: 600px) {
+                    margin-left: -15px;
+                    margin-right: -15px;
+                  }
+                `)}
               >
                 <PatternEditor
                   value={this.state.values.pattern}
                   onChange={this.handlePatternChange}
                   min={1}
                   max={scale.notesCount}
+                  maxPatternLength={
+                    this.state.values.customPatternAllowRepeatedNotes
+                      ? 16
+                      : scale.notesCount
+                  }
                   getSortableContainer={() =>
                     document.getElementById('scale-modifier-dialog-content')
                   }
