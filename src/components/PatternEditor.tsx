@@ -239,10 +239,23 @@ class PatternEditor extends React.Component<PatternEditorProps> {
   }
 
   handleAddNoteToPattern = () => {
-    const { value: pattern } = this.props
+    const { value: pattern, min, max } = this.props
+
+    const usedNotes = pattern.items.map(i => i.note)
+    const allNotes = _.range(min, max + 1)
+    const unusedNotes = _.difference(allNotes, usedNotes)
+
     const newPattern = {
       ...pattern,
-      items: [...pattern.items, { note: 1 }],
+      items: [
+        ...pattern.items,
+        {
+          note:
+            unusedNotes.length > 0
+              ? (_.sample(unusedNotes) as number)
+              : (_.sample(allNotes) as number),
+        },
+      ],
     }
     this.props.onChange(newPattern)
   }
