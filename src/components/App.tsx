@@ -229,6 +229,8 @@ const jss = create({
 })
 
 const audioEngine = new AudioEngine()
+// @ts-ignore
+window.audioEngine = audioEngine
 
 const getNoteCardsFromSessionCards = memoize(
   (sessionNoteCards: SessionNoteCard[]) => {

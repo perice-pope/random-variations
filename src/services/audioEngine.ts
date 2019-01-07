@@ -9,6 +9,7 @@ import {
   PlayableNote,
   PlayableLoopTick,
   StaffTick,
+  RhythmInfo,
 } from '../types'
 import audioFontsConfig, { AudioFontId, AudioFont } from '../audioFontsConfig'
 
@@ -29,11 +30,20 @@ window.Tone = Tone
 
 export default class AudioEngine {
   private loop: PlayableLoop = { ticks: [] }
+
+  // BPM of the metronome
   private bpm: number = 120
+
+  // Notes can be played at a BPM different than that of the metronome.
+  // The BPM of the notes playback is calculated as:
+  // notes' BPM = metronome's BPM * notesTempoFactor
+  private notesTempoFactor: number = 1.0
+
   private countIn: number = 0
   private metronomeEnabled: boolean = false
 
-  private loopSequence?: typeof Tone.Sequence
+  private notesSequence?: typeof Tone.Sequence
+  private metronomeSequence?: typeof Tone.Sequence
   private countInSequence?: typeof Tone.Sequence
 
   private animationCallback?: AnimationCallback
@@ -55,8 +65,11 @@ export default class AudioEngine {
   }
 
   public cleanUp = () => {
-    if (this.loopSequence) {
-      this.loopSequence.dispose()
+    if (this.notesSequence) {
+      this.notesSequence.dispose()
+    }
+    if (this.metronomeSequence) {
+      this.metronomeSequence.dispose()
     }
     if (this.countInSequence) {
       this.countInSequence.dispose()
@@ -120,6 +133,14 @@ export default class AudioEngine {
     Tone.Transport.bpm.value = this.bpm
   }
 
+  public setNotesRhythm = (rhythm: RhythmInfo) => {
+    this.notesTempoFactor = rhythm.divisions / rhythm.beats
+    if (this.notesSequence) {
+      console.log('setNotesRhythm: ', this.notesTempoFactor)
+      this.notesSequence.playbackRate = this.notesTempoFactor
+    }
+  }
+
   public setCountIn = (counts: number) => {
     this.countIn = counts || 0
   }
@@ -138,7 +159,8 @@ export default class AudioEngine {
   public startWithCountIn = () => {
     Tone.Transport.start('+0.1')
     this.countInSequence.start()
-    this.loopSequence.start(`0:${this.countIn}`)
+    this.notesSequence.start(`0:${this.countIn}`)
+    this.metronomeSequence.start(`0:${this.countIn}`)
     Tone.Master.volume.rampTo(1, 100)
   }
 
@@ -152,8 +174,11 @@ export default class AudioEngine {
       if (this.countInSequence) {
         this.countInSequence.stop()
       }
-      if (this.loopSequence) {
-        this.loopSequence.stop()
+      if (this.notesSequence) {
+        this.notesSequence.stop()
+      }
+      if (this.metronomeSequence) {
+        this.metronomeSequence.stop()
       }
       if (callback) {
         callback()
@@ -214,25 +239,12 @@ export default class AudioEngine {
 
   private rescheduleLoopNotes = () => {
     console.log('rescheduleLoopNotes')
-    if (!this.loopSequence) {
-      this.loopSequence = new Tone.Sequence(
+
+    if (!this.notesSequence) {
+      this.notesSequence = new Tone.Sequence(
         (contextTime, tick) => {
           try {
             const duration = 60.0 / this.bpm
-
-            if (this.metronomeEnabled && this.hasLoadedAudioFont('metronome')) {
-              this.audioFontPlayer.queueChord(
-                Tone.context,
-                Tone.context.destination,
-                this.audioFontCache['metronome'],
-                contextTime,
-                [tonal.Note.midi('C6')],
-                0.3,
-                // Volume
-                1.0,
-              )
-            }
-
             const midiNotes = tick.notes.map(note => note.midi)
 
             this.audioFontPlayer.queueChord(
@@ -262,13 +274,45 @@ export default class AudioEngine {
         this.loop.ticks,
         '4n',
       )
-      this.loopSequence.loop = true
+      this.notesSequence.loop = true
+      this.notesSequence.playbackRate = this.notesTempoFactor
     } else {
-      this.loopSequence.removeAll()
+      this.notesSequence.removeAll()
       this.loop.ticks.forEach((tick, index) => {
-        this.loopSequence.add(index, tick)
+        this.notesSequence.add(index, tick)
       })
-      this.loopSequence.loopEnd = `0:${this.loop.ticks.length}`
+      this.notesSequence.loopEnd = `0:${this.loop.ticks.length}`
+      this.notesSequence.playbackRate = this.notesTempoFactor
+    }
+
+    if (!this.metronomeSequence) {
+      this.metronomeSequence = new Tone.Sequence(
+        contextTime => {
+          try {
+            if (this.metronomeEnabled && this.hasLoadedAudioFont('metronome')) {
+              this.audioFontPlayer.queueChord(
+                Tone.context,
+                Tone.context.destination,
+                this.audioFontCache['metronome'],
+                contextTime,
+                [tonal.Note.midi('C6')],
+                0.3,
+                // Volume
+                1.0,
+              )
+            }
+          } catch (error) {
+            console.error(error)
+          }
+        },
+        [{ notes: [] }],
+        '4n',
+      )
+      this.metronomeSequence.loop = true
+    } else {
+      this.metronomeSequence.removeAll()
+      this.metronomeSequence.add(0, { notes: [] })
+      this.metronomeSequence.loopEnd = '0:1'
     }
 
     if (!this.countInSequence) {

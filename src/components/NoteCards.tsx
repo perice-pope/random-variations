@@ -145,10 +145,16 @@ const SortableNoteCard = SortableElement(
       } = this.props
       const menuId = `note-card-menu-${id}`
 
-      const midi = tonal.Note.midi(noteName) as number
-      const octave = tonal.Note.oct(noteName) as number
-      const enharmonicNoteName = tonal.Note.enharmonic(noteName)
-      const shouldShowChangeToEnharmonic = enharmonicNoteName !== noteName
+      let octave = tonal.Note.oct(noteName) as number
+      let noteNameWithOctave = noteName
+      if (!octave) {
+        octave = 4
+        noteNameWithOctave = `${noteName}4`
+      }
+      const midi = tonal.Note.midi(noteNameWithOctave) as number
+      const enharmonicNoteName = tonal.Note.enharmonic(noteNameWithOctave)
+      const shouldShowChangeToEnharmonic =
+        enharmonicNoteName !== noteNameWithOctave
 
       const noteNameHalfStepUp = normalizeNoteName(
         tonal.Note.fromMidi(midi + 1),

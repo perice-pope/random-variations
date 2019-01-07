@@ -41,6 +41,9 @@ import {
 
 export const normalizeNoteName = (noteName: string) => {
   const pc = tonal.Note.pc(noteName) as string
+  if (!pc) {
+    return noteName
+  }
   if (pc.includes('b')) {
     return tonal.Note.enharmonic(pc) as string
   }

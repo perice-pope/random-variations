@@ -91,6 +91,11 @@ export interface ArpeggioPatternElement {
   muted?: boolean
 }
 
+export interface RhythmInfo {
+  beats: number
+  divisions: number
+}
+
 export interface ArpeggioPattern {
   items: ArpeggioPatternElement[]
   mainNoteIndex: number
