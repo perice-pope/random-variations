@@ -96,6 +96,11 @@ export interface RhythmInfo {
   divisions: number
 }
 
+export interface RhythmInfoWithTempoScaleFactor extends RhythmInfo {
+  tempoFactor: number
+  title?: string
+}
+
 export interface ArpeggioPattern {
   items: ArpeggioPatternElement[]
   mainNoteIndex: number
@@ -243,6 +248,7 @@ export interface Session {
 
   bpm: number
   rests: number
+  rhythm: RhythmInfo
 
   countInCounts: number
   countInEnabled: boolean

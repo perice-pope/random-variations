@@ -37,6 +37,7 @@ import {
   InstrumentTransposingOption,
   InstrumentTransposingType,
   ClefType,
+  RhythmInfoWithTempoScaleFactor,
 } from './types'
 
 export const normalizeNoteName = (noteName: string) => {
@@ -329,6 +330,90 @@ const getAllInstrumentTransposingOptions: () => InstrumentTransposingOption[] = 
     )
   },
 )
+
+const getAllRhythmOptions = () => {
+  const rawData = [
+    ['10', '1', '10.00', ''],
+    ['9', '1', '9.00', ''],
+    ['8', '1', '8.00', 'Double Whole Note'],
+    ['7', '1', '7.00', ''],
+    ['6', '1', '6.00', 'Dotted Whole Note'],
+    ['5', '1', '5.00', ''],
+    ['9', '2', '4.50', ''],
+    ['4', '1', '4.00', 'Whole Note'],
+    ['7', '2', '3.50', 'Double Dotted Half Note'],
+    ['10', '3', '3.33', ''],
+    ['3', '1', '3.00', 'Dotted Half Note'],
+    ['8', '3', '2.67', ''],
+    ['5', '2', '2.50', ''],
+    ['7', '3', '2.33', ''],
+    ['9', '4', '2.25', ''],
+    ['2', '1', '2.00', 'Half Note'],
+    ['9', '5', '1.80', ''],
+    ['7', '4', '1.75', 'Double Dotted Quarter Note'],
+    ['5', '3', '1.67', ''],
+    ['8', '5', '1.60', 'Half Note Quintuplet'],
+    ['3', '2', '1.50', 'Dotted Quarter Note'],
+    ['10', '7', '1.43', ''],
+    ['7', '5', '1.40', ''],
+    ['4', '3', '1.33', 'Half Note Triplet'],
+    ['9', '7', '1.29', ''],
+    ['5', '4', '1.25', ''],
+    ['6', '5', '1.20', ''],
+    ['7', '6', '1.17', ''],
+    ['8', '7', '1.14', 'Half Note Septuplet'],
+    ['9', '8', '1.13', ''],
+    ['10', '9', '1.11', ''],
+    ['1', '1', '1.00', 'Quarter Note'],
+    ['9', '10', '0.90', ''],
+    ['8', '9', '0.89', ''],
+    ['7', '8', '0.88', ''],
+    ['6', '7', '0.86', ''],
+    ['5', '6', '0.83', ''],
+    ['4', '5', '0.80', 'Quarter Note Quintuplet'],
+    ['7', '9', '0.78', ''],
+    ['3', '4', '0.75', '"Dotted 8th'],
+    ['(Quarter Note Quadruplet)"'],
+    ['5', '7', '0.71', ''],
+    ['7', '10', '0.70', ''],
+    ['2', '3', '0.67', 'Quarter Note Triplet'],
+    ['5', '8', '0.63', ''],
+    ['3', '5', '0.60', ''],
+    ['4', '7', '0.57', ''],
+    ['5', '9', '0.56', ''],
+    ['1', '2', '0.50', '8th Note'],
+    ['4', '9', '0.44', '8th Note Nontuplet'],
+    ['3', '7', '0.43', ''],
+    ['2', '5', '0.40', '8th Note Quintuplet'],
+    ['3', '8', '0.38', 'Dotted 16th Note'],
+    ['1', '3', '0.33', '8th Note Triplet'],
+    ['3', '10', '0.30', ''],
+    ['2', '7', '0.29', '8th Note Septuplet'],
+    ['1', '4', '0.25', '16th Note'],
+    ['2', '9', '0.22', '16th Note Nontuplet'],
+    ['1', '5', '0.20', '16th Note Quintuplet'],
+    ['1', '6', '0.17', '16th Note Sextuplet'],
+    ['1', '7', '0.14', '16th Note Septuplet'],
+    ['1', '8', '0.13', '32nd Note'],
+    ['1', '9', '0.11', '32nd Note Nontuplet'],
+    ['1', '10', '0.10', '32nd Note Dectuplet'],
+    ['1', '16', '0.06', '64th Note'],
+  ]
+
+  const results: RhythmInfoWithTempoScaleFactor[] = rawData.map(
+    ([beats, divisions, , title]) =>
+      ({
+        title,
+        beats: parseInt(beats, 10),
+        divisions: parseInt(divisions, 10),
+        tempoFactor: parseInt(divisions, 10) / parseInt(beats, 10),
+      } as RhythmInfoWithTempoScaleFactor),
+  )
+
+  return _.sortBy(results, 'tempoFactor')
+}
+
+export const rhythmOptions = getAllRhythmOptions()
 
 export const instrumentTransposingOptions = getAllInstrumentTransposingOptions()
 export const instrumentTransposingOptionsByType = _.keyBy(

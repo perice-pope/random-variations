@@ -79,6 +79,7 @@ import {
   Scale,
   SessionNoteCard,
   ClefType,
+  RhythmInfo,
 } from '../types'
 
 import ArpeggioModifierModal, {
@@ -108,6 +109,7 @@ import {
   SemitonesToIntervalShortNameMap,
   enclosureByEnclosureType,
   ClefTypeToDefaultOctave,
+  rhythmOptions,
 } from '../musicUtils'
 import AudioFontsConfig, { AudioFontId } from '../audioFontsConfig'
 import AudioEngine, { AnimationCallback } from '../services/audioEngine'
@@ -441,6 +443,21 @@ class App extends React.Component<
     reaction(
       () =>
         sessionStore.activeSession
+          ? sessionStore.activeSession.rhythm
+          : undefined,
+      (rhythm?: RhythmInfo) => {
+        if (rhythm != null) {
+          audioEngine.setNotesRhythm(rhythm)
+        }
+      },
+      {
+        delay: 500,
+      },
+    )
+
+    reaction(
+      () =>
+        sessionStore.activeSession
           ? toJS({
               countInCounts: sessionStore.activeSession.countInCounts,
               countInEnabled: sessionStore.activeSession.countInEnabled,
@@ -667,6 +684,7 @@ class App extends React.Component<
 
     if (sessionStore.activeSession) {
       audioEngine.setBpm(sessionStore.activeSession.bpm)
+      audioEngine.setNotesRhythm(sessionStore.activeSession.rhythm)
       audioEngine.setCountIn(
         sessionStore.activeSession.countInEnabled
           ? sessionStore.activeSession.countInCounts
@@ -904,6 +922,21 @@ class App extends React.Component<
     }
   }
 
+  private handleRhythmSliderChange = (e, value) => {
+    // Find the closest combination of beat / division
+    let matchingRhythm = rhythmOptions.find(ro => ro.tempoFactor >= value)
+
+    // const oldValue = sessionStore.activeSession.rhythm.divisions / sessionStore.activeSession.rhythm.beats
+    // const direction = value > 
+    if (!matchingRhythm) {
+      matchingRhythm = rhythmOptions[rhythmOptions.length - 1]
+    }
+
+    if (sessionStore.activeSession) {
+      sessionStore.activeSession.rhythm = { ...matchingRhythm }
+    }
+  }
+
   private handleCountInCountsChange = e => {
     const value = parseIntEnsureInBounds(e.target.value, 0, 16)
     if (sessionStore.activeSession) {
@@ -931,6 +964,22 @@ class App extends React.Component<
     const value = parseIntEnsureInBounds(e.target.value, 0, 16)
     if (sessionStore.activeSession) {
       sessionStore.activeSession.rests = value
+    }
+  }
+
+  private handleRhythmBeatsChange = e => {
+    const value = parseIntEnsureInBounds(e.target.value, 1, 16)
+    if (sessionStore.activeSession) {
+      sessionStore.activeSession.rhythm.beats = value
+      audioEngine.setNotesRhythm(sessionStore.activeSession.rhythm)
+    }
+  }
+
+  private handleRhythmDivisionsChange = e => {
+    const value = parseIntEnsureInBounds(e.target.value, 1, 16)
+    if (sessionStore.activeSession) {
+      sessionStore.activeSession.rhythm.divisions = value
+      audioEngine.setNotesRhythm(sessionStore.activeSession.rhythm)
     }
   }
 
@@ -1483,11 +1532,14 @@ class App extends React.Component<
     const {
       bpm,
       rests,
+      rhythm,
       countInCounts,
       countInEnabled,
       metronomeEnabled,
       modifiers,
     } = sessionStore.activeSession
+
+    const rhythmSliderValue = rhythm.divisions / rhythm.beats
 
     const { noteCards, noteCardsById } = this.getNoteCards()
 
@@ -1843,6 +1895,22 @@ class App extends React.Component<
         />
       </Box>
     )
+
+    const RhythmSliderInput = (
+      <Box mb={2} width={1}>
+        <Slider
+          classes={{
+            container: css(`padding: 1rem;`),
+          }}
+          value={rhythmSliderValue}
+          min={0.06}
+          max={10.0}
+          step={0.06}
+          onChange={this.handleRhythmSliderChange}
+        />
+      </Box>
+    )
+
     const SessionControls = <Box mb={1}>{SessionParamsButton}</Box>
 
     const TogglePlaybackButton = noteCards.length > 0 && (
@@ -2765,6 +2833,57 @@ class App extends React.Component<
                     Number of rest beats between note groups
                   </Typography>
                   {RestsTextInput}
+                </Box>
+
+                <Divider light />
+
+                <Box mt={3} mb={3}>
+                  <Typography variant="h5">Rhythm</Typography>
+                  <Flex alignItems="center">
+                    <TextField
+                      className={css({
+                        maxWidth: '100px',
+                        marginRight: '15px',
+                      })}
+                      InputProps={{
+                        className: css({ fontSize: '1.3rem' }),
+                        endAdornment: (
+                          <InputAdornment position="end">Beats</InputAdornment>
+                        ),
+                      }}
+                      id="beats"
+                      type="number"
+                      // @ts-ignore
+                      step="1"
+                      min="1"
+                      max="16"
+                      value={`${rhythm.beats}`}
+                      onChange={this.handleRhythmBeatsChange}
+                    />
+                    <TextField
+                      className={css({
+                        maxWidth: '100px',
+                      })}
+                      InputProps={{
+                        className: css({ fontSize: '1.3rem' }),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            Divisions
+                          </InputAdornment>
+                        ),
+                      }}
+                      id="divisions"
+                      type="number"
+                      // @ts-ignore
+                      step="1"
+                      min="1"
+                      max="16"
+                      value={`${rhythm.divisions}`}
+                      onChange={this.handleRhythmDivisionsChange}
+                    />
+                  </Flex>
+
+                  {RhythmSliderInput}
                 </Box>
               </Box>
             </DialogContent>
