@@ -923,17 +923,9 @@ class App extends React.Component<
   }
 
   private handleRhythmSliderChange = (e, value) => {
-    // Find the closest combination of beat / division
-    let matchingRhythm = rhythmOptions.find(ro => ro.tempoFactor >= value)
-
-    // const oldValue = sessionStore.activeSession.rhythm.divisions / sessionStore.activeSession.rhythm.beats
-    // const direction = value > 
-    if (!matchingRhythm) {
-      matchingRhythm = rhythmOptions[rhythmOptions.length - 1]
-    }
-
+    const rhythm = rhythmOptions[value]
     if (sessionStore.activeSession) {
-      sessionStore.activeSession.rhythm = { ...matchingRhythm }
+      sessionStore.activeSession.rhythm = { ...rhythm }
     }
   }
 
@@ -1539,7 +1531,10 @@ class App extends React.Component<
       modifiers,
     } = sessionStore.activeSession
 
-    const rhythmSliderValue = rhythm.divisions / rhythm.beats
+    const rhythmSliderValue =
+      rhythmOptions.findIndex(
+        ro => ro.beats === rhythm.beats && ro.divisions === rhythm.divisions,
+      ) || 0
 
     const { noteCards, noteCardsById } = this.getNoteCards()
 
@@ -1903,9 +1898,9 @@ class App extends React.Component<
             container: css(`padding: 1rem;`),
           }}
           value={rhythmSliderValue}
-          min={0.06}
-          max={10.0}
-          step={0.06}
+          min={0}
+          max={rhythmOptions.length}
+          step={1}
           onChange={this.handleRhythmSliderChange}
         />
       </Box>
