@@ -144,6 +144,7 @@ export const createDefaultSession = () => {
 
     bpm: 120,
     rests: 1,
+    offset: 0,
     rhythm: { beats: 1, divisions: 1 },
 
     countInCounts: 3,

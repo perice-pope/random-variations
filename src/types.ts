@@ -247,9 +247,13 @@ export interface Session {
   updatedAt: string
 
   bpm: number
+  // Number of beats to wait between note groups
   rests: number
+  // Number of offset beats to wait before playing the notes
+  offset: number
   rhythm: RhythmInfo
 
+  // Number of metronome clicks to play before playing notes
   countInCounts: number
   countInEnabled: boolean
   metronomeEnabled: boolean

@@ -40,6 +40,7 @@ export default class AudioEngine {
   private notesTempoFactor: number = 1.0
 
   private countIn: number = 0
+  private offset: number = 0
   private metronomeEnabled: boolean = false
 
   private notesSequence?: typeof Tone.Sequence
@@ -145,6 +146,10 @@ export default class AudioEngine {
     this.countIn = counts || 0
   }
 
+  public setNotesOffset = (offset: number) => {
+    this.offset = offset || 0
+  }
+
   public setMetronomeEnabled = (enabled: boolean) => {
     this.metronomeEnabled = enabled
   }
@@ -159,7 +164,7 @@ export default class AudioEngine {
   public startWithCountIn = () => {
     Tone.Transport.start('+0.1')
     this.countInSequence.start()
-    this.notesSequence.start(`0:${this.countIn}`)
+    this.notesSequence.start(`0:${this.countIn + this.offset / this.notesTempoFactor}`)
     this.metronomeSequence.start(`0:${this.countIn}`)
     Tone.Master.volume.rampTo(1, 100)
   }

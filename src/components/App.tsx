@@ -458,6 +458,21 @@ class App extends React.Component<
     reaction(
       () =>
         sessionStore.activeSession
+          ? sessionStore.activeSession.offset
+          : undefined,
+      (offset?: number) => {
+        if (offset != null) {
+          audioEngine.setNotesOffset(offset)
+        }
+      },
+      {
+        delay: 500,
+      },
+    )
+
+    reaction(
+      () =>
+        sessionStore.activeSession
           ? toJS({
               countInCounts: sessionStore.activeSession.countInCounts,
               countInEnabled: sessionStore.activeSession.countInEnabled,
@@ -685,6 +700,7 @@ class App extends React.Component<
     if (sessionStore.activeSession) {
       audioEngine.setBpm(sessionStore.activeSession.bpm)
       audioEngine.setNotesRhythm(sessionStore.activeSession.rhythm)
+      audioEngine.setNotesOffset(sessionStore.activeSession.offset)
       audioEngine.setCountIn(
         sessionStore.activeSession.countInEnabled
           ? sessionStore.activeSession.countInCounts
@@ -959,11 +975,17 @@ class App extends React.Component<
     }
   }
 
+  private handleOffsetChange = e => {
+    const value = parseIntEnsureInBounds(e.target.value, 0, 16)
+    if (sessionStore.activeSession) {
+      sessionStore.activeSession.offset = value
+    }
+  }
+
   private handleRhythmBeatsChange = e => {
     const value = parseIntEnsureInBounds(e.target.value, 1, 16)
     if (sessionStore.activeSession) {
       sessionStore.activeSession.rhythm.beats = value
-      audioEngine.setNotesRhythm(sessionStore.activeSession.rhythm)
     }
   }
 
@@ -971,7 +993,6 @@ class App extends React.Component<
     const value = parseIntEnsureInBounds(e.target.value, 1, 16)
     if (sessionStore.activeSession) {
       sessionStore.activeSession.rhythm.divisions = value
-      audioEngine.setNotesRhythm(sessionStore.activeSession.rhythm)
     }
   }
 
@@ -1524,6 +1545,7 @@ class App extends React.Component<
     const {
       bpm,
       rests,
+      offset,
       rhythm,
       countInCounts,
       countInEnabled,
@@ -1744,7 +1766,7 @@ class App extends React.Component<
     const ToggleCountInButton = (
       <MuiButton
         color={countInEnabled ? 'secondary' : 'default'}
-        className={css(`margin: 0.5rem; margin-right: 0;`)}
+        className={css(`margin: 0.5rem; margin-right: 0; white-space: nowrap;`)}
         onClick={this.handleCountInToggle}
       >
         <TimerIcon className={css(`margin-right: 0.5rem;`)} />
@@ -1754,7 +1776,7 @@ class App extends React.Component<
     const ToggleMetronomeButton = (
       <MuiButton
         color={metronomeEnabled ? 'secondary' : 'default'}
-        className={css(`margin: 0.5rem; margin-left: 1rem;`)}
+        className={css(`margin: 0.5rem; margin-left: 1rem; white-space: nowrap;`)}
         onClick={this.handleMetronomeToggle}
       >
         <MetronomeIcon className={css(`margin-right: 0.5rem;`)} />
@@ -1814,6 +1836,7 @@ class App extends React.Component<
     )
 
     const CountInTextInput = (
+      // @ts-ignore
       <TextField
         className={css({
           maxWidth: '100px',
@@ -1834,6 +1857,7 @@ class App extends React.Component<
       />
     )
     const RestsTextInput = (
+      // @ts-ignore
       <TextField
         className={css({
           maxWidth: '200px',
@@ -1843,7 +1867,7 @@ class App extends React.Component<
             <InputAdornment
               position="end"
               classes={{ root: css(`width: 200px;`) }}
-            >
+              >
               Rest beats
             </InputAdornment>
           ),
@@ -1859,7 +1883,35 @@ class App extends React.Component<
         onChange={this.handleRestsChange}
       />
     )
+    const OffsetTextInput = (
+      // @ts-ignore
+      <TextField
+        className={css({
+          maxWidth: '200px',
+        })}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment
+            position="end"
+              classes={{ root: css(`width: 200px;`) }}
+              >
+              Offset beats
+            </InputAdornment>
+          ),
+          className: css({ fontSize: '1.3rem' }),
+        }}
+        id="rests"
+        type="number"
+        // @ts-ignore
+        step="1"
+        min="0"
+        max="8"
+        value={`${offset}`}
+        onChange={this.handleOffsetChange}
+      />
+    )
     const TempoTextInput = (
+      // @ts-ignore
       <TextField
         className={css({ maxWidth: '100px' })}
         InputProps={{
@@ -2811,7 +2863,7 @@ class App extends React.Component<
                 <Box mt={3} mb={3}>
                   <Typography variant="h5">Count-in</Typography>
                   <Typography variant="subtitle1">
-                    Number of metronome beats to play before playing the notes
+                    Number of metronome clicks to play before playing the notes
                   </Typography>
                   <Flex alignItems="center">
                     {CountInTextInput}
@@ -2822,12 +2874,19 @@ class App extends React.Component<
 
                 <Divider light />
 
-                <Box mt={3}>
-                  <Typography variant="h5">Rests</Typography>
+                <Box mt={3} mb={3}>
+                  <Typography variant="h5">Rests & offset</Typography>
                   <Typography variant="subtitle1">
                     Number of rest beats between note groups
                   </Typography>
                   {RestsTextInput}
+
+                  <Box mt={3}>
+                    <Typography variant="subtitle1">
+                      Number of rest beats before playing the first note (come after count-in clicks).
+                    </Typography>
+                    {OffsetTextInput}
+                  </Box>
                 </Box>
 
                 <Divider light />
