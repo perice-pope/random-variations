@@ -45,8 +45,6 @@ import ArrowsIcon from '@material-ui/icons/Cached'
 import TimerIcon from '@material-ui/icons/Timer'
 import MetronomeIcon from 'mdi-material-ui/Metronome'
 import PauseIcon from 'mdi-material-ui/Pause'
-import TextField from '@material-ui/core/TextField'
-import InputAdornment from '@material-ui/core/InputAdornment'
 import * as MidiWriter from 'midi-writer-js'
 
 import Chip from '@material-ui/core/Chip'
@@ -60,7 +58,6 @@ import {
   arrayMove,
   getNoteCardColorByNoteName,
   timeago,
-  parseIntEnsureInBounds,
   downloadBlob,
 } from '../utils'
 
@@ -109,7 +106,6 @@ import {
   SemitonesToIntervalShortNameMap,
   enclosureByEnclosureType,
   ClefTypeToDefaultOctave,
-  rhythmOptions,
 } from '../musicUtils'
 import AudioFontsConfig, { AudioFontId } from '../audioFontsConfig'
 import AudioEngine, { AnimationCallback } from '../services/audioEngine'
@@ -138,9 +134,6 @@ import {
   Menu,
   MenuItem,
   ListItemAvatar,
-  Dialog,
-  DialogContent,
-  DialogActions,
 } from '@material-ui/core'
 import { WithWidth } from '@material-ui/core/withWidth'
 import memoize from 'memoize-one'
@@ -152,11 +145,13 @@ import settingsStore from '../services/settingsStore'
 import ToneRowModal from './ToneRowModal'
 import { trackPageView } from '../services/googleAnalytics'
 import NoteSequenceModal from './NoteSequenceModal'
-import Slider from '@material-ui/lab/Slider'
 import DirectionsModifierModal, {
   SubmitValuesType as DirectionsModifierModalSubmitValues,
 } from './DirectionsModifierModal'
 import shortenString from '../utils/shortenString'
+import TempoSettingsModal, {
+  TempoSettingsFormValues,
+} from './TempoSettingsModal'
 
 globalStyles()
 smoothscroll.polyfill()
@@ -925,77 +920,6 @@ class App extends React.Component<
     return getNoteCardsFromSessionCards(sessionStore.activeSession.noteCards)
   }
 
-  private handleBpmChange = e => {
-    const value = parseIntEnsureInBounds(e.target.value, 0, 500)
-    if (sessionStore.activeSession) {
-      sessionStore.activeSession.bpm = value
-    }
-  }
-
-  private handleBpmSliderChange = (e, value) => {
-    if (sessionStore.activeSession) {
-      sessionStore.activeSession.bpm = value
-    }
-  }
-
-  private handleRhythmSliderChange = (e, value) => {
-    const rhythm = rhythmOptions[value]
-    if (sessionStore.activeSession) {
-      sessionStore.activeSession.rhythm = { ...rhythm }
-    }
-  }
-
-  private handleCountInCountsChange = e => {
-    const value = parseIntEnsureInBounds(e.target.value, 0, 16)
-    if (sessionStore.activeSession) {
-      sessionStore.activeSession.countInCounts = value
-    }
-  }
-
-  private handleCountInToggle = () => {
-    if (sessionStore.activeSession) {
-      sessionStore.activeSession.countInEnabled = !Boolean(
-        sessionStore.activeSession.countInEnabled,
-      )
-    }
-  }
-
-  private handleMetronomeToggle = () => {
-    if (sessionStore.activeSession) {
-      sessionStore.activeSession.metronomeEnabled = !Boolean(
-        sessionStore.activeSession.metronomeEnabled,
-      )
-    }
-  }
-
-  private handleRestsChange = e => {
-    const value = parseIntEnsureInBounds(e.target.value, 0, 16)
-    if (sessionStore.activeSession) {
-      sessionStore.activeSession.rests = value
-    }
-  }
-
-  private handleOffsetChange = e => {
-    const value = parseIntEnsureInBounds(e.target.value, 0, 16)
-    if (sessionStore.activeSession) {
-      sessionStore.activeSession.offset = value
-    }
-  }
-
-  private handleRhythmBeatsChange = e => {
-    const value = parseIntEnsureInBounds(e.target.value, 1, 16)
-    if (sessionStore.activeSession) {
-      sessionStore.activeSession.rhythm.beats = value
-    }
-  }
-
-  private handleRhythmDivisionsChange = e => {
-    const value = parseIntEnsureInBounds(e.target.value, 1, 16)
-    if (sessionStore.activeSession) {
-      sessionStore.activeSession.rhythm.divisions = value
-    }
-  }
-
   private handleAudioFontChanged = async (audioFontId: AudioFontId) => {
     await this.loadAndSetAudioFont(audioFontId)
     audioEngine.playNote({ midi: tonal.Note.midi('C4') as number }, 0, 0.5)
@@ -1439,6 +1363,22 @@ class App extends React.Component<
     uiState.isTempoModalShown = true
   }
 
+  private submitTempoParamsDialog = (values: TempoSettingsFormValues) => {
+    console.log('submitTempoParamsDialog', values)
+    if (!sessionStore.activeSession) {
+      return
+    }
+    sessionStore.activeSession.bpm = values.bpm
+    sessionStore.activeSession.metronomeEnabled = values.metronomeEnabled
+    sessionStore.activeSession.countInEnabled = values.countInEnabled
+    sessionStore.activeSession.countInCounts = values.countInCounts
+    sessionStore.activeSession.offset = values.offset
+    sessionStore.activeSession.rests = values.rests
+    sessionStore.activeSession.rhythm = values.rhythm
+
+    this.closeTempoParamsDialog()
+  }
+
   private handleShareSession = async (session?: Session) => {
     session = (session || sessionStore.activeSession) as Session
     await sessionStore.shareMySessionById(session.id)
@@ -1544,19 +1484,13 @@ class App extends React.Component<
 
     const {
       bpm,
-      rests,
-      offset,
       rhythm,
+      rests,
       countInCounts,
       countInEnabled,
       metronomeEnabled,
       modifiers,
     } = sessionStore.activeSession
-
-    const rhythmSliderValue =
-      rhythmOptions.findIndex(
-        ro => ro.beats === rhythm.beats && ro.divisions === rhythm.divisions,
-      ) || 0
 
     const { noteCards, noteCardsById } = this.getNoteCards()
 
@@ -1600,6 +1534,10 @@ class App extends React.Component<
       : true
 
     const currentUser = firebase.auth().currentUser
+
+    const activeNoteCardIndex = noteCards.findIndex(
+      nc => nc.id === this.state.activeNoteCardId,
+    )
 
     const SessionActionsButton = noteCards.length > 0 && (
       <ButtonWithMenu
@@ -1763,27 +1701,6 @@ class App extends React.Component<
       />
     )
 
-    const ToggleCountInButton = (
-      <MuiButton
-        color={countInEnabled ? 'secondary' : 'default'}
-        className={css(`margin: 0.5rem; margin-right: 0; white-space: nowrap;`)}
-        onClick={this.handleCountInToggle}
-      >
-        <TimerIcon className={css(`margin-right: 0.5rem;`)} />
-        {countInEnabled ? 'Count in on' : 'Count in off'}
-      </MuiButton>
-    )
-    const ToggleMetronomeButton = (
-      <MuiButton
-        color={metronomeEnabled ? 'secondary' : 'default'}
-        className={css(`margin: 0.5rem; margin-left: 1rem; white-space: nowrap;`)}
-        onClick={this.handleMetronomeToggle}
-      >
-        <MetronomeIcon className={css(`margin-right: 0.5rem;`)} />
-        {metronomeEnabled ? 'Metronome on' : 'Metronome off'}
-      </MuiButton>
-    )
-
     const SessionParamsButton = (
       <Tooltip
         title={'Tempo, rests and count-in settings'}
@@ -1792,7 +1709,9 @@ class App extends React.Component<
       >
         <MuiButton
           color="default"
-          className={css(`display: inline-flex; align-items: center; `)}
+          className={css(
+            `display: inline-flex; align-items: center; padding: 1px 5px; padding-right: 0;`,
+          )}
           onClick={this.openTempoParamsDialog}
         >
           <span
@@ -1807,18 +1726,22 @@ class App extends React.Component<
             />
             {countInCounts}
           </span>
-          <span
-            className={css(
-              `margin-right: 1rem; display: flex; align-items: center; `,
-            )}
-          >
-            <PauseIcon
-              fontSize="small"
-              color="disabled"
-              className={css(`margin-right: 5px;`)}
-            />
-            {rests}
-          </span>
+
+          <Hidden xsDown>
+            <span
+              className={css(
+                `margin-right: 1rem; display: flex; align-items: center; `,
+              )}
+            >
+              <PauseIcon
+                fontSize="small"
+                color="disabled"
+                className={css(`margin-right: 5px;`)}
+              />
+              {rests}
+            </span>
+          </Hidden>
+
           <span
             className={css(
               `margin-right: 1rem; display: flex; align-items: center; white-space: nowrap;`,
@@ -1829,133 +1752,15 @@ class App extends React.Component<
               color={metronomeEnabled ? 'secondary' : 'disabled'}
               className={css(`margin-right: 5px;`)}
             />
-            {bpm} BPM
+            {`${bpm} BPM`}
+            {(rhythm.beats !== 1 || rhythm.divisions !== 1) && (
+              <span className={css(`margin-left: 5px;`)}>
+                {`, ${rhythm.beats}/${rhythm.divisions}`}
+              </span>
+            )}
           </span>
         </MuiButton>
       </Tooltip>
-    )
-
-    const CountInTextInput = (
-      // @ts-ignore
-      <TextField
-        className={css({
-          maxWidth: '100px',
-        })}
-        InputProps={{
-          endAdornment: <InputAdornment position="end">Beats</InputAdornment>,
-          className: css({ fontSize: '1.3rem' }),
-        }}
-        id="countInCounts"
-        disabled={!countInEnabled}
-        type="number"
-        // @ts-ignore
-        step="1"
-        min="0"
-        max="16"
-        value={`${countInCounts}`}
-        onChange={this.handleCountInCountsChange}
-      />
-    )
-    const RestsTextInput = (
-      // @ts-ignore
-      <TextField
-        className={css({
-          maxWidth: '200px',
-        })}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment
-              position="end"
-              classes={{ root: css(`width: 200px;`) }}
-              >
-              Rest beats
-            </InputAdornment>
-          ),
-          className: css({ fontSize: '1.3rem' }),
-        }}
-        id="rests"
-        type="number"
-        // @ts-ignore
-        step="1"
-        min="0"
-        max="8"
-        value={`${rests}`}
-        onChange={this.handleRestsChange}
-      />
-    )
-    const OffsetTextInput = (
-      // @ts-ignore
-      <TextField
-        className={css({
-          maxWidth: '200px',
-        })}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment
-            position="end"
-              classes={{ root: css(`width: 200px;`) }}
-              >
-              Offset beats
-            </InputAdornment>
-          ),
-          className: css({ fontSize: '1.3rem' }),
-        }}
-        id="rests"
-        type="number"
-        // @ts-ignore
-        step="1"
-        min="0"
-        max="8"
-        value={`${offset}`}
-        onChange={this.handleOffsetChange}
-      />
-    )
-    const TempoTextInput = (
-      // @ts-ignore
-      <TextField
-        className={css({ maxWidth: '100px' })}
-        InputProps={{
-          endAdornment: <InputAdornment position="end">BPM</InputAdornment>,
-          className: css({ fontSize: '1.3rem' }),
-        }}
-        id="bpm"
-        type="number"
-        // @ts-ignore
-        step="1"
-        min="0"
-        max="400"
-        value={`${bpm}`}
-        onChange={this.handleBpmChange}
-      />
-    )
-    const TempoSliderInput = (
-      <Box mb={2} width={1}>
-        <Slider
-          classes={{
-            container: css(`padding: 1rem;`),
-          }}
-          value={bpm}
-          min={1}
-          max={400}
-          step={1}
-          onChange={this.handleBpmSliderChange}
-        />
-      </Box>
-    )
-
-    const RhythmSliderInput = (
-      <Box mb={2} width={1}>
-        <Slider
-          classes={{
-            container: css(`padding: 1rem;`),
-          }}
-          value={rhythmSliderValue}
-          min={0}
-          max={rhythmOptions.length}
-          step={1}
-          onChange={this.handleRhythmSliderChange}
-        />
-      </Box>
     )
 
     const SessionControls = <Box mb={1}>{SessionParamsButton}</Box>
@@ -2028,14 +1833,14 @@ class App extends React.Component<
     )
 
     const chipsStyles = css(`
-    margin-right: 0.5rem;
-    margin-bottom: 0.25rem;
-    margin-top: 0.25rem;
-    @media screen and (max-width: 768px) {
-      font-size: 0.8rem;
-      height: 24px;
-    }
-  `)
+      margin-right: 0.5rem;
+      margin-bottom: 0.25rem;
+      margin-top: 0.25rem;
+      @media screen and (max-width: 768px) {
+        font-size: 0.8rem;
+        height: 24px;
+      }
+    `)
     const chipsProps = {
       clickable: true,
       color: 'secondary' as
@@ -2371,10 +2176,6 @@ class App extends React.Component<
       </>
     )
 
-    const activeNoteCardIndex = noteCards.findIndex(
-      nc => nc.id === this.state.activeNoteCardId,
-    )
-
     return (
       <>
         <MeasureScreenSize onUpdate={this.handleScreenSizeUpdate} fireOnMount>
@@ -2596,27 +2397,27 @@ class App extends React.Component<
                     <div
                       className={cx(
                         css(`
-                      display: flex;
-                      justify-content: flex-end;
-                      align-items: center;
-                      text-align: right;
-                      color: #aaa;
-                      font-size: 13px;
-                      user-select: none;
+                          display: flex;
+                          justify-content: flex-end;
+                          align-items: center;
+                          text-align: right;
+                          color: #aaa;
+                          font-size: 13px;
+                          user-select: none;
 
-                      button {
-                        padding: 8px !important;
-                      }
+                          button {
+                            padding: 8px !important;
+                          }
 
-                      @media screen and (min-width: 768px) {
-                        font-size: 15px;
-                      }
+                          @media screen and (min-width: 768px) {
+                            font-size: 15px;
+                          }
 
-                      @media screen and (max-height: 600px) and (min-width: 500px) {
-                        flex-direction: column-reverse;
-                        margin-left: 0.5rem;
-                      }
-                    `),
+                          @media screen and (max-height: 600px) and (min-width: 500px) {
+                            flex-direction: column-reverse;
+                            margin-left: 0.5rem;
+                          }
+                        `),
                         this.state.isPlaying && css(`display: none;`),
                       )}
                     >
@@ -2666,14 +2467,14 @@ class App extends React.Component<
                           -ms-overflow-style: none;  /* IE 10+ */
                           overflow: -moz-scrollbars-none; /* should hide scroll bar */
 
-                        /* no scroll bar for Safari and Chrome */
-                        &::-webkit-scrollbar,
-                        &::-webkit-scrollbar {
-                          display: none; /*  might be enought */
-                          background: transparent;
-                          visibility: hidden;
-                          width: 0px;
-                        }
+                          /* no scroll bar for Safari and Chrome */
+                          &::-webkit-scrollbar,
+                          &::-webkit-scrollbar {
+                            display: none; /*  might be enought */
+                            background: transparent;
+                            visibility: hidden;
+                            width: 0px;
+                          }
                         `),
                       }}
                       innerContainerClassName={css(`
@@ -2834,124 +2635,20 @@ class App extends React.Component<
             initialValues={modifiers.directions}
           />
 
-          <Dialog
-            fullScreen={this.props.width === 'xs'}
-            maxWidth="sm"
-            fullWidth
-            scroll="paper"
+          <TempoSettingsModal
             open={uiState.isTempoModalShown}
             onClose={this.closeTempoParamsDialog}
-            aria-labelledby="tempo-params-dialog"
-          >
-            <DialogContent
-              id="tempo-params-content"
-              className={css(`overflow-x: hidden;`)}
-            >
-              <Box>
-                <Box>
-                  <Typography variant="h5">Session tempo</Typography>
-                  <Flex alignItems="center">
-                    {TempoTextInput}
-                    <span className={css(`flex: 1;`)} />
-                    {ToggleMetronomeButton}
-                  </Flex>
-                  {TempoSliderInput}
-                </Box>
-
-                <Divider light />
-
-                <Box mt={3} mb={3}>
-                  <Typography variant="h5">Count-in</Typography>
-                  <Typography variant="subtitle1">
-                    Number of metronome clicks to play before playing the notes
-                  </Typography>
-                  <Flex alignItems="center">
-                    {CountInTextInput}
-                    <span className={css(`flex: 1;`)} />
-                    {ToggleCountInButton}
-                  </Flex>
-                </Box>
-
-                <Divider light />
-
-                <Box mt={3} mb={3}>
-                  <Typography variant="h5">Rests & offset</Typography>
-                  <Typography variant="subtitle1">
-                    Number of rest beats between note groups
-                  </Typography>
-                  {RestsTextInput}
-
-                  <Box mt={3}>
-                    <Typography variant="subtitle1">
-                      Number of rest beats before playing the first note (come after count-in clicks).
-                    </Typography>
-                    {OffsetTextInput}
-                  </Box>
-                </Box>
-
-                <Divider light />
-
-                <Box mt={3} mb={3}>
-                  <Typography variant="h5">Rhythm</Typography>
-                  <Flex alignItems="center">
-                    <TextField
-                      className={css({
-                        maxWidth: '100px',
-                        marginRight: '15px',
-                      })}
-                      InputProps={{
-                        className: css({ fontSize: '1.3rem' }),
-                        endAdornment: (
-                          <InputAdornment position="end">Beats</InputAdornment>
-                        ),
-                      }}
-                      id="beats"
-                      type="number"
-                      // @ts-ignore
-                      step="1"
-                      min="1"
-                      max="16"
-                      value={`${rhythm.beats}`}
-                      onChange={this.handleRhythmBeatsChange}
-                    />
-                    <TextField
-                      className={css({
-                        maxWidth: '100px',
-                      })}
-                      InputProps={{
-                        className: css({ fontSize: '1.3rem' }),
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            Divisions
-                          </InputAdornment>
-                        ),
-                      }}
-                      id="divisions"
-                      type="number"
-                      // @ts-ignore
-                      step="1"
-                      min="1"
-                      max="16"
-                      value={`${rhythm.divisions}`}
-                      onChange={this.handleRhythmDivisionsChange}
-                    />
-                  </Flex>
-
-                  {RhythmSliderInput}
-                </Box>
-              </Box>
-            </DialogContent>
-
-            <DialogActions>
-              <MuiButton
-                onClick={this.closeTempoParamsDialog}
-                color="primary"
-                autoFocus
-              >
-                OK
-              </MuiButton>
-            </DialogActions>
-          </Dialog>
+            onSubmit={this.submitTempoParamsDialog}
+            initialValues={_.pick(toJS(sessionStore.activeSession), [
+              'bpm',
+              'metronomeEnabled',
+              'countInEnabled',
+              'countInCounts',
+              'rests',
+              'offset',
+              'rhythm',
+            ])}
+          />
         </MeasureScreenSize>
       </>
     )
