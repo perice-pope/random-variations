@@ -249,7 +249,7 @@ export default class AudioEngine {
       this.notesSequence = new Tone.Sequence(
         (contextTime, tick) => {
           try {
-            const duration = 60.0 / this.bpm
+            const duration = 60.0 / (this.bpm * this.notesTempoFactor)
             const midiNotes = tick.notes.map(note => note.midi)
 
             this.audioFontPlayer.queueChord(
