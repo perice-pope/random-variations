@@ -39,6 +39,7 @@ import {
   ClefType,
   RhythmInfoWithTempoScaleFactor,
 } from './types'
+import settingsStore from './services/settingsStore'
 
 export const normalizeNoteName = (noteName: string) => {
   const pc = tonal.Note.pc(noteName) as string
@@ -1019,7 +1020,21 @@ export const generateStaffTicks = ({
       ticksForCard = [...ticksForCard, ...breakTicksForCard]
     }
 
-    tickLabels[currentTickIndex] = `${tonal.Note.pc(noteCard.noteName)}${
+    let noteNameTransposed = noteCard.noteName
+    if (settingsStore.instrumentTransposing !== 'C') {
+      const transposingConfig =
+        instrumentTransposingOptionsByType[
+          settingsStore.instrumentTransposing
+        ]
+      if (transposingConfig) {
+        noteNameTransposed = tonal.transpose(
+          noteNameTransposed,
+          transposingConfig.interval,
+        ) as string
+      }
+    }
+
+    tickLabels[currentTickIndex] = `${tonal.Note.pc(noteNameTransposed)}${
       modifiers.chords.enabled ? modifiers.chords.chordType : ''
     }`
     currentTickIndex += ticksForCard.length

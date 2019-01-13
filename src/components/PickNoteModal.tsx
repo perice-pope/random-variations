@@ -31,7 +31,7 @@ import {
 import styled from 'react-emotion'
 import settingsStore from '../services/settingsStore'
 import { IconButton, Typography } from '@material-ui/core'
-import { normalizeNoteName } from '../musicUtils';
+import { normalizeNoteName, instrumentTransposingOptionsByType } from '../musicUtils';
 
 type PickNoteModalProps = {
   disabledNoteNames?: string[]
@@ -318,7 +318,8 @@ class PickNoteModal extends React.Component<
                 const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)!
 
                 const shouldUseFlat =
-                  settingsStore.enharmonicFlatsMap[notePitchWithSharp] === true
+                settingsStore.enharmonicFlatsMap[notePitchWithSharp] === true
+
 
                 const noteName = shouldUseFlat
                   ? tonal.Note.enharmonic(noteNameWithSharp)
@@ -331,6 +332,22 @@ class PickNoteModal extends React.Component<
 
                 const isDisabled =
                   disabledNoteNamesMap[normalizeNoteName(noteName)] === true
+
+                let transposedNoteName = noteName
+                let transposedNotePitch = notePitch
+                if (settingsStore.instrumentTransposing !== 'C') {
+                  const transposingConfig =
+                    instrumentTransposingOptionsByType[
+                      settingsStore.instrumentTransposing
+                    ]
+                  if (transposingConfig) {
+                    transposedNoteName = tonal.transpose(
+                      noteName,
+                      transposingConfig.interval,
+                    ) as string
+                    transposedNotePitch = tonal.Note.pc(transposedNoteName)!
+                  }
+                }
 
                 return (
                   <Box key={noteNameWithSharp} width={1 / 4} p={[1, 2, 2]}>
@@ -359,7 +376,7 @@ class PickNoteModal extends React.Component<
                         this.onNoteSelected(noteName)
                       }}
                     >
-                      {notePitch}
+                      {transposedNotePitch}
                     </NoteButton>
                   </Box>
                 )

@@ -23,7 +23,7 @@ import { getNoteCardColorByNoteName } from '../utils'
 import PickNoteModal from './PickNoteModal'
 import { observer } from 'mobx-react'
 import settingsStore from '../services/settingsStore'
-import { normalizeNoteName } from '../musicUtils'
+import { normalizeNoteName, instrumentTransposingOptionsByType } from '../musicUtils'
 
 const FlipperAlignCenter = styled(Flipper)`
   width: 100%;
@@ -321,6 +321,26 @@ const SortableNotesContainer = SortableContainer(
         >
           <FlipperComponent flipKey={items}>
             {items.map(({ noteName, id }, index) => {
+              let transposedNoteName = noteName
+
+              if (settingsStore.instrumentTransposing !== 'C') {
+                const transposingConfig =
+                  instrumentTransposingOptionsByType[
+                    settingsStore.instrumentTransposing
+                  ]
+                if (transposingConfig) {
+                  transposedNoteName = tonal.transpose(
+                    noteName,
+                    transposingConfig.interval,
+                  ) as string
+                }
+              }
+
+              const noteCardText =
+                settingsStore.showNoteOctaves || showOctaves
+                  ? transposedNoteName
+                  : tonal.Note.pc(transposedNoteName)
+
               return (
                 <SortableNoteCard
                   noteName={noteName}
@@ -356,9 +376,7 @@ const SortableNotesContainer = SortableContainer(
                     }
                   }}
                 >
-                  {settingsStore.showNoteOctaves || showOctaves
-                    ? noteName
-                    : tonal.Note.pc(noteName)}
+                  {noteCardText}
                 </SortableNoteCard>
               )
             })}
