@@ -1357,6 +1357,7 @@ class App extends React.Component<
   }
 
   private closeTempoParamsDialog = () => {
+    audioEngine.setBpm(sessionStore.activeSession!.bpm)
     uiState.isTempoModalShown = false
   }
   private openTempoParamsDialog = () => {

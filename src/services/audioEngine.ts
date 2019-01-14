@@ -42,6 +42,7 @@ export default class AudioEngine {
   private countIn: number = 0
   private offset: number = 0
   private metronomeEnabled: boolean = false
+  private metronomeAccentBeatCount?: number = undefined
 
   private notesSequence?: typeof Tone.Sequence
   private metronomeSequence?: typeof Tone.Sequence
@@ -154,6 +155,10 @@ export default class AudioEngine {
     this.metronomeEnabled = enabled
   }
 
+  public setMetronomeAccentBeatCount = (accentBeatCount?: number) => {
+    this.metronomeAccentBeatCount = accentBeatCount
+  }
+
   public playLoop = async () => {
     this.rescheduleLoopNotes()
     this.isPlayingLoop = true
@@ -164,7 +169,9 @@ export default class AudioEngine {
   public startWithCountIn = () => {
     Tone.Transport.start('+0.1')
     this.countInSequence.start()
-    this.notesSequence.start(`0:${this.countIn + this.offset / this.notesTempoFactor}`)
+    this.notesSequence.start(
+      `0:${this.countIn + this.offset / this.notesTempoFactor}`,
+    )
     this.metronomeSequence.start(`0:${this.countIn}`)
     Tone.Master.volume.rampTo(1, 100)
   }
@@ -292,7 +299,7 @@ export default class AudioEngine {
 
     if (!this.metronomeSequence) {
       this.metronomeSequence = new Tone.Sequence(
-        contextTime => {
+        (contextTime, note) => {
           try {
             if (this.metronomeEnabled && this.hasLoadedAudioFont('metronome')) {
               this.audioFontPlayer.queueChord(
@@ -300,7 +307,7 @@ export default class AudioEngine {
                 Tone.context.destination,
                 this.audioFontCache['metronome'],
                 contextTime,
-                [tonal.Note.midi('C6')],
+                [tonal.Note.midi(note || 'C6')],
                 0.3,
                 // Volume
                 1.0,
@@ -310,14 +317,25 @@ export default class AudioEngine {
             console.error(error)
           }
         },
-        [{ notes: [] }],
+        this.metronomeAccentBeatCount
+          ? ['D6', ...new Array(this.metronomeAccentBeatCount - 1).fill('C6')]
+          : ['C6'],
         '4n',
       )
       this.metronomeSequence.loop = true
     } else {
       this.metronomeSequence.removeAll()
-      this.metronomeSequence.add(0, { notes: [] })
-      this.metronomeSequence.loopEnd = '0:1'
+
+      const events = this.metronomeAccentBeatCount
+        ? ['D6', ...new Array(this.metronomeAccentBeatCount - 1).fill('C6')]
+        : ['C6']
+      events.forEach((tick, index) => {
+        this.metronomeSequence.add(index, tick)
+      })
+
+      this.metronomeSequence.loopEnd = this.metronomeAccentBeatCount
+        ? `0:${this.metronomeAccentBeatCount}`
+        : '0:1'
     }
 
     if (!this.countInSequence) {

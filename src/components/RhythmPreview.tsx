@@ -9,6 +9,7 @@ import MeasureScreenSize from './MeasureScreenSize'
 type RhythmPreviewProps = {
   beats: number
   divisions: number
+  offset?: number
 
   id: string
   scale?: number
@@ -52,6 +53,7 @@ class RhythmPreview extends React.Component<
   static defaultProps: Partial<RhythmPreviewProps> = {
     beats: 3,
     divisions: 2,
+    offset: 0,
 
     scale: 1,
     staveHeight: 130,
@@ -90,7 +92,7 @@ class RhythmPreview extends React.Component<
   private getWidth = () => {
     const { boxWidth } = this.state
     const notesCount = this.props.beats * this.props.divisions
-    const minWidth = notesCount * 30
+    const minWidth = notesCount * 25
     const maxWidth = notesCount * 100
     return Math.max(280, Math.min(maxWidth, Math.max(minWidth, boxWidth - 100)))
   }
@@ -632,8 +634,14 @@ class RhythmPreview extends React.Component<
     // this.staves[0].setText('Rhythm', Vex.Flow.Modifier.Position.LEFT)
     // this.staves[1].setText('Subdivision', Vex.Flow.Modifier.Position.LEFT)
     // this.staves[2].setText('Metronome', Vex.Flow.Modifier.Position.LEFT)
-    this.staves[0].setText(' Rhythm', Vex.Flow.Modifier.Position.ABOVE, { shift_x: 20, justification: Vex.Flow.TextNote.Justification.LEFT})
-    this.staves[1].setText(' Metronome', Vex.Flow.Modifier.Position.ABOVE, { shift_x: 20, justification: Vex.Flow.TextNote.Justification.LEFT})
+    this.staves[0].setText(' Rhythm', Vex.Flow.Modifier.Position.ABOVE, {
+      shift_x: 20,
+      justification: Vex.Flow.TextNote.Justification.LEFT,
+    })
+    this.staves[1].setText(' Metronome', Vex.Flow.Modifier.Position.ABOVE, {
+      shift_x: 20,
+      justification: Vex.Flow.TextNote.Justification.LEFT,
+    })
 
     this.staves.forEach(s => s.draw())
 
@@ -669,11 +677,17 @@ class RhythmPreview extends React.Component<
       beat_value: 4,
     })
       .setMode(Vex.Flow.Voice.Mode.SOFT)
-      .addTickables([new Vex.Flow.BarNote().setType(
-        Vex.Flow.Barline.type.REPEAT_BEGIN,
-      ), ...meterNotes, new Vex.Flow.BarNote().setType(
-        Vex.Flow.Barline.type.REPEAT_END,
-      )])
+      .addTickables([
+        ...new Array(this.props.offset)
+          .fill(null)
+          .map(
+            () =>
+              new Vex.Flow.StaveNote({ keys: ['B/4'], duration: 'qr', stem_direction: -1 }),
+          ),
+        new Vex.Flow.BarNote().setType(Vex.Flow.Barline.type.REPEAT_BEGIN),
+        ...meterNotes,
+        new Vex.Flow.BarNote().setType(Vex.Flow.Barline.type.REPEAT_END),
+      ])
 
     // Configure "Rhythm" stave
     // const rhythmNoteGroupsDescriptions = this.getRhythmNotes()
@@ -802,11 +816,17 @@ class RhythmPreview extends React.Component<
       beat_value: 4,
     })
       .setMode(Vex.Flow.Voice.Mode.SOFT)
-      .addTickables([new Vex.Flow.BarNote().setType(
-        Vex.Flow.Barline.type.REPEAT_BEGIN,
-      ), ...subdivisionNotes, new Vex.Flow.BarNote().setType(
-        Vex.Flow.Barline.type.REPEAT_END,
-      )])
+      .addTickables([
+        ...new Array(this.props.offset)
+          .fill(null)
+          .map(
+            () =>
+              new Vex.Flow.StaveNote({ keys: ['B/4'], duration: 'qr', stem_direction: -1 }),
+          ),
+        new Vex.Flow.BarNote().setType(Vex.Flow.Barline.type.REPEAT_BEGIN),
+        ...subdivisionNotes,
+        new Vex.Flow.BarNote().setType(Vex.Flow.Barline.type.REPEAT_END),
+      ])
 
     const subdivisionBeams = Vex.Flow.Beam.generateBeams(subdivisionNotes, {
       stem_direction: -1,
@@ -864,7 +884,8 @@ class RhythmPreview extends React.Component<
       // @ts-ignore
       <div
         {...containerProps}
-        className={cx(css(`
+        className={cx(
+          css(`
           width: 100%; 
           overflow-x: auto; 
           overflow-y: hidden; 
@@ -875,7 +896,9 @@ class RhythmPreview extends React.Component<
           &::-webkit-scrollbar{
             display: none;
           }
-          `), (containerProps || {}).className)}
+          `),
+          (containerProps || {}).className,
+        )}
         // @ts-ignore
         ref={this.boxRef}
       >

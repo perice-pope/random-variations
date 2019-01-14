@@ -1,5 +1,6 @@
 import * as React from 'react'
 import * as _ from 'lodash'
+import * as tonal from 'tonal'
 
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
@@ -8,6 +9,8 @@ import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import TimerIcon from '@material-ui/icons/Timer'
 import MetronomeIcon from 'mdi-material-ui/Metronome'
+import PlayIcon from '@material-ui/icons/PlayArrow'
+import StopIcon from '@material-ui/icons/Stop'
 import withMobileDialog, {
   InjectedProps,
 } from '@material-ui/core/withMobileDialog'
@@ -17,18 +20,19 @@ import { observable } from 'mobx'
 import { Flex, Box } from './ui'
 
 import { createDefaultSession, parseIntEnsureInBounds } from '../utils'
-import { RhythmInfo } from '../types'
+import { RhythmInfo, StaffTick } from '../types'
 import { css } from 'emotion'
 import ArrowsIcon from '@material-ui/icons/Cached'
 import {
   withAudioEngine,
   WithAudioEngineInjectedProps,
 } from './withAudioEngine'
-import { Typography, Divider, InputAdornment, Tooltip, withWidth } from '@material-ui/core'
+import { Typography, Divider, InputAdornment, Tooltip, withWidth, IconButton } from '@material-ui/core'
 import { rhythmOptions } from '../musicUtils'
 import Slider from '@material-ui/lab/Slider'
 import RhythmPreview from './RhythmPreview';
 import { WithWidth } from '@material-ui/core/withWidth';
+import AudioEngine from '../services/audioEngine';
 
 type Props = {
   open: boolean
@@ -47,6 +51,8 @@ export interface TempoSettingsFormValues {
   offset: number
   rhythm: RhythmInfo
 }
+
+const audioEngine = new AudioEngine()
 
 @observer
 class TempoSettingsModal extends React.Component<Props & WithWidth> {
@@ -95,7 +101,15 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
   }
 
   submit = () => {
+    audioEngine.stopLoop()
     this.props.onSubmit(this.values)
+  }
+
+  handleClose = () => {
+    audioEngine.stopLoop()
+    if (this.props.onClose) {
+    this.props.onClose()
+    }
   }
 
   private handleBpmChange = e => {
@@ -103,30 +117,35 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     if (e.target.value) {
       const value = parseIntEnsureInBounds(e.target.value, 0, 500)
       this.values.bpm = value
+      this.restartPlayback()
     }
   }
 
   private handleBpmSliderChange = (e, value) => {
     this.values.bpm = value
     this.inputValues.bpm = value.toString()
+    this.restartPlayback()
   }
 
   private handleRhythmSliderChange = (e, rhythmIndex) => {
     this.values.rhythm = rhythmOptions[rhythmIndex] || rhythmOptions[0]
     this.inputValues.rhythmBeats = this.values.rhythm.beats.toString()
     this.inputValues.rhythmDivisions = this.values.rhythm.divisions.toString()
+    this.restartPlayback()
   }
 
   private handleSelectRandomRhythm = () => {
     this.values.rhythm = _.sample(rhythmOptions) as RhythmInfo
     this.inputValues.rhythmBeats = this.values.rhythm.beats.toString()
     this.inputValues.rhythmDivisions = this.values.rhythm.divisions.toString()
+    this.restartPlayback()
   }
 
   private handleSelectDefaultRhythm = () => {
     this.values.rhythm = {beats: 1, divisions: 1}
     this.inputValues.rhythmBeats = this.values.rhythm.beats.toString()
     this.inputValues.rhythmDivisions = this.values.rhythm.divisions.toString()
+    this.restartPlayback()
   }
 
   private handleCountInCountsChange = e => {
@@ -150,6 +169,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     if (e.target.value) {
       const value = parseIntEnsureInBounds(e.target.value, 0, 16)
       this.values.rests = value
+      this.restartPlayback()
     }
   }
 
@@ -158,6 +178,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     if (e.target.value) {
       const value = parseIntEnsureInBounds(e.target.value, 0, 16)
       this.values.offset = value
+      this.restartPlayback()
     }
   }
 
@@ -166,6 +187,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     if (e.target.value) {
       const value = parseIntEnsureInBounds(e.target.value, 1, 16)
       this.values.rhythm.beats = value
+      this.restartPlayback()
     }
   }
 
@@ -174,7 +196,49 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     if (e.target.value) {
       const value = parseIntEnsureInBounds(e.target.value, 1, 16)
       this.values.rhythm.divisions = value
+      this.restartPlayback()
     }
+  }
+
+  private restartPlayback  =() => {
+    if (this.isPlaying) {
+      audioEngine.stopLoop()
+      setTimeout(() => {
+        this.setPlaybackLoop()
+        setTimeout(() => {
+          audioEngine.playLoop()
+        }, 10)
+      }, 10)
+    } else {
+      this.setPlaybackLoop()
+    }
+  }
+
+  private togglePlayback = () => {
+    if (this.isPlaying) {
+      audioEngine.stopLoop()
+      this.isPlaying = false
+    } else {
+      this.setPlaybackLoop()
+      audioEngine.playLoop()
+      this.isPlaying = true
+    }
+  }
+
+  private setPlaybackLoop = () => {
+    const ticks: StaffTick[] = new Array(this.values.rhythm.beats * this.values.rhythm.divisions).fill(null).map((value, index) => ({
+      id: `${index}`,
+      notes: [
+        {id: '1', midi: tonal.Note.midi('C4'), noteName: 'C4' }
+      ]
+    } as StaffTick))
+
+    audioEngine.setMetronomeEnabled(true)
+    audioEngine.setMetronomeAccentBeatCount(this.values.rhythm.beats)
+    audioEngine.setAudioFont(this.props.audioFontId)
+    audioEngine.setLoop(ticks)
+    audioEngine.setBpm(this.values.bpm)
+    audioEngine.setNotesRhythm(this.values.rhythm)
   }
 
   render() {
@@ -373,6 +437,20 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
         </Button>
     )
 
+    const TogglePlaybackButton = (
+      <IconButton
+                  color="secondary"
+                  onClick={this.togglePlayback}
+                  className={css(`margin-left: 0.5rem; margin-right: 0.5rem;`)}
+                >
+                  {this.isPlaying ? (
+                    <StopIcon fontSize="large" />
+                  ) : (
+                    <PlayIcon fontSize="large" />
+                  )}
+                </IconButton>
+    )
+
     const RhythmBeatsTextField = (
       // @ts-ignore
       <TextField
@@ -399,7 +477,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
       // @ts-ignore
       <TextField
         className={css({
-          maxWidth: '90px',
+          maxWidth: '110px',
         })}
         InputProps={{
           className: css({ fontSize: '1.3rem' }),
@@ -425,7 +503,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
         fullWidth
         scroll="paper"
         open={this.props.open}
-        onClose={this.props.onClose}
+        onClose={this.handleClose}
         aria-labelledby="session-tempo-dialog"
       >
         <DialogContent
@@ -490,6 +568,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
               {RhythmSliderInput}
               {RhythmRandomizeButton}
               {RhythmResetButton}
+              {TogglePlaybackButton}
 
               <div
                 className={css(
@@ -509,7 +588,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={this.props.onClose} color="secondary">
+          <Button onClick={this.handleClose} color="secondary">
             Cancel
           </Button>
           <Button onClick={this.submit} color="primary" autoFocus>
