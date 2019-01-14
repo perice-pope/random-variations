@@ -24,9 +24,11 @@ import {
   withAudioEngine,
   WithAudioEngineInjectedProps,
 } from './withAudioEngine'
-import { Typography, Divider, InputAdornment, Tooltip } from '@material-ui/core'
+import { Typography, Divider, InputAdornment, Tooltip, withWidth } from '@material-ui/core'
 import { rhythmOptions } from '../musicUtils'
 import Slider from '@material-ui/lab/Slider'
+import RhythmPreview from './RhythmPreview';
+import { WithWidth } from '@material-ui/core/withWidth';
 
 type Props = {
   open: boolean
@@ -47,10 +49,13 @@ export interface TempoSettingsFormValues {
 }
 
 @observer
-class TempoSettingsModal extends React.Component<Props> {
+class TempoSettingsModal extends React.Component<Props & WithWidth> {
   values: TempoSettingsFormValues = observable(
     TempoSettingsModal.getDefaultValues(),
   )
+
+  @observable
+  isPlaying = false
 
   inputValues = observable({
     bpm: '',
@@ -107,13 +112,19 @@ class TempoSettingsModal extends React.Component<Props> {
   }
 
   private handleRhythmSliderChange = (e, rhythmIndex) => {
-    this.values.rhythm = rhythmOptions[rhythmIndex]
+    this.values.rhythm = rhythmOptions[rhythmIndex] || rhythmOptions[0]
     this.inputValues.rhythmBeats = this.values.rhythm.beats.toString()
     this.inputValues.rhythmDivisions = this.values.rhythm.divisions.toString()
   }
 
   private handleSelectRandomRhythm = () => {
     this.values.rhythm = _.sample(rhythmOptions) as RhythmInfo
+    this.inputValues.rhythmBeats = this.values.rhythm.beats.toString()
+    this.inputValues.rhythmDivisions = this.values.rhythm.divisions.toString()
+  }
+
+  private handleSelectDefaultRhythm = () => {
+    this.values.rhythm = {beats: 1, divisions: 1}
     this.inputValues.rhythmBeats = this.values.rhythm.beats.toString()
     this.inputValues.rhythmDivisions = this.values.rhythm.divisions.toString()
   }
@@ -317,7 +328,7 @@ class TempoSettingsModal extends React.Component<Props> {
           }}
           value={rhythmSliderValue}
           min={0}
-          max={rhythmOptions.length}
+          max={rhythmOptions.length - 1}
           step={1}
           onChange={this.handleRhythmSliderChange}
         />
@@ -331,7 +342,6 @@ class TempoSettingsModal extends React.Component<Props> {
           color="primary"
           onClick={this.handleSelectRandomRhythm}
           className={css(`
-                      margin-left: 0.5rem;
                       @media screen and (max-width: 500px) {
                         margin-left: 0;
                         margin-top: 0.5rem;
@@ -345,6 +355,22 @@ class TempoSettingsModal extends React.Component<Props> {
           Randomize
         </Button>
       </Tooltip>
+    )
+
+    const RhythmResetButton = (
+        <Button
+          variant="outlined"
+          color="default"
+          onClick={this.handleSelectDefaultRhythm}
+          className={css(`
+                      margin-left: 0.5rem;
+                      @media screen and (max-width: 500px) {
+                        margin-top: 0.5rem;
+                      }
+                    `)}
+        >
+          Reset
+        </Button>
     )
 
     const RhythmBeatsTextField = (
@@ -453,6 +479,9 @@ class TempoSettingsModal extends React.Component<Props> {
 
             <Box mt={3} mb={3}>
               <Typography variant="h5">Rhythm</Typography>
+              <Typography variant="subtitle1">
+                Tweak how metronome ticks and notes rhythm relate to each other.
+              </Typography>
               <Flex alignItems="center">
                 {RhythmBeatsTextField}
                 {RhythmDivisionsTextField}
@@ -460,6 +489,21 @@ class TempoSettingsModal extends React.Component<Props> {
 
               {RhythmSliderInput}
               {RhythmRandomizeButton}
+              {RhythmResetButton}
+
+              <div
+                className={css(
+                  `height: 260px; width: 100%; margin-top: 1rem; margin-bottom: 1rem; margin-left: -1rem; margin-right: -1rem;`
+                )}
+              >
+                <RhythmPreview
+                  id={`rhythm-preview`}
+                  key={`${rhythm.beats}:${rhythm.divisions}`}
+                  beats={rhythm.beats}
+                  scale={this.props.width === 'xs' ? 0.6 : 0.9}
+                  divisions={rhythm.divisions}
+                />
+              </div>
             </Box>
           </Box>
         </DialogContent>
@@ -478,5 +522,5 @@ class TempoSettingsModal extends React.Component<Props> {
 }
 
 export default withAudioEngine(
-  withMobileDialog({ breakpoint: 'xs' })(TempoSettingsModal),
+  withMobileDialog({ breakpoint: 'xs' })(withWidth()(TempoSettingsModal)),
 )

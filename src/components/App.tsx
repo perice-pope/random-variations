@@ -1468,7 +1468,7 @@ class App extends React.Component<
 
   private renderApp = () => {
     if (!sessionStore.activeSession) {
-      return
+      return null
     }
 
     const { classes } = this.props
