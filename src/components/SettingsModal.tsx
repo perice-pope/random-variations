@@ -59,7 +59,7 @@ type AudioFontOption = {
 }
 
 const AudioFontOptions: AudioFontOption[] = AudioFontConfig.filter(
-  ({ id }) => id !== 'metronome',
+  ({ id }) => id !== 'metronome' && id !== 'woodblock',
 ).map(afc => ({
   title: afc.title,
   value: afc.id,

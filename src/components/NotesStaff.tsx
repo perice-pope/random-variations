@@ -638,7 +638,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
       activeTickIndex >= 0 &&
       activeTickIndex < ticks.length
     ) {
-      const notesPerActiveTick = notesPerTick[activeTickIndex]
+      const notesPerActiveTick = notesPerTick[activeTickIndex] || []
       const activeNote = notesPerActiveTick.find(
         n => n instanceof Vex.Flow.StaveNote,
       ) as Vex.Flow.StaveNote | undefined

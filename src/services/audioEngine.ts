@@ -50,7 +50,7 @@ export default class AudioEngine {
 
   private animationCallback?: AnimationCallback
 
-  private audioFontId: AudioFontId = audioFontsConfig[1].id
+  private audioFontId: AudioFontId = audioFontsConfig[2].id
   private audioFontPlayer?: typeof WebAudioFontPlayer
   private audioFontCache: { [audioFontId in AudioFontId]?: AudioFont } = {}
   private hasLoadedAudioFontMap: { [audioFontId in AudioFontId]?: boolean } = {}

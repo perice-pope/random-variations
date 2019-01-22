@@ -7,6 +7,7 @@ export type AudioFontId =
   | 'trumpet_soft_1'
   | 'acoustic_guitar_1'
   | 'metronome'
+  | 'woodblock'
 
 export type AudioFontConfig = {
   // Machine-friendly unique ID
@@ -24,6 +25,11 @@ const audioFontsConfig: AudioFontConfig[] = ([
     id: 'metronome',
     title: 'Metronome',
     name: '1130_SoundBlasterOld_sf2',
+  },
+  {
+    id: 'woodblock',
+    title: 'Woodblock',
+    name: '1150_SoundBlasterOld_sf2',
   },
   {
     id: 'grand_piano_1',
