@@ -104,7 +104,7 @@ export default class AddEntityButton extends React.Component<
               onClick={this.props.onAddToneRowClick}
               disabled={disableToneRow}
             >
-              Note(-s)
+              Notes
             </MenuItem>
 
             <MenuItem
