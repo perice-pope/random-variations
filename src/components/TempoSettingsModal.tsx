@@ -27,12 +27,19 @@ import {
   withAudioEngine,
   WithAudioEngineInjectedProps,
 } from './withAudioEngine'
-import { Typography, Divider, InputAdornment, Tooltip, withWidth, IconButton } from '@material-ui/core'
+import {
+  Typography,
+  Divider,
+  InputAdornment,
+  Tooltip,
+  withWidth,
+  IconButton,
+} from '@material-ui/core'
 import { rhythmOptions } from '../musicUtils'
 import Slider from '@material-ui/lab/Slider'
-import RhythmPreview from './RhythmPreview';
-import { WithWidth } from '@material-ui/core/withWidth';
-import AudioEngine from '../services/audioEngine';
+import RhythmPreview from './RhythmPreview'
+import { WithWidth } from '@material-ui/core/withWidth'
+import AudioEngine from '../services/audioEngine'
 
 type Props = {
   open: boolean
@@ -108,7 +115,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
   handleClose = () => {
     audioEngine.stopLoop()
     if (this.props.onClose) {
-    this.props.onClose()
+      this.props.onClose()
     }
   }
 
@@ -127,6 +134,24 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     this.restartPlayback()
   }
 
+  private handleCountInSliderChange = (e, value) => {
+    this.values.countInCounts = value
+    this.inputValues.countInCounts = value.toString()
+    this.restartPlayback()
+  }
+
+  private handleRestsSliderChange = (e, value) => {
+    this.values.rests = value
+    this.inputValues.rests = value.toString()
+    this.restartPlayback()
+  }
+
+  private handleOffsetSliderChange = (e, value) => {
+    this.values.offset = value
+    this.inputValues.offset = value.toString()
+    this.restartPlayback()
+  }
+
   private handleRhythmSliderChange = (e, rhythmIndex) => {
     this.values.rhythm = rhythmOptions[rhythmIndex] || rhythmOptions[0]
     this.inputValues.rhythmBeats = this.values.rhythm.beats.toString()
@@ -142,7 +167,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
   }
 
   private handleSelectDefaultRhythm = () => {
-    this.values.rhythm = {beats: 1, divisions: 1}
+    this.values.rhythm = { beats: 1, divisions: 1 }
     this.inputValues.rhythmBeats = this.values.rhythm.beats.toString()
     this.inputValues.rhythmDivisions = this.values.rhythm.divisions.toString()
     this.restartPlayback()
@@ -200,7 +225,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     }
   }
 
-  private restartPlayback  =() => {
+  private restartPlayback = () => {
     if (this.isPlaying) {
       audioEngine.stopLoop()
       setTimeout(() => {
@@ -226,12 +251,17 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
   }
 
   private setPlaybackLoop = () => {
-    const ticks: StaffTick[] = new Array(this.values.rhythm.beats * this.values.rhythm.divisions).fill(null).map((value, index) => ({
-      id: `${index}`,
-      notes: [
-        {id: '1', midi: tonal.Note.midi('C4'), noteName: 'C4' }
-      ]
-    } as StaffTick))
+    const ticks: StaffTick[] = new Array(
+      this.values.rhythm.beats * this.values.rhythm.divisions,
+    )
+      .fill(null)
+      .map(
+        (value, index) =>
+          ({
+            id: `${index}`,
+            notes: [{ id: '1', midi: tonal.Note.midi('C4'), noteName: 'C4' }],
+          } as StaffTick),
+      )
 
     audioEngine.setMetronomeEnabled(true)
     audioEngine.setMetronomeAccentBeatCount(this.values.rhythm.beats)
@@ -258,8 +288,9 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
         color={countInEnabled ? 'secondary' : 'default'}
         className={css(`margin: 0.5rem; margin-right: 0; white-space: nowrap;`)}
         onClick={this.handleCountInToggle}
+        variant="outlined"
       >
-        <TimerIcon className={css(`margin-right: 0.5rem;`)} />
+        <TimerIcon fontSize="small" className={css(`margin-right: 0.5rem;`)} />
         {countInEnabled ? 'Count in on' : 'Count in off'}
       </Button>
     )
@@ -270,8 +301,12 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
           `margin: 0.5rem; margin-left: 1rem; white-space: nowrap;`,
         )}
         onClick={this.handleMetronomeToggle}
+        variant="outlined"
       >
-        <MetronomeIcon className={css(`margin-right: 0.5rem;`)} />
+        <MetronomeIcon
+          fontSize="small"
+          className={css(`margin-right: 0.5rem;`)}
+        />
         {metronomeEnabled ? 'Metronome on' : 'Metronome off'}
       </Button>
     )
@@ -384,6 +419,52 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
       </Box>
     )
 
+    const CountInSliderInput = (
+      <Box mb={2} width={1}>
+        <Slider
+          classes={{
+            container: css(`padding: 1rem;`),
+          }}
+          disabled={!this.values.countInEnabled}
+          value={this.values.countInCounts}
+          min={0}
+          max={16}
+          step={1}
+          onChange={this.handleCountInSliderChange}
+        />
+      </Box>
+    )
+
+    const RestsSliderInput = (
+      <Box mb={2} width={1}>
+        <Slider
+          classes={{
+            container: css(`padding: 1rem;`),
+          }}
+          value={this.values.rests}
+          min={0}
+          max={16}
+          step={1}
+          onChange={this.handleRestsSliderChange}
+        />
+      </Box>
+    )
+
+    const OffsetSliderInput = (
+      <Box mb={2} width={1}>
+        <Slider
+          classes={{
+            container: css(`padding: 1rem;`),
+          }}
+          value={this.values.offset}
+          min={0}
+          max={16}
+          step={1}
+          onChange={this.handleOffsetSliderChange}
+        />
+      </Box>
+    )
+
     const RhythmSliderInput = (
       <Box mb={2} width={1}>
         <Slider
@@ -416,39 +497,44 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
             fontSize="small"
             className={css(`margin-right: 0.5rem;`)}
           />
-          Randomize
+          Random
         </Button>
       </Tooltip>
     )
 
     const RhythmResetButton = (
-        <Button
-          variant="outlined"
-          color="default"
-          onClick={this.handleSelectDefaultRhythm}
-          className={css(`
+      <Button
+        variant="outlined"
+        color="default"
+        onClick={this.handleSelectDefaultRhythm}
+        className={css(`
                       margin-left: 0.5rem;
                       @media screen and (max-width: 500px) {
                         margin-top: 0.5rem;
                       }
                     `)}
-        >
-          Reset
-        </Button>
+      >
+        Reset
+      </Button>
     )
 
     const TogglePlaybackButton = (
       <IconButton
-                  color="secondary"
-                  onClick={this.togglePlayback}
-                  className={css(`margin-left: 0.5rem; margin-right: 0.5rem;`)}
-                >
-                  {this.isPlaying ? (
-                    <StopIcon fontSize="large" />
-                  ) : (
-                    <PlayIcon fontSize="large" />
-                  )}
-                </IconButton>
+        color="secondary"
+        onClick={this.togglePlayback}
+        className={css(`
+          margin-left: 0.5rem; 
+          border: 1px solid;
+          padding: 5px;
+          margin-left: 1rem;
+        `)}
+      >
+        {this.isPlaying ? (
+          <StopIcon fontSize="large" />
+        ) : (
+          <PlayIcon fontSize="large" />
+        )}
+      </IconButton>
     )
 
     const RhythmBeatsTextField = (
@@ -533,6 +619,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
                 <span className={css(`flex: 1;`)} />
                 {ToggleCountInButton}
               </Flex>
+              {CountInSliderInput}
             </Box>
 
             <Divider light />
@@ -543,6 +630,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
                 Number of rest beats between note groups
               </Typography>
               {RestsTextInput}
+              {RestsSliderInput}
 
               <Box mt={3}>
                 <Typography variant="subtitle1">
@@ -550,6 +638,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
                   count-in clicks).
                 </Typography>
                 {OffsetTextInput}
+                {OffsetSliderInput}
               </Box>
             </Box>
 
@@ -572,7 +661,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
 
               <div
                 className={css(
-                  `height: 260px; width: 100%; margin-top: 1rem; margin-bottom: 1rem; margin-left: -1rem; margin-right: -1rem;`
+                  `height: 260px; width: 100%; margin-top: 1rem; margin-bottom: 1rem; margin-left: -1rem; margin-right: -1rem;`,
                 )}
               >
                 <RhythmPreview
