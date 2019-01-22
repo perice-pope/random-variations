@@ -25,7 +25,7 @@ import { Flex, Box } from './ui'
 import Tooltip from './ui/Tooltip'
 
 import { getNoteCardColorByNoteName, arrayMove } from '../utils'
-import { css } from 'emotion'
+import { css, cx } from 'emotion'
 import {
   withAudioEngine,
   WithAudioEngineInjectedProps,
@@ -34,7 +34,6 @@ import { NoteNamesWithSharps, normalizeNoteName } from '../musicUtils'
 import {
   Typography,
   IconButton,
-  Hidden,
   FormControlLabel,
   Switch,
 } from '@material-ui/core'
@@ -121,7 +120,7 @@ class ToneRowModal extends React.Component<
       })) as NoteCardNote[],
     }
 
-    this.setRandomPatternWithFirstNotePreserved()
+    this.setRandomNotes()
   }
 
   componentDidUpdate(prevProps) {
@@ -132,7 +131,7 @@ class ToneRowModal extends React.Component<
             noteName: 'C4',
           })) as NoteCardNote[],
         },
-        this.setRandomPatternWithFirstNotePreserved,
+        this.setRandomNotes,
       )
     }
   }
@@ -147,22 +146,12 @@ class ToneRowModal extends React.Component<
     return noteRange
   }
 
-  setRandomPatternWithFirstNotePreserved = () => {
+  setRandomNotes = () => {
     if (this.state.notes.length === 0) {
       return
     }
 
     const availableNotes = this.getAvailableNoteNamesWithSharps()
-
-    let firstNoteName =
-      this.state.notes.length > 0 ? this.state.notes[0].noteName : undefined
-
-    if (
-      firstNoteName &&
-      !_.includes(availableNotes, normalizeNoteName(firstNoteName))
-    ) {
-      firstNoteName = _.sample(availableNotes)
-    }
 
     let count = this.state.notes.length
     if (this.state.allowRepeatingNotes && count > availableNotes.length) {
@@ -175,7 +164,6 @@ class ToneRowModal extends React.Component<
         this.state.allowRepeatingNotes,
         count,
         this.state.octave,
-        firstNoteName,
       ),
     })
   }
@@ -375,7 +363,7 @@ class ToneRowModal extends React.Component<
           )
         }
 
-        this.setRandomPatternWithFirstNotePreserved()
+        this.setRandomNotes()
       },
     )
   }
@@ -435,22 +423,19 @@ class ToneRowModal extends React.Component<
       >
         <DialogContent className={css(`overflow-x: hidden;`)}>
           <Flex flexDirection="column" height="100%">
-            <Hidden mdDown>
-              <Box mb={3}>
-                <Typography variant="h4">Add a tone row</Typography>
-              </Box>
-            </Hidden>
-
             <Box mb={2}>
-              <Typography id="slider-label" className={css(`font-size: 20px;`)}>
+              <Typography variant="h5">
                 Add notes: {notes.length} {pluralize('notes', notes.length)}
               </Typography>
+            </Box>
+
+            <Box mb={2}>
               <Slider
                 classes={{
                   container: css(`padding: 1rem;`),
                 }}
                 value={notes.length}
-                min={0}
+                min={1}
                 max={this.getMaxNumberOfNotesToAdd()}
                 step={1}
                 aria-labelledby="slider-label"
@@ -460,26 +445,10 @@ class ToneRowModal extends React.Component<
 
             <Flex width={1} justifyContent="center">
               <div>
-                <Tooltip title="Randomize notes" disableFocusListener>
-                  <Button
-                    color="primary"
-                    variant="outlined"
-                    className={css({ minWidth: '40px', marginRight: '0.5rem' })}
-                    aria-label="Randomize notes"
-                    disabled={this.state.notes.length < 2}
-                    onClick={this.setRandomPatternWithFirstNotePreserved}
-                  >
-                    <ArrowsIcon
-                      fontSize="small"
-                      className={css({ marginRight: '0.5rem' })}
-                    />{' '}
-                    Randomize
-                  </Button>
-                </Tooltip>
-
                 <Tooltip title="Clear all notes" variant="gray">
                   <Button
                     disabled={this.state.notes.length === 0}
+                    className={css(`padding-left: 0; margin-right: 0.5rem;`)}
                     color="secondary"
                     onClick={this.clearAllNotes}
                   >
@@ -490,24 +459,40 @@ class ToneRowModal extends React.Component<
                     Clear
                   </Button>
                 </Tooltip>
+
+                <Tooltip title="Randomize notes" disableFocusListener>
+                  <Button
+                    color="primary"
+                    variant="outlined"
+                    className={css({ minWidth: '40px', marginRight: '1rem' })}
+                    aria-label="Randomize notes"
+                    onClick={this.setRandomNotes}
+                  >
+                    <ArrowsIcon
+                      fontSize="small"
+                      className={css({ marginRight: '0.5rem' })}
+                    />{' '}
+                    Randomize
+                  </Button>
+                </Tooltip>
+
+                <FormControlLabel
+                  classes={{
+                    label: css(`user-select: none;`),
+                  }}
+                  control={
+                    <Switch
+                      onChange={this.handleChangeAllowRepeatedNotes}
+                      checked={this.state.allowRepeatingNotes}
+                      color="primary"
+                    />
+                  }
+                  label="Allow repeating notes"
+                />
               </div>
             </Flex>
 
-            <Flex width={1} justifyContent="center">
-              <FormControlLabel
-                classes={{
-                  label: css(`user-select: none;`),
-                }}
-                control={
-                  <Switch
-                    onChange={this.handleChangeAllowRepeatedNotes}
-                    checked={this.state.allowRepeatingNotes}
-                    color="primary"
-                  />
-                }
-                label="Allow repeating notes"
-              />
-            </Flex>
+            <Flex width={1} justifyContent="center" />
 
             <Flex alignItems="center" justifyContent="center">
               <IconButton
@@ -614,6 +599,18 @@ class ToneRowModal extends React.Component<
                 onDeleteClick={this.deleteNoteCard}
               />
             </div>
+
+            <p
+              className={cx(
+                'text-soft',
+                css(`font-size: 0.8em;`),
+                css(`opacity: 0; transition: opacity 0.3s;`),
+                !this.state.allowRepeatingNotes && css(`opacity: 1.0;`),
+              )}
+            >
+              Notes that are already used are grayed out. If you want to allow
+              notes to repeat, toggle the switch above.
+            </p>
           </Flex>
         </DialogContent>
 

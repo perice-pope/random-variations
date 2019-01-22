@@ -2609,7 +2609,7 @@ class App extends React.Component<
           />
 
           <ToneRowModal
-            defaultNotesCount={Math.min(4, MaxNoteCards - noteCards.length)}
+            defaultNotesCount={1}
             maxNotesCount={MaxNoteCards - noteCards.length}
             notesUsedInSession={
               !!sessionStore.activeSession
