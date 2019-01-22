@@ -12,9 +12,10 @@ import settingsStore from '../services/settingsStore'
 import { instrumentTransposingOptionsByType } from '../musicUtils'
 
 const activeNoteClasses = {
-  base: css({
-    transition: '0.2s transform, 0.5s opacity',
-  }),
+  animation: (animationTransitionTimeMs = 200) =>
+    css({
+      transition: `${animationTransitionTimeMs}ms transform, 0.5s opacity`,
+    }),
   hidden: css({
     opacity: 0,
   }),
@@ -31,6 +32,7 @@ type NotesStaffProps = {
   showBreaks?: boolean
   showEnd?: boolean
   activeTickIndex?: number
+  activeNoteLineAnimationTimeMs?: number
   staveHeight: number
   topOffset: number
   containerProps?: any
@@ -40,6 +42,7 @@ type NotesStaffProps = {
 type NotesStaffState = {
   boxWidth: number
   scrollingTop: number
+  activeNoteOffsetX?: number
 }
 
 class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
@@ -48,6 +51,7 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
     scale: 1,
     staveHeight: 140,
     topOffset: 50,
+    activeNoteLineAnimationTimeMs: 200,
     clef: 'treble',
   }
 
@@ -242,9 +246,13 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
       .stroke()
     this.renderContext.restore()
 
-    this.activeLineEl.classList.add('vf-active-line', activeNoteClasses.base)
+    this.activeLineEl.classList.add(
+      'vf-active-line',
+      activeNoteClasses.animation(this.props.activeNoteLineAnimationTimeMs),
+    )
     // @ts-ignore
     this.activeLineEl.style = `transform: translateX(${noteHeadX}px) translateY(${0}px);`
+    this.setState({ activeNoteOffsetX: noteHeadX })
 
     if (!this.props.isPlaying) {
       this.activeLineEl.classList.add(activeNoteClasses.hidden)
@@ -660,8 +668,20 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
           (activeLineYNew - 40) * (this.props.scale || 1.0),
         )
 
-        // @ts-ignore
-        this.activeLineEl.style = `transform: translateX(${activeLineXNew}px) translateY(${activeLineYNew}px);`
+        const activeLineStyle = `transform: translateX(${activeLineXNew}px) translateY(${activeLineYNew}px);`
+
+        if (
+          this.state.activeNoteOffsetX != null &&
+          activeLineXNew < this.state.activeNoteOffsetX
+        ) {
+          const activeLineStyleWithTransitionsDisabled = `${activeLineStyle} transition: none !important;`
+          // @ts-ignore
+          this.activeLineEl.style = activeLineStyleWithTransitionsDisabled
+        } else {
+          // @ts-ignore
+          this.activeLineEl.style = activeLineStyle
+        }
+        this.setState({ activeNoteOffsetX: activeLineXNew })
 
         activeNote.draw()
       }

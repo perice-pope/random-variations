@@ -1468,6 +1468,21 @@ class App extends React.Component<
       : false
   }
 
+  private getActiveNoteLineAnimationTimeMs = () => {
+    if (!sessionStore.activeSession) {
+      return 150
+    }
+
+    const { bpm } = sessionStore.activeSession
+    if (bpm > 140) {
+      return 60
+    } else if (bpm > 200) {
+      return 20
+    }
+
+    return 150
+  }
+
   private renderApp = () => {
     if (!sessionStore.activeSession) {
       return null
@@ -2498,6 +2513,7 @@ class App extends React.Component<
                       activeTickIndex={
                         isPlaying ? activeStaffTickIndex : undefined
                       }
+                      activeNoteLineAnimationTimeMs={this.getActiveNoteLineAnimationTimeMs()}
                     />
                   </div>
                 </Flex>
