@@ -267,6 +267,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     audioEngine.setMetronomeAccentBeatCount(this.values.rhythm.beats)
     audioEngine.setAudioFont(this.props.audioFontId)
     audioEngine.setLoop(ticks)
+    audioEngine.setCountIn(4)
     audioEngine.setBpm(this.values.bpm)
     audioEngine.setNotesRhythm(this.values.rhythm)
   }
