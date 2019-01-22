@@ -23,7 +23,10 @@ import { getNoteCardColorByNoteName } from '../utils'
 import PickNoteModal from './PickNoteModal'
 import { observer } from 'mobx-react'
 import settingsStore from '../services/settingsStore'
-import { normalizeNoteName, instrumentTransposingOptionsByType } from '../musicUtils'
+import {
+  normalizeNoteName,
+  instrumentTransposingOptionsByType,
+} from '../musicUtils'
 
 const FlipperAlignCenter = styled(Flipper)`
   width: 100%;
@@ -131,6 +134,7 @@ const SortableNoteCard = SortableElement(
     render() {
       const {
         noteName,
+        instrumentTransposedNoteName,
         id,
         active,
         bgColor,
@@ -151,10 +155,20 @@ const SortableNoteCard = SortableElement(
         octave = 4
         noteNameWithOctave = `${noteName}4`
       }
+
+      let instrumentTransposedNoteNameWithOctave = instrumentTransposedNoteName
+      if (!octave) {
+        octave = 4
+        instrumentTransposedNoteNameWithOctave = `${instrumentTransposedNoteName}4`
+      }
+
       const midi = tonal.Note.midi(noteNameWithOctave) as number
-      const enharmonicNoteName = tonal.Note.enharmonic(noteNameWithOctave)
+      const instrumentTransposedEnharmonicNoteName = tonal.Note.enharmonic(
+        instrumentTransposedNoteNameWithOctave,
+      )
       const shouldShowChangeToEnharmonic =
-        enharmonicNoteName !== noteNameWithOctave
+        instrumentTransposedEnharmonicNoteName !==
+        instrumentTransposedNoteNameWithOctave
 
       const noteNameHalfStepUp = normalizeNoteName(
         tonal.Note.fromMidi(midi + 1),
@@ -237,7 +251,8 @@ const SortableNoteCard = SortableElement(
                     </ListItemIcon>
                     {'Change to '}
                     <Text ml={1} fontWeight="bold">
-                      {enharmonicNoteName && tonal.Note.pc(enharmonicNoteName)}
+                      {instrumentTransposedEnharmonicNoteName &&
+                        tonal.Note.pc(instrumentTransposedEnharmonicNoteName)}
                     </Text>
                   </MenuItem>
                 )}
@@ -344,6 +359,7 @@ const SortableNotesContainer = SortableContainer(
               return (
                 <SortableNoteCard
                   noteName={noteName}
+                  instrumentTransposedNoteName={transposedNoteName}
                   // @ts-ignore
                   shouldFlip={shouldFlip}
                   id={id}
@@ -546,10 +562,10 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
         />
         {this.state.noteEditingModalIsOpen && (
           <PickNoteModal
-            isOpen
+            isOpen={this.state.noteEditingModalIsOpen}
             disabledNoteNames={_.difference(
               disabledNoteNames || [],
-              this.state.noteEditingModalNoteIndex
+              this.state.noteEditingModalNoteIndex != null
                 ? [
                     normalizeNoteName(
                       this.props.notes[this.state.noteEditingModalNoteIndex]
@@ -559,7 +575,7 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
                 : [],
             )}
             noteName={
-              this.state.noteEditingModalNoteIndex
+              this.state.noteEditingModalNoteIndex != null
                 ? this.props.notes[this.state.noteEditingModalNoteIndex]
                     .noteName
                 : undefined

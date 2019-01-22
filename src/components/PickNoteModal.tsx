@@ -31,7 +31,10 @@ import {
 import styled from 'react-emotion'
 import settingsStore from '../services/settingsStore'
 import { IconButton, Typography } from '@material-ui/core'
-import { normalizeNoteName, instrumentTransposingOptionsByType } from '../musicUtils';
+import {
+  normalizeNoteName,
+  instrumentTransposingOptionsByType,
+} from '../musicUtils'
 
 type PickNoteModalProps = {
   disabledNoteNames?: string[]
@@ -70,6 +73,8 @@ class PickNoteModal extends React.Component<
   PickNoteModalProps & InjectedProps & WithAudioEngineInjectedProps,
   PickNoteModalState
 > {
+  state: PickNoteModalState
+
   constructor(props) {
     super(props)
     this.state = {
@@ -79,6 +84,23 @@ class PickNoteModal extends React.Component<
       notePitchName: props.noteName
         ? tonal.Note.pc(props.noteName)!
         : undefined,
+    }
+  }
+
+  componentDidUpdate(
+    prevProps: PickNoteModalProps &
+      InjectedProps &
+      WithAudioEngineInjectedProps,
+  ) {
+    if (this.props.isOpen !== prevProps.isOpen && this.props.isOpen) {
+      this.setState({
+        octave: this.props.noteName ? tonal.Note.oct(this.props.noteName)! : 4,
+        notePitchName: this.props.noteName
+          ? tonal.Note.pc(this.props.noteName)!
+          : undefined,
+        range: this.getNoteRange(this.props.noteName),
+        noteName: this.props.noteName,
+      })
     }
   }
 
@@ -318,8 +340,7 @@ class PickNoteModal extends React.Component<
                 const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)!
 
                 const shouldUseFlat =
-                settingsStore.enharmonicFlatsMap[notePitchWithSharp] === true
-
+                  settingsStore.enharmonicFlatsMap[notePitchWithSharp] === true
 
                 const noteName = shouldUseFlat
                   ? tonal.Note.enharmonic(noteNameWithSharp)
