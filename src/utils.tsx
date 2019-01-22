@@ -143,12 +143,14 @@ export const createDefaultSession = () => {
     updatedAt: new Date().toISOString(),
 
     bpm: 120,
-    rests: 1,
+    rests: 0,
     offset: 0,
     rhythm: { beats: 1, divisions: 1 },
 
-    countInCounts: 3,
-    countInEnabled: false,
+    countInCounts: 4,
+    countInEnabled: true,
+    metronomeEnabled: true,
+
     modifiers: {
       directions: {
         enabled: false,
