@@ -47,6 +47,34 @@ interface FormValues {
   direction: 'up' | 'down'
 }
 
+interface StepOption {
+  direction: 'up' | 'down'
+  stepInterval: number
+}
+
+const sliderStepOptions: StepOption[][] = [
+  [{ direction: 'up', stepInterval: 1 }],
+  [{ direction: 'up', stepInterval: 2 }],
+  [{ direction: 'up', stepInterval: 3 }],
+  [{ direction: 'up', stepInterval: 4 }],
+  [
+    { direction: 'up', stepInterval: 5 },
+    { direction: 'down', stepInterval: 7 },
+  ],
+  [
+    { direction: 'up', stepInterval: 6 },
+    { direction: 'down', stepInterval: 6 },
+  ],
+  [
+    { direction: 'up', stepInterval: 7 },
+    { direction: 'down', stepInterval: 5 },
+  ],
+  [{ direction: 'down', stepInterval: 4 }],
+  [{ direction: 'down', stepInterval: 3 }],
+  [{ direction: 'down', stepInterval: 2 }],
+  [{ direction: 'down', stepInterval: 1 }],
+]
+
 type NoteSequenceModalState = {
   range?: any
   values: FormValues
@@ -69,7 +97,7 @@ class NoteSequenceModal extends React.Component<
     super(props)
 
     const startNoteName = 'C4'
-    const stepInterval = tonal.Distance.semitones('C', 'G') as number
+    const stepInterval = 1
     const direction = 'up'
 
     this.state = {
@@ -224,12 +252,9 @@ class NoteSequenceModal extends React.Component<
   ]
 
   private getIntervalOptions = memoize(() =>
-    ['2m', '2M', '3m', '3M', '4P', '5d'].map(interval => {
+    ['2m', '2M', '3m', '3M', '4P', '5d', '5P'].map(interval => {
       const semitones = tonal.Interval.semitones(interval) as number
-      const intervalName =
-        interval === '4P'
-          ? 'Perfect 4th / Perfect 5th'
-          : SemitonesToIntervalNameMap[interval]
+      const intervalName = SemitonesToIntervalNameMap[interval]
       return {
         title: intervalName || interval,
         value: semitones,
@@ -244,12 +269,13 @@ class NoteSequenceModal extends React.Component<
     )
 
   private handleSliderValueChanged = (event, value) => {
+    const selectedOption = (sliderStepOptions[value] || sliderStepOptions[0])[0]
     this.setState(
       {
         values: {
           ...this.state.values,
-          stepInterval: Math.abs(value),
-          direction: value > 0 ? 'up' : 'down',
+          stepInterval: selectedOption.stepInterval || 2,
+          direction: selectedOption.direction || 'up',
         },
       },
       this.regenerateNoteSequence,
@@ -260,6 +286,15 @@ class NoteSequenceModal extends React.Component<
     if (!this.props.isOpen) {
       return null
     }
+
+    const sliderValue = sliderStepOptions.findIndex(options => {
+      const matchingOption = options.find(
+        o =>
+          o.direction === this.state.values.direction &&
+          o.stepInterval === this.state.values.stepInterval,
+      )
+      return matchingOption != null
+    })
 
     return (
       <Dialog
@@ -360,12 +395,9 @@ class NoteSequenceModal extends React.Component<
                 classes={{
                   container: css(`padding: 1rem;`),
                 }}
-                value={
-                  this.state.values.stepInterval *
-                  (this.state.values.direction === 'up' ? 1 : -1)
-                }
-                min={-7}
-                max={7}
+                value={sliderValue || 0}
+                min={0}
+                max={sliderStepOptions.length - 1}
                 step={1}
                 aria-labelledby="slider-label"
                 onChange={this.handleSliderValueChanged}
