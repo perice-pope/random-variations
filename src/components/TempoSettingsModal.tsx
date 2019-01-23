@@ -21,7 +21,7 @@ import { Flex, Box } from './ui'
 
 import { createDefaultSession, parseIntEnsureInBounds } from '../utils'
 import { RhythmInfo, StaffTick } from '../types'
-import { css } from 'emotion'
+import { css, cx } from 'emotion'
 import ArrowsIcon from '@material-ui/icons/Cached'
 import {
   withAudioEngine,
@@ -542,13 +542,10 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
       // @ts-ignore
       <TextField
         className={css({
-          maxWidth: '80px',
+          maxWidth: '50px',
           marginRight: '15px',
         })}
-        InputProps={{
-          className: css({ fontSize: '1.3rem' }),
-          endAdornment: <InputAdornment position="end">Beats</InputAdornment>,
-        }}
+        label="Meter"
         id="beats"
         type="number"
         // @ts-ignore
@@ -564,14 +561,9 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
       // @ts-ignore
       <TextField
         className={css({
-          maxWidth: '110px',
+          maxWidth: '50px',
         })}
-        InputProps={{
-          className: css({ fontSize: '1.3rem' }),
-          endAdornment: (
-            <InputAdornment position="end">Divisions</InputAdornment>
-          ),
-        }}
+        label="Division"
         id="divisions"
         type="number"
         // @ts-ignore
@@ -612,7 +604,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
 
             <Box mt={3} mb={3}>
               <Typography variant="h5">Count-in</Typography>
-              <Typography variant="subtitle1">
+              <Typography variant="body2">
                 Number of metronome clicks to play before playing the notes
               </Typography>
               <Flex alignItems="center">
@@ -627,14 +619,14 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
 
             <Box mt={3} mb={3}>
               <Typography variant="h5">Rests & offset</Typography>
-              <Typography variant="subtitle1">
+              <Typography variant="body2">
                 Number of rest beats between note groups
               </Typography>
               {RestsTextInput}
               {RestsSliderInput}
 
               <Box mt={3}>
-                <Typography variant="subtitle1">
+                <Typography variant="body2">
                   Number of rest beats before playing the first note (after
                   count-in clicks).
                 </Typography>
@@ -647,12 +639,32 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
 
             <Box mt={3} mb={3}>
               <Typography variant="h5">Rhythm</Typography>
-              <Typography variant="subtitle1">
+              <Typography variant="body2">
                 Tweak how metronome ticks and notes rhythm relate to each other.
               </Typography>
-              <Flex alignItems="center">
+
+              <Flex alignItems="center" mt={3}>
                 {RhythmBeatsTextField}
                 {RhythmDivisionsTextField}
+
+                <div
+                  className={css(
+                    `margin-left: 5px; margin-top: 10px; margin-right: -20px;`,
+                  )}
+                >
+                  {`= ${(rhythm.beats / rhythm.divisions).toFixed(2)} beats`}
+                  <br />
+                  <span
+                    className={cx(
+                      'text-soft',
+                      css(`font-size: 0.8rem; margin-left: 15px;`),
+                    )}
+                  >
+                    {`${Math.round(
+                      bpm / (rhythm.beats / rhythm.divisions),
+                    )} BPM`}
+                  </span>
+                </div>
               </Flex>
 
               {RhythmSliderInput}
