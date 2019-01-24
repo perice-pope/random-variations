@@ -24,7 +24,7 @@ import PickNoteModal from './PickNoteModal'
 import { observer } from 'mobx-react'
 import settingsStore from '../services/settingsStore'
 import {
-  normalizeNoteName,
+  getNotePitchClassWithSharp,
   instrumentTransposingOptionsByType,
 } from '../musicUtils'
 
@@ -170,10 +170,10 @@ const SortableNoteCard = SortableElement(
         instrumentTransposedEnharmonicNoteName !==
         instrumentTransposedNoteNameWithOctave
 
-      const noteNameHalfStepUp = normalizeNoteName(
+      const noteNameHalfStepUp = getNotePitchClassWithSharp(
         tonal.Note.fromMidi(midi + 1),
       )
-      const noteNameHalfStepDown = normalizeNoteName(
+      const noteNameHalfStepDown = getNotePitchClassWithSharp(
         tonal.Note.fromMidi(midi - 1),
       )
 
@@ -567,7 +567,7 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
               disabledNoteNames || [],
               this.state.noteEditingModalNoteIndex != null
                 ? [
-                    normalizeNoteName(
+                    getNotePitchClassWithSharp(
                       this.props.notes[this.state.noteEditingModalNoteIndex]
                         .noteName,
                     ),

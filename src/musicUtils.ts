@@ -41,7 +41,17 @@ import {
 } from './types'
 import settingsStore from './services/settingsStore'
 
-export const normalizeNoteName = (noteName: string) => {
+export const getNoteNameWithSharp = (noteName: string) => {
+  if (!noteName) {
+    return noteName
+  }
+  if (noteName.includes('b')) {
+    return tonal.Note.enharmonic(noteName) as string
+  }
+  return noteName
+}
+
+export const getNotePitchClassWithSharp = (noteName: string) => {
   const pc = tonal.Note.pc(noteName) as string
   if (!pc) {
     return noteName
@@ -1023,9 +1033,7 @@ export const generateStaffTicks = ({
     let noteNameTransposed = noteCard.noteName
     if (settingsStore.instrumentTransposing !== 'C') {
       const transposingConfig =
-        instrumentTransposingOptionsByType[
-          settingsStore.instrumentTransposing
-        ]
+        instrumentTransposingOptionsByType[settingsStore.instrumentTransposing]
       if (transposingConfig) {
         noteNameTransposed = tonal.transpose(
           noteNameTransposed,

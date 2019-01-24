@@ -32,7 +32,7 @@ import styled from 'react-emotion'
 import settingsStore from '../services/settingsStore'
 import { IconButton, Typography } from '@material-ui/core'
 import {
-  normalizeNoteName,
+  getNotePitchClassWithSharp,
   instrumentTransposingOptionsByType,
 } from '../musicUtils'
 
@@ -352,7 +352,7 @@ class PickNoteModal extends React.Component<
                 const bgColor = getNoteCardColorByNoteName(noteName)
 
                 const isDisabled =
-                  disabledNoteNamesMap[normalizeNoteName(noteName)] === true
+                  disabledNoteNamesMap[getNotePitchClassWithSharp(noteName)] === true
 
                 let transposedNoteName = noteName
                 let transposedNotePitch = notePitch

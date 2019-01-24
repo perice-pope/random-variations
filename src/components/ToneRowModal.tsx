@@ -30,7 +30,7 @@ import {
   withAudioEngine,
   WithAudioEngineInjectedProps,
 } from './withAudioEngine'
-import { NoteNamesWithSharps, normalizeNoteName } from '../musicUtils'
+import { NoteNamesWithSharps, getNotePitchClassWithSharp } from '../musicUtils'
 import {
   Typography,
   IconButton,
@@ -81,7 +81,7 @@ const generateRandomNotes = (
     ? [
         firstNoteName,
         ...(allowRepeatingNotes ? sampleRepeating : sampleNonRepeating)(
-          _.difference(availableNotes, [normalizeNoteName(firstNoteName)]),
+          _.difference(availableNotes, [getNotePitchClassWithSharp(firstNoteName)]),
           count - 1,
         ),
       ]
@@ -278,7 +278,7 @@ class ToneRowModal extends React.Component<
     const commonPrefixLength = Math.min(count, this.state.notes.length)
 
     const notesInUseWithSharps = this.state.notes.map(n =>
-      normalizeNoteName(n.noteName),
+      getNotePitchClassWithSharp(n.noteName),
     )
     let availableNotes = this.getAvailableNoteNamesWithSharps()
     if (!this.state.allowRepeatingNotes) {
@@ -374,7 +374,7 @@ class ToneRowModal extends React.Component<
     }
 
     const noteNamesUsedInSession = _.uniq(
-      this.props.notesUsedInSession.map(normalizeNoteName),
+      this.props.notesUsedInSession.map(getNotePitchClassWithSharp),
     )
 
     return _.difference(NoteNamesWithSharps, noteNamesUsedInSession) as string[]
@@ -386,10 +386,10 @@ class ToneRowModal extends React.Component<
     }
 
     const notesInUseWithSharps = this.state.notes.map(n =>
-      normalizeNoteName(n.noteName),
+      getNotePitchClassWithSharp(n.noteName),
     )
     const noteNamesUsedInSession = _.uniq(
-      this.props.notesUsedInSession.map(normalizeNoteName),
+      this.props.notesUsedInSession.map(getNotePitchClassWithSharp),
     )
     return _.uniq(_.union(notesInUseWithSharps, noteNamesUsedInSession))
   }

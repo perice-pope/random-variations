@@ -10,7 +10,7 @@ import { Box } from './ui'
 import { withAudioEngine } from './withAudioEngine'
 import AudioEngine from '../services/audioEngine'
 import { AudioFontId } from '../audioFontsConfig'
-import { normalizeNoteName } from '../musicUtils'
+import { getNotePitchClassWithSharp } from '../musicUtils'
 
 export const pianoNoteRangeWide: MidiNoteRange = {
   first: tonal.Note.midi('C3') as number,
@@ -80,7 +80,7 @@ class PianoKeyboard extends React.Component<
   }
 
   private onPlayNote = noteMidi => {
-    const normalizedNoteName = normalizeNoteName(tonal.Note.fromMidi(noteMidi))
+    const normalizedNoteName = getNotePitchClassWithSharp(tonal.Note.fromMidi(noteMidi))
 
     const isDisabled =
       !!this.props.disabledNoteNames &&
@@ -152,7 +152,7 @@ class PianoKeyboard extends React.Component<
       ? this.props.secondaryNotesMidi.findIndex(n => n === midiNumber) >= 0
       : false
 
-    const normalizedNoteName = normalizeNoteName(
+    const normalizedNoteName = getNotePitchClassWithSharp(
       tonal.Note.fromMidi(midiNumber),
     )
 

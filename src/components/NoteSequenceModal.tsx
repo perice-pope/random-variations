@@ -29,7 +29,10 @@ import {
   Divider,
 } from '@material-ui/core'
 import NoteCards, { NoteCardNote } from './NoteCards'
-import { SemitonesToIntervalNameMap } from '../musicUtils'
+import {
+  SemitonesToIntervalNameMap,
+  getNotePitchClassWithSharp,
+} from '../musicUtils'
 import Slider from '@material-ui/lab/Slider'
 
 type NoteSequenceModalProps = {
@@ -119,55 +122,47 @@ class NoteSequenceModal extends React.Component<
     direction: 'up' | 'down',
   ) => {
     const notes: string[] = []
-    const notesUsedSharps = {}
-    const octave = tonal.Note.oct(noteName) as number
-    let currentNote = noteName
-    let currentNoteSharp = currentNote.includes('b')
-      ? (tonal.Note.enharmonic(currentNote) as string)
-      : currentNote
 
-    let index = 0
-    while (!notesUsedSharps[currentNoteSharp] && notes.length < 12) {
-      notesUsedSharps[currentNoteSharp] = true
+    let currentNote = noteName
+    let currentNotePitchClassWithSharp = getNotePitchClassWithSharp(currentNote)
+
+    const usedPitchClassesWithSharps = {}
+    let currentNoteIndex = 0
+
+    while (
+      !usedPitchClassesWithSharps[currentNotePitchClassWithSharp] &&
+      notes.length < 12
+    ) {
+      usedPitchClassesWithSharps[currentNotePitchClassWithSharp] = true
       notes.push(currentNote)
 
       let nextNote: string
-      let nextNoteOctave: number
 
       // For perfect 4th / perfect 5th, we want to alternate between up/down step direction
-      if (stepInterval === 5) {
+      if (stepInterval === 5 || stepInterval === 7) {
         const currentDirection =
-          index % 2 ? flipDirection(direction) : direction
-        const currentStepInterval = index % 2 ? 5 : 7
+          currentNoteIndex % 2 ? flipDirection(direction) : direction
+
+        let currentStepInterval = stepInterval
+        if (currentNoteIndex % 2) {
+          if (currentStepInterval === 5) {
+            currentStepInterval = 7
+          } else if (currentStepInterval === 7) {
+            currentStepInterval = 5
+          }
+        }
 
         nextNote = tonal.Note.fromMidi(
           (tonal.Note.midi(currentNote) as number) +
             (currentDirection === 'up' ? 1 : -1) * currentStepInterval,
           true,
         )
-        nextNoteOctave = tonal.Note.oct(nextNote) as number
       } else {
         nextNote = tonal.Note.fromMidi(
           (tonal.Note.midi(currentNote) as number) +
             stepInterval * (direction === 'up' ? 1 : -1),
           true,
         ) as string
-        nextNoteOctave = tonal.Note.oct(nextNote) as number
-
-        if (nextNoteOctave > octave) {
-          nextNote = tonal.Note.fromMidi(
-            (tonal.Note.midi(nextNote) as number) - 12,
-            true,
-          )
-          nextNoteOctave = tonal.Note.oct(nextNote) as number
-        }
-        if (nextNoteOctave < octave) {
-          nextNote = tonal.Note.fromMidi(
-            (tonal.Note.midi(nextNote) as number) + 12,
-            true,
-          )
-          nextNoteOctave = tonal.Note.oct(nextNote) as number
-        }
       }
 
       nextNote =
@@ -175,14 +170,10 @@ class NoteSequenceModal extends React.Component<
           ? (tonal.Note.enharmonic(nextNote) as string)
           : nextNote
 
-      const nextNoteSharp = nextNote.includes('b')
-        ? (tonal.Note.enharmonic(nextNote) as string)
-        : nextNote
-
       currentNote = nextNote
-      currentNoteSharp = nextNoteSharp
+      currentNotePitchClassWithSharp = getNotePitchClassWithSharp(currentNote)
 
-      index += 1
+      currentNoteIndex += 1
     }
 
     return notes.map(
@@ -308,7 +299,7 @@ class NoteSequenceModal extends React.Component<
         <DialogContent className={css(`overflow-x: hidden;`)}>
           <Typography variant="h5">Add note sequence</Typography>
           <Typography variant="subtitle2">
-            A number of notes with equal intervals in between
+            A sequence of notes with equal intervals in between
           </Typography>
 
           <Box mt={3}>
