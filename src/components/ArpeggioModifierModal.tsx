@@ -195,6 +195,35 @@ class ArpeggioModifierModal extends React.Component<
     const chord = chordsByChordType[chordType] as Chord
     const { notesCount } = chord
 
+    let { pattern, patternPreset } = this.state.values
+
+    const shouldResetPatternType = chordType !== this.state.values.chordType
+    if (shouldResetPatternType) {
+      patternPreset = 'ascending'
+      pattern = generateChordPatternFromPreset({
+        chord,
+        patternPreset,
+      })
+    } else {
+      pattern =
+        patternPreset === 'custom'
+          ? {
+              ...this.state.values.pattern,
+              items: this.state.values.pattern.items.map(item => ({
+                ...item,
+                // Adapt the pattern to the new chord (e.g. when new chord has less notes, etc)
+                note:
+                  item.note > notesCount
+                    ? 1 + ((item.note - 1) % notesCount)
+                    : item.note,
+              })),
+            }
+          : generateChordPatternFromPreset({
+              chord,
+              patternPreset: this.state.values.patternPreset,
+            })
+    }
+
     this.setState(
       {
         values: {
@@ -204,23 +233,8 @@ class ArpeggioModifierModal extends React.Component<
             notesCount - 1,
             this.state.values.chordInversion,
           ),
-          pattern:
-            this.state.values.patternPreset !== 'custom'
-              ? generateChordPatternFromPreset({
-                  chord,
-                  patternPreset: this.state.values.patternPreset,
-                })
-              : {
-                  ...this.state.values.pattern,
-                  items: this.state.values.pattern.items.map(item => ({
-                    ...item,
-                    // Adapt the pattern to the new chord (e.g. when new chord has less notes, etc)
-                    note:
-                      item.note > notesCount
-                        ? 1 + ((item.note - 1) % notesCount)
-                        : item.note,
-                  })),
-                },
+          patternPreset,
+          pattern,
         },
       },
       this.setPlaybackLoop,
@@ -456,9 +470,7 @@ class ArpeggioModifierModal extends React.Component<
     let noteNameTransposed = this.props.baseNote || 'C4'
     if (settingsStore.instrumentTransposing !== 'C') {
       const transposingConfig =
-        instrumentTransposingOptionsByType[
-          settingsStore.instrumentTransposing
-        ]
+        instrumentTransposingOptionsByType[settingsStore.instrumentTransposing]
       if (transposingConfig) {
         noteNameTransposed = tonal.transpose(
           noteNameTransposed,
@@ -468,9 +480,7 @@ class ArpeggioModifierModal extends React.Component<
     }
 
     const tickLabels = [
-      `${tonal.Note.pc(noteNameTransposed)}${
-        this.state.values.chordType
-      }`,               
+      `${tonal.Note.pc(noteNameTransposed)}${this.state.values.chordType}`,
     ]
 
     return (

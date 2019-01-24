@@ -218,21 +218,34 @@ class ScaleModifierModal extends React.Component<
       scaleByScaleType[scaleType] ||
       (scaleByScaleType[DEFAULT_SCALE_NAME] as Scale)
 
+    let { pattern, patternPreset } = this.state.values
+    const shouldResetPatternType = scaleType !== this.state.values.scaleType
+    if (shouldResetPatternType) {
+      patternPreset = 'up'
+      pattern = generateScalePatternFromPreset({
+        scale,
+        patternPreset,
+      })
+    } else {
+      pattern =
+        this.state.values.patternPreset === 'custom'
+          ? adaptPatternForScale({
+              scale,
+              pattern: this.state.values.pattern,
+            })
+          : generateScalePatternFromPreset({
+              scale,
+              patternPreset: this.state.values.patternPreset,
+            })
+    }
+
     this.setState(
       {
         values: {
           ...this.state.values,
           scaleType,
-          pattern:
-            this.state.values.patternPreset !== 'custom'
-              ? generateScalePatternFromPreset({
-                  scale,
-                  patternPreset: this.state.values.patternPreset,
-                })
-              : adaptPatternForScale({
-                  scale,
-                  pattern: this.state.values.pattern,
-                }),
+          patternPreset,
+          pattern,
         },
       },
       this.setPlaybackLoop,
