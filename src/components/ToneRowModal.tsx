@@ -24,13 +24,17 @@ import withMobileDialog, {
 import { Flex, Box } from './ui'
 import Tooltip from './ui/Tooltip'
 
-import { getNoteCardColorByNoteName, arrayMove } from '../utils'
+import { getColorForNote, arrayMove } from '../utils'
 import { css, cx } from 'emotion'
 import {
   withAudioEngine,
   WithAudioEngineInjectedProps,
 } from './withAudioEngine'
-import { NoteNamesWithSharps, getNotePitchClassWithSharp } from '../musicUtils'
+import {
+  NoteNamesWithSharps,
+  getNotePitchClassWithSharp,
+  getNoteNameWithSharp,
+} from '../musicUtils'
 import {
   Typography,
   IconButton,
@@ -40,6 +44,7 @@ import {
 import settingsStore from '../services/settingsStore'
 import NoteCards, { NoteCardNote } from './NoteCards'
 import { ChromaticNoteSharps } from '../types'
+import { transparentize } from 'polished'
 
 type ToneRowModalProps = {
   isOpen: boolean
@@ -81,7 +86,9 @@ const generateRandomNotes = (
     ? [
         firstNoteName,
         ...(allowRepeatingNotes ? sampleRepeating : sampleNonRepeating)(
-          _.difference(availableNotes, [getNotePitchClassWithSharp(firstNoteName)]),
+          _.difference(availableNotes, [
+            getNotePitchClassWithSharp(firstNoteName),
+          ]),
           count - 1,
         ),
       ]
@@ -380,18 +387,31 @@ class ToneRowModal extends React.Component<
     return _.difference(NoteNamesWithSharps, noteNamesUsedInSession) as string[]
   }
 
-  private getDisabledNotes = () => {
+  private getNotePitchClassWithSharpsUsedWithinSession = () => {
+    const noteNamesUsedInSession = _.uniq(
+      this.props.notesUsedInSession.map(getNotePitchClassWithSharp),
+    )
+    return noteNamesUsedInSession
+  }
+
+  private getNotePitchClassWithSharpsUsedWithinWindow = () => {
+    const notesInUseWithSharps = this.state.notes.map(n =>
+      getNotePitchClassWithSharp(n.noteName),
+    )
+    return notesInUseWithSharps
+  }
+
+  private getDisabledPitchClassesWithSharps = () => {
     if (this.state.allowRepeatingNotes) {
       return []
     }
 
-    const notesInUseWithSharps = this.state.notes.map(n =>
-      getNotePitchClassWithSharp(n.noteName),
+    return _.uniq(
+      _.union(
+        this.getNotePitchClassWithSharpsUsedWithinSession(),
+        this.getNotePitchClassWithSharpsUsedWithinWindow(),
+      ),
     )
-    const noteNamesUsedInSession = _.uniq(
-      this.props.notesUsedInSession.map(getNotePitchClassWithSharp),
-    )
-    return _.uniq(_.union(notesInUseWithSharps, noteNamesUsedInSession))
   }
 
   private getMaxNumberOfNotesToAdd = () => {
@@ -403,6 +423,41 @@ class ToneRowModal extends React.Component<
       this.props.maxNotesCount,
       this.getAvailableNoteNamesWithSharps().length,
     )
+  }
+
+  private isMidiNoteDisabled = (midi: number) => {
+    if (this.state.allowRepeatingNotes) {
+      return false
+    }
+    const pitchClass = getNotePitchClassWithSharp(tonal.Note.fromMidi(
+      midi,
+      true,
+    ) as string)
+    return (
+      this.getDisabledPitchClassesWithSharps().findIndex(
+        n => n === pitchClass,
+      ) > -1
+    )
+  }
+
+  private getPianoNoteColor = (midi: number) => {
+    const noteNameWithSharp = getNoteNameWithSharp(tonal.Note.fromMidi(
+      midi,
+      true,
+    ) as string)
+
+    if (this.isMidiNoteDisabled(midi)) {
+      return transparentize(0.6, '#bbb')
+    }
+
+    if (
+      !!this.state.noteNameMouseOver &&
+      getNoteNameWithSharp(this.state.noteNameMouseOver) === noteNameWithSharp
+    ) {
+      return transparentize(0.7, getColorForNote(this.state.noteNameMouseOver))
+    }
+
+    return undefined
   }
 
   render() {
@@ -550,22 +605,27 @@ class ToneRowModal extends React.Component<
 
                   this.onKeyboardNotePlayed(noteName)
                 }}
-                disabledNoteNames={this.getDisabledNotes()}
-                primaryNotesMidi={
-                  this.state.noteNameMouseOver
-                    ? [tonal.Note.midi(this.state.noteNameMouseOver)]
-                    : undefined
-                }
-                notesColor={
-                  this.state.noteNameMouseOver
-                    ? getNoteCardColorByNoteName(
-                        // @ts-ignore
-                        this.state.noteNameMouseOver,
-                      )
-                    : undefined
-                }
+                getIsNoteDisabled={this.isMidiNoteDisabled}
+                getNoteColor={this.getPianoNoteColor}
               />
             </Box>
+
+            <p
+              className={cx(
+                'text-soft',
+                css(`font-size: 0.8em;`),
+                css(`opacity: 0; transition: opacity 0.3s;`),
+                (this.state.notes.length === this.props.maxNotesCount ||
+                  !this.state.allowRepeatingNotes) &&
+                  css(`opacity: 1.0;`),
+              )}
+            >
+              {!this.state.allowRepeatingNotes &&
+                'Notes that are already used in the session are grayed out. If you want to allow repeating notes, toggle the switch above.'}
+              {this.state.notes.length === this.props.maxNotesCount &&
+                this.state.allowRepeatingNotes &&
+                `This is the maximum number of notes you can add to this session - limit of 12 notes per session is reached`}
+            </p>
 
             <div
               className={css(`
@@ -586,8 +646,9 @@ class ToneRowModal extends React.Component<
               <NoteCards
                 zIndex={10000000}
                 verticalAlign="top"
+                disableRemoving={this.state.notes.length === 1}
                 notes={this.state.notes}
-                disabledNoteNames={this.getDisabledNotes()}
+                disabledNotePitches={this.getDisabledPitchClassesWithSharps()}
                 onMouseOver={this.handleNoteCardMouseOver}
                 onMouseLeave={this.handleNoteCardMouseLeave}
                 onCardsReorder={this.handleCardsReorder}
@@ -599,18 +660,6 @@ class ToneRowModal extends React.Component<
                 onDeleteClick={this.deleteNoteCard}
               />
             </div>
-
-            <p
-              className={cx(
-                'text-soft',
-                css(`font-size: 0.8em;`),
-                css(`opacity: 0; transition: opacity 0.3s;`),
-                !this.state.allowRepeatingNotes && css(`opacity: 1.0;`),
-              )}
-            >
-              Notes that are already used are grayed out. If you want to allow
-              notes to repeat, toggle the switch above.
-            </p>
           </Flex>
         </DialogContent>
 

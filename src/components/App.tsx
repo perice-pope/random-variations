@@ -56,7 +56,7 @@ import MeasureScreenSize from './MeasureScreenSize'
 import {
   shuffle,
   arrayMove,
-  getNoteCardColorByNoteName,
+  getColorForNote,
   timeago,
   downloadBlob,
 } from '../utils'
@@ -152,6 +152,7 @@ import shortenString from '../utils/shortenString'
 import TempoSettingsModal, {
   TempoSettingsFormValues,
 } from './TempoSettingsModal'
+import { transparentize } from 'polished';
 
 globalStyles()
 smoothscroll.polyfill()
@@ -237,7 +238,7 @@ const getNoteCardsFromSessionCards = memoize(
       text: tonal.Note.pc(nc.noteName) as string,
       midi: tonal.Note.midi(nc.noteName) as number,
       freq: tonal.Note.freq(nc.noteName) as number,
-      color: getNoteCardColorByNoteName(nc.noteName),
+      color: getColorForNote(nc.noteName),
     }))
 
     const noteCardsById = _.keyBy(noteCards, 'id')
@@ -1491,12 +1492,8 @@ class App extends React.Component<
     const { classes } = this.props
     const {
       isSignedIn,
-      staffTicks,
-      staffTicksPerCard,
       isPlaying,
       activeStaffTickIndex,
-      activeNoteCardId,
-      noteCardWithMouseOver,
     } = this.state
 
     const {
@@ -1509,7 +1506,7 @@ class App extends React.Component<
       modifiers,
     } = sessionStore.activeSession
 
-    const { noteCards, noteCardsById } = this.getNoteCards()
+    const { noteCards } = this.getNoteCards()
 
     const isPhone = this.props.width === 'xs'
     const isMobile = this.props.width === 'xs' || this.props.width === 'sm'
@@ -1519,21 +1516,6 @@ class App extends React.Component<
       settingsStore.clefType
     ] || 4}`
 
-    const activeNoteCard =
-      isPlaying && activeNoteCardId != null
-        ? noteCardsById[activeNoteCardId]
-        : undefined
-    const activeStaffTick = isPlaying
-      ? staffTicks[activeStaffTickIndex]
-      : undefined
-
-    const activeNoteCardStaffTicks = activeNoteCard
-      ? staffTicksPerCard[activeNoteCard.id]
-      : undefined
-
-    const noteCardWithMouseOverStaffTicks = noteCardWithMouseOver
-      ? staffTicksPerCard[noteCardWithMouseOver.id]
-      : undefined
 
     const highestNote = this.getHighestNoteWithinSession(this.state.staffTicks)
     const lowestNote = this.getLowestNoteWithinSession(this.state.staffTicks)
@@ -2534,35 +2516,8 @@ class App extends React.Component<
                   }
                   noteRange={this.getPianoNoteRange()}
                   height={this.getPianoHeight()}
-                  secondaryNotesMidi={
-                    activeNoteCardStaffTicks
-                      ? _.flatten(
-                          activeNoteCardStaffTicks.map(t =>
-                            t.notes.map(n => n.midi),
-                          ),
-                        )
-                      : noteCardWithMouseOverStaffTicks
-                        ? _.flatten(
-                            noteCardWithMouseOverStaffTicks.map(t =>
-                              t.notes.map(n => n.midi),
-                            ),
-                          )
-                        : undefined
-                  }
-                  primaryNotesMidi={
-                    activeStaffTick
-                      ? activeStaffTick.notes.map(n => n.midi)
-                      : noteCardWithMouseOver
-                        ? [noteCardWithMouseOver.midi]
-                        : undefined
-                  }
-                  notesColor={
-                    activeNoteCard
-                      ? activeNoteCard.color
-                      : noteCardWithMouseOver
-                        ? noteCardWithMouseOver.color
-                        : undefined
-                  }
+                  getNoteColor={this.getPianoKeyboardNoteColor}
+                  getIsCirclesShown={this.getPianoKeyboardNoteShowCircle}
                 />
               </div>
             </div>
@@ -2690,11 +2645,85 @@ class App extends React.Component<
     )
   }
 
-  private getMaxNotesStaffLines() {
+  private getMaxNotesStaffLines=  () => {
     return 16
   }
 
-  private getNotesStaffScaleFactor(isMobile: boolean) {
+  private getPianoKeyboardNoteShowCircle = (midi) => {
+    return !!this.getPianoKeyboardNoteColor(midi)
+  }
+
+  private getPianoKeyboardNoteColor = (midi) => {
+    const {
+      staffTicks,
+      staffTicksPerCard,
+      isPlaying,
+      activeStaffTickIndex,
+      activeNoteCardId,
+      noteCardWithMouseOver,
+    } = this.state
+
+    const { noteCardsById } = this.getNoteCards()
+
+    const activeNoteCard =
+    isPlaying && activeNoteCardId != null
+      ? noteCardsById[activeNoteCardId]
+      : undefined
+
+    const activeNoteCardColor = 
+    activeNoteCard
+      ? activeNoteCard.color
+      : noteCardWithMouseOver
+        ? noteCardWithMouseOver.color
+        : undefined
+
+if (!activeNoteCardColor) {
+  return undefined
+}
+
+    const activeStaffTick = isPlaying
+    ? staffTicks[activeStaffTickIndex]
+    : undefined
+
+  const activeNoteCardStaffTicks = activeNoteCard
+    ? staffTicksPerCard[activeNoteCard.id]
+    : undefined
+
+  const noteCardWithMouseOverStaffTicks = noteCardWithMouseOver
+    ? staffTicksPerCard[noteCardWithMouseOver.id]
+    : undefined
+
+    const isSecondaryNote=
+      activeNoteCardStaffTicks
+        ? activeNoteCardStaffTicks.findIndex(t =>
+              t.notes.findIndex(n => n.midi === midi) > -1,
+            ) > -1
+        : noteCardWithMouseOverStaffTicks
+          ? noteCardWithMouseOverStaffTicks.findIndex(t =>
+                t.notes.findIndex(n => n.midi === midi) > -1,
+              ) > -1
+          : false
+    
+    const isPrimaryNote = 
+      activeStaffTick
+        ? activeStaffTick.notes.findIndex(n => n.midi === midi) > -1
+        : noteCardWithMouseOver
+          ? noteCardWithMouseOver.midi === midi
+          : false
+
+
+    if (isPrimaryNote) {
+      return transparentize(0.3, activeNoteCardColor)
+    }
+
+    if (isSecondaryNote) {
+      return transparentize(0.8, activeNoteCardColor)
+    }
+
+    return undefined
+  }
+
+  private getNotesStaffScaleFactor = (isMobile: boolean) => {
     let scale = 1.0
     if (isMobile) {
       scale = 0.7

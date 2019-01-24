@@ -113,8 +113,8 @@ baseNotes.forEach(baseNote => {
 /**
  * @param fullNoteName Full note name, e.g. "C#4"
  */
-export const getNoteCardColorByNoteName = (fullNoteName: string) => {
-  const pitchName = tonal.Note.pc(fullNoteName) as string
+export const getColorForNote = (noteName: string) => {
+  const pitchName = tonal.Note.pc(noteName) as string
   return NoteNameToColorMap[pitchName]
 }
 

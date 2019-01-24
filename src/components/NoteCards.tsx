@@ -19,7 +19,7 @@ import RemoveIcon from '@material-ui/icons/Close'
 
 import { Flex, Text } from './ui'
 import NoteCard from './NoteCard'
-import { getNoteCardColorByNoteName } from '../utils'
+import { getColorForNote } from '../utils'
 import PickNoteModal from './PickNoteModal'
 import { observer } from 'mobx-react'
 import settingsStore from '../services/settingsStore'
@@ -144,7 +144,7 @@ const SortableNoteCard = SortableElement(
         zIndex,
         hideContextMenu,
         disableRemoving,
-        disabledNoteNames,
+        disabledNotePitches,
         ...props
       } = this.props
       const menuId = `note-card-menu-${id}`
@@ -177,17 +177,17 @@ const SortableNoteCard = SortableElement(
         tonal.Note.fromMidi(midi - 1),
       )
 
-      let disabledNoteNamesMap = {}
-      if (disabledNoteNames) {
-        disabledNoteNames.forEach(n => {
-          disabledNoteNamesMap[n] = true
+      let disabledNotePitchesMap = {}
+      if (disabledNotePitches) {
+        disabledNotePitches.forEach(n => {
+          disabledNotePitchesMap[n] = true
         })
       }
 
       const shouldDisableHalfStepUp =
-        midi >= 95 || disabledNoteNamesMap[noteNameHalfStepUp]
+        midi >= 95 || disabledNotePitchesMap[noteNameHalfStepUp]
       const shouldDisableHalfStepDown =
-        midi <= 24 || disabledNoteNamesMap[noteNameHalfStepDown]
+        midi <= 24 || disabledNotePitchesMap[noteNameHalfStepDown]
 
       return (
         <Flipped flipId={id} shouldFlip={shouldFlip}>
@@ -312,7 +312,7 @@ const SortableNotesContainer = SortableContainer(
       showOctaves,
       onMouseLeave,
       verticalAlign,
-      disabledNoteNames,
+      disabledNotePitches,
     }) => {
       let backgroundColor = 'transparent'
       if (isDraggingOutOfContainer) {
@@ -366,12 +366,12 @@ const SortableNotesContainer = SortableContainer(
                   key={id}
                   index={index}
                   // @ts-ignore
-                  bgColor={getNoteCardColorByNoteName(noteName)}
+                  bgColor={getColorForNote(noteName)}
                   tabIndex={-1}
                   perLineCount={perLineCount}
                   hideContextMenu={hideContextMenu}
                   disableRemoving={disableRemoving}
-                  disabledNoteNames={disabledNoteNames}
+                  disabledNotePitches={disabledNotePitches}
                   width={1}
                   zIndex={zIndex}
                   active={activeNoteCardIndex === index}
@@ -413,7 +413,7 @@ export interface NoteCardNote {
 
 type NoteCardsProps = {
   notes: NoteCardNote[]
-  disabledNoteNames?: string[]
+  disabledNotePitches?: string[]
   draggable?: boolean
   disableRemoving?: boolean
   hideContextMenu?: boolean
@@ -527,7 +527,7 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
       showOctaves,
       disableRemoving,
       verticalAlign,
-      disabledNoteNames,
+      disabledNotePitches: disabledNotePitches,
     } = this.props
 
     return (
@@ -558,13 +558,13 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
           onChangeToEnharmonicClick={onChangeToEnharmonicClick}
           axis="xy"
           children={children}
-          disabledNoteNames={disabledNoteNames || []}
+          disabledNotePitches={disabledNotePitches || []}
         />
         {this.state.noteEditingModalIsOpen && (
           <PickNoteModal
             isOpen={this.state.noteEditingModalIsOpen}
-            disabledNoteNames={_.difference(
-              disabledNoteNames || [],
+            disabledNotePitches={_.difference(
+              disabledNotePitches || [],
               this.state.noteEditingModalNoteIndex != null
                 ? [
                     getNotePitchClassWithSharp(

@@ -10,7 +10,6 @@ import { Box } from './ui'
 import { withAudioEngine } from './withAudioEngine'
 import AudioEngine from '../services/audioEngine'
 import { AudioFontId } from '../audioFontsConfig'
-import { getNotePitchClassWithSharp } from '../musicUtils'
 
 export const pianoNoteRangeWide: MidiNoteRange = {
   first: tonal.Note.midi('C3') as number,
@@ -45,47 +44,28 @@ type PianoKeyboardProps = {
   width: number
   height: number
   noteRange?: MidiNoteRange
-  disabledNoteNames: string[]
-  primaryNotesMidi?: number[]
-  secondaryNotesMidi?: number[]
-  notesColor?: string
+
+  getIsNoteDisabled?: (noteMidi: number) => boolean
+  getIsCirclesShown?: (noteMidi: number) => boolean
+  getNoteColor?: (noteMidi: number) => string | undefined
+
   onPlayNote?: (noteMidi: number) => any
   onStopNote?: (noteMidi: number) => any
 }
 
-type PianoKeyboardState = {
-  notesColor: string
-}
-
-class PianoKeyboard extends React.Component<
-  PianoKeyboardProps,
-  PianoKeyboardState
-> {
+class PianoKeyboard extends React.Component<PianoKeyboardProps> {
   playingNoteEnvelopes: { [midi: string]: any } = {}
 
-  state = {
-    notesColor: 'rgba(0,0,0,0)',
+  static defaultProps = {
+    getNoteColor: (midi: number) => undefined,
+    getIsCirclesShown: (midi: number) => false,
+    getIsNoteDisabled: (midi: number) => false,
   }
 
   private boxRef = React.createRef<typeof Box>()
 
-  static getDerivedStateFromProps(props) {
-    if (props.notesColor) {
-      return {
-        notesColor: props.notesColor,
-      }
-    }
-
-    return null
-  }
-
   private onPlayNote = noteMidi => {
-    const normalizedNoteName = getNotePitchClassWithSharp(tonal.Note.fromMidi(noteMidi))
-
-    const isDisabled =
-      !!this.props.disabledNoteNames &&
-      !!this.props.disabledNoteNames.find(n => n === normalizedNoteName)
-
+    const isDisabled = this.props.getIsNoteDisabled!(noteMidi)
     if (isDisabled) {
       return
     }
@@ -145,28 +125,30 @@ class PianoKeyboard extends React.Component<
     const circleSize =
       this.props.width != null ? `${widthPerNote - 4}px` : '25px'
 
-    const isPrimary = this.props.primaryNotesMidi
-      ? this.props.primaryNotesMidi.findIndex(n => n === midiNumber) >= 0
-      : false
-    const isSecondary = this.props.secondaryNotesMidi
-      ? this.props.secondaryNotesMidi.findIndex(n => n === midiNumber) >= 0
-      : false
+    const isDisabled = this.props.getIsNoteDisabled!(midiNumber)
+    const isCircleShown = this.props.getIsCirclesShown!(midiNumber)
 
-    const normalizedNoteName = getNotePitchClassWithSharp(
-      tonal.Note.fromMidi(midiNumber),
-    )
+    let naturalColor = this.props.getNoteColor!(midiNumber) || 'rgba(0,0,0,0)'
+    if (getLuminance(naturalColor) > 0.91) {
+      naturalColor = darken(0.1, naturalColor)
+    }
 
-    const isDisabled =
-      !!this.props.disabledNoteNames &&
-      !!this.props.disabledNoteNames.find(n => n === normalizedNoteName)
+    let accidentalColor =
+      this.props.getNoteColor!(midiNumber) || 'rgba(0,0,0,0)'
+    if (getLuminance(accidentalColor) < 0.5) {
+      accidentalColor = lighten(0.1, accidentalColor)
+    }
+
+    const isAccidental = tonal.Note.fromMidi(midiNumber, true).includes('#')
+
+    const naturalLabelColor = darken(0.1, naturalColor)
+    const accidentalLabelColor = lighten(0.1, accidentalColor)
 
     return (
       <>
         <span
           className={cx(
             isDisabled && '--disabled',
-            isPrimary ? '--primary' : undefined,
-            !isPrimary && isSecondary ? '--secondary' : undefined,
             'vf-key-overlay',
             css(`
               transition: 0.3s background-color;
@@ -175,14 +157,17 @@ class PianoKeyboard extends React.Component<
               left: 0;
               right: 0;
               bottom: 0;
+
+              background-color: ${opacify(
+                isAccidental ? 0.15 : 0,
+                isAccidental ? accidentalColor : naturalColor,
+              )};
             `),
           )}
         />
         {shouldRenderCircles ? (
           <span
             className={cx(
-              isPrimary ? '--primary' : undefined,
-              !isPrimary && isSecondary ? '--secondary' : undefined,
               'vf-note-label',
               css({
                 transition: '0.3s background-color',
@@ -192,6 +177,18 @@ class PianoKeyboard extends React.Component<
                 height: circleSize,
                 borderRadius: '100%',
               }),
+              css(
+                `background-color: ${
+                  isAccidental ? accidentalLabelColor : naturalLabelColor
+                };`,
+              ),
+              isCircleShown
+                ? css(`
+                  opacity: 1.0;
+                `)
+                : css(`
+                  opacity: 0;
+                `),
             )}
           />
         ) : null}
@@ -201,20 +198,6 @@ class PianoKeyboard extends React.Component<
 
   public render() {
     const { className, height } = this.props
-
-    let naturalColor = this.state.notesColor
-
-    if (getLuminance(naturalColor) > 0.91) {
-      naturalColor = darken(0.1, naturalColor)
-    }
-
-    let accidentalColor = this.state.notesColor
-    if (getLuminance(accidentalColor) < 0.5) {
-      accidentalColor = lighten(0.1, accidentalColor)
-    }
-
-    const naturalLabelColor = darken(0.1, naturalColor)
-    const accidentalLabelColor = lighten(0.1, accidentalColor)
 
     return (
       <Box innerRef={this.boxRef}>
@@ -235,10 +218,6 @@ class PianoKeyboard extends React.Component<
 
                 -webkit-tap-highlight-color: rgba(0,0,0,0);
                 -webkit-tap-highlight-color: transparent;
-                
-                .vf-note-label {
-                  opacity: 0;
-                }
 
                 &:hover {
                   border: none;
@@ -246,16 +225,21 @@ class PianoKeyboard extends React.Component<
                   &.ReactPiano__Key--natural {
                     background: #f6f5f3;
                     border: 1px solid #888;
+
+                    .vf-key-overlay {
+                      background-color: ${rgba('salmon', 0.1)};
+                    }
                   }
 
                   &.ReactPiano__Key--accidental {
                     background: #555;
                     border: 1px solid #fff;
+
+                    .vf-key-overlay {
+                      background-color: ${rgba('salmon', 0.25)};
+                    }
                   }
 
-                  .vf-key-overlay {
-                    background-color: ${rgba('salmon', 0.1)};
-                  }
                 }
 
                 &.ReactPiano__Key--active {
@@ -264,82 +248,23 @@ class PianoKeyboard extends React.Component<
                   &.ReactPiano__Key--natural {
                     background: #f6f5f3;
                     border: 1px solid #888;
+
+                    .vf-key-overlay {
+                      background-color: ${rgba('salmon', 0.4)};
+                    }
                   }
 
                   &.ReactPiano__Key--accidental {
                     background: #555;
                     border: 1px solid #fff;
-                  }
 
-                  .vf-key-overlay {
-                    background-color: ${rgba('salmon', 0.4)};
-                  }
-                }
-
-                &.ReactPiano__Key--natural {
-                  .vf-note-label {
-                    &.--primary {
-                      background-color: ${naturalLabelColor} !important;
-                    }
-                    &.--secondary {
-                      background-color: ${rgba(
-                        naturalLabelColor,
-                        0.3,
-                      )} !important;
+                    .vf-key-overlay {
+                      background-color: ${rgba('salmon', 0.7)};
                     }
                   }
                 }
 
-                &.ReactPiano__Key--accidental {
-                  .vf-note-label {
-                    &.--primary {
-                      background-color: ${accidentalLabelColor} !important;
-                    }
-                    &.--secondary {
-                      background-color: ${rgba(
-                        accidentalLabelColor,
-                        0.4,
-                      )} !important;
-                    }
-                  }
-                }
-
-                .vf-note-label {
-                  &.--primary, &.--secondary  {
-                    opacity: 1 !important;
-                  }
-                }
-
-                &.ReactPiano__Key--natural {
-                  .vf-key-overlay {
-                    &.--primary {
-                      background-color: ${rgba(naturalColor, 0.7)} !important;
-                    }
-                    &.--secondary {
-                      background-color: ${rgba(naturalColor, 0.2)} !important;
-                    }
-                  }
-                }
-
-                &.ReactPiano__Key--accidental {
-                  .vf-key-overlay {
-                    &.--primary {
-                      background-color: ${rgba(
-                        accidentalColor,
-                        0.8,
-                      )} !important;
-                    }
-                    
-                    &.--secondary {
-                      background-color: ${rgba(
-                        accidentalColor,
-                        0.5,
-                      )} !important;
-                    }
-                  }
-                }
-
-                &.ReactPiano__Key--accidental,&.ReactPiano__Key--natural {
+                &.ReactPiano__Key--accidental, &.ReactPiano__Key--natural {
                   .vf-key-overlay {
                     &.--disabled {
                       cursor: default !important;

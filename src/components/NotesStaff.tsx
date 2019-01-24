@@ -509,6 +509,10 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
         const stave = this.staves[i]
         const voice = lineVoices[i] as Vex.Flow.Voice
 
+        if (!stave || !voice) {
+          continue
+        }
+
         // @ts-ignore
         const staveBB = stave.getBoundingBox()
         const voiceBB = voice.getBoundingBox()

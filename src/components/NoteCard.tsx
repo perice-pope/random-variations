@@ -8,6 +8,7 @@ import { lighten, saturate } from 'polished'
 
 type NoteCardProps = {
   active: boolean
+  disabled?: boolean
 } & BaseButtonProps
 
 const enhance = recompose.compose(
@@ -46,7 +47,7 @@ const BoxWithTouchRipple: React.SFC<PaperProps & { children?: any }> = ({
 
 const NoteCard = styled(BoxWithTouchRipple)<NoteCardProps>`
   display: inline-flex;
-  cursor: pointer;
+  cursor: ${props => (props.disabled ? 'default' : 'pointer')};
 
   align-items: center;
   justify-content: center;

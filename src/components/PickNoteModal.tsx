@@ -20,10 +20,10 @@ import { observer } from 'mobx-react'
 
 import { Flex, Box, BaseButton, Paper, BaseButtonProps } from './ui'
 
-import { getNoteCardColorByNoteName } from '../utils'
+import { getColorForNote } from '../utils'
 import { ChromaticNoteSharps } from '../types'
-import { css } from 'emotion'
-import { lighten } from 'polished'
+import { css, cx } from 'emotion'
+import { lighten, transparentize } from 'polished'
 import {
   withAudioEngine,
   WithAudioEngineInjectedProps,
@@ -34,10 +34,11 @@ import { IconButton, Typography } from '@material-ui/core'
 import {
   getNotePitchClassWithSharp,
   instrumentTransposingOptionsByType,
+  getNoteNameWithSharp,
 } from '../musicUtils'
 
 type PickNoteModalProps = {
-  disabledNoteNames?: string[]
+  disabledNotePitches?: string[]
   isOpen: boolean
   onClose: () => any
   onSubmit: (args: { noteName: string }) => any
@@ -55,6 +56,7 @@ type PickNoteModalState = {
 
 type NoteButtonProps = {
   active: boolean
+  disabled?: boolean
 } & BaseButtonProps
 
 const NoteButton = styled(BaseButton)<NoteButtonProps>`
@@ -65,6 +67,8 @@ const NoteButton = styled(BaseButton)<NoteButtonProps>`
     active ? lighten(0.1, bg as string) : bg};
 
   ${({ active, bg }) => (active ? lighten(0.1, bg as string) : bg)};
+
+  cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
 `
 
 // @ts-ignore
@@ -227,6 +231,45 @@ class PickNoteModal extends React.Component<
     })
   }
 
+  private isMidiNoteDisabled = (midi: number) => {
+    if (!this.props.disabledNotePitches) {
+      return false
+    }
+    const pitchClass = getNotePitchClassWithSharp(tonal.Note.fromMidi(
+      midi,
+      true,
+    ) as string)
+
+    return this.props.disabledNotePitches.findIndex(n => n === pitchClass) > -1
+  }
+
+  private getPianoNoteColor = (midi: number) => {
+    const noteNameWithSharp = getNoteNameWithSharp(tonal.Note.fromMidi(
+      midi,
+      true,
+    ) as string)
+
+    if (this.isMidiNoteDisabled(midi)) {
+      return transparentize(0.6, '#bbb')
+    }
+
+    if (
+      !!this.state.noteNameMouseOver &&
+      getNoteNameWithSharp(this.state.noteNameMouseOver) === noteNameWithSharp
+    ) {
+      return transparentize(0.7, getColorForNote(this.state.noteNameMouseOver))
+    }
+
+    if (
+      !!this.state.noteName &&
+      getNoteNameWithSharp(this.state.noteName) === noteNameWithSharp
+    ) {
+      return transparentize(0.7, getColorForNote(this.state.noteName))
+    }
+
+    return undefined
+  }
+
   render() {
     const octaveOrDefault = this.state.octave || 4
     const noteNames = TonalRange.chromatic(
@@ -234,10 +277,10 @@ class PickNoteModal extends React.Component<
       true,
     )
 
-    let disabledNoteNamesMap = {}
-    if (this.props.disabledNoteNames) {
-      this.props.disabledNoteNames.forEach(n => {
-        disabledNoteNamesMap[n] = true
+    let disabledNotePitchClassesMap = {}
+    if (this.props.disabledNotePitches) {
+      this.props.disabledNotePitches.forEach(n => {
+        disabledNotePitchClassesMap[n] = true
       })
     }
 
@@ -313,27 +356,19 @@ class PickNoteModal extends React.Component<
 
                   this.onNoteSelected(noteName, true)
                 }}
-                disabledNoteNames={this.props.disabledNoteNames}
-                primaryNotesMidi={
-                  this.state.noteName
-                    ? [tonal.Note.midi(this.state.noteName)]
-                    : undefined
-                }
-                secondaryNotesMidi={
-                  this.state.noteNameMouseOver
-                    ? [tonal.Note.midi(this.state.noteNameMouseOver)]
-                    : undefined
-                }
-                notesColor={
-                  this.state.noteName || this.state.noteNameMouseOver
-                    ? getNoteCardColorByNoteName(
-                        // @ts-ignore
-                        this.state.noteName || this.state.noteNameMouseOver,
-                      )
-                    : undefined
-                }
+                getIsNoteDisabled={this.isMidiNoteDisabled}
+                getNoteColor={this.getPianoNoteColor}
               />
             </Box>
+
+            {this.props.disabledNotePitches &&
+              this.props.disabledNotePitches.length > 0 && (
+                <p className={cx('text-soft', css(`font-size: 0.8em;`))}>
+                  Notes that are already used in the session are grayed out. If
+                  you want to allow repeating notes, toggle the switch in the
+                  previous window.
+                </p>
+              )}
 
             <Flex flexWrap="wrap" flex={1}>
               {noteNames.map(noteNameWithSharp => {
@@ -349,10 +384,12 @@ class PickNoteModal extends React.Component<
                 const notePitch = tonal.Note.pc(noteName)
 
                 const isSelected = notePitch === this.state.notePitchName
-                const bgColor = getNoteCardColorByNoteName(noteName)
+                const bgColor = getColorForNote(noteName)
 
                 const isDisabled =
-                  disabledNoteNamesMap[getNotePitchClassWithSharp(noteName)] === true
+                  disabledNotePitchClassesMap[
+                    getNotePitchClassWithSharp(noteName)
+                  ] === true
 
                 let transposedNoteName = noteName
                 let transposedNotePitch = notePitch
@@ -375,6 +412,7 @@ class PickNoteModal extends React.Component<
                     <NoteButton
                       // @ts-ignore
                       component={Paper}
+                      disabled={isDisabled}
                       active={isSelected}
                       fontWeight="bold"
                       fontSize={[2, 3, 3]}
