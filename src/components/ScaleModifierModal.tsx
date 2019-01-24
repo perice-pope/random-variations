@@ -72,6 +72,9 @@ type ScaleModifierModalProps = {
 
 type ScaleModifierModalState = {
   values: SubmitValuesType
+  inputValues: {
+    scaleType?: string
+  }
   isPlaying: boolean
   activeTickIndex?: number
 }
@@ -179,7 +182,11 @@ class ScaleModifierModal extends React.Component<
     const scale =
       scaleByScaleType[props.initialValues!.scaleType] ||
       (scaleByScaleType[DEFAULT_SCALE_NAME] as Scale)
+
     this.state = {
+      inputValues: {
+        scaleType: props.initialValues!.scaleType,
+      },
       values: {
         ...props.initialValues!,
         pattern: adaptPatternForScale({
@@ -212,7 +219,25 @@ class ScaleModifierModal extends React.Component<
     )
   }
 
+  handleScaleTypeBlur = () => {
+    if (!this.state.inputValues.scaleType) {
+      this.setState({
+        inputValues: {
+          ...this.state.inputValues,
+          scaleType: this.state.values.scaleType,
+        },
+      })
+    }
+  }
+
   handleScaleTypeSelected = (scaleOption: ScaleTypeOption) => {
+    if (!scaleOption) {
+      this.setState({
+        inputValues: { ...this.state.inputValues, scaleOption: undefined },
+      })
+      return
+    }
+
     const scaleType = scaleOption.value
     const scale =
       scaleByScaleType[scaleType] ||
@@ -241,6 +266,7 @@ class ScaleModifierModal extends React.Component<
 
     this.setState(
       {
+        inputValues: { ...this.state.inputValues, scaleType },
         values: {
           ...this.state.values,
           scaleType,
@@ -465,13 +491,17 @@ class ScaleModifierModal extends React.Component<
                       },
                     }}
                     value={
-                      this.state.values.scaleType
+                      this.state.inputValues.scaleType
                         ? scaleTypeToScaleTypeOptionMap[
-                            this.state.values.scaleType
+                            this.state.inputValues.scaleType
                           ]
                         : undefined
                     }
+                    placeholder="Type to find a scale..."
+                    isSearchable
+                    removeOnBackspace
                     onChange={this.handleScaleTypeSelected}
+                    onBlur={this.handleScaleTypeBlur}
                     name="chordType"
                     options={scaleTypeOptionsGrouped}
                   />

@@ -104,6 +104,9 @@ type ArpeggioModifierModalProps = {
 
 type ArpeggioModifierModalState = {
   values: SubmitValuesType
+  inputValues: {
+    chordType?: string
+  }
   isPlaying: boolean
   activeTickIndex?: number
 }
@@ -142,6 +145,14 @@ class ArpeggioModifierModal extends React.Component<
   } & WithAudioEngineInjectedProps,
   ArpeggioModifierModalState
 > {
+  state: ArpeggioModifierModalState = {
+    values: this.props.initialValues!,
+    inputValues: {
+      chordType: this.props.initialValues!.chordType,
+    },
+    isPlaying: false,
+  }
+
   static defaultProps: Partial<ArpeggioModifierModalProps> = {
     baseNote: 'C4',
     initialValues: {
@@ -155,15 +166,6 @@ class ArpeggioModifierModal extends React.Component<
       }),
       customPatternAllowRepeatedNotes: false,
     },
-  }
-
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      values: props.initialValues,
-      isPlaying: false,
-    }
   }
 
   handleClose = () => {
@@ -190,8 +192,27 @@ class ArpeggioModifierModal extends React.Component<
     )
   }
 
+  handleChordTypeBlur = () => {
+    if (!this.state.inputValues.chordType) {
+      this.setState({
+        inputValues: {
+          ...this.state.inputValues,
+          chordType: this.state.values.chordType,
+        },
+      })
+    }
+  }
+
   handleChordTypeSelected = (option: ChordTypeOption) => {
+    if (!option) {
+      this.setState({
+        inputValues: { ...this.state.inputValues, chordType: undefined },
+      })
+      return
+    }
+
     const chordType = option.value
+
     const chord = chordsByChordType[chordType] as Chord
     const { notesCount } = chord
 
@@ -226,6 +247,7 @@ class ArpeggioModifierModal extends React.Component<
 
     this.setState(
       {
+        inputValues: { ...this.state.inputValues, chordType },
         values: {
           ...this.state.values,
           chordType,
@@ -525,13 +547,17 @@ class ArpeggioModifierModal extends React.Component<
                       },
                     }}
                     value={
-                      this.state.values.chordType
+                      this.state.inputValues.chordType
                         ? chordTypeToChordTypeOptionMap[
-                            this.state.values.chordType
+                            this.state.inputValues.chordType
                           ]
-                        : undefined
+                        : null
                     }
+                    placeholder="Type to find a chord..."
+                    isSearchable
+                    removeOnBackspace
                     onChange={this.handleChordTypeSelected}
+                    onBlur={this.handleChordTypeBlur}
                     name="chordType"
                     options={chordTypeOptionsGrouped}
                   />

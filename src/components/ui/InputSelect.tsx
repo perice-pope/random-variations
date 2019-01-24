@@ -206,7 +206,26 @@ const formatGroupLabel = data => (
   </div>
 )
 
-class InputSelect extends React.Component<WithStyles, SelectProps> {
+class InputSelect extends React.Component<
+  WithStyles & SelectProps & { removeOnBackspace: boolean },
+  { isMenuOpen: boolean }
+> {
+  state = {
+    isMenuOpen: false,
+  }
+
+  handleMenuOpen = () => this.setState({ isMenuOpen: true })
+  handleMenuClose = () => this.setState({ isMenuOpen: false })
+
+  handleKeyDown = key => {
+    if (this.props.removeOnBackspace) {
+      if (key.which === 8) {
+        // Backspace
+        this.props.onChange(undefined)
+      }
+    }
+  }
+
   render() {
     const { classes, ...props } = this.props
     const selectStyles = {
@@ -224,7 +243,11 @@ class InputSelect extends React.Component<WithStyles, SelectProps> {
         styles={selectStyles}
         components={components}
         formatGroupLabel={formatGroupLabel}
+        onKeyDown={this.handleKeyDown}
+        onMenuOpen={this.handleMenuOpen}
+        onMenuClose={this.handleMenuClose}
         {...props}
+        value={this.state.isMenuOpen ? null : props.value}
       />
     )
   }
