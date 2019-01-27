@@ -38,9 +38,14 @@ import {
   InstrumentTransposingType,
   ClefType,
   RhythmInfoWithTempoScaleFactor,
+  NoteNameOrPitch,
+  NotePitch,
 } from './types'
 import settingsStore from './services/settingsStore'
 
+/**
+ * E.g. "Db4" -> "C#4", "Db" -> "C#"
+ */
 export const getNoteNameWithSharp = (noteName: string) => {
   if (!noteName) {
     return noteName
@@ -51,6 +56,22 @@ export const getNoteNameWithSharp = (noteName: string) => {
   return noteName
 }
 
+/**
+ * E.g. "C#4" -> "Db4", "C#" -> "Db"
+ */
+export const getNoteNameWithFlat = (noteName: string) => {
+  if (!noteName) {
+    return noteName
+  }
+  if (noteName.includes('#')) {
+    return tonal.Note.enharmonic(noteName) as string
+  }
+  return noteName
+}
+
+/**
+ * E.g. "Db4" -> "C#"
+ */
 export const getNotePitchClassWithSharp = (noteName: string) => {
   const pc = tonal.Note.pc(noteName) as string
   if (!pc) {
@@ -60,6 +81,102 @@ export const getNotePitchClassWithSharp = (noteName: string) => {
     return tonal.Note.enharmonic(pc) as string
   }
   return pc
+}
+
+/**
+ * E.g. "C#4" -> "Db"
+ */
+export const getNotePitchClassWithFlat = (noteName: string) => {
+  const pc = tonal.Note.pc(noteName) as string
+  if (!pc) {
+    return noteName
+  }
+  if (pc.includes('#')) {
+    return tonal.Note.enharmonic(pc) as string
+  }
+  return pc
+}
+
+const enharmonicNoteVersion: { [k: string]: NotePitch } = {
+  C: 'B#',
+  'B#': 'C',
+  Db: 'C#',
+  'C#': 'Db',
+  Eb: 'D#',
+  'D#': 'Eb',
+  E: 'Fb',
+  'E#': 'F',
+  Fb: 'E',
+  F: 'E#',
+  Gb: 'F#',
+  'F#': 'Gb',
+  Ab: 'G#',
+  'G#': 'Ab',
+  Bb: 'A#',
+  'A#': 'Bb',
+  B: 'Cb',
+  Cb: 'B',
+}
+
+export const getEnharmonicVersionForNote = _.memoize(
+  (note: NoteNameOrPitch) => {
+    const pitch = tonal.Note.pc(note)
+
+    if (!pitch) {
+      return null
+    }
+
+    if (pitch === note) {
+      const enharmonicPitch = enharmonicNoteVersion[pitch]
+      return enharmonicPitch ? enharmonicPitch : null
+    }
+
+    const enharmonicPitch = enharmonicNoteVersion[pitch]
+
+    if (!enharmonicPitch) {
+      return null
+    }
+
+    const octave = tonal.Note.oct(note) as number
+    if (pitch === 'C' || pitch === 'Cb') {
+      // Octave changes to the previous octave
+      const newOctave = octave - 1
+      if (newOctave < 1) {
+        return null
+      }
+
+      return `${enharmonicPitch}${newOctave}`
+    }
+
+    if (pitch === 'B#' || pitch === 'B') {
+      // Octave changes to the next octave
+      const newOctave = octave + 1
+      if (newOctave > 6) {
+        return null
+      }
+
+      return `${enharmonicPitch}${newOctave}`
+    }
+
+    return `${enharmonicPitch}${octave}`
+  },
+)
+
+export const getNoteNameAfterInstrumentTranspose = (
+  transposing: InstrumentTransposingType,
+  noteName: string,
+) => {
+  let noteNameTransposed = noteName
+
+  const transposingConfig = instrumentTransposingOptionsByType[transposing]
+  if (transposingConfig) {
+    noteNameTransposed = tonal.transpose(
+      noteNameTransposed,
+      transposingConfig.interval,
+    ) as string
+  }
+
+  return noteNameTransposed
 }
 
 export const NoteNamesWithSharps = [
@@ -1030,6 +1147,7 @@ export const generateStaffTicks = ({
       ticksForCard = [...ticksForCard, ...breakTicksForCard]
     }
 
+    // Generate tick labels (with chord names if needed)
     let noteNameTransposed = noteCard.noteName
     if (settingsStore.instrumentTransposing !== 'C') {
       const transposingConfig =

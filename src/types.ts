@@ -4,6 +4,10 @@ export interface PlayableNote {
   midi: number
 }
 
+export type NoteName = string
+export type NotePitch = string
+export type NoteNameOrPitch = NoteName | NotePitch
+
 export type ChromaticNoteSharps = 'A#' | 'C#' | 'D#' | 'F#' | 'G#'
 
 export type EnharmonicFlatsMap = { [key in ChromaticNoteSharps]?: boolean }
@@ -200,7 +204,7 @@ export interface DirectionsModifier {
   direction: PatternDirection
 }
 
-export type InstrumentTransposingType = 'C' | 'Bb' | 'Eb' | 'F'
+export type InstrumentTransposingType = 'C' | 'Bb' | 'A' | 'G' | 'F' | 'Eb'
 
 export interface InstrumentTransposingOption {
   type: InstrumentTransposingType
