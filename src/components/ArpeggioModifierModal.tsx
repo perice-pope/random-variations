@@ -45,7 +45,6 @@ import {
   generateChordPatternFromPreset,
   chordOptions,
   chordsByChordType,
-  instrumentTransposingOptionsByType,
 } from '../musicUtils'
 import { Flex } from './ui/Flex'
 import { Box } from './ui'
@@ -489,20 +488,9 @@ class ArpeggioModifierModal extends React.Component<
 
     const { isMelodic } = this.state.values
 
-    let noteNameTransposed = this.props.baseNote || 'C4'
-    if (settingsStore.instrumentTransposing !== 'C') {
-      const transposingConfig =
-        instrumentTransposingOptionsByType[settingsStore.instrumentTransposing]
-      if (transposingConfig) {
-        noteNameTransposed = tonal.transpose(
-          noteNameTransposed,
-          transposingConfig.interval,
-        ) as string
-      }
-    }
-
+    const noteName = this.props.baseNote || 'C4'
     const tickLabels = [
-      `${tonal.Note.pc(noteNameTransposed)}${this.state.values.chordType}`,
+      `${tonal.Note.pc(noteName)}${this.state.values.chordType}`,
     ]
 
     return (

@@ -21,7 +21,6 @@ import { observer } from 'mobx-react'
 import { Flex, Box, BaseButton, Paper, BaseButtonProps } from './ui'
 
 import { getColorForNote } from '../utils'
-import { ChromaticNoteSharps } from '../types'
 import { css, cx } from 'emotion'
 import { lighten, transparentize } from 'polished'
 import {
@@ -29,13 +28,16 @@ import {
   WithAudioEngineInjectedProps,
 } from './withAudioEngine'
 import styled from 'react-emotion'
-import settingsStore from '../services/settingsStore'
 import { IconButton, Typography } from '@material-ui/core'
 import {
   getNotePitchClassWithSharp,
-  instrumentTransposingOptionsByType,
   getNoteNameWithSharp,
+  getEnharmonicVersionForNote,
+  getDefaultEnharmonicPitchVersion,
+  getPreferredEnharmonicNoteVersion,
+  getDefaultEnharmonicNoteVersion,
 } from '../musicUtils'
+import sessionStore from '../services/sessionStore'
 
 type PickNoteModalProps = {
   disabledNotePitches?: string[]
@@ -48,7 +50,6 @@ type PickNoteModalProps = {
 type PickNoteModalState = {
   range?: any
   noteName?: string
-  notePitchName?: string
   octave?: number
 
   noteNameMouseOver?: string
@@ -85,9 +86,6 @@ class PickNoteModal extends React.Component<
       range: this.getNoteRange(props.noteName),
       noteName: props.noteName,
       octave: props.noteName ? tonal.Note.oct(props.noteName)! : 4,
-      notePitchName: props.noteName
-        ? tonal.Note.pc(props.noteName)!
-        : undefined,
     }
   }
 
@@ -99,9 +97,6 @@ class PickNoteModal extends React.Component<
     if (this.props.isOpen !== prevProps.isOpen && this.props.isOpen) {
       this.setState({
         octave: this.props.noteName ? tonal.Note.oct(this.props.noteName)! : 4,
-        notePitchName: this.props.noteName
-          ? tonal.Note.pc(this.props.noteName)!
-          : undefined,
         range: this.getNoteRange(this.props.noteName),
         noteName: this.props.noteName,
       })
@@ -109,8 +104,11 @@ class PickNoteModal extends React.Component<
   }
 
   getNoteRange = noteName => {
-    console.log('getNoteRange', noteName)
-    const octave = noteName ? tonal.Note.oct(noteName)! : 4
+    const defaultEnharmonicNoteVersion = getDefaultEnharmonicNoteVersion(
+      noteName,
+    )
+
+    const octave = noteName ? tonal.Note.oct(defaultEnharmonicNoteVersion)! : 4
     const firstNote = octave === 1 ? `C${octave}` : `A${octave - 1}`
     const lastNote = octave === 6 ? `B${octave}` : `D${octave + 1}`
     const noteRange = {
@@ -165,9 +163,18 @@ class PickNoteModal extends React.Component<
 
     if (octaveValue != null && this.state.noteName != null) {
       const newNoteName = `${tonal.Note.pc(this.state.noteName)}${octaveValue}`
-      this.onNoteSelected(newNoteName)
+      this.setState(
+        {
+          octave: octaveValue,
+          range: this.getNoteRange(newNoteName),
+        },
+        () => {
+          this.onNoteSelected(newNoteName)
+        },
+      )
     } else {
       this.setState({
+        range: this.getNoteRange(`C${octaveValue}`),
         octave: octaveValue,
       })
     }
@@ -177,48 +184,45 @@ class PickNoteModal extends React.Component<
     if (!noteName) {
       this.setState({
         noteName: undefined,
-        notePitchName: undefined,
         octave: undefined,
       })
       return
     }
 
     console.log('TCL: onNoteSelected -> noteName', noteName)
-    const noteEnharmonicName = tonal.Note.enharmonic(noteName) as string
-
-    setTimeout(() => this.setState({ range: this.getNoteRange(noteName) }), 100)
 
     if (!skipPlayingNote) {
-      this.props.audioEngine.playNote(
-        {
-          midi: tonal.Note.midi(noteName)!,
-        },
-        0,
-        0.5,
-      )
+      const midi = tonal.Note.midi(noteName)
+
+      if (midi) {
+        this.props.audioEngine.playNote(
+          {
+            midi,
+          },
+          0,
+          0.5,
+        )
+      }
     }
 
-    if (noteName !== noteEnharmonicName && this.state.noteName === noteName) {
+    const noteEnharmonicName = getEnharmonicVersionForNote(noteName)
+    if (this.state.noteName === noteName && !!noteEnharmonicName) {
       // This is a second click on a card with "enharmonic-capable" note...
-      // this.props.onEnharmonicChange(noteNameWithSharp)
-      const noteNameWithSharp = (noteName.includes('#')
-        ? noteName
-        : noteEnharmonicName) as string
-      const notePitchWithSharp = tonal.Note.pc(
-        noteNameWithSharp!,
-      ) as ChromaticNoteSharps
 
-      settingsStore.enharmonicFlatsMap = {
-        ...settingsStore.enharmonicFlatsMap,
-        [notePitchWithSharp]: !Boolean(
-          settingsStore.enharmonicFlatsMap[notePitchWithSharp],
-        ),
-      }
+      const defaultEnharmonicPitchName =
+        getDefaultEnharmonicPitchVersion(noteName) ||
+        (tonal.Note.pc(noteEnharmonicName) as string)
+
+      const isUsingDefaultEnharmonicVariant =
+        (getDefaultEnharmonicPitchVersion(noteName) as string) ===
+        (tonal.Note.pc(noteEnharmonicName) as string)
+
+      sessionStore.activeSession!.enharmonicVariantsMap[
+        defaultEnharmonicPitchName
+      ] = !isUsingDefaultEnharmonicVariant
 
       this.setState({
-        noteName: noteEnharmonicName!,
-        octave: tonal.Note.oct(noteEnharmonicName)!,
-        notePitchName: tonal.Note.pc(noteEnharmonicName)!,
+        noteName: noteEnharmonicName,
       })
 
       return
@@ -226,8 +230,6 @@ class PickNoteModal extends React.Component<
 
     this.setState({
       noteName: noteName,
-      octave: tonal.Note.oct(noteName)!,
-      notePitchName: tonal.Note.pc(noteName)!,
     })
   }
 
@@ -272,10 +274,10 @@ class PickNoteModal extends React.Component<
 
   render() {
     const octaveOrDefault = this.state.octave || 4
-    const noteNames = TonalRange.chromatic(
-      [`C${octaveOrDefault}`, `B${octaveOrDefault}`],
-      true,
-    )
+    const noteNamesAsFlats = TonalRange.chromatic([
+      `C${octaveOrDefault}`,
+      `B${octaveOrDefault}`,
+    ])
 
     let disabledNotePitchClassesMap = {}
     if (this.props.disabledNotePitches) {
@@ -309,6 +311,8 @@ class PickNoteModal extends React.Component<
                 <MinusIcon fontSize="large" />
               </IconButton>
 
+              {/* 
+                // @ts-ignore */}
               <TextField
                 className={css({
                   maxWidth: '80px',
@@ -345,16 +349,16 @@ class PickNoteModal extends React.Component<
               <PianoKeyboard
                 height={70}
                 noteRange={this.state.range}
-                onPlayNote={midiNote => {
-                  const noteNameWithSharp = tonal.Note.fromMidi(midiNote, true)
-                  const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)!
-                  const noteName = settingsStore.enharmonicFlatsMap[
-                    notePitchWithSharp
-                  ]
-                    ? tonal.Note.enharmonic(noteNameWithSharp)!
-                    : noteNameWithSharp
+                onPlayNote={midi => {
+                  const noteNameWithFlat = tonal.Note.fromMidi(
+                    midi,
+                    false,
+                  ) as string
 
-                  this.onNoteSelected(noteName, true)
+                  this.onNoteSelected(
+                    getPreferredEnharmonicNoteVersion(noteNameWithFlat),
+                    true,
+                  )
                 }}
                 getIsNoteDisabled={this.isMidiNoteDisabled}
                 getNoteColor={this.getPianoNoteColor}
@@ -371,44 +375,23 @@ class PickNoteModal extends React.Component<
               )}
 
             <Flex flexWrap="wrap" flex={1}>
-              {noteNames.map(noteNameWithSharp => {
-                const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)!
+              {noteNamesAsFlats.map(noteNameAsFlat => {
+                const noteName = getPreferredEnharmonicNoteVersion(
+                  noteNameAsFlat,
+                )
+                const notePitch = tonal.Note.pc(noteName) as string
 
-                const shouldUseFlat =
-                  settingsStore.enharmonicFlatsMap[notePitchWithSharp] === true
-
-                const noteName = shouldUseFlat
-                  ? tonal.Note.enharmonic(noteNameWithSharp)
-                  : noteNameWithSharp
-
-                const notePitch = tonal.Note.pc(noteName)
-
-                const isSelected = notePitch === this.state.notePitchName
-                const bgColor = getColorForNote(noteName)
+                const isSelected =
+                  notePitch === tonal.Note.pc(this.state.noteName!)
+                const bgColor = getColorForNote(notePitch)
 
                 const isDisabled =
                   disabledNotePitchClassesMap[
-                    getNotePitchClassWithSharp(noteName)
+                    getNotePitchClassWithSharp(notePitch)
                   ] === true
 
-                let transposedNoteName = noteName
-                let transposedNotePitch = notePitch
-                if (settingsStore.instrumentTransposing !== 'C') {
-                  const transposingConfig =
-                    instrumentTransposingOptionsByType[
-                      settingsStore.instrumentTransposing
-                    ]
-                  if (transposingConfig) {
-                    transposedNoteName = tonal.transpose(
-                      noteName,
-                      transposingConfig.interval,
-                    ) as string
-                    transposedNotePitch = tonal.Note.pc(transposedNoteName)!
-                  }
-                }
-
                 return (
-                  <Box key={noteNameWithSharp} width={1 / 4} p={[1, 2, 2]}>
+                  <Box key={noteNameAsFlat} width={1 / 4} p={[1, 2, 2]}>
                     <NoteButton
                       // @ts-ignore
                       component={Paper}
@@ -435,7 +418,7 @@ class PickNoteModal extends React.Component<
                         this.onNoteSelected(noteName)
                       }}
                     >
-                      {transposedNotePitch}
+                      {notePitch}
                     </NoteButton>
                   </Box>
                 )

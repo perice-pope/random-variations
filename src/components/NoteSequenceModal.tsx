@@ -34,9 +34,11 @@ import {
   getNotePitchClassWithSharp,
 } from '../musicUtils'
 import Slider from '@material-ui/lab/Slider'
+import { InstrumentTransposingType } from '../types'
 
 type NoteSequenceModalProps = {
   isOpen: boolean
+  transposing: InstrumentTransposingType
   onClose: () => any
   onSubmit: (args: { noteNames: string[] }) => any
 }
@@ -224,19 +226,6 @@ class NoteSequenceModal extends React.Component<
     })
   }
 
-  private handleChangeNoteCardToEnharmonicClick = (index: number) =>
-    this.setState(
-      {
-        values: {
-          ...this.state.values,
-          startNoteName: tonal.Note.enharmonic(
-            this.state.values.startNoteName,
-          ) as string,
-        },
-      },
-      this.regenerateNoteSequence,
-    )
-
   private getDirectionOptions = () => [
     { title: 'Up', value: 'up' },
     { title: 'Down', value: 'down' },
@@ -323,9 +312,6 @@ class NoteSequenceModal extends React.Component<
                   notes={[
                     { id: '1', noteName: this.state.values.startNoteName },
                   ]}
-                  onChangeToEnharmonicClick={
-                    this.handleChangeNoteCardToEnharmonicClick
-                  }
                   onEditNote={this.handleStartNoteChange}
                 />
               </Flex>
@@ -405,9 +391,6 @@ class NoteSequenceModal extends React.Component<
                     hideContextMenu
                     zIndex={10000000}
                     notes={this.state.notes}
-                    onChangeToEnharmonicClick={
-                      this.handleChangeNoteCardToEnharmonicClick
-                    }
                   />
                 </Flex>
               </div>

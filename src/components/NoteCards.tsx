@@ -22,11 +22,12 @@ import NoteCard from './NoteCard'
 import { getColorForNote } from '../utils'
 import PickNoteModal from './PickNoteModal'
 import { observer } from 'mobx-react'
-import settingsStore from '../services/settingsStore'
 import {
   getNotePitchClassWithSharp,
-  instrumentTransposingOptionsByType,
+  getEnharmonicVersionForNote,
+  getConcertPitchMidi,
 } from '../musicUtils'
+import settingsStore from '../services/settingsStore'
 
 const FlipperAlignCenter = styled(Flipper)`
   width: 100%;
@@ -86,9 +87,7 @@ const SortableNoteCard = SortableElement(
 
     private handleChangeToEnharmonicClick = () => {
       this.closeMenu()
-      if (this.props.onChangeToEnharmonicClick) {
-        this.props.onChangeToEnharmonicClick()
-      }
+      this.props.onNoteEdited(this.getEnharmonicNote() || this.props.noteName)
     }
 
     private handleOctaveUpClick = () =>
@@ -131,10 +130,23 @@ const SortableNoteCard = SortableElement(
       }
     }
 
+    private getEnharmonicNote = () => {
+      const { noteName } = this.props
+      let octave = tonal.Note.oct(noteName) as number
+      let noteNameWithOctave = noteName
+      if (!octave) {
+        octave = 4
+        noteNameWithOctave = `${noteName}4`
+      }
+
+      const enharmonicNoteName = getEnharmonicVersionForNote(noteNameWithOctave)
+
+      return enharmonicNoteName
+    }
+
     render() {
       const {
         noteName,
-        instrumentTransposedNoteName,
         id,
         active,
         bgColor,
@@ -145,8 +157,10 @@ const SortableNoteCard = SortableElement(
         hideContextMenu,
         disableRemoving,
         disabledNotePitches,
+        transposing = 'C',
         ...props
       } = this.props
+
       const menuId = `note-card-menu-${id}`
 
       let octave = tonal.Note.oct(noteName) as number
@@ -156,19 +170,16 @@ const SortableNoteCard = SortableElement(
         noteNameWithOctave = `${noteName}4`
       }
 
-      let instrumentTransposedNoteNameWithOctave = instrumentTransposedNoteName
-      if (!octave) {
-        octave = 4
-        instrumentTransposedNoteNameWithOctave = `${instrumentTransposedNoteName}4`
-      }
-
       const midi = tonal.Note.midi(noteNameWithOctave) as number
-      const instrumentTransposedEnharmonicNoteName = tonal.Note.enharmonic(
-        instrumentTransposedNoteNameWithOctave,
-      )
-      const shouldShowChangeToEnharmonic =
-        instrumentTransposedEnharmonicNoteName !==
-        instrumentTransposedNoteNameWithOctave
+      const midiConcertPitch = getConcertPitchMidi(
+        transposing,
+        noteNameWithOctave,
+      ) as number
+
+      const enharmonicPitchName = tonal.Note.pc(
+        this.getEnharmonicNote() as string,
+      ) as string
+      const shouldShowChangeToEnharmonic = !!enharmonicPitchName
 
       const noteNameHalfStepUp = getNotePitchClassWithSharp(
         tonal.Note.fromMidi(midi + 1),
@@ -185,9 +196,9 @@ const SortableNoteCard = SortableElement(
       }
 
       const shouldDisableHalfStepUp =
-        midi >= 95 || disabledNotePitchesMap[noteNameHalfStepUp]
+        midiConcertPitch >= 95 || disabledNotePitchesMap[noteNameHalfStepUp]
       const shouldDisableHalfStepDown =
-        midi <= 24 || disabledNotePitchesMap[noteNameHalfStepDown]
+        midiConcertPitch <= 24 || disabledNotePitchesMap[noteNameHalfStepDown]
 
       return (
         <Flipped flipId={id} shouldFlip={shouldFlip}>
@@ -251,8 +262,8 @@ const SortableNoteCard = SortableElement(
                     </ListItemIcon>
                     {'Change to '}
                     <Text ml={1} fontWeight="bold">
-                      {instrumentTransposedEnharmonicNoteName &&
-                        tonal.Note.pc(instrumentTransposedEnharmonicNoteName)}
+                      {enharmonicPitchName &&
+                        tonal.Note.pc(enharmonicPitchName)}
                     </Text>
                   </MenuItem>
                 )}
@@ -303,7 +314,6 @@ const SortableNotesContainer = SortableContainer(
       hideContextMenu,
       disableRemoving,
       shouldFlip,
-      onChangeToEnharmonicClick,
       onEditClick,
       perLineCount,
       onDeleteClick,
@@ -336,30 +346,14 @@ const SortableNotesContainer = SortableContainer(
         >
           <FlipperComponent flipKey={items}>
             {items.map(({ noteName, id }, index) => {
-              let transposedNoteName = noteName
-
-              if (settingsStore.instrumentTransposing !== 'C') {
-                const transposingConfig =
-                  instrumentTransposingOptionsByType[
-                    settingsStore.instrumentTransposing
-                  ]
-                if (transposingConfig) {
-                  transposedNoteName = tonal.transpose(
-                    noteName,
-                    transposingConfig.interval,
-                  ) as string
-                }
-              }
-
               const noteCardText =
                 settingsStore.showNoteOctaves || showOctaves
-                  ? transposedNoteName
-                  : tonal.Note.pc(transposedNoteName)
+                  ? noteName
+                  : tonal.Note.pc(noteName)
 
               return (
                 <SortableNoteCard
                   noteName={noteName}
-                  instrumentTransposedNoteName={transposedNoteName}
                   // @ts-ignore
                   shouldFlip={shouldFlip}
                   id={id}
@@ -377,9 +371,6 @@ const SortableNotesContainer = SortableContainer(
                   active={activeNoteCardIndex === index}
                   onEditClick={() => onEditClick(index)}
                   onNoteEdited={noteName => onEditNote(index, noteName)}
-                  onChangeToEnharmonicClick={() =>
-                    onChangeToEnharmonicClick(index)
-                  }
                   onDeleteClick={() => onDeleteClick(index)}
                   onMouseOver={() => {
                     if (onMouseOver) {
@@ -425,7 +416,6 @@ type NoteCardsProps = {
   onMouseOver?: (index: number) => any
   onMouseLeave?: (index: number) => any
   onCardsReorder?: (arg: { oldIndex: number; newIndex: number }) => any
-  onChangeToEnharmonicClick?: (index: number) => any
   onDeleteClick?: (index: number) => any
   onCardDraggedOut?: (index: number) => any
   onEditNote?: (index: number, data: { noteName: string }) => any
@@ -516,7 +506,6 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
     const {
       children,
       onDeleteClick,
-      onChangeToEnharmonicClick,
       notes,
       activeNoteCardIndex,
       onMouseOver,
@@ -555,7 +544,6 @@ class NoteCards extends React.Component<NoteCardsProps, NoteCardsState> {
           onSortStart={this.handleSortStart}
           onEditClick={this.handleEditNoteClick}
           onDeleteClick={onDeleteClick}
-          onChangeToEnharmonicClick={onChangeToEnharmonicClick}
           axis="xy"
           children={children}
           disabledNotePitches={disabledNotePitches || []}

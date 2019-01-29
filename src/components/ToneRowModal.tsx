@@ -41,9 +41,8 @@ import {
   FormControlLabel,
   Switch,
 } from '@material-ui/core'
-import settingsStore from '../services/settingsStore'
 import NoteCards, { NoteCardNote } from './NoteCards'
-import { ChromaticNoteSharps } from '../types'
+import { InstrumentTransposingType } from '../types'
 import { transparentize } from 'polished'
 
 type ToneRowModalProps = {
@@ -51,6 +50,7 @@ type ToneRowModalProps = {
   maxNotesCount: number
   notesUsedInSession: string[]
   defaultNotesCount: number
+  transposing: InstrumentTransposingType
   onClose: () => any
   onSubmit: (args: { noteNames: string[] }) => any
   noteName?: string
@@ -248,19 +248,20 @@ class ToneRowModal extends React.Component<
     if (noteName !== noteEnharmonicName && this.state.noteName === noteName) {
       // This is a second click on a card with "enharmonic-capable" note...
       // this.props.onEnharmonicChange(noteNameWithSharp)
-      const noteNameWithSharp = (noteName.includes('#')
-        ? noteName
-        : noteEnharmonicName) as string
-      const notePitchWithSharp = tonal.Note.pc(
-        noteNameWithSharp!,
-      ) as ChromaticNoteSharps
+      // const noteNameWithSharp = (noteName.includes('#')
+      //   ? noteName
+      //   : noteEnharmonicName) as string
+      // const notePitchWithSharp = tonal.Note.pc(
+      //   noteNameWithSharp!,
+      // ) as ChromaticNoteSharps
 
-      settingsStore.enharmonicFlatsMap = {
-        ...settingsStore.enharmonicFlatsMap,
-        [notePitchWithSharp]: !Boolean(
-          settingsStore.enharmonicFlatsMap[notePitchWithSharp],
-        ),
-      }
+      // TODO
+      // settingsStore.enharmonicFlatsMap = {
+      //   ...settingsStore.enharmonicFlatsMap,
+      //   [notePitchWithSharp]: !Boolean(
+      //     settingsStore.enharmonicFlatsMap[notePitchWithSharp],
+      //   ),
+      // }
 
       this.setState({
         noteName: noteEnharmonicName!,
@@ -311,19 +312,6 @@ class ToneRowModal extends React.Component<
     }
     this.setState({ notes })
   }
-
-  private handleChangeNoteCardToEnharmonicClick = (index: number) =>
-    this.setState({
-      notes: this.state.notes.map(
-        (n, i) =>
-          i === index
-            ? {
-                ...n,
-                noteName: tonal.Note.enharmonic(n.noteName) as string,
-              }
-            : n,
-      ),
-    })
 
   handleEditNote = (index: number, { noteName }) =>
     this.setState({
@@ -558,6 +546,8 @@ class ToneRowModal extends React.Component<
                 <MinusIcon fontSize="large" />
               </IconButton>
 
+              {/*
+              // @ts-ignore */}
               <TextField
                 className={css({
                   maxWidth: '80px',
@@ -596,12 +586,14 @@ class ToneRowModal extends React.Component<
                 noteRange={this.state.range}
                 onPlayNote={midiNote => {
                   const noteNameWithSharp = tonal.Note.fromMidi(midiNote, true)
-                  const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)!
-                  const noteName = settingsStore.enharmonicFlatsMap[
-                    notePitchWithSharp
-                  ]
-                    ? tonal.Note.enharmonic(noteNameWithSharp)!
-                    : noteNameWithSharp
+                  // const notePitchWithSharp = tonal.Note.pc(noteNameWithSharp)!
+                  // const noteName = settingsStore.enharmonicFlatsMap[
+                  //   notePitchWithSharp
+                  // ]
+                  //   ? tonal.Note.enharmonic(noteNameWithSharp)!
+                  //   : noteNameWithSharp
+                  // TODO
+                  const noteName = noteNameWithSharp
 
                   this.onKeyboardNotePlayed(noteName)
                 }}
@@ -654,9 +646,6 @@ class ToneRowModal extends React.Component<
                 onCardsReorder={this.handleCardsReorder}
                 onCardDraggedOut={this.deleteNoteCard}
                 onEditNote={this.handleEditNote}
-                onChangeToEnharmonicClick={
-                  this.handleChangeNoteCardToEnharmonicClick
-                }
                 onDeleteClick={this.deleteNoteCard}
               />
             </div>

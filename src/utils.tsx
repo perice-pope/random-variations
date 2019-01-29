@@ -142,6 +142,20 @@ export const createDefaultSession = () => {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
 
+    // "C" = no instrument transposing
+    instrumentTransposing: 'C',
+    enharmonicVariantsMap: {
+      C: false,
+      Db: false,
+      Eb: false,
+      E: false,
+      F: false,
+      Gb: false,
+      Ab: false,
+      Bb: false,
+      B: false,
+    },
+
     bpm: 120,
     rests: 0,
     offset: 0,

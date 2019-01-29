@@ -10,7 +10,20 @@ export type NoteNameOrPitch = NoteName | NotePitch
 
 export type ChromaticNoteSharps = 'A#' | 'C#' | 'D#' | 'F#' | 'G#'
 
-export type EnharmonicFlatsMap = { [key in ChromaticNoteSharps]?: boolean }
+export type NotesWithEnharmonicVariant =
+  | 'C'
+  | 'Db'
+  | 'Eb'
+  | 'E'
+  | 'F'
+  | 'Gb'
+  | 'Ab'
+  | 'Bb'
+  | 'B'
+
+export type EnharmonicVariantsMap = {
+  [key in NotesWithEnharmonicVariant]?: boolean
+}
 
 export type User = {
   displayName: string | null
@@ -257,6 +270,9 @@ export interface Session {
   offset: number
   rhythm: RhythmInfo
 
+  instrumentTransposing: InstrumentTransposingType
+  enharmonicVariantsMap: EnharmonicVariantsMap
+
   // Number of metronome clicks to play before playing notes
   countInCounts: number
   countInEnabled: boolean
@@ -280,7 +296,7 @@ export type ClefType =
 
 export interface LocalAppState {
   audioFontId: AudioFontId
-  enharmonicFlatsMap: EnharmonicFlatsMap
+  enharmonicFlatsMap: EnharmonicVariantsMap
 
   clef: ClefType
 }

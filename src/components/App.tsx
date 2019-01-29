@@ -936,15 +936,6 @@ class App extends React.Component<
     this.setState({ noteCardWithMouseOver: undefined })
   }
 
-  private handleChangeNoteCardToEnharmonicClick = (index: number) => {
-    const { noteCards } = this.getNoteCards()
-    const noteCard = noteCards[index]
-    this.updateNoteCard({
-      noteCardId: noteCard.id,
-      noteName: tonal.Note.enharmonic(noteCard.noteName),
-    })
-  }
-
   private handleDeleteCard = (index: number) => this.deleteNoteCard(index)
 
   private deleteNoteCard = (index: number) => {
@@ -1063,9 +1054,13 @@ class App extends React.Component<
       }
     }
 
-    Object.keys(values).forEach(key => {
+    Object.keys(_.omit(values, ['instrumentTransposing'])).forEach(key => {
       settingsStore[key] = values[key]
     })
+
+    if (!!values.instrumentTransposing) {
+      sessionStore.activeSession!.instrumentTransposing = values.instrumentTransposing
+    }
 
     this.onNotesUpdated()
     this.saveAppState()
@@ -1504,6 +1499,7 @@ class App extends React.Component<
       countInEnabled,
       metronomeEnabled,
       modifiers,
+      instrumentTransposing,
     } = sessionStore.activeSession
 
     const { noteCards } = this.getNoteCards()
@@ -2281,9 +2277,6 @@ class App extends React.Component<
                         notes={noteCards}
                         perLineCount={this.state.height > 568 ? 6 : 6}
                         activeNoteCardIndex={activeNoteCardIndex}
-                        onChangeToEnharmonicClick={
-                          this.handleChangeNoteCardToEnharmonicClick
-                        }
                         onMouseOver={this.handleMouseOverNoteCard}
                         onMouseLeave={this.handleMouseLeaveNoteCard}
                         onEditNote={this.handleEditNote}
@@ -2532,9 +2525,9 @@ class App extends React.Component<
             isOpen={this.state.settingsModalIsOpen}
             onClose={this.closeSettingsModal}
             defaultValues={{
+              instrumentTransposing,
               audioFontId: settingsStore.audioFontId,
               clefType: settingsStore.clefType,
-              instrumentTransposing: settingsStore.instrumentTransposing,
               showNoteNamesAboveStaff: settingsStore.showNoteNamesAboveStaff,
               showNoteOctaves: settingsStore.showNoteOctaves,
             }}

@@ -41,7 +41,7 @@ import {
   NoteNameOrPitch,
   NotePitch,
 } from './types'
-import settingsStore from './services/settingsStore'
+import sessionStore from './services/sessionStore';
 
 /**
  * E.g. "Db4" -> "C#4", "Db" -> "C#"
@@ -97,6 +97,59 @@ export const getNotePitchClassWithFlat = (noteName: string) => {
   return pc
 }
 
+const defaultEnharmonicPitchVersion: { [k: string]: NotePitch } = {
+  Cb: 'B',
+  C: 'C',
+  'C#': 'Db',
+  Db: 'Db',
+  D: 'D',
+  'D#': 'Eb',
+  Eb: 'Eb',
+  E: 'E',
+  'E#': 'F',
+  Fb: 'E',
+  F: 'F',
+  'F#': 'Gb',
+  Gb: 'Gb',
+  G: 'G',
+  'G#': 'Ab',
+  Ab: 'Ab',
+  A: 'A',
+  'A#': 'Bb',
+  Bb: 'Bb',
+  B: 'B',
+  'B#': 'C',
+}
+
+export const getPreferredEnharmonicNoteVersion = (noteName: string) => {
+  const defaultPitchVersion = getDefaultEnharmonicPitchVersion(noteName)
+  if (!defaultPitchVersion) {
+    return noteName
+  }
+
+  if (!sessionStore.activeSession) {
+    return noteName
+  }
+
+  if (sessionStore.activeSession!.enharmonicVariantsMap[
+    defaultPitchVersion
+  ] === true) {
+    return getEnharmonicVersionForNote(noteName) || noteName
+  }
+
+  return noteName
+}
+
+export const getDefaultEnharmonicPitchVersion = _.memoize(
+  (noteName: string) => {
+    const pitch = tonal.Note.pc(noteName)
+    if (!pitch) {
+      return undefined
+    }
+    return defaultEnharmonicPitchVersion[pitch] || pitch
+  },
+)
+
 const enharmonicNoteVersion: { [k: string]: NotePitch } = {
   C: 'B#',
   'B#': 'C',
@@ -117,6 +170,15 @@ const enharmonicNoteVersion: { [k: string]: NotePitch } = {
   B: 'Cb',
   Cb: 'B',
 }
+
+export const getDefaultEnharmonicNoteVersion = _.memoize((noteName: string) => {
+  const pitch = tonal.Note.pc(noteName) as string
+  const defaultPitch = getDefaultEnharmonicPitchVersion(noteName) as string
+  if (pitch !== defaultPitch) {
+    return getEnharmonicVersionForNote(noteName) || noteName
+  }
+  return noteName
+})
 
 export const getEnharmonicVersionForNote = _.memoize(
   (note: NoteNameOrPitch) => {
@@ -330,6 +392,37 @@ export const getNoteNameAfterInstrumentTranspose = (
   }
 
   return `${transposedPitch}${octave + 1}`
+}
+
+export const getConcertPitchMidi = (
+  transposing: InstrumentTransposingType,
+  noteName: string,
+) => {
+  const midi = tonal.Note.midi(noteName)
+  if (!midi) {
+    return undefined
+  }
+
+  switch (transposing) {
+    case 'Bb':
+      // Written D, sounds C
+      return midi - 2
+    case 'A':
+      // Written Eb, sounds C
+      return midi - 3
+    case 'G':
+      // Written F, sounds C
+      return midi - 5
+    case 'F':
+      // Written G, sounds C
+      return midi - 7
+    case 'Eb':
+      // Written A, sounds C
+      return midi - 9
+    case 'C':
+    default:
+      return midi
+  }
 }
 
 export const NoteNamesWithSharps = [
@@ -1301,19 +1394,7 @@ export const generateStaffTicks = ({
     }
 
     // Generate tick labels (with chord names if needed)
-    let noteNameTransposed = noteCard.noteName
-    if (settingsStore.instrumentTransposing !== 'C') {
-      const transposingConfig =
-        instrumentTransposingOptionsByType[settingsStore.instrumentTransposing]
-      if (transposingConfig) {
-        noteNameTransposed = tonal.transpose(
-          noteNameTransposed,
-          transposingConfig.interval,
-        ) as string
-      }
-    }
-
-    tickLabels[currentTickIndex] = `${tonal.Note.pc(noteNameTransposed)}${
+    tickLabels[currentTickIndex] = `${tonal.Note.pc(noteCard.noteName)}${
       modifiers.chords.enabled ? modifiers.chords.chordType : ''
     }`
     currentTickIndex += ticksForCard.length

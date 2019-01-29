@@ -1,16 +1,10 @@
 import AudioFontsConfig, { AudioFontId } from '../audioFontsConfig'
 import { observable } from 'mobx'
-import {
-  ClefType,
-  EnharmonicFlatsMap,
-  InstrumentTransposingType,
-} from '../types'
+import { ClefType } from '../types'
 
 interface SettingsStoreData {
   audioFontId: AudioFontId
   clefType: ClefType
-  enharmonicFlatsMap: EnharmonicFlatsMap
-  instrumentTransposing: InstrumentTransposingType
   scaleZoomFactor: number
   showNoteOctaves: boolean
   showNoteNamesAboveStaff: boolean
@@ -21,10 +15,6 @@ class SettingsStore {
   public audioFontId: AudioFontId = AudioFontsConfig[2].id
   @observable
   public clefType: ClefType = 'treble'
-  @observable
-  public enharmonicFlatsMap: EnharmonicFlatsMap = {}
-  @observable
-  public instrumentTransposing: InstrumentTransposingType = 'C'
 
   @observable
   public scaleZoomFactor = 1.0
@@ -38,9 +28,7 @@ class SettingsStore {
   public saveSettingsLocally = () => {
     const savedState: SettingsStoreData = {
       audioFontId: this.audioFontId,
-      enharmonicFlatsMap: this.enharmonicFlatsMap,
       clefType: this.clefType,
-      instrumentTransposing: this.instrumentTransposing,
       scaleZoomFactor: this.scaleZoomFactor,
       showNoteNamesAboveStaff: this.showNoteNamesAboveStaff,
       showNoteOctaves: this.showNoteOctaves,

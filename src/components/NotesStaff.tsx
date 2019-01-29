@@ -8,8 +8,6 @@ import { darken, getLuminance } from 'polished'
 import { Box } from './ui'
 import { StaffTick, ClefType } from '../types'
 import MeasureScreenSize from './MeasureScreenSize'
-import settingsStore from '../services/settingsStore'
-import { instrumentTransposingOptionsByType } from '../musicUtils'
 
 const activeNoteClasses = {
   animation: (animationTransitionTimeMs = 200) =>
@@ -161,35 +159,9 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
 
   private getTicksTransformed = () => {
     const { ticks } = this.props
-    if (!ticks) {
-      return ticks
-    }
-
-    return ticks.map(tick => ({
-      ...tick,
-      notes: tick.notes.map(note => {
-        let noteName = note.noteName
-
-        // Apply instrument transposing
-        if (settingsStore.instrumentTransposing !== 'C') {
-          const transposingConfig =
-            instrumentTransposingOptionsByType[
-              settingsStore.instrumentTransposing
-            ]
-          if (transposingConfig) {
-            noteName = tonal.transpose(
-              noteName,
-              transposingConfig.interval,
-            ) as string
-          }
-        }
-
-        return {
-          ...note,
-          noteName,
-        }
-      }),
-    }))
+    // For now we don't transform ticks in any way. This method is added just in case we
+    // do need to do some transforms in the future
+    return ticks
   }
 
   private drawActiveNoteLine = () => {
