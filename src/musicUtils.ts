@@ -41,7 +41,7 @@ import {
   NoteNameOrPitch,
   NotePitch,
 } from './types'
-import sessionStore from './services/sessionStore';
+import sessionStore from './services/sessionStore'
 
 /**
  * E.g. "Db4" -> "C#4", "Db" -> "C#"
@@ -131,9 +131,10 @@ export const getPreferredEnharmonicNoteVersion = (noteName: string) => {
     return noteName
   }
 
-  if (sessionStore.activeSession!.enharmonicVariantsMap[
-    defaultPitchVersion
-  ] === true) {
+  if (
+    sessionStore.activeSession!.enharmonicVariantsMap[defaultPitchVersion] ===
+    true
+  ) {
     return getEnharmonicVersionForNote(noteName) || noteName
   }
 
@@ -396,13 +397,8 @@ export const getNoteNameAfterInstrumentTranspose = (
 
 export const getConcertPitchMidi = (
   transposing: InstrumentTransposingType,
-  noteName: string,
+  midi: number,
 ) => {
-  const midi = tonal.Note.midi(noteName)
-  if (!midi) {
-    return undefined
-  }
-
   switch (transposing) {
     case 'Bb':
       // Written D, sounds C
@@ -419,6 +415,32 @@ export const getConcertPitchMidi = (
     case 'Eb':
       // Written A, sounds C
       return midi - 9
+    case 'C':
+    default:
+      return midi
+  }
+}
+
+export const getMidiForConcertPitch = (
+  transposing: InstrumentTransposingType,
+  midi: number,
+) => {
+  switch (transposing) {
+    case 'Bb':
+      // Written D, sounds C
+      return midi + 2
+    case 'A':
+      // Written Eb, sounds C
+      return midi + 3
+    case 'G':
+      // Written F, sounds C
+      return midi + 5
+    case 'F':
+      // Written G, sounds C
+      return midi + 7
+    case 'Eb':
+      // Written A, sounds C
+      return midi + 9
     case 'C':
     default:
       return midi

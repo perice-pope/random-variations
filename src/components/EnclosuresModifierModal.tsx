@@ -16,7 +16,11 @@ import PlayIcon from '@material-ui/icons/PlayArrow'
 import StopIcon from '@material-ui/icons/Stop'
 
 import { EnclosuresType, StaffTick } from '../types'
-import { enclosureOptions, enclosureByEnclosureType } from '../musicUtils'
+import {
+  enclosureOptions,
+  enclosureByEnclosureType,
+  getConcertPitchMidi,
+} from '../musicUtils'
 import {
   FormControl,
   NativeSelect,
@@ -36,6 +40,7 @@ import {
 
 import AudioEngine, { AnimationCallback } from '../services/audioEngine'
 import Tooltip from './ui/Tooltip'
+import sessionStore from '../services/sessionStore'
 
 const audioEngine = new AudioEngine()
 
@@ -150,7 +155,16 @@ class EnclosuresModifierModal extends React.Component<
       } as StaffTick,
     ]
 
-    return staffTicks
+    return staffTicks.map(st => ({
+      ...st,
+      notes: st.notes.map(n => ({
+        ...n,
+        midi: getConcertPitchMidi(
+          sessionStore.activeSession!.instrumentTransposing,
+          n.midi,
+        ),
+      })),
+    }))
   })
 
   setPlaybackLoop = () => {

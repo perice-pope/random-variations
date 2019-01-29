@@ -195,8 +195,6 @@ class SettingsModal extends React.Component<
           <Divider light />
 
           <Box mt={3}>
-            <Typography variant="h6">Notes staff</Typography>
-
             <Box mt={2}>
               <FormControl fullWidth className={css({ marginBottom: '1rem' })}>
                 <InputLabel htmlFor="instrument-transposing">

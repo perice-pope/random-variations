@@ -29,6 +29,7 @@ import { css } from 'react-emotion'
 import {
   SemitonesToIntervalLongNameMap,
   SemitonesToIntervalShortNameMap,
+  getConcertPitchMidi,
 } from '../musicUtils'
 import { Flex } from './ui/Flex'
 import { Box } from './ui'
@@ -36,6 +37,7 @@ import NotesStaff from './NotesStaff'
 import { Omit } from '../utils'
 import settingsStore from '../services/settingsStore'
 import Tooltip from './ui/Tooltip'
+import sessionStore from '../services/sessionStore'
 
 export type SubmitValuesType = Omit<IntervalsModifier, 'enabled'>
 
@@ -199,7 +201,16 @@ class IntervalModifierModal extends React.Component<
       ]
     }
 
-    return staffTicks
+    return staffTicks.map(st => ({
+      ...st,
+      notes: st.notes.map(n => ({
+        ...n,
+        midi: getConcertPitchMidi(
+          sessionStore.activeSession!.instrumentTransposing,
+          n.midi,
+        ),
+      })),
+    }))
   })
 
   render() {
@@ -329,7 +340,10 @@ class IntervalModifierModal extends React.Component<
                 <NotesStaff
                   id="interval-preview"
                   clef={settingsStore.clefType}
-                  ticks={this.generateStaffTicks(this.state.values, this.props.baseNote)}
+                  ticks={this.generateStaffTicks(
+                    this.state.values,
+                    this.props.baseNote,
+                  )}
                   isPlaying={false}
                   showBreaks
                   activeTickIndex={undefined}

@@ -28,6 +28,7 @@ import {
   getConcertPitchMidi,
 } from '../musicUtils'
 import settingsStore from '../services/settingsStore'
+import sessionStore from '../services/sessionStore'
 
 const FlipperAlignCenter = styled(Flipper)`
   width: 100%;
@@ -157,7 +158,6 @@ const SortableNoteCard = SortableElement(
         hideContextMenu,
         disableRemoving,
         disabledNotePitches,
-        transposing = 'C',
         ...props
       } = this.props
 
@@ -172,8 +172,8 @@ const SortableNoteCard = SortableElement(
 
       const midi = tonal.Note.midi(noteNameWithOctave) as number
       const midiConcertPitch = getConcertPitchMidi(
-        transposing,
-        noteNameWithOctave,
+        sessionStore.activeSession!.instrumentTransposing,
+        midi,
       ) as number
 
       const enharmonicPitchName = tonal.Note.pc(

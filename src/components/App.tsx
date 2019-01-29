@@ -77,6 +77,7 @@ import {
   SessionNoteCard,
   ClefType,
   RhythmInfo,
+  InstrumentTransposingType,
 } from '../types'
 
 import ArpeggioModifierModal, {
@@ -106,6 +107,9 @@ import {
   SemitonesToIntervalShortNameMap,
   enclosureByEnclosureType,
   ClefTypeToDefaultOctave,
+  getConcertPitchMidi,
+  getNoteNameAfterInstrumentTranspose,
+  instrumentTransposingOptionsByType,
 } from '../musicUtils'
 import AudioFontsConfig, { AudioFontId } from '../audioFontsConfig'
 import AudioEngine, { AnimationCallback } from '../services/audioEngine'
@@ -152,7 +156,7 @@ import shortenString from '../utils/shortenString'
 import TempoSettingsModal, {
   TempoSettingsFormValues,
 } from './TempoSettingsModal'
-import { transparentize } from 'polished';
+import { transparentize } from 'polished'
 
 globalStyles()
 smoothscroll.polyfill()
@@ -414,6 +418,19 @@ class App extends React.Component<
       () =>
         sessionStore.activeSession
           ? toJS(sessionStore.activeSession)
+          : undefined,
+      () => {
+        this.onNotesUpdated()
+      },
+      {
+        delay: 300,
+      },
+    )
+
+    reaction(
+      () =>
+        sessionStore.activeSession
+          ? sessionStore.activeSession.instrumentTransposing
           : undefined,
       () => {
         this.onNotesUpdated()
@@ -758,8 +775,15 @@ class App extends React.Component<
           staffTicks.map(st => st.notes.map(n => n.midi)),
         )
         if (allMidiNotes.length > 0) {
-          const maxMidiNote = _.max(allMidiNotes) as number
-          const minMidiNote = _.min(allMidiNotes) as number
+          const maxMidiNote = getConcertPitchMidi(
+            sessionStore.activeSession!.instrumentTransposing,
+            _.max(allMidiNotes) as number,
+          )
+          const minMidiNote = getConcertPitchMidi(
+            sessionStore.activeSession!.instrumentTransposing,
+            _.min(allMidiNotes) as number,
+          )
+
           if (maxMidiNote! > noteRange.last - 3) {
             noteRange.last = maxMidiNote! + 3
           }
@@ -844,10 +868,23 @@ class App extends React.Component<
     settingsStore.saveSettingsLocally()
   }
 
+  private getStaffTicksAfterInstrumentTransposing = () => {
+    return this.state.staffTicks.map(st => ({
+      ...st,
+      notes: st.notes.map(n => ({
+        ...n,
+        midi: getConcertPitchMidi(
+          sessionStore.activeSession!.instrumentTransposing,
+          n.midi,
+        ),
+      })),
+    }))
+  }
+
   private onNotesUpdated = async () => {
     console.log('onNotesUpdated')
     await this.updateStaffNotes()
-    audioEngine.setLoop(this.state.staffTicks)
+    audioEngine.setLoop(this.getStaffTicksAfterInstrumentTransposing())
   }
 
   private drawAnimation: AnimationCallback = ({
@@ -998,6 +1035,68 @@ class App extends React.Component<
   private closeSettingsModal = () =>
     this.setState({ settingsModalIsOpen: false })
 
+  private transposeNotesAfterChangingClefIfNeeded = (clefFrom: ClefType, clefTo: ClefType) => {
+    const highClefs = [
+      'treble',
+      'alto',
+      'soprano',
+      'mezzo-soprano',
+      'french',
+    ] as ClefType[]
+
+    const lowClefs = [
+      'bass',
+      'tenor',
+      'baritone-c',
+      'baritone-f',
+      'subbass',
+    ] as ClefType[]
+
+    if (
+      _.includes(highClefs, clefFrom) &&
+      _.includes(lowClefs, clefTo) &&
+      this.canTransposeAllCardsDownOctave()
+    ) {
+      // Suggest to transpose an octave DOWN
+      if (
+        confirm(
+          'Clef has been changed. Do you want to transpose all notes an octave down?',
+        )
+      ) {
+        this.transposeAllCards(-12)
+      }
+    } else if (
+      _.includes(lowClefs, clefFrom) &&
+      _.includes(highClefs, clefTo) &&
+      this.canTransposeAllCardsUpOctave()
+    ) {
+      // Suggest to transpose an octave UP
+      if (
+        confirm(
+          'Clef has been changed. Do you want to transpose all notes an octave up?',
+        )
+      ) {
+        this.transposeAllCards(12)
+      }
+    }
+  }
+
+  private transposeNotesAfterChangingInstrumentTransposing = (transposingFrom: InstrumentTransposingType, transposingTo: InstrumentTransposingType) => {
+    const transposingConfigFrom = instrumentTransposingOptionsByType[transposingFrom]
+    const transposingConfigTo = instrumentTransposingOptionsByType[transposingTo]
+    if (!transposingConfigFrom || !transposingConfigTo) {
+      return
+    }
+    const intervalFrom = transposingConfigFrom.interval
+    const intervalTo = transposingConfigTo.interval
+
+    const semitonesFrom = tonal.Interval.semitones(intervalFrom) as number
+    const semitonesTo = tonal.Interval.semitones(intervalTo) as number
+
+    const semitonesToTranspose = semitonesTo - semitonesFrom
+    this.transposeAllCards(semitonesToTranspose)
+  }
+
   private submitSettingsModal = ({
     values,
   }: {
@@ -1009,49 +1108,15 @@ class App extends React.Component<
       const clefFrom = settingsStore.clefType
       const clefTo = values.clefType
 
-      const highClefs = [
-        'treble',
-        'alto',
-        'soprano',
-        'mezzo-soprano',
-        'french',
-      ] as ClefType[]
+      this.transposeNotesAfterChangingClefIfNeeded(clefFrom, clefTo)
+    }
 
-      const lowClefs = [
-        'bass',
-        'tenor',
-        'baritone-c',
-        'baritone-f',
-        'subbass',
-      ] as ClefType[]
+    if (!!values.instrumentTransposing && values.instrumentTransposing !== sessionStore.activeSession!.instrumentTransposing) {
+      // Instrument transposing has changed. Transpose all note cards accordingly
+      const transposingFrom = sessionStore.activeSession!.instrumentTransposing
+      const transposingTo = values.instrumentTransposing
 
-      if (
-        _.includes(highClefs, clefFrom) &&
-        _.includes(lowClefs, clefTo) &&
-        this.canTransposeAllCardsDownOctave()
-      ) {
-        // Suggest to transpose an octave DOWN
-        if (
-          confirm(
-            'Clef has been changed. Do you want to transpose all notes an octave down?',
-          )
-        ) {
-          this.transposeAllCards(-12)
-        }
-      } else if (
-        _.includes(lowClefs, clefFrom) &&
-        _.includes(highClefs, clefTo) &&
-        this.canTransposeAllCardsUpOctave()
-      ) {
-        // Suggest to transpose an octave UP
-        if (
-          confirm(
-            'Clef has been changed. Do you want to transpose all notes an octave up?',
-          )
-        ) {
-          this.transposeAllCards(12)
-        }
-      }
+      this.transposeNotesAfterChangingInstrumentTransposing(transposingFrom, transposingTo)
     }
 
     Object.keys(_.omit(values, ['instrumentTransposing'])).forEach(key => {
@@ -1059,7 +1124,8 @@ class App extends React.Component<
     })
 
     if (!!values.instrumentTransposing) {
-      sessionStore.activeSession!.instrumentTransposing = values.instrumentTransposing
+      sessionStore.activeSession!.instrumentTransposing =
+        values.instrumentTransposing
     }
 
     this.onNotesUpdated()
@@ -1421,7 +1487,7 @@ class App extends React.Component<
           const midi = tonal.Note.midi(noteName)
           if (midi + semitones < 96 && midi + semitones >= 24) {
             // "C7" and C0"
-            noteName = tonal.Note.fromMidi(midi + semitones, true)
+            noteName = tonal.Note.fromMidi(midi + semitones, false)
           }
         }
 
@@ -1485,11 +1551,7 @@ class App extends React.Component<
     }
 
     const { classes } = this.props
-    const {
-      isSignedIn,
-      isPlaying,
-      activeStaffTickIndex,
-    } = this.state
+    const { isSignedIn, isPlaying, activeStaffTickIndex } = this.state
 
     const {
       bpm,
@@ -1508,10 +1570,10 @@ class App extends React.Component<
     const isMobile = this.props.width === 'xs' || this.props.width === 'sm'
     const shouldShowPlayButtonInContentContainer = !isPhone
 
-    const baseNoteForPatternPreviewInDialogWindows = `C${ClefTypeToDefaultOctave[
-      settingsStore.clefType
-    ] || 4}`
-
+    const baseNoteForPatternPreviewInDialogWindows = getNoteNameAfterInstrumentTranspose(
+      instrumentTransposing,
+      `C${ClefTypeToDefaultOctave[settingsStore.clefType] || 4}`,
+    )
 
     const highestNote = this.getHighestNoteWithinSession(this.state.staffTicks)
     const lowestNote = this.getLowestNoteWithinSession(this.state.staffTicks)
@@ -2413,7 +2475,7 @@ class App extends React.Component<
                         this.state.isPlaying && css(`display: none;`),
                       )}
                     >
-                      <span>{`x ${settingsStore.scaleZoomFactor}`}</span>
+                      <span className={css(`white-space: nowrap;`)}>{`x ${settingsStore.scaleZoomFactor}`}</span>
                       <Tooltip title="Smaller font">
                         <IconButton
                           color="inherit"
@@ -2446,6 +2508,17 @@ class App extends React.Component<
                         </IconButton>
                       </Tooltip>
                     </div>
+                    
+                    {sessionStore.activeSession!.instrumentTransposing !== 'C' && (
+                        <span className={css(`
+                          font-size: 0.7rem; 
+                          margin-right: 0.8rem;
+                          text-align: right;
+                          color: #f80054;
+                        `)}>
+                          {`INSTRUMENT TRANSPOSING: ${sessionStore.activeSession!.instrumentTransposing}`}
+                        </span>
+                      )}
 
                     <NotesStaff
                       containerProps={{
@@ -2638,15 +2711,15 @@ class App extends React.Component<
     )
   }
 
-  private getMaxNotesStaffLines=  () => {
+  private getMaxNotesStaffLines = () => {
     return 16
   }
 
-  private getPianoKeyboardNoteShowCircle = (midi) => {
+  private getPianoKeyboardNoteShowCircle = midi => {
     return !!this.getPianoKeyboardNoteColor(midi)
   }
 
-  private getPianoKeyboardNoteColor = (midi) => {
+  private getPianoKeyboardNoteColor = midi => {
     const {
       staffTicks,
       staffTicksPerCard,
@@ -2659,51 +2732,70 @@ class App extends React.Component<
     const { noteCardsById } = this.getNoteCards()
 
     const activeNoteCard =
-    isPlaying && activeNoteCardId != null
-      ? noteCardsById[activeNoteCardId]
-      : undefined
+      isPlaying && activeNoteCardId != null
+        ? noteCardsById[activeNoteCardId]
+        : undefined
 
-    const activeNoteCardColor = 
-    activeNoteCard
+    const activeNoteCardColor = activeNoteCard
       ? activeNoteCard.color
       : noteCardWithMouseOver
         ? noteCardWithMouseOver.color
         : undefined
 
-if (!activeNoteCardColor) {
-  return undefined
-}
+    if (!activeNoteCardColor) {
+      return undefined
+    }
 
     const activeStaffTick = isPlaying
-    ? staffTicks[activeStaffTickIndex]
-    : undefined
+      ? staffTicks[activeStaffTickIndex]
+      : undefined
 
-  const activeNoteCardStaffTicks = activeNoteCard
-    ? staffTicksPerCard[activeNoteCard.id]
-    : undefined
+    const activeNoteCardStaffTicks = activeNoteCard
+      ? staffTicksPerCard[activeNoteCard.id]
+      : undefined
 
-  const noteCardWithMouseOverStaffTicks = noteCardWithMouseOver
-    ? staffTicksPerCard[noteCardWithMouseOver.id]
-    : undefined
+    const noteCardWithMouseOverStaffTicks = noteCardWithMouseOver
+      ? staffTicksPerCard[noteCardWithMouseOver.id]
+      : undefined
 
-    const isSecondaryNote=
-      activeNoteCardStaffTicks
-        ? activeNoteCardStaffTicks.findIndex(t =>
-              t.notes.findIndex(n => n.midi === midi) > -1,
-            ) > -1
-        : noteCardWithMouseOverStaffTicks
-          ? noteCardWithMouseOverStaffTicks.findIndex(t =>
-                t.notes.findIndex(n => n.midi === midi) > -1,
-              ) > -1
-          : false
-    
-    const isPrimaryNote = 
-      activeStaffTick
-        ? activeStaffTick.notes.findIndex(n => n.midi === midi) > -1
-        : noteCardWithMouseOver
-          ? noteCardWithMouseOver.midi === midi
-          : false
+    const isSecondaryNote = activeNoteCardStaffTicks
+      ? activeNoteCardStaffTicks.findIndex(
+          t =>
+            t.notes.findIndex(
+              n =>
+                getConcertPitchMidi(
+                  sessionStore.activeSession!.instrumentTransposing,
+                  n.midi,
+                ) === midi,
+            ) > -1,
+        ) > -1
+      : noteCardWithMouseOverStaffTicks
+        ? noteCardWithMouseOverStaffTicks.findIndex(
+            t =>
+              t.notes.findIndex(
+                n =>
+                  getConcertPitchMidi(
+                    sessionStore.activeSession!.instrumentTransposing,
+                    n.midi,
+                  ) === midi,
+              ) > -1,
+          ) > -1
+        : false
 
+    const isPrimaryNote = activeStaffTick
+      ? activeStaffTick.notes.findIndex(
+          n =>
+            getConcertPitchMidi(
+              sessionStore.activeSession!.instrumentTransposing,
+              n.midi,
+            ) === midi,
+        ) > -1
+      : noteCardWithMouseOver
+        ? getConcertPitchMidi(
+            sessionStore.activeSession!.instrumentTransposing,
+            noteCardWithMouseOver.midi,
+          ) === midi
+        : false
 
     if (isPrimaryNote) {
       return transparentize(0.3, activeNoteCardColor)

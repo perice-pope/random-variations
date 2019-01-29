@@ -10,6 +10,8 @@ import { Box } from './ui'
 import { withAudioEngine } from './withAudioEngine'
 import AudioEngine from '../services/audioEngine'
 import { AudioFontId } from '../audioFontsConfig'
+import { InstrumentTransposingType } from '../types'
+import { getConcertPitchMidi } from '../musicUtils'
 
 export const pianoNoteRangeWide: MidiNoteRange = {
   first: tonal.Note.midi('C3') as number,
@@ -38,6 +40,7 @@ type MidiNoteRange = {
 }
 
 type PianoKeyboardProps = {
+  instrumentTransposing?: InstrumentTransposingType
   audioEngine: AudioEngine
   audioFontId: AudioFontId
   className?: any
@@ -64,32 +67,45 @@ class PianoKeyboard extends React.Component<PianoKeyboardProps> {
 
   private boxRef = React.createRef<typeof Box>()
 
-  private onPlayNote = noteMidi => {
-    const isDisabled = this.props.getIsNoteDisabled!(noteMidi)
+  private onPlayNote = midi => {
+    const midiAfterTransposing = getConcertPitchMidi(
+      this.props.instrumentTransposing || 'C',
+      midi,
+    )
+
+    const isDisabled = this.props.getIsNoteDisabled!(midiAfterTransposing)
     if (isDisabled) {
       return
     }
 
     if (this.props.onPlayNote) {
-      this.props.onPlayNote(noteMidi)
+      this.props.onPlayNote(midiAfterTransposing)
     }
 
-    this.playingNoteEnvelopes[noteMidi] = this.props.audioEngine.playNote(
+    this.playingNoteEnvelopes[
+      midiAfterTransposing
+    ] = this.props.audioEngine.playNote(
       {
-        midi: noteMidi,
+        midi: midiAfterTransposing,
       },
       0,
       1.5,
     )
   }
 
-  private onStopNote = noteMidi => {
-    if (this.playingNoteEnvelopes[noteMidi]) {
-      this.props.audioEngine.stopNote(this.playingNoteEnvelopes[noteMidi])
-      delete this.playingNoteEnvelopes[noteMidi]
+  private onStopNote = midi => {
+    const midiAfterTransposing = getConcertPitchMidi(
+      this.props.instrumentTransposing || 'C',
+      midi,
+    )
+    if (this.playingNoteEnvelopes[midiAfterTransposing]) {
+      this.props.audioEngine.stopNote(
+        this.playingNoteEnvelopes[midiAfterTransposing],
+      )
+      delete this.playingNoteEnvelopes[midiAfterTransposing]
     }
     if (this.props.onStopNote) {
-      this.props.onStopNote(noteMidi)
+      this.props.onStopNote(midiAfterTransposing)
     }
   }
 
@@ -119,27 +135,37 @@ class PianoKeyboard extends React.Component<PianoKeyboardProps> {
   }
 
   private renderNoteLabel = ({ midiNumber }) => {
+    const midiAfterTransposing =
+      getConcertPitchMidi(
+        this.props.instrumentTransposing || 'C',
+        midiNumber,
+      ) || midiNumber
+
     const range = this.getNoteRange()
     const widthPerNote = this.props.width / (range.last - range.first + 1)
     const shouldRenderCircles = this.props.width != null
     const circleSize =
       this.props.width != null ? `${widthPerNote - 4}px` : '25px'
 
-    const isDisabled = this.props.getIsNoteDisabled!(midiNumber)
-    const isCircleShown = this.props.getIsCirclesShown!(midiNumber)
+    const isDisabled = this.props.getIsNoteDisabled!(midiAfterTransposing)
+    const isCircleShown = this.props.getIsCirclesShown!(midiAfterTransposing)
 
-    let naturalColor = this.props.getNoteColor!(midiNumber) || 'rgba(0,0,0,0)'
+    let naturalColor =
+      this.props.getNoteColor!(midiAfterTransposing) || 'rgba(0,0,0,0)'
     if (getLuminance(naturalColor) > 0.91) {
       naturalColor = darken(0.1, naturalColor)
     }
 
     let accidentalColor =
-      this.props.getNoteColor!(midiNumber) || 'rgba(0,0,0,0)'
+      this.props.getNoteColor!(midiAfterTransposing) || 'rgba(0,0,0,0)'
     if (getLuminance(accidentalColor) < 0.5) {
       accidentalColor = lighten(0.1, accidentalColor)
     }
 
-    const isAccidental = tonal.Note.fromMidi(midiNumber, true).includes('#')
+    const isAccidental = tonal.Note.fromMidi(
+      midiAfterTransposing,
+      true,
+    ).includes('#')
 
     const naturalLabelColor = darken(0.1, naturalColor)
     const accidentalLabelColor = lighten(0.1, accidentalColor)

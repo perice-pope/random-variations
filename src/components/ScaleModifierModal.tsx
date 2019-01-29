@@ -42,6 +42,7 @@ import {
   scaleOptions,
   scaleByScaleType,
   generateScalePatternFromPreset,
+  getConcertPitchMidi,
 } from '../musicUtils'
 import { Flex } from './ui/Flex'
 import { Box } from './ui'
@@ -55,6 +56,7 @@ import {
 } from './withAudioEngine'
 
 import AudioEngine, { AnimationCallback } from '../services/audioEngine'
+import sessionStore from '../services/sessionStore'
 
 const audioEngine = new AudioEngine()
 
@@ -345,7 +347,16 @@ class ScaleModifierModal extends React.Component<
       } as StaffTick
     })
 
-    return staffTicks
+    return staffTicks.map(st => ({
+      ...st,
+      notes: st.notes.map(n => ({
+        ...n,
+        midi: getConcertPitchMidi(
+          sessionStore.activeSession!.instrumentTransposing,
+          n.midi,
+        ),
+      })),
+    }))
   })
 
   buildRandomPattern = () => {

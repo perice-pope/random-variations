@@ -45,6 +45,7 @@ import {
   generateChordPatternFromPreset,
   chordOptions,
   chordsByChordType,
+  getConcertPitchMidi,
 } from '../musicUtils'
 import { Flex } from './ui/Flex'
 import { Box } from './ui'
@@ -57,6 +58,7 @@ import {
 } from './withAudioEngine'
 import AudioEngine, { AnimationCallback } from '../services/audioEngine'
 import { Omit } from '../utils'
+import sessionStore from '../services/sessionStore'
 
 const audioEngine = new AudioEngine()
 
@@ -382,7 +384,16 @@ class ArpeggioModifierModal extends React.Component<
       ]
     }
 
-    return staffTicks
+    return staffTicks.map(st => ({
+      ...st,
+      notes: st.notes.map(n => ({
+        ...n,
+        midi: getConcertPitchMidi(
+          sessionStore.activeSession!.instrumentTransposing,
+          n.midi,
+        ),
+      })),
+    }))
   })
 
   animationCallback: AnimationCallback = ({ tick }) => {
