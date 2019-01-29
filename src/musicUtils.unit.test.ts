@@ -71,7 +71,7 @@ describe('getNotePitchClassWithSharp', () => {
   })
 })
 
-describe.only('getEnharmonicVersionForNote', () => {
+describe('getEnharmonicVersionForNote', () => {
   const getEnharmonicVersionForNoteTests = [
     ['C', 'B#'],
     ['C2', 'B#1'],
@@ -140,6 +140,150 @@ describe.only('getEnharmonicVersionForNote', () => {
     '%s -> %s',
     (note, expectedEnharmonicVersion) => {
       expect(getEnharmonicVersionForNote(note)).toBe(expectedEnharmonicVersion)
+    },
+  )
+})
+
+const instrumentTransposingTestData = {
+  C: [['C', 'C']],
+  Bb: [
+    ['C', 'D'],
+    ['B#', 'D'],
+    ['Db', 'Eb'],
+    ['C#', 'Eb'],
+    ['D', 'E'],
+    ['Eb', 'F'],
+    ['D#', 'F'],
+    ['E', 'Gb'],
+    ['Fb', 'Gb'],
+    ['F', 'G'],
+    ['E#', 'G'],
+    ['Gb', 'Ab'],
+    ['F#', 'Ab'],
+    ['G', 'A'],
+    ['Ab', 'Bb'],
+    ['G#', 'Bb'],
+    ['A', 'B'],
+    ['Bb', 'C'],
+    ['A#', 'C'],
+    ['B', 'Db'],
+    ['Cb', 'Db'],
+  ],
+  A: [
+    ['C', 'Eb'],
+    ['B#', 'Eb'],
+    ['Db', 'E'],
+    ['C#', 'E'],
+    ['D', 'F'],
+    ['Eb', 'Gb'],
+    ['D#', 'Gb'],
+    ['E', 'G'],
+    ['Fb', 'G'],
+    ['F', 'Ab'],
+    ['E#', 'Ab'],
+    ['Gb', 'A'],
+    ['F#', 'A'],
+    ['G', 'Bb'],
+    ['Ab', 'B'],
+    ['G#', 'B'],
+    ['A', 'C'],
+    ['Bb', 'Db'],
+    ['A#', 'Db'],
+    ['B', 'D'],
+    ['Cb', 'D'],
+  ],
+  G: [
+    ['C', 'F'],
+    ['B#', 'F'],
+    ['Db', 'Gb'],
+    ['C#', 'Gb'],
+    ['D', 'G'],
+    ['Eb', 'Ab'],
+    ['D#', 'Ab'],
+    ['E', 'A'],
+    ['Fb', 'A'],
+    ['F', 'Bb'],
+    ['E#', 'Bb'],
+    ['Gb', 'B'],
+    ['F#', 'B'],
+    ['G', 'C'],
+    ['Ab', 'Db'],
+    ['G#', 'Db'],
+    ['A', 'D'],
+    ['Bb', 'Eb'],
+    ['A#', 'Eb'],
+    ['B', 'E'],
+    ['Cb', 'E'],
+  ],
+  F: [
+    ['C', 'G'],
+    ['B#', 'G'],
+    ['Db', 'Ab'],
+    ['C#', 'Ab'],
+    ['D', 'A'],
+    ['Eb', 'Bb'],
+    ['D#', 'Bb'],
+    ['E', 'B'],
+    ['Fb', 'B'],
+    ['F', 'C'],
+    ['E#', 'C'],
+    ['Gb', 'Db'],
+    ['F#', 'Db'],
+    ['G', 'D'],
+    ['Ab', 'Eb'],
+    ['G#', 'Eb'],
+    ['A', 'E'],
+    ['Bb', 'F'],
+    ['A#', 'F'],
+    ['B', 'Gb'],
+    ['Cb', 'Gb'],
+  ],
+  Eb: [
+    ['C', 'A'],
+    ['B#', 'A'],
+    ['Db', 'Bb'],
+    ['C#', 'Bb'],
+    ['D', 'B'],
+    ['Eb', 'C'],
+    ['D#', 'C'],
+    ['E', 'Db'],
+    ['Fb', 'Db'],
+    ['F', 'D'],
+    ['E#', 'D'],
+    ['Gb', 'Eb'],
+    ['F#', 'Eb'],
+    ['G', 'E'],
+    ['Ab', 'F'],
+    ['G#', 'F'],
+    ['A', 'Gb'],
+    ['Bb', 'G'],
+    ['A#', 'G'],
+    ['B', 'Ab'],
+    ['Cb', 'Ab'],
+  ],
+}
+
+describe('getNoteNameAfterInstrumentTranspose', () => {
+  describe.each([
+    'C',
+    'Bb',
+    'A',
+    'G',
+    'F',
+    'Eb',
+  ] as InstrumentTransposingType[])(
+    'Instrument transposing: %s',
+    (transposingType: InstrumentTransposingType) => {
+      describe('For pitch classes', () => {
+        test.each(instrumentTransposingTestData[transposingType])(
+          '%s -> %s',
+          (testNote, expectedResultNote) => {
+            expect(
+              getNoteNameAfterInstrumentTranspose(transposingType, testNote),
+            ).toBe(expectedResultNote)
+          },
+        )
+      })
     },
   )
 })

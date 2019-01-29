@@ -162,21 +162,174 @@ export const getEnharmonicVersionForNote = _.memoize(
   },
 )
 
+// [concert pitch, transposed note, isOctaveUp, isOctaveDown]
+const instrumentTransposingPitchMap = {
+  Bb: _.keyBy(
+    [
+      ['C', 'D'],
+      ['B#', 'D', true],
+      ['Db', 'Eb'],
+      ['C#', 'Eb'],
+      ['D', 'E'],
+      ['Eb', 'F'],
+      ['D#', 'F'],
+      ['E', 'Gb'],
+      ['Fb', 'Gb'],
+      ['F', 'G'],
+      ['E#', 'G'],
+      ['Gb', 'Ab'],
+      ['F#', 'Ab'],
+      ['G', 'A'],
+      ['Ab', 'Bb'],
+      ['G#', 'Bb'],
+      ['A', 'B'],
+      ['Bb', 'C', true],
+      ['A#', 'C', true],
+      ['B', 'Db', true],
+      ['Cb', 'Db'],
+    ],
+    ([note]) => note,
+  ),
+  A: _.keyBy(
+    [
+      ['C', 'Eb'],
+      ['B#', 'Eb', true],
+      ['Db', 'E'],
+      ['C#', 'E'],
+      ['D', 'F'],
+      ['Eb', 'Gb'],
+      ['D#', 'Gb'],
+      ['E', 'G'],
+      ['Fb', 'G'],
+      ['F', 'Ab'],
+      ['E#', 'Ab'],
+      ['Gb', 'A'],
+      ['F#', 'A'],
+      ['G', 'Bb'],
+      ['Ab', 'B'],
+      ['G#', 'B'],
+      ['A', 'C', true],
+      ['Bb', 'Db', true],
+      ['A#', 'Db', true],
+      ['B', 'D', true],
+      ['Cb', 'D', true],
+    ],
+    ([note]) => note,
+  ),
+  G: _.keyBy(
+    [
+      ['C', 'F'],
+      ['B#', 'F', true],
+      ['Db', 'Gb'],
+      ['C#', 'Gb'],
+      ['D', 'G'],
+      ['Eb', 'Ab'],
+      ['D#', 'Ab'],
+      ['E', 'A'],
+      ['Fb', 'A'],
+      ['F', 'Bb'],
+      ['E#', 'Bb'],
+      ['Gb', 'B'],
+      ['F#', 'B'],
+      ['G', 'C', true],
+      ['Ab', 'Db', true],
+      ['G#', 'Db', true],
+      ['A', 'D', true],
+      ['Bb', 'Eb', true],
+      ['A#', 'Eb', true],
+      ['B', 'E', true],
+      ['Cb', 'E', true],
+    ],
+    ([note]) => note,
+  ),
+  F: _.keyBy(
+    [
+      ['C', 'G'],
+      ['B#', 'G', true],
+      ['Db', 'Ab'],
+      ['C#', 'Ab'],
+      ['D', 'A'],
+      ['Eb', 'Bb'],
+      ['D#', 'Bb'],
+      ['E', 'B'],
+      ['Fb', 'B'],
+      ['F', 'C', true],
+      ['E#', 'C', true],
+      ['Gb', 'Db', true],
+      ['F#', 'Db', true],
+      ['G', 'D', true],
+      ['Ab', 'Eb', true],
+      ['G#', 'Eb', true],
+      ['A', 'E', true],
+      ['Bb', 'F', true],
+      ['A#', 'F', true],
+      ['B', 'Gb', true],
+      ['Cb', 'Gb', true],
+    ],
+    ([note]) => note,
+  ),
+  Eb: _.keyBy(
+    [
+      ['C', 'A'],
+      ['B#', 'A', true],
+      ['Db', 'Bb'],
+      ['C#', 'Bb'],
+      ['D', 'B'],
+      ['Eb', 'C', true],
+      ['D#', 'C', true],
+      ['E', 'Db', true],
+      ['Fb', 'Db', true],
+      ['F', 'D', true],
+      ['E#', 'D', true],
+      ['Gb', 'Eb', true],
+      ['F#', 'Eb', true],
+      ['G', 'E', true],
+      ['Ab', 'F', true],
+      ['G#', 'F', true],
+      ['A', 'Gb', true],
+      ['Bb', 'G', true],
+      ['A#', 'G', true],
+      ['B', 'Ab', true],
+      ['Cb', 'Ab', true],
+    ],
+    ([note]) => note,
+  ),
+}
+
 export const getNoteNameAfterInstrumentTranspose = (
   transposing: InstrumentTransposingType,
   noteName: string,
 ) => {
-  let noteNameTransposed = noteName
-
-  const transposingConfig = instrumentTransposingOptionsByType[transposing]
-  if (transposingConfig) {
-    noteNameTransposed = tonal.transpose(
-      noteNameTransposed,
-      transposingConfig.interval,
-    ) as string
+  if (transposing === 'C') {
+    // No transposing required
+    return noteName
   }
 
-  return noteNameTransposed
+  const pitch = tonal.Note.pc(noteName)
+  if (!pitch) {
+    return noteName
+  }
+
+  const transposingConfig = instrumentTransposingPitchMap[transposing]
+  const noteTransposingConfig = transposingConfig[pitch] as [
+    string,
+    string,
+    boolean?
+  ]
+  const [, transposedPitch, isNextOctave] = noteTransposingConfig
+
+  if (pitch === noteName) {
+    // The note is without an octave
+    return transposedPitch
+  }
+
+  const octave = tonal.Note.oct(noteName) as number
+  // The note has an octave specified
+  if (!isNextOctave) {
+    return `${transposedPitch}${octave}`
+  }
+
+  return `${transposedPitch}${octave + 1}`
 }
 
 export const NoteNamesWithSharps = [
