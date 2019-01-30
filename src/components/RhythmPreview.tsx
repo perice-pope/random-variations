@@ -68,8 +68,9 @@ class RhythmPreview extends React.Component<
   private getWidth = () => {
     const { boxWidth } = this.state
     const notesCount = this.props.beats * this.props.divisions
-    const minWidth = notesCount * 25
+    const minWidth = notesCount * 22
     const maxWidth = notesCount * 100
+
     return Math.max(280, Math.min(maxWidth, Math.max(minWidth, boxWidth - 100)))
   }
 
@@ -115,10 +116,317 @@ class RhythmPreview extends React.Component<
     }
   }
 
+  private configureRhythmStave = () => {
+    const { beats, divisions } = this.props
+
+    const rhythmKey = `${beats}:${divisions}`
+    const rhythmConfigs = {
+      '8:1': {
+        noteDurations: ['1/2'],
+        rhythmName: 'Double Whole Note',
+      },
+      '6:1': {
+        noteDurations: ['1d'],
+        rhythmName: 'Dotted Whole Note',
+      },
+      '4:1': {
+        noteDurations: ['1'],
+        rhythmName: 'Whole Note',
+      },
+      '7:2': {
+        noteDurations: ['2dd', '2dd'],
+        rhythmName: 'Double Dotted Half Note',
+      },
+      '3:1': {
+        noteDurations: ['2d'],
+        rhythmName: 'Dotted Half Note',
+      },
+      '2:1': {
+        noteDurations: ['2'],
+        rhythmName: 'Half Note',
+      },
+      '7:4': {
+        noteDurations: ['4dd', '4dd', '4dd', '4dd'],
+        rhythmName: 'Double Dotted Quarter Note',
+      },
+      '8:5': {
+        noteDurations: ['2', '2', '2', '2', '2'],
+        rhythmName: 'Half Note Quintuplet',
+        tupleOptions: {
+          num_notes: 5,
+          notes_occupied: 4,
+        },
+      },
+      '3:2': {
+        noteDurations: ['4d', '4d'],
+        rhythmName: 'Dotted Quarter Note',
+      },
+      '4:3': {
+        noteDurations: ['2', '2', '2'],
+        rhythmName: 'Half Note Triplet',
+        tupleOptions: {
+          num_notes: 3,
+          notes_occupied: 2,
+        },
+      },
+      '8:7': {
+        noteDurations: ['2', '2', '2', '2', '2', '2', '2'],
+        rhythmName: 'Half Note Septuplet',
+        tupleOptions: {
+          num_notes: 7,
+          notes_occupied: 2,
+        },
+      },
+      '1:1': {
+        noteDurations: ['4'],
+        rhythmName: 'Quarter Note',
+      },
+      '4:5': {
+        noteDurations: ['4', '4', '4', '4', '4'],
+        rhythmName: 'Quarter Note Quintuplet',
+        tupleOptions: {
+          num_notes: 5,
+          notes_occupied: 4,
+        },
+      },
+      '3:4': {
+        noteDurations: ['8d', '8d', '8d', '8d'],
+        rhythmName: 'Dotted 8th',
+      },
+      '2:3': {
+        noteDurations: ['4', '4', '4'],
+        rhythmName: 'Quarter Note Triplet',
+        tupleOptions: {
+          num_notes: 3,
+          notes_occupied: 2,
+        },
+      },
+      '1:2': {
+        noteDurations: ['8', '8'],
+        rhythmName: '8th Note',
+      },
+      '4:9': {
+        noteDurations: ['8', '8', '8', '8', '8', '8', '8', '8', '8'],
+        rhythmName: '8th Note Nontuplet',
+        tupleOptions: {
+          num_notes: 9,
+          notes_occupied: 8,
+        },
+      },
+      '2:5': {
+        noteDurations: ['8', '8', '8', '8', '8'],
+        rhythmName: '8th Note Quintuplet',
+        tupleOptions: {
+          num_notes: 5,
+          notes_occupied: 4,
+        },
+      },
+      '3:8': {
+        noteDurations: ['16d', '16d', '16d', '16d', '16d', '16d', '16d', '16d'],
+        rhythmName: 'Dotted 16th Note',
+      },
+      '1:3': {
+        noteDurations: ['8', '8', '8'],
+        rhythmName: '8th Note Triplet',
+        tupleOptions: {
+          num_notes: 3,
+          notes_occupied: 2,
+        },
+      },
+      '2:7': {
+        noteDurations: ['8', '8', '8', '8', '8', '8', '8'],
+        rhythmName: '8th Note Septuplet',
+        tupleOptions: {
+          num_notes: 7,
+          notes_occupied: 4,
+        },
+      },
+      '1:4': {
+        noteDurations: ['16', '16', '16', '16'],
+        rhythmName: '16th Note',
+      },
+      '2:9': {
+        noteDurations: ['16', '16', '16', '16', '16', '16', '16', '16', '16'],
+        rhythmName: '16th Note Nontuplet',
+        tupleOptions: {
+          num_notes: 9,
+          notes_occupied: 8,
+        },
+      },
+      '1:5': {
+        noteDurations: ['16', '16', '16', '16', '16'],
+        rhythmName: '16th Note Quintuplet',
+        tupleOptions: {
+          num_notes: 5,
+          notes_occupied: 4,
+        },
+      },
+      '1:6': {
+        noteDurations: ['16', '16', '16', '16', '16', '16'],
+        rhythmName: '16th Note Sextuplet',
+        tupleOptions: {
+          num_notes: 6,
+          notes_occupied: 4,
+        },
+      },
+      '1:7': {
+        noteDurations: ['16', '16', '16', '16', '16', '16', '16'],
+        rhythmName: '16th Note Septuplet',
+        tupleOptions: {
+          num_notes: 7,
+          notes_occupied: 4,
+        },
+      },
+      '1:8': {
+        noteDurations: ['32', '32', '32', '32', '32', '32', '32', '32'],
+        rhythmName: '32th Note',
+      },
+      '1:9': {
+        noteDurations: ['32', '32', '32', '32', '32', '32', '32', '32', '32'],
+        rhythmName: '32th Note Nontuplet',
+        tupleOptions: {
+          num_notes: 9,
+          notes_occupied: 8,
+        },
+      },
+      '1:10': {
+        noteDurations: [
+          '32',
+          '32',
+          '32',
+          '32',
+          '32',
+          '32',
+          '32',
+          '32',
+          '32',
+          '32',
+        ],
+        enableBeams: true,
+        rhythmName: '32th Note Dectuplet',
+        tupleOptions: {
+          num_notes: 10,
+          notes_occupied: 8,
+        },
+      },
+      '1:16': {
+        noteDurations: [
+          '64',
+          '64',
+          '64',
+          '64',
+          '64',
+          '64',
+          '64',
+          '64',
+          '64',
+          '64',
+          '64',
+          '64',
+          '64',
+          '64',
+          '64',
+          '64',
+        ],
+        rhythmName: '64th Note',
+      },
+    }
+
+    const {
+      enableBeams = false,
+      rhythmName = '',
+      noteDurations = [],
+      tupleOptions = undefined,
+    } = rhythmConfigs[rhythmKey] || {}
+
+    const notes = noteDurations.map(duration => {
+      const note = new Vex.Flow.StaveNote({
+        duration,
+        keys: ['B/4'],
+        stem_direction: -1,
+      })
+
+      if (duration.endsWith('dd')) {
+        note.addDot(0).addDot(0)
+      } else if (duration.endsWith('d')) {
+        note.addDot(0)
+      }
+
+      return note
+    })
+
+    const beams = enableBeams ? [new Vex.Flow.Beam(notes)] : []
+
+    const tuplets: Vex.Flow.Tuplet[] = []
+    if (tupleOptions) {
+      let currentNoteIndex = 0
+      while (currentNoteIndex < notes.length) {
+        // @ts-ignore
+        const tuplet = new Vex.Flow.Tuplet(
+          notes.slice(
+            currentNoteIndex,
+            currentNoteIndex + tupleOptions.num_notes,
+          ),
+          {
+            location: -1,
+            bracketed: true,
+            // @ts-ignore
+            ratioed: false,
+            ...tupleOptions,
+          },
+        )
+        // @ts-ignore
+        // Workaround for bug in VexFlow: glyphs are shown in the wrong order
+        tuplet.num_glyphs = _.reverse(tuplet.num_glyphs)
+
+        tuplets.push(tuplet)
+        currentNoteIndex += tupleOptions.num_notes
+      }
+    }
+
+    const voice = new Vex.Flow.Voice({
+      num_beats: this.props.beats,
+      beat_value: 4,
+    })
+      .setMode(Vex.Flow.Voice.Mode.SOFT)
+      .addTickables([
+        ...new Array(this.props.offset).fill(null).map(
+          () =>
+            new Vex.Flow.StaveNote({
+              keys: ['B/4'],
+              duration: 'qr',
+              stem_direction: -1,
+            }),
+        ),
+        new Vex.Flow.BarNote().setType(Vex.Flow.Barline.type.REPEAT_BEGIN),
+        ...notes,
+        new Vex.Flow.BarNote().setType(Vex.Flow.Barline.type.REPEAT_END),
+      ])
+
+    return {
+      rhythmName,
+      notes,
+      beams,
+      voice,
+      tuplets,
+      shouldShowRhythmsStave: notes.length > 0,
+    }
+  }
+
   private drawStaveAndClef = (staveYs?: number[]) => {
     console.log('RhythmPreview -> drawStaveAndClef')
     const { staveHeight, scale, beats } = this.props
-    const linesCount = 2
+
+    // Configure "Rhythm" stave for some of the rhythms
+    const {
+      rhythmName,
+      shouldShowRhythmsStave,
+      voice: rhythmVoice,
+      beams: rhythmBeams,
+      tuplets: rhythmTuplets,
+    } = this.configureRhythmStave()
+
+    const linesCount = shouldShowRhythmsStave ? 3 : 2
     const width = this.getWidth() / (scale || 1.0)
 
     // Create a stave of at position 0, 0 on the canvas.
@@ -142,21 +450,40 @@ class RhythmPreview extends React.Component<
         .setContext(this.renderContext)
     }
 
-    this.staves[0].setText(' Rhythm', Vex.Flow.Modifier.Position.ABOVE, {
-      shift_x: 20,
-      justification: Vex.Flow.TextNote.Justification.LEFT,
-    })
-    this.staves[1].setText(' Metronome', Vex.Flow.Modifier.Position.ABOVE, {
-      shift_x: 20,
-      justification: Vex.Flow.TextNote.Justification.LEFT,
-    })
+    if (shouldShowRhythmsStave) {
+      this.staves[0].setText(
+        ` Rhythm - ${rhythmName}`,
+        Vex.Flow.Modifier.Position.ABOVE,
+        {
+          shift_x: 20,
+          justification: Vex.Flow.TextNote.Justification.LEFT,
+        },
+      )
+      this.staves[1].setText(' Subdivision', Vex.Flow.Modifier.Position.ABOVE, {
+        shift_x: 20,
+        justification: Vex.Flow.TextNote.Justification.LEFT,
+      })
+      this.staves[2].setText(' Metronome', Vex.Flow.Modifier.Position.ABOVE, {
+        shift_x: 20,
+        justification: Vex.Flow.TextNote.Justification.LEFT,
+      })
+    } else {
+      this.staves[0].setText(' Subdivision', Vex.Flow.Modifier.Position.ABOVE, {
+        shift_x: 20,
+        justification: Vex.Flow.TextNote.Justification.LEFT,
+      })
+      this.staves[1].setText(' Metronome', Vex.Flow.Modifier.Position.ABOVE, {
+        shift_x: 20,
+        justification: Vex.Flow.TextNote.Justification.LEFT,
+      })
+    }
 
     this.staves.forEach(s => s.draw())
 
     // @ts-ignore
     const connector = new Vex.Flow.StaveConnector(
       this.staves[0],
-      this.staves[1],
+      this.staves[this.staves.length - 1],
     )
     connector.setType(Vex.Flow.StaveConnector.type.BRACKET)
     connector.setContext(this.renderContext)
@@ -186,16 +513,14 @@ class RhythmPreview extends React.Component<
     })
       .setMode(Vex.Flow.Voice.Mode.SOFT)
       .addTickables([
-        ...new Array(this.props.offset)
-          .fill(null)
-          .map(
-            () =>
-              new Vex.Flow.StaveNote({
-                keys: ['B/4'],
-                duration: 'qr',
-                stem_direction: -1,
-              }),
-          ),
+        ...new Array(this.props.offset).fill(null).map(
+          () =>
+            new Vex.Flow.StaveNote({
+              keys: ['B/4'],
+              duration: 'qr',
+              stem_direction: -1,
+            }),
+        ),
         new Vex.Flow.BarNote().setType(Vex.Flow.Barline.type.REPEAT_BEGIN),
         ...meterNotes,
         new Vex.Flow.BarNote().setType(Vex.Flow.Barline.type.REPEAT_END),
@@ -257,16 +582,14 @@ class RhythmPreview extends React.Component<
     })
       .setMode(Vex.Flow.Voice.Mode.SOFT)
       .addTickables([
-        ...new Array(this.props.offset)
-          .fill(null)
-          .map(
-            () =>
-              new Vex.Flow.StaveNote({
-                keys: ['B/4'],
-                duration: 'qr',
-                stem_direction: -1,
-              }),
-          ),
+        ...new Array(this.props.offset).fill(null).map(
+          () =>
+            new Vex.Flow.StaveNote({
+              keys: ['B/4'],
+              duration: 'qr',
+              stem_direction: -1,
+            }),
+        ),
         new Vex.Flow.BarNote().setType(Vex.Flow.Barline.type.REPEAT_BEGIN),
         ...subdivisionNotes,
         new Vex.Flow.BarNote().setType(Vex.Flow.Barline.type.REPEAT_END),
@@ -280,15 +603,37 @@ class RhythmPreview extends React.Component<
 
     const formatter = new Vex.Flow.Formatter()
 
+    if (shouldShowRhythmsStave) {
+      formatter.joinVoices([rhythmVoice])
+    }
     formatter.joinVoices([meterVoice])
     formatter.joinVoices([subdivisionVoice])
-    formatter.formatToStave([meterVoice, subdivisionVoice], this.staves[0])
+    formatter.formatToStave(
+      [
+        ...(shouldShowRhythmsStave ? [rhythmVoice] : []),
+        meterVoice,
+        subdivisionVoice,
+      ],
+      this.staves[0],
+    )
 
-    subdivisionVoice.draw(this.renderContext, this.staves[0])
+    if (shouldShowRhythmsStave) {
+      rhythmVoice.draw(this.renderContext, this.staves[0])
+      rhythmBeams.forEach(b => b.setContext(this.renderContext).draw())
+      rhythmTuplets.forEach(b => b.setContext(this.renderContext).draw())
+    }
+
+    subdivisionVoice.draw(
+      this.renderContext,
+      this.staves[shouldShowRhythmsStave ? 1 : 0],
+    )
     subdivisionBeams.forEach(b => b.setContext(this.renderContext).draw())
     subdivisionTuplets.forEach(b => b.setContext(this.renderContext).draw())
 
-    meterVoice.draw(this.renderContext, this.staves[1])
+    meterVoice.draw(
+      this.renderContext,
+      this.staves[shouldShowRhythmsStave ? 2 : 1],
+    )
   }
 
   private handleScreenSizeUpdate = () => {
@@ -317,13 +662,6 @@ class RhythmPreview extends React.Component<
           width: 100%; 
           overflow-x: auto; 
           overflow-y: hidden; 
-
-          &::scrollbar{
-            display: none;
-          }
-          &::-webkit-scrollbar{
-            display: none;
-          }
           `),
           (containerProps || {}).className,
         )}

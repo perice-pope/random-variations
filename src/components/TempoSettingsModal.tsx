@@ -10,6 +10,8 @@ import DialogContent from '@material-ui/core/DialogContent'
 import TimerIcon from '@material-ui/icons/Timer'
 import MetronomeIcon from 'mdi-material-ui/Metronome'
 import PlayIcon from '@material-ui/icons/PlayArrow'
+import ArrowBackIcon from '@material-ui/icons/ArrowBack'
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
 import StopIcon from '@material-ui/icons/Stop'
 import withMobileDialog, {
   InjectedProps,
@@ -34,6 +36,7 @@ import {
   Tooltip,
   withWidth,
   IconButton,
+  Hidden,
 } from '@material-ui/core'
 import { rhythmOptions } from '../musicUtils'
 import Slider from '@material-ui/lab/Slider'
@@ -152,11 +155,39 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     this.restartPlayback()
   }
 
-  private handleRhythmSliderChange = (e, rhythmIndex) => {
+  private setRhythmWithIndex = rhythmIndex => {
     this.values.rhythm = rhythmOptions[rhythmIndex] || rhythmOptions[0]
     this.inputValues.rhythmBeats = this.values.rhythm.beats.toString()
     this.inputValues.rhythmDivisions = this.values.rhythm.divisions.toString()
     this.restartPlayback()
+  }
+
+  private handleRhythmSliderChange = (e, rhythmIndex) => {
+    this.setRhythmWithIndex(rhythmIndex)
+  }
+
+  private handleSelectPreviousRhythm = () => {
+    const rhythmIndex = rhythmOptions.findIndex(
+      ro =>
+        ro.beats === this.values.rhythm.beats &&
+        ro.divisions === this.values.rhythm.divisions,
+    )
+    if (rhythmIndex < 1) {
+      return
+    }
+    this.setRhythmWithIndex(rhythmIndex - 1)
+  }
+
+  private handleSelectNextRhythm = () => {
+    const rhythmIndex = rhythmOptions.findIndex(
+      ro =>
+        ro.beats === this.values.rhythm.beats &&
+        ro.divisions === this.values.rhythm.divisions,
+    )
+    if (rhythmIndex >= rhythmOptions.length - 1) {
+      return
+    }
+    this.setRhythmWithIndex(rhythmIndex + 1)
   }
 
   private handleSelectRandomRhythm = () => {
@@ -303,6 +334,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
         )}
         onClick={this.handleMetronomeToggle}
         variant="outlined"
+        size="small"
       >
         <MetronomeIcon
           fontSize="small"
@@ -390,7 +422,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     const TempoTextInput = (
       // @ts-ignore
       <TextField
-        className={css({ maxWidth: '100px' })}
+        className={css({ maxWidth: '110px' })}
         InputProps={{
           endAdornment: <InputAdornment position="end">BPM</InputAdornment>,
           className: css({ fontSize: '1.3rem' }),
@@ -481,6 +513,39 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
       </Box>
     )
 
+    const RhythmPrevButton = (
+      <Tooltip title="Previous rhythm">
+        <IconButton
+          color="default"
+          disabled={rhythmSliderValue === 0}
+          onClick={this.handleSelectPreviousRhythm}
+          className={css(`
+            border: 1px solid;
+            padding: 5px;
+          `)}
+        >
+          <ArrowBackIcon />
+        </IconButton>
+      </Tooltip>
+    )
+
+    const RhythmNextButton = (
+      <Tooltip title="Next rhythm">
+        <IconButton
+          color="default"
+          disabled={rhythmSliderValue === rhythmOptions.length - 1}
+          onClick={this.handleSelectNextRhythm}
+          className={css(`
+            margin-left: 0.5rem;
+            border: 1px solid;
+            padding: 5px;
+          `)}
+        >
+          <ArrowForwardIcon />
+        </IconButton>
+      </Tooltip>
+    )
+
     const RhythmRandomizeButton = (
       <Tooltip title="Choose random beat division">
         <Button
@@ -488,17 +553,13 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
           color="primary"
           onClick={this.handleSelectRandomRhythm}
           className={css(`
-                      @media screen and (max-width: 500px) {
-                        margin-left: 0;
-                        margin-top: 0.5rem;
-                      }
-                    `)}
+            margin-left: 0.5rem;
+          `)}
         >
-          <ArrowsIcon
-            fontSize="small"
-            className={css(`margin-right: 0.5rem;`)}
-          />
-          Random
+          <ArrowsIcon fontSize="small" />
+          <Hidden smDown>
+            <span className={css(`margin-right: 0.5rem;`)}>Random</span>
+          </Hidden>
         </Button>
       </Tooltip>
     )
@@ -507,15 +568,13 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
       <Button
         variant="outlined"
         color="default"
+        disabled={rhythm.beats === 1 && rhythm.divisions === 1}
         onClick={this.handleSelectDefaultRhythm}
         className={css(`
-                      margin-left: 0.5rem;
-                      @media screen and (max-width: 500px) {
-                        margin-top: 0.5rem;
-                      }
-                    `)}
+          margin-left: 0.5rem;
+        `)}
       >
-        Reset
+        1/1
       </Button>
     )
 
@@ -527,7 +586,6 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
           margin-left: 0.5rem; 
           border: 1px solid;
           padding: 5px;
-          margin-left: 1rem;
         `)}
       >
         {this.isPlaying ? (
@@ -668,20 +726,27 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
               </Flex>
 
               {RhythmSliderInput}
-              {RhythmRandomizeButton}
-              {RhythmResetButton}
-              {TogglePlaybackButton}
+              <div
+                className={css(`margin-left: -0.5rem; white-space: nowrap;`)}
+              >
+                {RhythmPrevButton}
+                {RhythmResetButton}
+                {RhythmNextButton}
+
+                {RhythmRandomizeButton}
+                {TogglePlaybackButton}
+              </div>
 
               <div
                 className={css(
-                  `height: 260px; width: 100%; margin-top: 1rem; margin-bottom: 1rem; margin-left: -1rem; margin-right: -1rem;`,
+                  `height: 260px; margin-top: 1rem; margin-bottom: 1rem; margin-left: -1rem; margin-right: -1rem;`,
                 )}
               >
                 <RhythmPreview
                   id={`rhythm-preview`}
                   key={`${rhythm.beats}:${rhythm.divisions}`}
                   beats={rhythm.beats}
-                  scale={this.props.width === 'xs' ? 0.6 : 0.9}
+                  scale={this.props.width === 'xs' ? 0.55 : 0.7}
                   divisions={rhythm.divisions}
                 />
               </div>
