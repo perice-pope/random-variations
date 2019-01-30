@@ -310,10 +310,17 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
 
     const { bpm, rhythm, countInEnabled, metronomeEnabled } = this.values
 
-    const rhythmSliderValue =
-      rhythmOptions.findIndex(
-        ro => ro.beats === rhythm.beats && ro.divisions === rhythm.divisions,
-      ) || 0
+    let rhythmSliderValue = rhythmOptions.findIndex(
+      ro => ro.beats === rhythm.beats && ro.divisions === rhythm.divisions,
+    )
+    if (rhythmSliderValue < 0) {
+      rhythmSliderValue = rhythmOptions.findIndex(
+        ro => ro.beats / ro.divisions <= rhythm.beats / rhythm.divisions,
+      )
+    }
+    if (rhythmSliderValue < 0) {
+      rhythmSliderValue = 0
+    }
 
     const ToggleCountInButton = (
       <Button
