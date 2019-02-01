@@ -68,7 +68,7 @@ class RhythmPreview extends React.Component<
   private getWidth = () => {
     const { boxWidth } = this.state
     const notesCount = this.props.beats * this.props.divisions
-    const minWidth = notesCount * 22
+    const minWidth = notesCount * 15
     const maxWidth = notesCount * 100
 
     return Math.max(280, Math.min(maxWidth, Math.max(minWidth, boxWidth - 100)))
@@ -87,16 +87,25 @@ class RhythmPreview extends React.Component<
     this.drawStaveAndClef()
   }
 
-  private getSubdivisionNotesLength = () => {
+  private getSubdivisionTupletOptions = () => {
     const { divisions } = this.props
+    if (_.includes([1, 2, 4, 8, 16], divisions)) {
+      return undefined
+    }
+
+    let notesOccupied = 1
     switch (divisions) {
-      case 1:
-        return 'q'
       case 2:
       case 3:
+        notesOccupied = 2
+        break
+      case 4:
       case 5:
       case 7:
       case 6:
+        notesOccupied = 4
+        break
+      case 8:
       case 9:
       case 10:
       case 11:
@@ -104,15 +113,218 @@ class RhythmPreview extends React.Component<
       case 13:
       case 14:
       case 15:
+        notesOccupied = 8
+        break
+      case 16:
+        notesOccupied = 16
+        break
+      case 1:
+      default:
+        notesOccupied = 1
+        break
+    }
+
+    return {
+      num_notes: divisions,
+      notes_occupied: notesOccupied,
+    }
+  }
+
+  private getSubdivisionNotesDuration = () => {
+    const { divisions } = this.props
+    switch (divisions) {
+      case 1:
+        return 'q'
+      case 2:
+      case 3:
         return '8'
       case 4:
+      case 5:
+      case 7:
+      case 6:
         return '16'
       case 8:
+      case 9:
+      case 10:
+      case 11:
+      case 12:
+      case 13:
+      case 14:
+      case 15:
         return '32'
       case 16:
         return '64'
       default:
         return '64'
+    }
+  }
+
+  private configureSubdivisionStave = () => {
+    const subdivisionNotesCount = this.props.beats * this.props.divisions
+
+    const { beats, divisions } = this.props
+
+    const rhythmKey = `${beats}:${divisions}`
+    const rhythmConfigs = {
+      '9:2': {
+        manualBeams: [[0, 4], [4, 8], [8, 10], [10, 14], [14, 18]],
+      },
+      '7:2': {
+        manualBeams: [[0, 4], [4, 8], [8, 12], [12, 14]],
+      },
+      '5:2': {
+        manualBeams: [[0, 4], [4, 6], [6, 10]],
+      },
+      '8:5': {
+        noteDuration: '16',
+        tupletOptions: {
+          num_notes: 5,
+          notes_occupied: 4,
+        },
+      },
+      '3:10': {
+        noteDuration: '32',
+        tupletOptions: {
+          num_notes: 10,
+          notes_occupied: 8,
+        },
+      },
+      '2:7': {
+        noteDuration: '16',
+        tupletOptions: {
+          num_notes: 7,
+          notes_occupied: 4,
+        },
+      },
+      '2:9': {
+        noteDuration: '32',
+        tupletOptions: {
+          num_notes: 9,
+          notes_occupied: 8,
+        },
+      },
+      '1:5': {
+        noteDuration: '16',
+        tupletOptions: {
+          num_notes: 5,
+          notes_occupied: 4,
+        },
+      },
+      '1:6': {
+        noteDuration: '16',
+        tupletOptions: {
+          num_notes: 6,
+          notes_occupied: 4,
+        },
+      },
+      '1:7': {
+        noteDuration: '16',
+        tupletOptions: {
+          num_notes: 7,
+          notes_occupied: 4,
+        },
+      },
+      '1:9': {
+        noteDuration: '32',
+        tupletOptions: {
+          num_notes: 9,
+          notes_occupied: 8,
+        },
+      },
+      '1:10': {
+        noteDuration: '32',
+        tupletOptions: {
+          num_notes: 10,
+          notes_occupied: 8,
+        },
+      },
+    }
+
+    const {
+      noteDuration = this.getSubdivisionNotesDuration(),
+      tupletOptions = this.getSubdivisionTupletOptions(),
+      manualBeams = undefined,
+    } = rhythmConfigs[rhythmKey] || {}
+
+    const notes = _.range(0, subdivisionNotesCount).map(index => {
+      const note = new Vex.Flow.StaveNote({
+        keys: ['B/4'],
+        duration: noteDuration,
+        stem_direction: -1,
+      })
+      if (index % this.props.beats === 0) {
+        note.addArticulation(0, new Vex.Flow.Articulation('a>').setPosition(3))
+      } else {
+        // @ts-ignore
+        note.setKeyStyle(0, {
+          fillStyle: 'transparent',
+          strokeStyle: 'transparent',
+        })
+      }
+
+      return note
+    })
+
+    // Add subdivision tuplets
+    const tuplets: Vex.Flow.Tuplet[] = []
+    if (!!tupletOptions) {
+      let currentNoteIndex = 0
+      while (currentNoteIndex < notes.length) {
+        // @ts-ignore
+        const tuplet = new Vex.Flow.Tuplet(
+          notes.slice(
+            currentNoteIndex,
+            currentNoteIndex + this.props.divisions,
+          ),
+          {
+            // @ts-ignore
+            ratioed: false,
+            ...tupletOptions,
+          },
+        )
+        // @ts-ignore
+        // Workaround for bug in VexFlow: glyphs are shown in the wrong order
+        tuplet.num_glyphs = _.reverse(tuplet.num_glyphs)
+
+        tuplets.push(tuplet)
+        currentNoteIndex += this.props.divisions
+      }
+    }
+
+    const voice = new Vex.Flow.Voice({
+      num_beats: this.props.beats,
+      beat_value: 4,
+    })
+      .setMode(Vex.Flow.Voice.Mode.SOFT)
+      .addTickables([
+        ...new Array(this.props.offset).fill(null).map(
+          () =>
+            new Vex.Flow.StaveNote({
+              keys: ['B/4'],
+              duration: 'qr',
+              stem_direction: -1,
+            }),
+        ),
+        new Vex.Flow.BarNote().setType(Vex.Flow.Barline.type.REPEAT_BEGIN),
+        ...notes,
+        new Vex.Flow.BarNote().setType(Vex.Flow.Barline.type.REPEAT_END),
+      ])
+
+    const beams = manualBeams
+      ? manualBeams.map(
+          ([from, to]) => new Vex.Flow.Beam(notes.slice(from, to)),
+        )
+      : Vex.Flow.Beam.generateBeams(notes, {
+          stem_direction: -1,
+          // @ts-ignore
+          secondary_breaks: '4',
+        })
+
+    return {
+      notes,
+      voice,
+      beams,
+      tuplets,
     }
   }
 
@@ -152,7 +364,7 @@ class RhythmPreview extends React.Component<
       '8:5': {
         noteDurations: ['2', '2', '2', '2', '2'],
         rhythmName: 'Half Note Quintuplet',
-        tupleOptions: {
+        tupletOptions: {
           num_notes: 5,
           notes_occupied: 4,
         },
@@ -164,7 +376,7 @@ class RhythmPreview extends React.Component<
       '4:3': {
         noteDurations: ['2', '2', '2'],
         rhythmName: 'Half Note Triplet',
-        tupleOptions: {
+        tupletOptions: {
           num_notes: 3,
           notes_occupied: 2,
         },
@@ -172,9 +384,9 @@ class RhythmPreview extends React.Component<
       '8:7': {
         noteDurations: ['2', '2', '2', '2', '2', '2', '2'],
         rhythmName: 'Half Note Septuplet',
-        tupleOptions: {
+        tupletOptions: {
           num_notes: 7,
-          notes_occupied: 2,
+          notes_occupied: 4,
         },
       },
       '1:1': {
@@ -184,7 +396,7 @@ class RhythmPreview extends React.Component<
       '4:5': {
         noteDurations: ['4', '4', '4', '4', '4'],
         rhythmName: 'Quarter Note Quintuplet',
-        tupleOptions: {
+        tupletOptions: {
           num_notes: 5,
           notes_occupied: 4,
         },
@@ -192,11 +404,12 @@ class RhythmPreview extends React.Component<
       '3:4': {
         noteDurations: ['8d', '8d', '8d', '8d'],
         rhythmName: 'Dotted 8th',
+        enableBeams: true,
       },
       '2:3': {
         noteDurations: ['4', '4', '4'],
         rhythmName: 'Quarter Note Triplet',
-        tupleOptions: {
+        tupletOptions: {
           num_notes: 3,
           notes_occupied: 2,
         },
@@ -204,90 +417,103 @@ class RhythmPreview extends React.Component<
       '1:2': {
         noteDurations: ['8', '8'],
         rhythmName: '8th Note',
+        enableBeams: true,
       },
       '4:9': {
         noteDurations: ['8', '8', '8', '8', '8', '8', '8', '8', '8'],
         rhythmName: '8th Note Nontuplet',
-        tupleOptions: {
+        tupletOptions: {
           num_notes: 9,
           notes_occupied: 8,
         },
+        enableBeams: true,
       },
       '2:5': {
         noteDurations: ['8', '8', '8', '8', '8'],
         rhythmName: '8th Note Quintuplet',
-        tupleOptions: {
+        tupletOptions: {
           num_notes: 5,
           notes_occupied: 4,
         },
+        enableBeams: true,
       },
       '3:8': {
         noteDurations: ['16d', '16d', '16d', '16d', '16d', '16d', '16d', '16d'],
         rhythmName: 'Dotted 16th Note',
+        enableBeams: true,
       },
       '1:3': {
         noteDurations: ['8', '8', '8'],
         rhythmName: '8th Note Triplet',
-        tupleOptions: {
+        tupletOptions: {
           num_notes: 3,
           notes_occupied: 2,
         },
+        enableBeams: true,
       },
       '2:7': {
         noteDurations: ['8', '8', '8', '8', '8', '8', '8'],
         rhythmName: '8th Note Septuplet',
-        tupleOptions: {
+        tupletOptions: {
           num_notes: 7,
           notes_occupied: 4,
         },
+        enableBeams: true,
       },
       '1:4': {
         noteDurations: ['16', '16', '16', '16'],
         rhythmName: '16th Note',
+        enableBeams: true,
       },
       '2:9': {
         noteDurations: ['16', '16', '16', '16', '16', '16', '16', '16', '16'],
         rhythmName: '16th Note Nontuplet',
-        tupleOptions: {
+        tupletOptions: {
           num_notes: 9,
           notes_occupied: 8,
         },
+        enableBeams: true,
       },
       '1:5': {
         noteDurations: ['16', '16', '16', '16', '16'],
         rhythmName: '16th Note Quintuplet',
-        tupleOptions: {
+        tupletOptions: {
           num_notes: 5,
           notes_occupied: 4,
         },
+        enableBeams: true,
       },
       '1:6': {
         noteDurations: ['16', '16', '16', '16', '16', '16'],
         rhythmName: '16th Note Sextuplet',
-        tupleOptions: {
+        tupletOptions: {
           num_notes: 6,
           notes_occupied: 4,
         },
+        enableBeams: true,
       },
       '1:7': {
         noteDurations: ['16', '16', '16', '16', '16', '16', '16'],
         rhythmName: '16th Note Septuplet',
-        tupleOptions: {
+        tupletOptions: {
           num_notes: 7,
           notes_occupied: 4,
         },
+        enableBeams: true,
       },
       '1:8': {
         noteDurations: ['32', '32', '32', '32', '32', '32', '32', '32'],
         rhythmName: '32th Note',
+        enableBeams: true,
       },
       '1:9': {
         noteDurations: ['32', '32', '32', '32', '32', '32', '32', '32', '32'],
         rhythmName: '32th Note Nontuplet',
-        tupleOptions: {
+        tupletOptions: {
           num_notes: 9,
           notes_occupied: 8,
         },
+        enableBeams: true,
       },
       '1:10': {
         noteDurations: [
@@ -304,7 +530,7 @@ class RhythmPreview extends React.Component<
         ],
         enableBeams: true,
         rhythmName: '32th Note Dectuplet',
-        tupleOptions: {
+        tupletOptions: {
           num_notes: 10,
           notes_occupied: 8,
         },
@@ -329,6 +555,7 @@ class RhythmPreview extends React.Component<
           '64',
         ],
         rhythmName: '64th Note',
+        enableBeams: true,
       },
     }
 
@@ -336,7 +563,7 @@ class RhythmPreview extends React.Component<
       enableBeams = false,
       rhythmName = '',
       noteDurations = [],
-      tupleOptions = undefined,
+      tupletOptions = undefined,
     } = rhythmConfigs[rhythmKey] || {}
 
     const notes = noteDurations.map(duration => {
@@ -358,21 +585,21 @@ class RhythmPreview extends React.Component<
     const beams = enableBeams ? [new Vex.Flow.Beam(notes)] : []
 
     const tuplets: Vex.Flow.Tuplet[] = []
-    if (tupleOptions) {
+    if (tupletOptions) {
       let currentNoteIndex = 0
       while (currentNoteIndex < notes.length) {
         // @ts-ignore
         const tuplet = new Vex.Flow.Tuplet(
           notes.slice(
             currentNoteIndex,
-            currentNoteIndex + tupleOptions.num_notes,
+            currentNoteIndex + tupletOptions.num_notes,
           ),
           {
             location: -1,
             bracketed: true,
             // @ts-ignore
             ratioed: false,
-            ...tupleOptions,
+            ...tupletOptions,
           },
         )
         // @ts-ignore
@@ -380,7 +607,7 @@ class RhythmPreview extends React.Component<
         tuplet.num_glyphs = _.reverse(tuplet.num_glyphs)
 
         tuplets.push(tuplet)
-        currentNoteIndex += tupleOptions.num_notes
+        currentNoteIndex += tupletOptions.num_notes
       }
     }
 
@@ -527,79 +754,11 @@ class RhythmPreview extends React.Component<
       ])
 
     // Configure "Subdivision" stave
-
-    const subdivisionNoteLength = this.getSubdivisionNotesLength()
-    const subdivisionNotesCount = this.props.beats * this.props.divisions
-
-    const subdivisionNotes = _.range(0, subdivisionNotesCount).map(index => {
-      const note = new Vex.Flow.StaveNote({
-        keys: ['B/4'],
-        duration: subdivisionNoteLength,
-        stem_direction: -1,
-      })
-      if (index % this.props.beats === 0) {
-        note.addArticulation(0, new Vex.Flow.Articulation('a>').setPosition(3))
-      } else {
-        // @ts-ignore
-        note.setKeyStyle(0, {
-          fillStyle: 'transparent',
-          strokeStyle: 'transparent',
-        })
-      }
-
-      return note
-    })
-
-    // Add subdivision tuplets
-    const subdivisionTuplets: Vex.Flow.Tuplet[] = []
-    if (!_.includes([1, 2, 4, 8, 16], this.props.divisions)) {
-      let currentNoteIndex = 0
-      while (currentNoteIndex < subdivisionNotes.length) {
-        // @ts-ignore
-        const tuplet = new Vex.Flow.Tuplet(
-          subdivisionNotes.slice(
-            currentNoteIndex,
-            currentNoteIndex + this.props.divisions,
-          ),
-          {
-            // @ts-ignore
-            ratioed: false,
-            num_notes: this.props.divisions,
-          },
-        )
-        // @ts-ignore
-        // Workaround for bug in VexFlow: glyphs are shown in the wrong order
-        tuplet.num_glyphs = _.reverse(tuplet.num_glyphs)
-
-        subdivisionTuplets.push(tuplet)
-        currentNoteIndex += this.props.divisions
-      }
-    }
-
-    const subdivisionVoice = new Vex.Flow.Voice({
-      num_beats: this.props.beats,
-      beat_value: 4,
-    })
-      .setMode(Vex.Flow.Voice.Mode.SOFT)
-      .addTickables([
-        ...new Array(this.props.offset).fill(null).map(
-          () =>
-            new Vex.Flow.StaveNote({
-              keys: ['B/4'],
-              duration: 'qr',
-              stem_direction: -1,
-            }),
-        ),
-        new Vex.Flow.BarNote().setType(Vex.Flow.Barline.type.REPEAT_BEGIN),
-        ...subdivisionNotes,
-        new Vex.Flow.BarNote().setType(Vex.Flow.Barline.type.REPEAT_END),
-      ])
-
-    const subdivisionBeams = Vex.Flow.Beam.generateBeams(subdivisionNotes, {
-      stem_direction: -1,
-      // @ts-ignore
-      secondary_breaks: '4',
-    })
+    const {
+      voice: subdivisionVoice,
+      beams: subdivisionBeams,
+      tuplets: subdivisionTuplets,
+    } = this.configureSubdivisionStave()
 
     const formatter = new Vex.Flow.Formatter()
 
