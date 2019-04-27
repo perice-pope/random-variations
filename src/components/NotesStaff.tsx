@@ -530,8 +530,6 @@ class NotesStaff extends React.Component<NotesStaffProps, NotesStaffState> {
       const height = this.getHeight()
       const width = this.state.boxWidth
 
-      console.log('height: ', height, width)
-
       // Configure the rendering context
       this.renderer.resize(width, height)
 
