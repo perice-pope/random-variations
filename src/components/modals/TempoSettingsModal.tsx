@@ -705,7 +705,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
             <Box mt={3} mb={3}>
               <Typography variant="h5">Rhythm</Typography>
               <Typography variant="body2">
-                Tweak how metronome ticks and notes rhythm relate to each other.
+                Control note duration of each event
               </Typography>
 
               <Flex alignItems="center" mt={3}>
