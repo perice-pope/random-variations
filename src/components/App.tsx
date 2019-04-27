@@ -612,6 +612,7 @@ class App extends React.Component<
         })
 
         await settingsStore.loadSettings()
+        await this.initAudioEngine()
 
         const loadAndActivateOfflineSession = async () => {
           await sessionStore.loadAndActivateOfflineSession()
@@ -697,7 +698,6 @@ class App extends React.Component<
   }
 
   private init = async () => {
-    await this.initAudioEngine()
     if (this.state.isInitialized) {
       return
     }
