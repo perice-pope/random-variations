@@ -19,7 +19,6 @@ import {
   Switch,
   FormControlLabel,
   Typography,
-  Divider,
   FormHelperText,
 } from '@material-ui/core'
 import { Box } from './ui'
@@ -158,20 +157,6 @@ class SettingsModal extends React.Component<
         <DialogContent>
           <Typography variant="h5">Settings</Typography>
 
-          <Box mt={2}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={this.state.values.showNoteOctaves}
-                  onChange={this.handleChangeShownNoteOctaves}
-                  value={this.state.values.showNoteOctaves}
-                  color="primary"
-                />
-              }
-              label="Show octave numbers next to note names (e.g. C3)"
-            />
-          </Box>
-
           <Box mt={2} mb={3}>
             <FormControl fullWidth className={css({ marginBottom: '1rem' })}>
               <InputLabel htmlFor="instrument-sound">
@@ -192,9 +177,7 @@ class SettingsModal extends React.Component<
             </FormControl>
           </Box>
 
-          <Divider light />
-
-          <Box mt={3}>
+          <Box mt={4}>
             <Box mt={2}>
               <FormControl fullWidth className={css({ marginBottom: '1rem' })}>
                 <InputLabel htmlFor="instrument-transposing">
@@ -246,17 +229,31 @@ class SettingsModal extends React.Component<
               </FormControl>
             </Box>
 
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={this.state.values.showNoteNamesAboveStaff}
-                  onChange={this.handleChangeShownNoteNamesAboveStaff}
-                  value={this.state.values.showNoteNamesAboveStaff}
-                  color="primary"
-                />
-              }
-              label="Show note / chord names above staff"
-            />
+            <Box mt={3}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={this.state.values.showNoteNamesAboveStaff}
+                    onChange={this.handleChangeShownNoteNamesAboveStaff}
+                    value={this.state.values.showNoteNamesAboveStaff}
+                    color="primary"
+                  />
+                }
+                label="Show note / chord names above staff"
+              />
+
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={this.state.values.showNoteOctaves}
+                    onChange={this.handleChangeShownNoteOctaves}
+                    value={this.state.values.showNoteOctaves}
+                    color="primary"
+                  />
+                }
+                label="Show octave numbers next to note names (e.g. C3)"
+              />
+            </Box>
           </Box>
         </DialogContent>
 
