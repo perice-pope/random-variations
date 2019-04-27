@@ -1,6 +1,7 @@
 import * as React from 'react'
 import styled from 'react-emotion'
 import * as recompose from 'recompose'
+import { includes } from 'lodash'
 
 // import ButtonBase from '@material-ui/core/ButtonBase'
 import { BaseButton, Paper, PaperProps, BaseButtonProps } from './ui'
@@ -45,7 +46,10 @@ const BoxWithTouchRipple: React.SFC<PaperProps & { children?: any }> = ({
   </NoteCardButton>
 )
 
-const NoteCard = styled(BoxWithTouchRipple)<NoteCardProps>`
+const NoteCard = styled(BoxWithTouchRipple, {
+  shouldForwardProp: prop =>
+    !includes(['onEditClick', 'onNoteEdited', 'onDeleteClick'], prop),
+})<NoteCardProps>`
   display: inline-flex;
   cursor: ${props => (props.disabled ? 'default' : 'pointer')};
 
@@ -58,6 +62,8 @@ const NoteCard = styled(BoxWithTouchRipple)<NoteCardProps>`
   font-size: 15px;
   font-weight: bold;
   user-select: none;
+
+  border: 1px solid #777;
 
   @media screen and (min-height: 600px) and (min-width: 300px) {
     font-size: 18px;

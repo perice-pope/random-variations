@@ -23,7 +23,7 @@ const Tooltip: React.SFC<
       {...props}
     />
   ) : (
-    React.cloneElement(props.children, _.omit(props, 'children'))
+    React.cloneElement(props.children)
   )
 
 export default withWidth()(Tooltip)

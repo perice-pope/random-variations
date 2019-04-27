@@ -23,7 +23,7 @@ export type BaseButtonProps = MuiButtonBaseProps &
 
 const StyledBaseButton = styled(MuiButtonBase, {
   shouldForwardProp: prop =>
-    isPropValid || prop === 'variant' || prop === 'component',
+    isPropValid(prop) || prop === 'variant' || prop === 'component',
 })<BaseButtonProps>`
   ${ss.color}
   ${ss.width}
