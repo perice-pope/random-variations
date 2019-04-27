@@ -72,7 +72,7 @@ export const arrayMove = reactHocArrayMove
 const NoteNameToColorMap = {
   A: '#D783FF',
   B: '#0096FF',
-  C: '#8EFA00',
+  C: '#90EE4F',
   D: '#FFFB02',
   E: '#FFD479',
   F: '#FF7E79',

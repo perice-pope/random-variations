@@ -26,10 +26,11 @@ const NoteCardButton = styled(BaseButton)<NoteCardButtonProps>`
   transition: all 200ms;
 
   &:hover {
-    transform: scale(1.1);
+    transform: scale(1.1) translateY(-5%);
   }
 
-  transform: ${({ active }) => (active ? 'scale(1.2)' : 'none')};
+  transform: ${({ active }) =>
+    active ? 'scale(1.2) translateY(-10%)' : 'none'};
 
   background-color: ${({ active, bg }) =>
     active ? saturate(0.2, lighten(0.07, bg as string)) : bg};
