@@ -11,14 +11,14 @@ import withMobileDialog from '@material-ui/core/withMobileDialog'
 import FormControl from '@material-ui/core/FormControl'
 import NativeSelect from '@material-ui/core/NativeSelect'
 
-import { DirectionsModifier } from '../types'
+import { DirectionsModifier } from '../../types'
 import { ChangeEvent } from 'react'
 import { Input, Typography, InputLabel } from '@material-ui/core'
 import { css } from 'react-emotion'
-import { patternDirectionOptions, patternDirectionByType } from '../musicUtils'
-import { Flex } from './ui/Flex'
-import { Box } from './ui'
-import { Omit } from '../utils'
+import { patternDirectionOptions, patternDirectionByType } from '../../musicUtils'
+import { Flex } from '../ui/Flex'
+import { Box } from '../ui'
+import { Omit } from '../../utils'
 
 export type SubmitValuesType = Omit<DirectionsModifier, 'enabled'>
 

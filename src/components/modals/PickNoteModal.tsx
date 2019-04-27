@@ -3,7 +3,7 @@ import * as _ from 'lodash'
 import * as tonal from 'tonal'
 import * as TonalRange from 'tonal-range'
 
-import PianoKeyboard from './PianoKeyboard'
+import PianoKeyboard from '../PianoKeyboard'
 
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
@@ -18,15 +18,15 @@ import withMobileDialog, {
 } from '@material-ui/core/withMobileDialog'
 import { observer } from 'mobx-react'
 
-import { Flex, Box, BaseButton, Paper, BaseButtonProps } from './ui'
+import { Flex, Box, BaseButton, Paper, BaseButtonProps } from '../ui'
 
-import { getColorForNote } from '../utils'
+import { getColorForNote } from '../../utils'
 import { css, cx } from 'emotion'
 import { lighten, transparentize } from 'polished'
 import {
   withAudioEngine,
   WithAudioEngineInjectedProps,
-} from './withAudioEngine'
+} from '../withAudioEngine'
 import styled from 'react-emotion'
 import { IconButton, Typography } from '@material-ui/core'
 import {
@@ -36,8 +36,8 @@ import {
   getDefaultEnharmonicPitchVersion,
   getPreferredEnharmonicNoteVersion,
   getDefaultEnharmonicNoteVersion,
-} from '../musicUtils'
-import sessionStore from '../services/sessionStore'
+} from '../../musicUtils'
+import sessionStore from '../../services/sessionStore'
 
 type PickNoteModalProps = {
   disabledNotePitches?: string[]

@@ -17,7 +17,7 @@ import PlayIcon from '@material-ui/icons/PlayArrow'
 import StopIcon from '@material-ui/icons/Stop'
 import memoize from 'memoize-one'
 
-import PatternEditor from './PatternEditor'
+import PatternEditor from '../PatternEditor'
 
 import {
   ScalePattern,
@@ -26,7 +26,7 @@ import {
   StaffTick,
   Scale,
   ScaleModifier,
-} from '../types'
+} from '../../types'
 import { ChangeEvent } from 'react'
 import {
   Input,
@@ -37,26 +37,26 @@ import {
   Switch,
 } from '@material-ui/core'
 import { css } from 'react-emotion'
-import Tooltip from './ui/Tooltip'
+import Tooltip from '../ui/Tooltip'
 import {
   scaleOptions,
   scaleByScaleType,
   generateScalePatternFromPreset,
   getConcertPitchMidi,
-} from '../musicUtils'
-import { Flex } from './ui/Flex'
-import { Box } from './ui'
-import NotesStaff from './NotesStaff'
-import { Omit } from '../utils'
-import settingsStore from '../services/settingsStore'
-import InputSelect from './ui/InputSelect'
+} from '../../musicUtils'
+import { Flex } from '../ui/Flex'
+import { Box } from '../ui'
+import NotesStaff from '../NotesStaff'
+import { Omit } from '../../utils'
+import settingsStore from '../../services/settingsStore'
+import InputSelect from '../ui/InputSelect'
 import {
   WithAudioEngineInjectedProps,
   withAudioEngine,
-} from './withAudioEngine'
+} from '../withAudioEngine'
 
-import AudioEngine, { AnimationCallback } from '../services/audioEngine'
-import sessionStore from '../services/sessionStore'
+import AudioEngine, { AnimationCallback } from '../../services/audioEngine'
+import sessionStore from '../../services/sessionStore'
 
 const audioEngine = new AudioEngine()
 

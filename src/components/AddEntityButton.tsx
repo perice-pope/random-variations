@@ -7,7 +7,7 @@ import Button, { ButtonProps } from '@material-ui/core/Button'
 import { css } from 'emotion'
 import Tooltip from './ui/Tooltip'
 import { Hidden, Divider } from '@material-ui/core'
-import ButtonWithMenu from './ButtonWithMenu'
+import ButtonWithMenu from './ui/ButtonWithMenu'
 
 type AddEntityButtonProps = {
   onAddToneRowClick: () => any

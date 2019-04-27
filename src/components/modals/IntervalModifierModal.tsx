@@ -15,7 +15,7 @@ import ArrowsIcon from '@material-ui/icons/Cached'
 import FormControl from '@material-ui/core/FormControl'
 import NativeSelect from '@material-ui/core/NativeSelect'
 
-import { IntervalType, StaffTick, IntervalsModifier } from '../types'
+import { IntervalType, StaffTick, IntervalsModifier } from '../../types'
 import { ChangeEvent } from 'react'
 import {
   Input,
@@ -30,14 +30,14 @@ import {
   SemitonesToIntervalLongNameMap,
   SemitonesToIntervalShortNameMap,
   getConcertPitchMidi,
-} from '../musicUtils'
-import { Flex } from './ui/Flex'
-import { Box } from './ui'
-import NotesStaff from './NotesStaff'
-import { Omit } from '../utils'
-import settingsStore from '../services/settingsStore'
-import Tooltip from './ui/Tooltip'
-import sessionStore from '../services/sessionStore'
+} from '../../musicUtils'
+import { Flex } from '../ui/Flex'
+import { Box } from '../ui'
+import NotesStaff from '../NotesStaff'
+import { Omit } from '../../utils'
+import settingsStore from '../../services/settingsStore'
+import Tooltip from '../ui/Tooltip'
+import sessionStore from '../../services/sessionStore'
 
 export type SubmitValuesType = Omit<IntervalsModifier, 'enabled'>
 

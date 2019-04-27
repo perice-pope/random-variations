@@ -12,7 +12,7 @@ import withMobileDialog, {
   InjectedProps,
 } from '@material-ui/core/withMobileDialog'
 
-import { withFirebase } from '../services/firebase'
+import { withFirebase } from '../../services/firebase'
 import { Typography } from '@material-ui/core'
 
 type SignInModalProps = {

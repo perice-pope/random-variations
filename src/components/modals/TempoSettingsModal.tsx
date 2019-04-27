@@ -19,16 +19,16 @@ import withMobileDialog, {
 import { observer } from 'mobx-react'
 import { observable } from 'mobx'
 
-import { Flex, Box } from './ui'
+import { Flex, Box } from '../ui'
 
-import { createDefaultSession, parseIntEnsureInBounds } from '../utils'
-import { RhythmInfo, StaffTick } from '../types'
+import { createDefaultSession, parseIntEnsureInBounds } from '../../utils'
+import { RhythmInfo, StaffTick } from '../../types'
 import { css, cx } from 'emotion'
 import ArrowsIcon from '@material-ui/icons/Cached'
 import {
   withAudioEngine,
   WithAudioEngineInjectedProps,
-} from './withAudioEngine'
+} from '../withAudioEngine'
 import {
   Typography,
   Divider,
@@ -38,11 +38,11 @@ import {
   IconButton,
   Hidden,
 } from '@material-ui/core'
-import { rhythmOptions } from '../musicUtils'
+import { rhythmOptions } from '../../musicUtils'
 import Slider from '@material-ui/lab/Slider'
-import RhythmPreview from './RhythmPreview'
+import RhythmPreview from '../RhythmPreview'
 import { WithWidth } from '@material-ui/core/withWidth'
-import AudioEngine from '../services/audioEngine'
+import AudioEngine from '../../services/audioEngine'
 
 type Props = {
   open: boolean

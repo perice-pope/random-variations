@@ -9,8 +9,8 @@ import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 
-import AudioFontConfig, { AudioFontId } from '../audioFontsConfig'
-import { ClefType, InstrumentTransposingType } from '../types'
+import AudioFontConfig, { AudioFontId } from '../../audioFontsConfig'
+import { ClefType, InstrumentTransposingType } from '../../types'
 import {
   FormControl,
   InputLabel,
@@ -21,12 +21,12 @@ import {
   Typography,
   FormHelperText,
 } from '@material-ui/core'
-import { Box } from './ui'
+import { Box } from '../ui'
 import {
   instrumentTransposingOptions,
   instrumentTransposingOptionsByType,
   SemitonesToIntervalNameMap,
-} from '../musicUtils'
+} from '../../musicUtils'
 
 export type SettingsFormValues = {
   audioFontId: AudioFontId

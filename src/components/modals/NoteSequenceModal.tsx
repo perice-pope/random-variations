@@ -13,13 +13,13 @@ import withMobileDialog, {
   InjectedProps,
 } from '@material-ui/core/withMobileDialog'
 
-import { Flex, Box } from './ui'
+import { Flex, Box } from '../ui'
 
 import { css } from 'emotion'
 import {
   withAudioEngine,
   WithAudioEngineInjectedProps,
-} from './withAudioEngine'
+} from '../withAudioEngine'
 import {
   InputLabel,
   FormControl,
@@ -28,13 +28,13 @@ import {
   Typography,
   Divider,
 } from '@material-ui/core'
-import NoteCards, { NoteCardNote } from './NoteCards'
+import NoteCards, { NoteCardNote } from '../NoteCards'
 import {
   SemitonesToIntervalNameMap,
   getNotePitchClassWithSharp,
-} from '../musicUtils'
+} from '../../musicUtils'
 import Slider from '@material-ui/lab/Slider'
-import { InstrumentTransposingType } from '../types'
+import { InstrumentTransposingType } from '../../types'
 
 type NoteSequenceModalProps = {
   isOpen: boolean

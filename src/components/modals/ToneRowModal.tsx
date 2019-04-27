@@ -3,7 +3,7 @@ import * as _ from 'lodash'
 import * as tonal from 'tonal'
 import pluralize from 'pluralize'
 
-import PianoKeyboard from './PianoKeyboard'
+import PianoKeyboard from '../PianoKeyboard'
 
 import DeleteIcon from '@material-ui/icons/Close'
 import Button from '@material-ui/core/Button'
@@ -21,28 +21,28 @@ import withMobileDialog, {
   InjectedProps,
 } from '@material-ui/core/withMobileDialog'
 
-import { Flex, Box } from './ui'
-import Tooltip from './ui/Tooltip'
+import { Flex, Box } from '../ui'
+import Tooltip from '../ui/Tooltip'
 
-import { getColorForNote, arrayMove } from '../utils'
+import { getColorForNote, arrayMove } from '../../utils'
 import { css, cx } from 'emotion'
 import {
   withAudioEngine,
   WithAudioEngineInjectedProps,
-} from './withAudioEngine'
+} from '../withAudioEngine'
 import {
   NoteNamesWithSharps,
   getNotePitchClassWithSharp,
   getNoteNameWithSharp,
-} from '../musicUtils'
+} from '../../musicUtils'
 import {
   Typography,
   IconButton,
   FormControlLabel,
   Switch,
 } from '@material-ui/core'
-import NoteCards, { NoteCardNote } from './NoteCards'
-import { InstrumentTransposingType } from '../types'
+import NoteCards, { NoteCardNote } from '../NoteCards'
+import { InstrumentTransposingType } from '../../types'
 import { transparentize } from 'polished'
 
 type ToneRowModalProps = {

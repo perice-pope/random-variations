@@ -20,7 +20,7 @@ import RemoveIcon from '@material-ui/icons/Close'
 import { Flex, Text } from './ui'
 import NoteCard from './NoteCard'
 import { getColorForNote } from '../utils'
-import PickNoteModal from './PickNoteModal'
+import PickNoteModal from './modals/PickNoteModal'
 import { observer } from 'mobx-react'
 import {
   getNotePitchClassWithSharp,

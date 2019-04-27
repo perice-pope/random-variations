@@ -82,21 +82,21 @@ import {
 
 import ArpeggioModifierModal, {
   SubmitValuesType as ArpeggioModifierModalSubmitValues,
-} from './ArpeggioModifierModal'
+} from './modals/ArpeggioModifierModal'
 import ScaleModifierModal, {
   SubmitValuesType as ScaleModifierModalSubmitValues,
-} from './ScaleModifierModal'
+} from './modals/ScaleModifierModal'
 import IntervalModifierModal, {
   SubmitValuesType as IntervalModifierModalSubmitValues,
-} from './IntervalModifierModal'
-import EnclosuresModifierModal from './EnclosuresModifierModal'
+} from './modals/IntervalModifierModal'
+import EnclosuresModifierModal from './modals/EnclosuresModifierModal'
 import PianoKeyboard, {
   pianoNoteRangeWide,
   pianoNoteRangeNarrow,
   pianoNoteRangeMiddle,
 } from './PianoKeyboard'
 
-import SettingsModal, { SettingsFormValues } from './SettingsModal'
+import SettingsModal, { SettingsFormValues } from './modals/SettingsModal'
 import AddEntityButton from './AddEntityButton'
 import { reaction, toJS } from 'mobx'
 import { observer } from 'mobx-react'
@@ -116,7 +116,7 @@ import AudioEngine, { AnimationCallback } from '../services/audioEngine'
 import { AudioEngineContext } from './withAudioEngine'
 import firebase, { FirebaseContext } from '../services/firebase'
 import sessionStore from '../services/sessionStore'
-import SignInModal from './SignInModal'
+import SignInModal from './modals/SignInModal'
 import Tooltip from './ui/Tooltip'
 import {
   CircularProgress,
@@ -143,19 +143,19 @@ import { WithWidth } from '@material-ui/core/withWidth'
 import memoize from 'memoize-one'
 import { observable } from 'mobx'
 import ToastNotifications, { notificationsStore } from './ToastNotifications'
-import ButtonWithMenu from './ButtonWithMenu'
-import ShareSessionModal from './ShareSessionModal'
+import ButtonWithMenu from './ui/ButtonWithMenu'
+import ShareSessionModal from './modals/ShareSessionModal'
 import settingsStore from '../services/settingsStore'
-import ToneRowModal from './ToneRowModal'
+import ToneRowModal from './modals/ToneRowModal'
 import { trackPageView } from '../services/googleAnalytics'
-import NoteSequenceModal from './NoteSequenceModal'
+import NoteSequenceModal from './modals/NoteSequenceModal'
 import DirectionsModifierModal, {
   SubmitValuesType as DirectionsModifierModalSubmitValues,
-} from './DirectionsModifierModal'
+} from './modals/DirectionsModifierModal'
 import shortenString from '../utils/shortenString'
 import TempoSettingsModal, {
   TempoSettingsFormValues,
-} from './TempoSettingsModal'
+} from './modals/TempoSettingsModal'
 import { transparentize } from 'polished'
 
 globalStyles()

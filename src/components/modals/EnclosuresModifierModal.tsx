@@ -15,12 +15,12 @@ import ArrowsIcon from '@material-ui/icons/Cached'
 import PlayIcon from '@material-ui/icons/PlayArrow'
 import StopIcon from '@material-ui/icons/Stop'
 
-import { EnclosuresType, StaffTick } from '../types'
+import { EnclosuresType, StaffTick } from '../../types'
 import {
   enclosureOptions,
   enclosureByEnclosureType,
   getConcertPitchMidi,
-} from '../musicUtils'
+} from '../../musicUtils'
 import {
   FormControl,
   NativeSelect,
@@ -29,18 +29,18 @@ import {
   Typography,
   InputLabel,
 } from '@material-ui/core'
-import NotesStaff from './NotesStaff'
-import { Flex, Box } from './ui'
-import settingsStore from '../services/settingsStore'
+import NotesStaff from '../NotesStaff'
+import { Flex, Box } from '../ui'
+import settingsStore from '../../services/settingsStore'
 
 import {
   WithAudioEngineInjectedProps,
   withAudioEngine,
-} from './withAudioEngine'
+} from '../withAudioEngine'
 
-import AudioEngine, { AnimationCallback } from '../services/audioEngine'
-import Tooltip from './ui/Tooltip'
-import sessionStore from '../services/sessionStore'
+import AudioEngine, { AnimationCallback } from '../../services/audioEngine'
+import Tooltip from '../ui/Tooltip'
+import sessionStore from '../../services/sessionStore'
 
 const audioEngine = new AudioEngine()
 

@@ -17,7 +17,7 @@ import PlayIcon from '@material-ui/icons/PlayArrow'
 import StopIcon from '@material-ui/icons/Stop'
 import memoize from 'memoize-one'
 
-import PatternEditor from './PatternEditor'
+import PatternEditor from '../PatternEditor'
 
 import {
   ArpeggioPattern,
@@ -26,7 +26,7 @@ import {
   StaffTick,
   Chord,
   ChordModifier,
-} from '../types'
+} from '../../types'
 import { ChangeEvent } from 'react'
 import {
   Input,
@@ -40,25 +40,25 @@ import {
   Switch,
 } from '@material-ui/core'
 import { css } from 'react-emotion'
-import Tooltip from './ui/Tooltip'
+import Tooltip from '../ui/Tooltip'
 import {
   generateChordPatternFromPreset,
   chordOptions,
   chordsByChordType,
   getConcertPitchMidi,
-} from '../musicUtils'
-import { Flex } from './ui/Flex'
-import { Box } from './ui'
-import NotesStaff from './NotesStaff'
-import settingsStore from '../services/settingsStore'
-import InputSelect from './ui/InputSelect'
+} from '../../musicUtils'
+import { Flex } from '../ui/Flex'
+import { Box } from '../ui'
+import NotesStaff from '../NotesStaff'
+import settingsStore from '../../services/settingsStore'
+import InputSelect from '../ui/InputSelect'
 import {
   withAudioEngine,
   WithAudioEngineInjectedProps,
-} from './withAudioEngine'
-import AudioEngine, { AnimationCallback } from '../services/audioEngine'
-import { Omit } from '../utils'
-import sessionStore from '../services/sessionStore'
+} from '../withAudioEngine'
+import AudioEngine, { AnimationCallback } from '../../services/audioEngine'
+import { Omit } from '../../utils'
+import sessionStore from '../../services/sessionStore'
 
 const audioEngine = new AudioEngine()
 

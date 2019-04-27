@@ -21,10 +21,10 @@ import withMobileDialog, {
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 
 import { Input, Typography, Divider } from '@material-ui/core'
-import { Session } from '../types'
-import { notificationsStore } from './ToastNotifications'
+import { Session } from '../../types'
+import { notificationsStore } from '../ToastNotifications'
 import { css } from 'emotion'
-import { Box } from './ui'
+import { Box } from '../ui'
 
 type ShareSessionModalProps = {
   session: Session
