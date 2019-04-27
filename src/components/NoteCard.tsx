@@ -3,9 +3,8 @@ import styled from 'react-emotion'
 import * as recompose from 'recompose'
 import { includes } from 'lodash'
 
-// import ButtonBase from '@material-ui/core/ButtonBase'
 import { BaseButton, Paper, PaperProps, BaseButtonProps } from './ui'
-import { lighten, saturate } from 'polished'
+import { lighten, saturate, darken } from 'polished'
 
 type NoteCardProps = {
   active: boolean
@@ -62,7 +61,8 @@ const NoteCard = styled(BoxWithTouchRipple, {
   font-weight: bold;
   user-select: none;
 
-  border: 1px solid #aaa;
+  border: 1px solid ${({ bg }) => darken(0.2, bg as string)} !important;
+  box-shadow: 1px 3px 6px rgba(0, 0, 0, 0.5) !important;
 
   @media screen and (min-height: 600px) and (min-width: 300px) {
     font-size: 18px;
