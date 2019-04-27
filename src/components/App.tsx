@@ -2484,66 +2484,85 @@ class App extends React.Component<
                           @media screen and (min-width: 768px) {
                             font-size: 15px;
                           }
-
-                          @media screen and (max-height: 600px) and (min-width: 500px) {
-                            flex-direction: column-reverse;
-                            margin-left: 0.5rem;
-                          }
                         `),
                         this.state.isPlaying && css(`display: none;`),
                       )}
                     >
-                      <span className={css(`white-space: nowrap;`)}>{`x ${
-                        settingsStore.scaleZoomFactor
-                      }`}</span>
-                      <Tooltip title="Smaller font">
-                        <IconButton
-                          color="inherit"
-                          aria-label="Decrease font size"
-                          onClick={this.handleDecreaseZoomFactor}
-                        >
-                          <ZoomOutIcon />
-                        </IconButton>
-                      </Tooltip>
-
-                      <Tooltip title="Larger font">
-                        <IconButton
-                          color="inherit"
-                          aria-label="Increase font size"
-                          onClick={this.handleIncreaseZoomFactor}
-                        >
-                          <ZoomInIcon />
-                        </IconButton>
-                      </Tooltip>
-
-                      <Tooltip title="Notes staff settings">
-                        <IconButton
-                          color="inherit"
-                          aria-label="Change notes staff settings"
-                          onClick={() => {
-                            this.openSettingsModal()
-                          }}
-                        >
-                          <SettingsIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
-
-                    {sessionStore.activeSession!.instrumentTransposing !==
-                      'C' && (
                       <span
                         className={css(`
+                          flex: 1;
                           font-size: 0.7rem; 
                           margin-right: 0.8rem;
-                          text-align: right;
-                          color: #f80054;
+                          text-align: left;
+
+                          cursor: pointer;
+
+                          @media screen and (max-height: 600px) and (min-width: 500px) {
+                            display: none;
+                          }
+
+                          color: ${
+                            sessionStore.activeSession!
+                              .instrumentTransposing === 'C'
+                              ? '#aaa'
+                              : '#f80054'
+                          };
                         `)}
                       >
-                        {`INSTRUMENT TRANSPOSING: ${
-                          sessionStore.activeSession!.instrumentTransposing
-                        }`}
+                        <span onClick={this.openSettingsModal}>
+                          {`Instrument Transpose: ${
+                            sessionStore.activeSession!.instrumentTransposing ===
+                            'C'
+                              ? 'OFF'
+                              : sessionStore.activeSession!.instrumentTransposing
+                          }`}
+                        </span>
                       </span>
-                    )}
+
+                      <div className={css(`
+                        @media screen and (max-height: 600px) and (min-width: 500px) {
+                          display: flex;
+                          flex-direction: column-reverse;
+                          align-items: flex-end;
+                          justify-content: flex-start;
+                          flex-direction: column-reverse;
+                          margin-left: 0.5rem;
+                        }
+                      `)}>
+                        <span className={css(`display: inline-block; width: 50px; white-space: nowrap;`)}>{`x ${
+                          settingsStore.scaleZoomFactor
+                        }`}</span>
+                        <Tooltip title="Smaller font">
+                          <IconButton
+                            color="inherit"
+                            aria-label="Decrease font size"
+                            onClick={this.handleDecreaseZoomFactor}
+                          >
+                            <ZoomOutIcon />
+                          </IconButton>
+                        </Tooltip>
+
+                        <Tooltip title="Larger font">
+                          <IconButton
+                            color="inherit"
+                            aria-label="Increase font size"
+                            onClick={this.handleIncreaseZoomFactor}
+                          >
+                            <ZoomInIcon />
+                          </IconButton>
+                        </Tooltip>
+
+                        <Tooltip title="Notes staff settings">
+                          <IconButton
+                            color="inherit"
+                            aria-label="Change notes staff settings"
+                            onClick={this.openSettingsModal}
+                          >
+                            <SettingsIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </div>
+                    </div>
 
                     <NotesStaff
                       containerProps={{
