@@ -43,3 +43,9 @@ export function withFirebase(Component) {
     )
   }
 }
+
+// For debugging
+// @ts-ignore
+window.base = base
+// @ts-ignore
+window.firebase = firebase

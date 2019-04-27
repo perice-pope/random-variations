@@ -611,6 +611,8 @@ class App extends React.Component<
           userId: user ? user.uid : undefined,
         })
 
+        await settingsStore.loadSettings()
+
         const loadAndActivateOfflineSession = async () => {
           await sessionStore.loadAndActivateOfflineSession()
           await sessionStore.clearMySessions()
@@ -673,7 +675,7 @@ class App extends React.Component<
   private activateMySession = (sessionId?: string) => {
     console.log('activateMySession: ', sessionId)
     const firstSession = sessionStore.mySessionsSorted[0]
-    console.log('firstSession', JSON.stringify(firstSession))
+    console.log('firstSession', firstSession)
     let id = sessionId
     if (!sessionId && firstSession) {
       id = firstSession.id
@@ -695,7 +697,6 @@ class App extends React.Component<
   }
 
   private init = async () => {
-    settingsStore.loadSettingsLocally()
     await this.initAudioEngine()
     if (this.state.isInitialized) {
       return
@@ -865,7 +866,7 @@ class App extends React.Component<
 
   private saveAppState = () => {
     console.log('saveAppState')
-    settingsStore.saveSettingsLocally()
+    settingsStore.saveSettings()
   }
 
   private getStaffTicksAfterInstrumentTransposing = () => {
@@ -1035,7 +1036,10 @@ class App extends React.Component<
   private closeSettingsModal = () =>
     this.setState({ settingsModalIsOpen: false })
 
-  private transposeNotesAfterChangingClefIfNeeded = (clefFrom: ClefType, clefTo: ClefType) => {
+  private transposeNotesAfterChangingClefIfNeeded = (
+    clefFrom: ClefType,
+    clefTo: ClefType,
+  ) => {
     const highClefs = [
       'treble',
       'alto',
@@ -1081,9 +1085,14 @@ class App extends React.Component<
     }
   }
 
-  private transposeNotesAfterChangingInstrumentTransposing = (transposingFrom: InstrumentTransposingType, transposingTo: InstrumentTransposingType) => {
-    const transposingConfigFrom = instrumentTransposingOptionsByType[transposingFrom]
-    const transposingConfigTo = instrumentTransposingOptionsByType[transposingTo]
+  private transposeNotesAfterChangingInstrumentTransposing = (
+    transposingFrom: InstrumentTransposingType,
+    transposingTo: InstrumentTransposingType,
+  ) => {
+    const transposingConfigFrom =
+      instrumentTransposingOptionsByType[transposingFrom]
+    const transposingConfigTo =
+      instrumentTransposingOptionsByType[transposingTo]
     if (!transposingConfigFrom || !transposingConfigTo) {
       return
     }
@@ -1111,15 +1120,23 @@ class App extends React.Component<
       this.transposeNotesAfterChangingClefIfNeeded(clefFrom, clefTo)
     }
 
-    if (!!values.instrumentTransposing && values.instrumentTransposing !== sessionStore.activeSession!.instrumentTransposing) {
+    if (
+      !!values.instrumentTransposing &&
+      values.instrumentTransposing !==
+        sessionStore.activeSession!.instrumentTransposing
+    ) {
       // Instrument transposing has changed. Transpose all note cards accordingly
       const transposingFrom = sessionStore.activeSession!.instrumentTransposing
       const transposingTo = values.instrumentTransposing
 
-      this.transposeNotesAfterChangingInstrumentTransposing(transposingFrom, transposingTo)
+      this.transposeNotesAfterChangingInstrumentTransposing(
+        transposingFrom,
+        transposingTo,
+      )
     }
 
-    Object.keys(_.omit(values, ['instrumentTransposing'])).forEach(key => {
+    // Persist settings in the settings store
+    Object.keys(values).forEach(key => {
       settingsStore[key] = values[key]
     })
 
@@ -1309,6 +1326,7 @@ class App extends React.Component<
 
     await sessionStore.createAndActivateNewSession({
       name: sessionName,
+      instrumentTransposing: settingsStore.instrumentTransposing,
     })
     notificationsStore.showNotification({
       message: `Created new session "${sessionName}"`,
@@ -1457,7 +1475,7 @@ class App extends React.Component<
       settingsStore.scaleZoomFactor - 0.25,
       0.25,
     )
-    settingsStore.saveSettingsLocally()
+    settingsStore.saveSettings()
     window.dispatchEvent(new Event('resize'))
   }
 
@@ -1466,7 +1484,7 @@ class App extends React.Component<
       settingsStore.scaleZoomFactor + 0.25,
       3,
     )
-    settingsStore.saveSettingsLocally()
+    settingsStore.saveSettings()
     window.dispatchEvent(new Event('resize'))
   }
 
@@ -2475,7 +2493,9 @@ class App extends React.Component<
                         this.state.isPlaying && css(`display: none;`),
                       )}
                     >
-                      <span className={css(`white-space: nowrap;`)}>{`x ${settingsStore.scaleZoomFactor}`}</span>
+                      <span className={css(`white-space: nowrap;`)}>{`x ${
+                        settingsStore.scaleZoomFactor
+                      }`}</span>
                       <Tooltip title="Smaller font">
                         <IconButton
                           color="inherit"
@@ -2508,17 +2528,22 @@ class App extends React.Component<
                         </IconButton>
                       </Tooltip>
                     </div>
-                    
-                    {sessionStore.activeSession!.instrumentTransposing !== 'C' && (
-                        <span className={css(`
+
+                    {sessionStore.activeSession!.instrumentTransposing !==
+                      'C' && (
+                      <span
+                        className={css(`
                           font-size: 0.7rem; 
                           margin-right: 0.8rem;
                           text-align: right;
                           color: #f80054;
-                        `)}>
-                          {`INSTRUMENT TRANSPOSING: ${sessionStore.activeSession!.instrumentTransposing}`}
-                        </span>
-                      )}
+                        `)}
+                      >
+                        {`INSTRUMENT TRANSPOSING: ${
+                          sessionStore.activeSession!.instrumentTransposing
+                        }`}
+                      </span>
+                    )}
 
                     <NotesStaff
                       containerProps={{

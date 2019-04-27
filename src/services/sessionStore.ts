@@ -1,20 +1,18 @@
 import { observable, computed, reaction, toJS } from 'mobx'
-import firebase, { base } from './firebase'
+import firebase from './firebase'
 import { Session } from '../types'
 import _ from 'lodash'
 import uuid from 'uuid/v4'
 import { createDefaultSession } from '../utils'
 
-// @ts-ignore
-window.base = base
-// @ts-ignore
-window.firebase = firebase
-
 const ANONYMOUS_USER_UID = 'anonymous-user-uid'
 
 type ActiveSessionType = 'offline' | 'my' | 'shared'
 
-const preprocessSessionData = (session: Session): Session => ({
+/**
+ * Apply some data transforms before passing a Session loaded from the API down to the app
+ */
+const preprocessLoadedSessionData = (session: Session): Session => ({
   ...createDefaultSession(),
   noteCards: [],
   ...session,
@@ -164,7 +162,7 @@ class SessionStore {
     } else {
       this._sharedSession = {
         noteCards: [],
-        ...preprocessSessionData(session),
+        ...preprocessLoadedSessionData(session),
         id: sessionId,
       }
     }
@@ -196,7 +194,7 @@ class SessionStore {
 
     this._mySessionsById[sessionId] = {
       noteCards: [],
-      ...preprocessSessionData(session),
+      ...preprocessLoadedSessionData(session),
     }
 
     this._myActiveSessionKey = sessionId
@@ -302,7 +300,7 @@ class SessionStore {
     } else {
       this._mySessionsById = {
         ...this._mySessionsById,
-        ..._.mapValues(sessionsById, preprocessSessionData),
+        ..._.mapValues(sessionsById, preprocessLoadedSessionData),
       }
     }
 
