@@ -2148,7 +2148,7 @@ class App extends React.Component<
                   // color="primary"
                   color="secondary"
                   onClick={this.openSignInModal}
-                  variant="raised"
+                  variant="contained"
                 >
                   Sign in
                 </MuiButton>
