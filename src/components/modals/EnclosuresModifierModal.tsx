@@ -38,7 +38,7 @@ import {
   withAudioEngine,
 } from '../withAudioEngine'
 
-import AudioEngine, { AnimationCallback } from '../../services/audioEngine'
+import AudioEngine, { TickCallback } from '../../services/audioEngine'
 import Tooltip from '../ui/Tooltip'
 import sessionStore from '../../services/sessionStore'
 
@@ -177,7 +177,7 @@ class EnclosuresModifierModal extends React.Component<
     ]
     audioEngine.setAudioFont(this.props.audioFontId)
     audioEngine.setLoop(ticks)
-    audioEngine.setAnimationCallback(this.animationCallback)
+    audioEngine.setTickCallback(this.animationCallback)
   }
 
   togglePlayback = () => {
@@ -191,7 +191,7 @@ class EnclosuresModifierModal extends React.Component<
     }
   }
 
-  animationCallback: AnimationCallback = ({ tick }) => {
+  animationCallback: TickCallback = ({ tick }) => {
     if (tick.notes.length > 0) {
       this.setState({ activeTickIndex: tick.meta.staffTickIndex })
     }

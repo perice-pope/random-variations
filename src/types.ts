@@ -29,7 +29,7 @@ export type User = {
   displayName: string | null
 }
 
-export interface PlayableLoopTick {
+export interface NotesLoopTick {
   // If empty, it represents a break
   notes: PlayableNote[]
   meta: {
@@ -46,8 +46,8 @@ export interface PlayableLoopTick {
  *
  * Ticks come at equal intervals.
  */
-export interface PlayableLoop {
-  ticks: PlayableLoopTick[]
+export interface NotesLoop {
+  ticks: NotesLoopTick[]
 }
 
 export interface StaffNote extends PlayableNote {

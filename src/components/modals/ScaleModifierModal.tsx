@@ -55,7 +55,7 @@ import {
   withAudioEngine,
 } from '../withAudioEngine'
 
-import AudioEngine, { AnimationCallback } from '../../services/audioEngine'
+import AudioEngine, { TickCallback } from '../../services/audioEngine'
 import sessionStore from '../../services/sessionStore'
 
 const audioEngine = new AudioEngine()
@@ -402,7 +402,7 @@ class ScaleModifierModal extends React.Component<
   }
 
   // TODO: refactor common code here and in ArpeggioModifierModal
-  animationCallback: AnimationCallback = ({ tick }) => {
+  animationCallback: TickCallback = ({ tick }) => {
     if (tick.notes.length > 0) {
       this.setState({ activeTickIndex: tick.meta.staffTickIndex })
     }
@@ -418,7 +418,7 @@ class ScaleModifierModal extends React.Component<
     ]
     audioEngine.setAudioFont(this.props.audioFontId)
     audioEngine.setLoop(ticks)
-    audioEngine.setAnimationCallback(this.animationCallback)
+    audioEngine.setTickCallback(this.animationCallback)
   }
 
   togglePlayback = () => {

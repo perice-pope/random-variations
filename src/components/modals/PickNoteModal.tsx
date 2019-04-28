@@ -195,7 +195,7 @@ class PickNoteModal extends React.Component<
       const midi = tonal.Note.midi(noteName)
 
       if (midi) {
-        this.props.audioEngine.playNote(
+        this.props.audioEngine.playSingleSound(
           {
             midi,
           },

@@ -1,63 +1,50 @@
+/**
+ * This module implements AudioEngine class which can:
+ * - load soundfonts
+ * - play individual sounds
+ * - set up multiple channels each capable of playing looped sequences of sounds
+ * - control channels' params such as volume, solo and mute
+ *
+ * Each `Channel` has its own `ChannelAudioContent` object, which describes
+ * audio events and playback params (is looped, loop end / start, playback rate) for that `Channel`.
+ *
+ * Time is measured in `ticks`, and the global playback speed is controlled by the global param `bpm`,
+ * which affects each `Channel`.
+ *
+ * Every `Channel` can also define its own `playbackRate` field, which is combined with `bpm`
+ * (multipied by it) to determine that `Channel`'s final playback rate.
+ */
+
 import Tone from 'tone'
 import WebAudioFontPlayer from 'webaudiofont'
 import * as _ from 'lodash'
-import * as tonal from 'tonal'
 import UnmuteButton from 'unmute'
 
-import {
-  PlayableLoop,
-  PlayableNote,
-  PlayableLoopTick,
-  StaffTick,
-  RhythmInfo,
-} from '../types'
 import audioFontsConfig, { AudioFontId, AudioFont } from '../audioFontsConfig'
+import { merge, groupBy, some } from 'lodash'
 
 const audioFontsConfigById = _.keyBy(audioFontsConfig, 'id')
 
-type AnimationCallbackArg = {
-  tick: PlayableLoopTick
-  loop: PlayableLoop
-}
-
-export type AnimationCallback = (arg: AnimationCallbackArg) => any
-
-// Needed to enable the webaudio in Safari and on iOS devices
-UnmuteButton({ tone: Tone })
-
-// @ts-ignore
-window.Tone = Tone
-
 export default class AudioEngine {
-  private loop: PlayableLoop = { ticks: [] }
+  // private loop: NotesLoop = { ticks: [] }
 
   // BPM of the metronome
   private bpm: number = 120
 
-  // Notes can be played at a BPM different than that of the metronome.
-  // The BPM of the notes playback is calculated as:
-  // notes' BPM = metronome's BPM * notesTempoFactor
-  private notesTempoFactor: number = 1.0
+  // Configs for Channels
+  private channels: ChannelConfig[] = []
+  // Audio content for each Channel
+  private channelContent: ChannelsAudioContent = {}
+  // Tone's Sequence instances, one per Channel
+  private channelSequence: ChannelsToneSequence = {}
 
-  private countIn: number = 0
-  private offset: number = 0
-  private metronomeEnabled: boolean = false
-  private metronomeAccentBeatCount?: number = undefined
+  // Client can register a callback to be called on each tick
+  private tickCallback?: TickCallback
 
-  private notesSequence?: typeof Tone.Sequence
-  private metronomeSequence?: typeof Tone.Sequence
-  private countInSequence?: typeof Tone.Sequence
-
-  private animationCallback?: AnimationCallback
-
-  private audioFontId: AudioFontId = audioFontsConfig[2].id
   private audioFontPlayer?: typeof WebAudioFontPlayer
   private audioFontCache: { [audioFontId in AudioFontId]?: AudioFont } = {}
   private hasLoadedAudioFontMap: { [audioFontId in AudioFontId]?: boolean } = {}
   private isLoadingAudioFontMap: { [audioFontId in AudioFontId]?: boolean } = {}
-
-  // @ts-ignore
-  private isPlayingLoop: boolean = false
 
   constructor() {
     Tone.Transport.bpm.value = this.bpm
@@ -66,31 +53,49 @@ export default class AudioEngine {
     this.loadAudioFont('metronome')
   }
 
+  /**
+   * Updates parameters of a Channel.
+   */
+  public updateChannelConfig = async (
+    channelId: ChannelId,
+    channelConfigUpdate: Partial<ChannelConfig>,
+  ) => {
+    console.log(
+      'AudioEngine / updateAudioContent',
+      channelId,
+      channelConfigUpdate,
+    )
+    this.channels[channelId] = merge(
+      this.channels[channelId],
+      channelConfigUpdate,
+    )
+    this.rescheduleSoundEventsAfterAudioContentUpdate()
+  }
+
+  /**
+   * Updates audio content for all Channels
+   */
+  public updateAudioContent = (channelsAudioContent: ChannelsAudioContent) => {
+    console.log('AudioEngine / updateAudioContent', channelsAudioContent)
+    this.channelContent = channelsAudioContent
+    this.rescheduleSoundEventsAfterAudioContentUpdate()
+  }
+
   public cleanUp = () => {
-    if (this.notesSequence) {
-      this.notesSequence.dispose()
-    }
-    if (this.metronomeSequence) {
-      this.metronomeSequence.dispose()
-    }
-    if (this.countInSequence) {
-      this.countInSequence.dispose()
-    }
+    // Dispose of all Tone's Sequences
+    this.channels
+      .map(ch => ch.channelId)
+      .map(channelId => this.channelSequence[channelId])
+      .filter(x => !!x)
+      .forEach(sequence => sequence.stop())
   }
 
-  public hasLoadedAudioFont = (audioFontId: AudioFontId) => {
-    return this.hasLoadedAudioFontMap[audioFontId] === true
-  }
+  /**
+   * Fetches an audio font, resolves when the audio font is loaded
+   */
+  public loadAudioFont = async (audioFontId: AudioFontId) => {
+    console.log('AudioEngine / loadAudioFont', audioFontId)
 
-  public setAudioFont = async (audioFontId: AudioFontId) => {
-    if (!this.hasLoadedAudioFont[audioFontId]) {
-      await this.loadAudioFont(audioFontId)
-    }
-
-    this.audioFontId = audioFontId
-  }
-
-  private loadAudioFont = async (audioFontId: AudioFontId) => {
     const audioFont = audioFontsConfigById[audioFontId]
 
     if (!audioFont) {
@@ -98,7 +103,7 @@ export default class AudioEngine {
     }
 
     this.isLoadingAudioFontMap[audioFontId] = true
-    const audioFontLoadingPromise = new Promise((resolve, reject) => {
+    const audioFontLoadingPromise = new Promise(resolve => {
       // See https://surikov.github.io/webaudiofont/
       this.audioFontPlayer.loader.startLoad(
         Tone.context,
@@ -126,8 +131,8 @@ export default class AudioEngine {
     return audioFontLoadingPromise
   }
 
-  public setAnimationCallback = (value: AnimationCallback) => {
-    this.animationCallback = value
+  public setTickCallback = (callback: TickCallback) => {
+    this.tickCallback = callback
   }
 
   public setBpm = (bpm: number) => {
@@ -135,147 +140,153 @@ export default class AudioEngine {
     Tone.Transport.bpm.value = this.bpm
   }
 
-  public setNotesRhythm = (rhythm: RhythmInfo) => {
-    this.notesTempoFactor = rhythm.divisions / rhythm.beats
-    if (this.notesSequence) {
-      console.log('setNotesRhythm: ', this.notesTempoFactor)
-      this.notesSequence.playbackRate = this.notesTempoFactor
-    }
-  }
-
-  public setCountIn = (counts: number) => {
-    this.countIn = counts || 0
-  }
-
-  public setNotesOffset = (offset: number) => {
-    this.offset = offset || 0
-  }
-
-  public setMetronomeEnabled = (enabled: boolean) => {
-    this.metronomeEnabled = enabled
-  }
-
-  public setMetronomeAccentBeatCount = (accentBeatCount?: number) => {
-    this.metronomeAccentBeatCount = accentBeatCount
-  }
-
   public playLoop = async () => {
-    this.rescheduleLoopNotes()
-    this.isPlayingLoop = true
+    console.log('AudioEngine / playLoop')
+    this.rescheduleSoundEventsAfterAudioContentUpdate()
 
-    this.startWithCountIn()
-  }
-
-  public startWithCountIn = () => {
     Tone.Transport.start('+0.1')
-    this.countInSequence.start()
-    this.notesSequence.start(
-      `0:${this.countIn + this.offset / this.notesTempoFactor}`,
-    )
-    this.metronomeSequence.start(`0:${this.countIn}`)
+
+    // Start all Tone's Sequences
+    this.channels.forEach(ch => {
+      const sequence = this.channelSequence[ch.channelId]
+      if (!sequence) {
+        return
+      }
+
+      const content = this.channelContent[ch.channelId]
+      if (!content) {
+        return
+      }
+      const sequenceOffset = content.startAt || 0
+      sequence.start(`0:${sequenceOffset}`)
+    })
+
     Tone.Master.volume.rampTo(1, 100)
   }
 
   public stopLoop = (callback?: () => any) => {
+    console.log('AudioEngine / stopLoop')
+
     const rampTimeMs = 100
     Tone.Master.volume.rampTo(0, rampTimeMs)
-    this.isPlayingLoop = false
 
     setTimeout(() => {
       Tone.Transport.stop()
-      if (this.countInSequence) {
-        this.countInSequence.stop()
-      }
-      if (this.notesSequence) {
-        this.notesSequence.stop()
-      }
-      if (this.metronomeSequence) {
-        this.metronomeSequence.stop()
-      }
+
+      // Stop all Tone's Sequences
+      this.channels
+        .map(ch => ch.channelId)
+        .map(channelId => this.channelSequence[channelId])
+        .filter(x => !!x)
+        .forEach(sequence => sequence.stop())
+
       if (callback) {
         callback()
       }
     }, rampTimeMs)
   }
 
-  public playNote = (
-    note: PlayableNote,
-    when: number = 0,
+  /**
+   * Plays a single sound.
+   * Returns an object that can be used to cancel the playing sound before its duration ends.
+   */
+  public playSingleSound = (
+    sound: SoundConfig,
     duration: number = 10000000,
-    audioFontId?: AudioFontId,
+    volume: number = 1.0,
+    when: number = 0,
   ) => {
-    if (!this.audioFontPlayer || !this.hasLoadedAudioFont(this.audioFontId)) {
+    console.log('AudioEngine / playNote', sound, duration, volume, when)
+
+    if (
+      !this.audioFontPlayer ||
+      !this.hasLoadedAudioFontMap[sound.audioFontId]
+    ) {
+      console.error(
+        `Trying to play a Note with AudioFontId = "${
+          sound.audioFontId
+        }" before the Audio Font has been loaded, ignoring`,
+      )
       return
     }
 
-    return this.audioFontPlayer.queueWaveTable(
+    const noteEnvelope = this.audioFontPlayer.queueWaveTable(
       Tone.context,
       Tone.context.destination,
-      this.audioFontCache[this.audioFontId],
+      this.audioFontCache[sound.audioFontId],
       when,
-      note.midi,
+      sound.midi,
       duration,
-      // Volume
-      1.0,
-    )
-  }
-
-  public stopNote = envelope => {
-    if (!envelope) {
-      return
-    }
-
-    envelope.cancel()
-  }
-
-  public setLoop = (staffTicks: StaffTick[]) => {
-    // Generate loop
-    const loopTicks: PlayableLoopTick[] = staffTicks.map(
-      (staffTick, index) => ({
-        notes: staffTick.notes,
-        meta: {
-          staffTickIndex: index,
-          noteCardId: staffTick.noteCardId!,
-        },
-      }),
+      volume,
     )
 
-    const loop: PlayableLoop = { ticks: loopTicks }
-
-    this.loop = loop
-    if (!this.loop.ticks) {
-      this.loop.ticks = []
+    const envelope: SoundEnvelope = {
+      cancel: () => noteEnvelope.cancel(),
     }
-    this.rescheduleLoopNotes()
+
+    return envelope
   }
 
-  private rescheduleLoopNotes = () => {
+  private rescheduleSoundEventsAfterAudioContentUpdate = () => {
     console.log('rescheduleLoopNotes')
 
-    if (!this.notesSequence) {
-      this.notesSequence = new Tone.Sequence(
-        (contextTime, tick) => {
-          try {
-            const duration = 60.0 / (this.bpm * this.notesTempoFactor)
-            const midiNotes = tick.notes.map(note => note.midi)
+    const { channelSequence, channelContent, channels } = this
 
-            this.audioFontPlayer.queueChord(
-              Tone.context,
-              Tone.context.destination,
-              this.audioFontCache[this.audioFontId],
-              contextTime,
-              midiNotes,
-              duration,
-              // Volume
-              1.0,
+    const isAnyChannelSoloing = some(channels.map(ch => ch.isSolo))
+
+    channels.forEach(channel => {
+      if (channelSequence[channel.channelId]) {
+        channelSequence[channel.channelId].dispose()
+      }
+
+      if (isAnyChannelSoloing && !channel.isSolo) {
+        return
+      }
+
+      if (channel.isMuted) {
+        return
+      }
+
+      const content = channelContent[channel.channelId]
+      if (!content) {
+        return
+      }
+      const { events } = content
+
+      const sequence = new Tone.Sequence(
+        (contextTime: number, [event, eventIndex]: [SoundEvent, number]) => {
+          try {
+            const duration =
+              (60.0 / (this.bpm * content.playbackRate)) * (event.duration || 1)
+            const soundsGroupedByAudioFontId = groupBy(
+              event.sounds,
+              'audioFontId',
             )
+
+            Object.keys(soundsGroupedByAudioFontId).forEach(audioFontId => {
+              const sounds = soundsGroupedByAudioFontId[audioFontId]
+              const midiNotes = sounds.map(sound => sound.midi)
+
+              const volume = channel.volume * (event.volume || 1)
+
+              this.audioFontPlayer.queueChord(
+                Tone.context,
+                Tone.context.destination,
+                this.audioFontCache[audioFontId],
+                contextTime,
+                midiNotes,
+                duration,
+                volume,
+              )
+            })
 
             // Call animation callback
             Tone.Draw.schedule(() => {
-              if (this.animationCallback) {
-                this.animationCallback({
-                  tick,
-                  loop: this.loop,
+              if (this.tickCallback) {
+                this.tickCallback({
+                  event,
+                  events,
+                  eventIndex,
                 })
               }
             }, contextTime)
@@ -283,86 +294,82 @@ export default class AudioEngine {
             console.error(error)
           }
         },
-        this.loop.ticks,
+        events.map((event, eventIndex) => [event, eventIndex]),
         '4n',
       )
-      this.notesSequence.loop = true
-      this.notesSequence.playbackRate = this.notesTempoFactor
-    } else {
-      this.notesSequence.removeAll()
-      this.loop.ticks.forEach((tick, index) => {
-        this.notesSequence.add(index, tick)
-      })
-      this.notesSequence.loopEnd = `0:${this.loop.ticks.length}`
-      this.notesSequence.playbackRate = this.notesTempoFactor
-    }
 
-    if (!this.metronomeSequence) {
-      this.metronomeSequence = new Tone.Sequence(
-        (contextTime, note) => {
-          try {
-            if (this.metronomeEnabled && this.hasLoadedAudioFont('metronome')) {
-              this.audioFontPlayer.queueChord(
-                Tone.context,
-                Tone.context.destination,
-                this.audioFontCache['metronome'],
-                contextTime,
-                [tonal.Note.midi(note || 'C6')],
-                0.3,
-                // Volume
-                1.0,
-              )
-            }
-          } catch (error) {
-            console.error(error)
-          }
-        },
-        this.metronomeAccentBeatCount
-          ? ['D6', ...new Array(this.metronomeAccentBeatCount - 1).fill('C6')]
-          : ['C6'],
-        '4n',
-      )
-      this.metronomeSequence.loop = true
-    } else {
-      this.metronomeSequence.removeAll()
+      sequence.playbackRate = content.playbackRate
 
-      const events = this.metronomeAccentBeatCount
-        ? ['D6', ...new Array(this.metronomeAccentBeatCount - 1).fill('C6')]
-        : ['C6']
-      events.forEach((tick, index) => {
-        this.metronomeSequence.add(index, tick)
-      })
+      if (!!content.loop) {
+        sequence.loop = true
+        sequence.loopStart = `0:${content.loop.startAt}`
+        sequence.loopEnd = `0:${content.loop.endAt}`
+      }
 
-      this.metronomeSequence.loopEnd = this.metronomeAccentBeatCount
-        ? `0:${this.metronomeAccentBeatCount}`
-        : '0:1'
-    }
-
-    if (!this.countInSequence) {
-      this.countInSequence = new Tone.Sequence(
-        contextTime => {
-          if (this.hasLoadedAudioFont('metronome')) {
-            this.audioFontPlayer.queueChord(
-              Tone.context,
-              Tone.context.destination,
-              this.audioFontCache['metronome'],
-              contextTime,
-              [tonal.Note.midi('C6')],
-              0.3,
-              // Volume
-              1.0,
-            )
-          }
-        },
-        new Array(this.countIn).fill(null).map(() => 'C6'),
-        '4n',
-      )
-      this.countInSequence.loop = false
-    } else {
-      this.countInSequence.removeAll()
-      new Array(this.countIn).fill(null).forEach((value, index) => {
-        this.countInSequence.add(index, 'C6')
-      })
-    }
+      channelSequence[channel.channelId] = sequence
+    })
   }
+}
+
+// Needed to enable the webaudio in Safari and on iOS devices
+UnmuteButton({ tone: Tone })
+
+// @ts-ignore
+window.Tone = Tone
+
+export type ChannelId = 'notes' | 'metronome' | 'rhythm' | 'subdivision'
+
+export type ChannelConfig = {
+  channelId: ChannelId
+  audioFontId: AudioFontId
+  volume: number
+  isMuted: boolean
+  isSolo: boolean
+}
+
+export type SoundConfig = {
+  audioFontId: AudioFontId
+  midi: number
+}
+
+export type SoundEvent<DataType = any> = {
+  sounds: SoundConfig[]
+  // Event duration in ticks. Default: 1
+  duration?: number
+  // Any data associated with an event. Default: undefined
+  data?: DataType
+  // Volume of the event. Default: 1
+  volume?: number
+}
+
+export type ChannelAudioContent<DataType = any> = {
+  events: SoundEvent<DataType>[]
+  playbackRate: number
+  // Start playback with a given offset (measured in ticks)
+  startAt: number
+  // If specified, the sound event sequence will be looped
+  loop?: {
+    // Loop start (measured in ticks)
+    startAt: number
+    // Loop end, including the last event (measured in ticks)
+    endAt: number
+  }
+}
+
+export type ChannelsAudioContent = {
+  [channelId in ChannelId]?: ChannelAudioContent
+}
+
+type TickCallbackParams = {
+  event: SoundEvent
+  eventIndex: number
+  events: SoundEvent[]
+}
+
+export type TickCallback = (params: TickCallbackParams) => any
+
+type ChannelsToneSequence = { [channelId in ChannelId]?: Tone.Sequence }
+
+export type SoundEnvelope = {
+  cancel: () => void
 }

@@ -70,7 +70,7 @@ import {
   NoteCardType,
   StaffTick,
   EnclosuresType,
-  PlayableLoopTick,
+  NotesLoopTick,
   User,
   Session,
   Scale,
@@ -112,7 +112,7 @@ import {
   instrumentTransposingOptionsByType,
 } from '../musicUtils'
 import AudioFontsConfig, { AudioFontId } from '../audioFontsConfig'
-import AudioEngine, { AnimationCallback } from '../services/audioEngine'
+import AudioEngine, { TickCallback } from '../services/audioEngine'
 import { AudioEngineContext } from './withAudioEngine'
 import firebase, { FirebaseContext } from '../services/firebase'
 import sessionStore from '../services/sessionStore'
@@ -709,7 +709,7 @@ class App extends React.Component<
 
   private initAudioEngine = async () => {
     console.log('initAudioEngine', sessionStore.activeSession)
-    audioEngine.setAnimationCallback(this.drawAnimation)
+    audioEngine.setTickCallback(this.drawAnimation)
 
     if (sessionStore.activeSession) {
       audioEngine.setBpm(sessionStore.activeSession.bpm)
@@ -888,10 +888,10 @@ class App extends React.Component<
     audioEngine.setLoop(this.getStaffTicksAfterInstrumentTransposing())
   }
 
-  private drawAnimation: AnimationCallback = ({
+  private drawAnimation: TickCallback = ({
     tick,
   }: {
-    tick: PlayableLoopTick
+    tick: NotesLoopTick
   }) => {
     this.setState(state => {
       if (!state.isPlaying) {
@@ -961,7 +961,11 @@ class App extends React.Component<
 
   private handleAudioFontChanged = async (audioFontId: AudioFontId) => {
     await this.loadAndSetAudioFont(audioFontId)
-    audioEngine.playNote({ midi: tonal.Note.midi('C4') as number }, 0, 0.5)
+    audioEngine.playSingleSound(
+      { midi: tonal.Note.midi('C4') as number },
+      0,
+      0.5,
+    )
   }
 
   private handleMouseOverNoteCard = (index: number) => {
@@ -2511,15 +2515,17 @@ class App extends React.Component<
                       >
                         <span onClick={this.openSettingsModal}>
                           {`Instrument Transpose: ${
-                            sessionStore.activeSession!.instrumentTransposing ===
-                            'C'
+                            sessionStore.activeSession!
+                              .instrumentTransposing === 'C'
                               ? 'OFF'
-                              : sessionStore.activeSession!.instrumentTransposing
+                              : sessionStore.activeSession!
+                                  .instrumentTransposing
                           }`}
                         </span>
                       </span>
 
-                      <div className={css(`
+                      <div
+                        className={css(`
                         @media screen and (max-height: 600px) and (min-width: 500px) {
                           display: flex;
                           flex-direction: column-reverse;
@@ -2528,10 +2534,13 @@ class App extends React.Component<
                           flex-direction: column-reverse;
                           margin-left: 0.5rem;
                         }
-                      `)}>
-                        <span className={css(`display: inline-block; width: 50px; white-space: nowrap;`)}>{`x ${
-                          settingsStore.scaleZoomFactor
-                        }`}</span>
+                      `)}
+                      >
+                        <span
+                          className={css(
+                            `display: inline-block; width: 50px; white-space: nowrap;`,
+                          )}
+                        >{`x ${settingsStore.scaleZoomFactor}`}</span>
                         <Tooltip title="Smaller font">
                           <IconButton
                             color="inherit"

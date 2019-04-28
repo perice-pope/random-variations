@@ -42,6 +42,20 @@ import {
   NotePitch,
 } from './types'
 import sessionStore from './services/sessionStore'
+import { SoundConfig } from './services/audioEngine.js';
+
+// MIDI numbers for (percussion) sounds
+// Source: https://usermanuals.finalemusic.com/SongWriter2012Win/Content/PercussionMaps.htm
+export const Sounds: { [key: string]: SoundConfig } = {
+  SNARE_DRUM: {
+    audioFontId: 'drumkit',
+    midi: 38,
+  },
+  COWBELL: {
+    audioFontId: 'drumkit',
+    midi: 56,
+  },
+}
 
 /**
  * E.g. "Db4" -> "C#4", "Db" -> "C#"

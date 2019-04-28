@@ -84,7 +84,7 @@ class PianoKeyboard extends React.Component<PianoKeyboardProps> {
 
     this.playingNoteEnvelopes[
       midiAfterTransposing
-    ] = this.props.audioEngine.playNote(
+    ] = this.props.audioEngine.playSingleSound(
       {
         midi: midiAfterTransposing,
       },
