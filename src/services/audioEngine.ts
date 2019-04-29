@@ -56,27 +56,31 @@ export default class AudioEngine {
   /**
    * Updates parameters of a Channel.
    */
-  public updateChannelConfig = async (
+  public setChannels = async (channels: ChannelConfig[]) => {
+    console.log('AudioEngine / setChannels', channels)
+    this.channels = channels
+    return this.rescheduleSoundEventsAfterAudioContentUpdate()
+  }
+
+  /**
+   * Updates parameters of a Channel.
+   */
+  public updateChannel = async (
     channelId: ChannelId,
     channelConfigUpdate: Partial<ChannelConfig>,
   ) => {
-    console.log(
-      'AudioEngine / updateAudioContent',
-      channelId,
-      channelConfigUpdate,
+    console.log('AudioEngine / updateChannel', channelId, channelConfigUpdate)
+    this.channels = this.channels.map(
+      ch => (ch.channelId === channelId ? merge(ch, channelConfigUpdate) : ch),
     )
-    this.channels[channelId] = merge(
-      this.channels[channelId],
-      channelConfigUpdate,
-    )
-    this.rescheduleSoundEventsAfterAudioContentUpdate()
+    return this.rescheduleSoundEventsAfterAudioContentUpdate()
   }
 
   /**
    * Updates audio content for all Channels
    */
-  public updateAudioContent = (channelsAudioContent: ChannelsAudioContent) => {
-    console.log('AudioEngine / updateAudioContent', channelsAudioContent)
+  public setAudioContent = (channelsAudioContent: ChannelsAudioContent) => {
+    console.log('AudioEngine / setAudioContent', channelsAudioContent)
     this.channelContent = channelsAudioContent
     this.rescheduleSoundEventsAfterAudioContentUpdate()
   }
@@ -317,7 +321,7 @@ UnmuteButton({ tone: Tone })
 // @ts-ignore
 window.Tone = Tone
 
-export type ChannelId = 'notes' | 'metronome' | 'rhythm' | 'subdivision'
+export type ChannelId = string
 
 export type ChannelConfig = {
   channelId: ChannelId

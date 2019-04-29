@@ -42,7 +42,7 @@ import {
   NotePitch,
 } from './types'
 import sessionStore from './services/sessionStore'
-import { SoundConfig } from './services/audioEngine.js';
+import { SoundConfig } from './services/audioEngine.js'
 
 // MIDI numbers for (percussion) sounds
 // Source: https://usermanuals.finalemusic.com/SongWriter2012Win/Content/PercussionMaps.htm
