@@ -11708,10 +11708,10 @@ tonal@^2.1.2:
     tonal-pcset "^2.1.2"
     tonal-scale "^2.1.2"
 
-tone@13.3.6:
-  version "13.3.6"
-  resolved "https://registry.yarnpkg.com/tone/-/tone-13.3.6.tgz#dc0a48b80733fd589eb628e87d90c1379bed7c47"
-  integrity sha512-GHIHtopVgQ4bb7UI+aKUTGeMNJZC7q281PWPnT+DxmABPbHt5SoMtQQXWQlkkr8sqD68GXYATIXa3OCQiUbxRg==
+tone@13.4.9:
+  version "13.4.9"
+  resolved "https://registry.yarnpkg.com/tone/-/tone-13.4.9.tgz#c5e9f69d0cdea6d2fa03e108766b10d5f9185dde"
+  integrity sha512-jU3MJOzt9wcGbo57TIzgAQe13EgwvdC7N6N/cA6ZkGYHH8gop+L6a87NRP3LIBCcJxVps6I6i/39ZUJI2aCWUA==
 
 topo@2.x.x:
   version "2.0.2"

@@ -34,7 +34,7 @@ const audioFontsConfig: AudioFontConfig[] = ([
   {
     id: 'drumkit',
     title: 'Drumkit',
-    name: '1140_SoundBlasterOld_sf2.js',
+    name: '1140_SoundBlasterOld_sf2',
     type: 'percussion',
   },
   {

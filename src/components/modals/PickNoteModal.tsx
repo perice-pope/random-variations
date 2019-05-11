@@ -38,6 +38,7 @@ import {
   getDefaultEnharmonicNoteVersion,
 } from '../../musicUtils'
 import sessionStore from '../../services/sessionStore'
+import settingsStore from '../../services/settingsStore'
 
 type PickNoteModalProps = {
   disabledNotePitches?: string[]
@@ -189,8 +190,6 @@ class PickNoteModal extends React.Component<
       return
     }
 
-    console.log('TCL: onNoteSelected -> noteName', noteName)
-
     if (!skipPlayingNote) {
       const midi = tonal.Note.midi(noteName)
 
@@ -198,9 +197,9 @@ class PickNoteModal extends React.Component<
         this.props.audioEngine.playSingleSound(
           {
             midi,
+            audioFontId: settingsStore.audioFontId,
           },
-          0,
-          0.5,
+          0.5, // duration - 0.5s
         )
       }
     }

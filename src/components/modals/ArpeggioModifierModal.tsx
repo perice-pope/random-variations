@@ -56,9 +56,14 @@ import {
   withAudioEngine,
   WithAudioEngineInjectedProps,
 } from '../withAudioEngine'
-import AudioEngine, { TickCallback } from '../../services/audioEngine'
+import AudioEngine, {
+  TickCallback,
+  ChannelAudioContent,
+  SoundEvent,
+} from '../../services/audioEngine'
 import { Omit } from '../../utils'
 import sessionStore from '../../services/sessionStore'
+import { channelId } from '../../utils/channels'
 
 const audioEngine = new AudioEngine()
 
@@ -396,23 +401,44 @@ class ArpeggioModifierModal extends React.Component<
     }))
   })
 
-  animationCallback: TickCallback = ({ tick }) => {
-    if (tick.notes.length > 0) {
-      this.setState({ activeTickIndex: tick.meta.staffTickIndex })
+  tickCallback: TickCallback = ({
+    event,
+  }: {
+    event: SoundEvent<{ staffTickIndex: number }>
+  }) => {
+    if (event.data) {
+      this.setState({ activeTickIndex: event.data.staffTickIndex })
     }
   }
 
   setPlaybackLoop = () => {
-    const ticks: StaffTick[] = [
+    const staffTicks: StaffTick[] = [
       ...this.generateStaffTicks(this.state.values, this.props.baseNote),
       {
         id: 'rest',
         notes: [],
       },
     ]
-    audioEngine.setAudioFont(this.props.audioFontId)
-    audioEngine.setLoop(ticks)
-    audioEngine.setTickCallback(this.animationCallback)
+    const audioFontId = settingsStore.audioFontId
+    const notesChannelAudioContent: ChannelAudioContent<{
+      staffTickIndex: number
+    }> = {
+      loop: {
+        startAt: 0,
+        endAt: staffTicks.length - 1,
+      },
+      startAt: 0,
+      events: staffTicks.map(
+        (tick, staffTickIndex) =>
+          ({
+            sounds: tick.notes.map(note => ({ midi: note.midi, audioFontId })),
+            data: { staffTickIndex },
+          } as SoundEvent<{ staffTickIndex: number }>),
+      ),
+      playbackRate: 1,
+    }
+    audioEngine.setAudioContent({ [channelId.NOTES]: notesChannelAudioContent })
+    audioEngine.setTickCallback(this.tickCallback)
   }
 
   togglePlayback = () => {

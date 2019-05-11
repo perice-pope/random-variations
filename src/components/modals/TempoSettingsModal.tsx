@@ -42,7 +42,11 @@ import { rhythmOptions } from '../../musicUtils'
 import Slider from '@material-ui/lab/Slider'
 import RhythmPreview from '../RhythmPreview'
 import { WithWidth } from '@material-ui/core/withWidth'
-import AudioEngine from '../../services/audioEngine'
+import AudioEngine, {
+  ChannelAudioContent,
+  SoundEvent,
+} from '../../services/audioEngine'
+import { channelId } from '../../utils/channels'
 
 type Props = {
   open: boolean
@@ -282,7 +286,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
   }
 
   private setPlaybackLoop = () => {
-    const ticks: StaffTick[] = new Array(
+    const staffTicks: StaffTick[] = new Array(
       this.values.rhythm.beats * this.values.rhythm.divisions,
     )
       .fill(null)
@@ -294,13 +298,37 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
           } as StaffTick),
       )
 
-    audioEngine.setMetronomeEnabled(true)
-    audioEngine.setMetronomeAccentBeatCount(this.values.rhythm.beats)
-    audioEngine.setAudioFont('woodblock')
-    audioEngine.setLoop(ticks)
-    audioEngine.setCountIn(4)
+    // audioEngine.setMetronomeEnabled(true)
+    // audioEngine.setMetronomeAccentBeatCount(this.values.rhythm.beats)
+    // audioEngine.setAudioFont('woodblock')
+    // audioEngine.setLoop(ticks)
+    // audioEngine.setCountIn(4)
+    const audioFontId = 'metronome'
+    const metronomeChannelAudioContent: ChannelAudioContent<{
+      staffTickIndex: number
+    }> = {
+      loop: {
+        startAt: 0,
+        endAt: staffTicks.length - 1,
+      },
+      startAt: 0,
+      events: staffTicks.map(
+        (tick, staffTickIndex) =>
+          ({
+            sounds: tick.notes.map(note => ({
+              midi: note.midi,
+              audioFontId: 'metronome',
+            })),
+            data: { staffTickIndex },
+          } as SoundEvent<{ staffTickIndex: number }>),
+      ),
+      playbackRate: 1,
+    }
+    audioEngine.setAudioContent({
+      [channelId.METRONOME]: metronomeChannelAudioContent,
+    })
     audioEngine.setBpm(this.values.bpm)
-    audioEngine.setNotesRhythm(this.values.rhythm)
+    // audioEngine.setNotesRhythm(this.values.rhythm)
   }
 
   render() {

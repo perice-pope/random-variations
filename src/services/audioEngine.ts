@@ -257,43 +257,48 @@ export default class AudioEngine {
       }
       const { events } = content
 
+      console.log(
+        'content = ',
+        channel.channelId,
+        content,
+        events,
+        events.map((event, eventIndex) => [event, eventIndex]),
+      )
+
       const sequence = new Tone.Sequence(
         (contextTime: number, [event, eventIndex]: [SoundEvent, number]) => {
+          console.log('tick', contextTime, event, eventIndex)
           try {
-            const duration =
-              (60.0 / (this.bpm * content.playbackRate)) * (event.duration || 1)
-            const soundsGroupedByAudioFontId = groupBy(
-              event.sounds,
-              'audioFontId',
-            )
-
-            Object.keys(soundsGroupedByAudioFontId).forEach(audioFontId => {
-              const sounds = soundsGroupedByAudioFontId[audioFontId]
-              const midiNotes = sounds.map(sound => sound.midi)
-
-              const volume = channel.volume * (event.volume || 1)
-
-              this.audioFontPlayer.queueChord(
-                Tone.context,
-                Tone.context.destination,
-                this.audioFontCache[audioFontId],
-                contextTime,
-                midiNotes,
-                duration,
-                volume,
-              )
-            })
-
+            // const duration =
+            //   (60.0 / (this.bpm * content.playbackRate)) * (event.duration || 1)
+            // const soundsGroupedByAudioFontId = groupBy(
+            //   event.sounds,
+            //   'audioFontId',
+            // )
+            // Object.keys(soundsGroupedByAudioFontId).forEach(audioFontId => {
+            //   const sounds = soundsGroupedByAudioFontId[audioFontId]
+            //   const midiNotes = sounds.map(sound => sound.midi)
+            //   const volume = channel.volume * (event.volume || 1)
+            //   this.audioFontPlayer.queueChord(
+            //     Tone.context,
+            //     Tone.context.destination,
+            //     this.audioFontCache[audioFontId],
+            //     contextTime,
+            //     midiNotes,
+            //     duration,
+            //     volume,
+            //   )
+            // })
             // Call animation callback
-            Tone.Draw.schedule(() => {
-              if (this.tickCallback) {
-                this.tickCallback({
-                  event,
-                  events,
-                  eventIndex,
-                })
-              }
-            }, contextTime)
+            // Tone.Draw.schedule(() => {
+            //   if (this.tickCallback) {
+            //     this.tickCallback({
+            //       event,
+            //       events,
+            //       eventIndex,
+            //     })
+            //   }
+            // }, contextTime)
           } catch (error) {
             console.error(error)
           }

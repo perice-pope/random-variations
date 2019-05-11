@@ -163,13 +163,7 @@ import TempoSettingsModal, {
   TempoSettingsFormValues,
 } from './modals/TempoSettingsModal'
 import { transparentize } from 'polished'
-
-const channelId = {
-  METRONOME: 'metronome',
-  RHYTHM: 'rhythm',
-  SUBDIVISION: 'subdivision',
-  NOTES: 'notes',
-}
+import { channelId } from '../utils/channels';
 
 const channelsInitialConfig: ChannelConfig[] = [
   {
@@ -666,7 +660,7 @@ class App extends React.Component<
     const { rhythm, bpm } = activeSession
     const audioFontId = settingsStore.audioFontId
     const staffTicks = this.getStaffTicksAfterInstrumentTransposing()
-    const notesChannelAudioContent: ChannelAudioContent = {
+    const notesChannelAudioContent: ChannelAudioContent<{ staffTickIndex: number}> = {
       loop: {
         startAt: 0,
         endAt: staffTicks.length - 1,

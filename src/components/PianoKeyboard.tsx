@@ -12,6 +12,7 @@ import AudioEngine from '../services/audioEngine'
 import { AudioFontId } from '../audioFontsConfig'
 import { InstrumentTransposingType } from '../types'
 import { getConcertPitchMidi } from '../musicUtils'
+import settingsStore from '../services/settingsStore'
 
 export const pianoNoteRangeWide: MidiNoteRange = {
   first: tonal.Note.midi('C3') as number,
@@ -84,13 +85,10 @@ class PianoKeyboard extends React.Component<PianoKeyboardProps> {
 
     this.playingNoteEnvelopes[
       midiAfterTransposing
-    ] = this.props.audioEngine.playSingleSound(
-      {
-        midi: midiAfterTransposing,
-      },
-      0,
-      1.5,
-    )
+    ] = this.props.audioEngine.playSingleSound({
+      midi: midiAfterTransposing,
+      audioFontId: settingsStore.audioFontId,
+    })
   }
 
   private onStopNote = midi => {
@@ -99,9 +97,7 @@ class PianoKeyboard extends React.Component<PianoKeyboardProps> {
       midi,
     )
     if (this.playingNoteEnvelopes[midiAfterTransposing]) {
-      this.props.audioEngine.stopNote(
-        this.playingNoteEnvelopes[midiAfterTransposing],
-      )
+      this.playingNoteEnvelopes[midiAfterTransposing].cancel()
       delete this.playingNoteEnvelopes[midiAfterTransposing]
     }
     if (this.props.onStopNote) {
