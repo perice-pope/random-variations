@@ -1,4 +1,7 @@
 import { AudioFontId } from './audioFontsConfig'
+import { ChannelId, PercussionChannelId } from './utils/channels'
+import { SoundConfig } from './services/audioEngine'
+import { PercussionSoundId } from './musicUtils'
 
 export interface PlayableNote {
   midi: number
@@ -254,6 +257,22 @@ export interface SharedSessionInfo {
 /**
  * Persisted sharable session
  */
+
+export type SessionChannelSettings = {
+  [key in PercussionChannelId]: {
+    sound: PercussionSoundId
+    volume: number
+    isMuted: boolean
+    isSolo: boolean
+  }
+} & {
+  notes: {
+    volume: number
+    isMuted: boolean
+    isSolo: boolean
+  }
+}
+
 export interface Session {
   id: string
   sharedKey?: string
@@ -262,6 +281,8 @@ export interface Session {
 
   createdAt: string
   updatedAt: string
+
+  channelSettings: SessionChannelSettings
 
   bpm: number
   // Number of beats to wait between note groups

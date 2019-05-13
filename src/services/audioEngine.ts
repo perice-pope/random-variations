@@ -20,10 +20,18 @@ import WebAudioFontPlayer from 'webaudiofont'
 import * as _ from 'lodash'
 import UnmuteButton from 'unmute'
 
-import audioFontsConfig, { AudioFontId, AudioFont } from '../audioFontsConfig'
-import { merge, groupBy, some } from 'lodash'
+import {
+  AudioFontId,
+  AudioFont,
+  instrumentAudioFontConfigs,
+  percussionAudioFontConfigs,
+} from '../audioFontsConfig'
+import { merge, groupBy, some, keys } from 'lodash'
 
-const audioFontsConfigById = _.keyBy(audioFontsConfig, 'id')
+const audioFontsConfigById = _.keyBy(
+  [...instrumentAudioFontConfigs, ...percussionAudioFontConfigs],
+  'id',
+)
 
 export default class AudioEngine {
   // private loop: NotesLoop = { ticks: [] }
@@ -48,9 +56,7 @@ export default class AudioEngine {
 
   constructor() {
     Tone.Transport.bpm.value = this.bpm
-
     this.audioFontPlayer = new WebAudioFontPlayer()
-    this.loadAudioFont('metronome')
   }
 
   /**
@@ -68,12 +74,33 @@ export default class AudioEngine {
   public updateChannel = async (
     channelId: ChannelId,
     channelConfigUpdate: Partial<ChannelConfig>,
+    skipRescheduling = false,
   ) => {
     console.log('AudioEngine / updateChannel', channelId, channelConfigUpdate)
-    this.channels = this.channels.map(
-      ch => (ch.channelId === channelId ? merge(ch, channelConfigUpdate) : ch),
+    this.channels[channelId] = merge(
+      this.channels[channelId],
+      channelConfigUpdate,
     )
-    return this.rescheduleSoundEventsAfterAudioContentUpdate()
+    if (!skipRescheduling) {
+      this.rescheduleSoundEventsAfterAudioContentUpdate()
+    }
+  }
+
+  public updateChannels = async (
+    update: {
+      [channelId: string]: Partial<ChannelConfig>
+    },
+    skipRescheduling = false,
+  ) => {
+    console.log('AudioEngine / updateChannels', update)
+    this.channels.forEach((channel, index) => {
+      if (update[channel.channelId]) {
+        this.channels[index] = merge(channel, update[channel.channelId])
+      }
+    })
+    if (!skipRescheduling) {
+      this.rescheduleSoundEventsAfterAudioContentUpdate()
+    }
   }
 
   /**
@@ -103,7 +130,11 @@ export default class AudioEngine {
     const audioFont = audioFontsConfigById[audioFontId]
 
     if (!audioFont) {
-      throw new Error('Could not find audio font with name')
+      throw new Error(
+        `Could not find audio font with id ${audioFontId}, available options are: ${Object.keys(
+          audioFontsConfigById,
+        ).join(', ')}`,
+      )
     }
 
     this.isLoadingAudioFontMap[audioFontId] = true
@@ -232,80 +263,103 @@ export default class AudioEngine {
   }
 
   private rescheduleSoundEventsAfterAudioContentUpdate = () => {
-    console.log('rescheduleLoopNotes')
+    console.log('rescheduleSoundEventsAfterAudioContentUpdate')
 
     const { channelSequence, channelContent, channels } = this
 
-    const isAnyChannelSoloing = some(channels.map(ch => ch.isSolo))
-
     channels.forEach(channel => {
-      if (channelSequence[channel.channelId]) {
-        channelSequence[channel.channelId].dispose()
-      }
-
-      if (isAnyChannelSoloing && !channel.isSolo) {
-        return
-      }
-
-      if (channel.isMuted) {
-        return
-      }
-
       const content = channelContent[channel.channelId]
+      const events = content ? content.events : []
+
       if (!content) {
         return
+        // throw new Error(`no content for channel ${channel.channelId}`)
       }
-      const { events } = content
 
-      console.log(
-        'content = ',
-        channel.channelId,
-        content,
-        events,
-        events.map((event, eventIndex) => [event, eventIndex]),
-      )
+      console.log('content = ', channel.channelId, channel, content)
 
-      const sequence = new Tone.Sequence(
-        (contextTime: number, [event, eventIndex]: [SoundEvent, number]) => {
-          console.log('tick', contextTime, event, eventIndex)
-          try {
-            // const duration =
-            //   (60.0 / (this.bpm * content.playbackRate)) * (event.duration || 1)
-            // const soundsGroupedByAudioFontId = groupBy(
-            //   event.sounds,
-            //   'audioFontId',
-            // )
-            // Object.keys(soundsGroupedByAudioFontId).forEach(audioFontId => {
-            //   const sounds = soundsGroupedByAudioFontId[audioFontId]
-            //   const midiNotes = sounds.map(sound => sound.midi)
-            //   const volume = channel.volume * (event.volume || 1)
-            //   this.audioFontPlayer.queueChord(
-            //     Tone.context,
-            //     Tone.context.destination,
-            //     this.audioFontCache[audioFontId],
-            //     contextTime,
-            //     midiNotes,
-            //     duration,
-            //     volume,
-            //   )
-            // })
-            // Call animation callback
-            // Tone.Draw.schedule(() => {
-            //   if (this.tickCallback) {
-            //     this.tickCallback({
-            //       event,
-            //       events,
-            //       eventIndex,
-            //     })
-            //   }
-            // }, contextTime)
-          } catch (error) {
-            console.error(error)
-          }
-        },
-        events.map((event, eventIndex) => [event, eventIndex]),
-        '4n',
-      )
+      let sequence = channelSequence[channel.channelId]
+      if (!sequence) {
+        sequence = new Tone.Sequence(
+          (
+            contextTime: number,
+            { event, eventIndex }: { event: SoundEvent; eventIndex: number },
+          ) => {
+            const isAnyChannelSoloing = some(channels.map(ch => ch.isSolo))
+            const isChannelAudible =
+              (isAnyChannelSoloing && channel.isSolo) ||
+              (!isAnyChannelSoloing && !channel.isMuted)
+
+              
+              const content = channelContent[channel.channelId]
+              console.log(
+                'tick',
+                channel.channelId,
+                channel.volume,
+                channel,
+                isAnyChannelSoloing,
+                isChannelAudible,
+                content
+              )
+              if (!content) {
+              return
+            }
+
+            try {
+              const duration =
+                (60.0 / (this.bpm * content.playbackRate)) *
+                (event.duration || 1)
+              const soundsGroupedByAudioFontId = groupBy(
+                event.sounds,
+                'audioFontId',
+              )
+              Object.keys(soundsGroupedByAudioFontId).forEach(audioFontId => {
+                const sounds = soundsGroupedByAudioFontId[audioFontId]
+                const midiNotes = sounds.map(sound => sound.midi)
+                const volume =
+                  channel.volume *
+                  (event.volume || 1) *
+                  (isChannelAudible ? 1 : 0)
+
+                  if (volume > 0) {
+
+                this.audioFontPlayer.queueChord(
+                  Tone.context,
+                  Tone.context.destination,
+                  this.audioFontCache[audioFontId],
+                  contextTime,
+                  midiNotes,
+                  duration,
+                  volume,
+                )
+                  }
+              })
+              // Call animation callback
+              Tone.Draw.schedule(() => {
+                if (this.tickCallback) {
+                  this.tickCallback({
+                    event,
+                    events,
+                    eventIndex,
+                  })
+                }
+              }, contextTime)
+            } catch (error) {
+              console.error(error)
+            }
+          },
+          events.map((event, eventIndex) => ({ event, eventIndex })),
+          '4n',
+        )
+        channelSequence[channel.channelId] = sequence
+      } else {
+        // Update sound events in the Sequence
+        events
+          .map((event, eventIndex) => ({ event, eventIndex }))
+          .forEach((event, index) => {
+            sequence.at(index, event)
+          })
+      }
 
       sequence.playbackRate = content.playbackRate
 
@@ -314,8 +368,6 @@ export default class AudioEngine {
         sequence.loopStart = `0:${content.loop.startAt}`
         sequence.loopEnd = `0:${content.loop.endAt}`
       }
-
-      channelSequence[channel.channelId] = sequence
     })
   }
 }
@@ -330,7 +382,6 @@ export type ChannelId = string
 
 export type ChannelConfig = {
   channelId: ChannelId
-  audioFontId: AudioFontId
   volume: number
   isMuted: boolean
   isSolo: boolean
@@ -365,8 +416,8 @@ export type ChannelAudioContent<DataType = any> = {
   }
 }
 
-export type ChannelsAudioContent = {
-  [channelId in ChannelId]?: ChannelAudioContent
+export type ChannelsAudioContent<DataType = any> = {
+  [channelId in ChannelId]?: ChannelAudioContent<DataType>
 }
 
 type TickCallbackParams = {

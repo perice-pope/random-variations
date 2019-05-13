@@ -24,6 +24,7 @@
     "strict": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "disableSizeLimit": true,
     "noEmit": true
   },
   "exclude": [
@@ -37,5 +38,6 @@
     "functions",
     "public"
   ],
+  
   "include": ["src"]
 }

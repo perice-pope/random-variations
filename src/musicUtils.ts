@@ -46,14 +46,22 @@ import { SoundConfig } from './services/audioEngine.js'
 
 // MIDI numbers for (percussion) sounds
 // Source: https://usermanuals.finalemusic.com/SongWriter2012Win/Content/PercussionMaps.htm
-export const Sounds: { [key: string]: SoundConfig } = {
-  SNARE_DRUM: {
-    audioFontId: 'drumkit',
+export type PercussionSoundId = 'snare' | 'cowbell' | 'woodblock'
+
+export const PercussionSoundConfigs: {
+  [key in PercussionSoundId]: SoundConfig
+} = {
+  snare: {
+    audioFontId: 'snare_drum',
     midi: 38,
   },
-  COWBELL: {
-    audioFontId: 'drumkit',
+  cowbell: {
+    audioFontId: 'cowbell',
     midi: 56,
+  },
+  woodblock: {
+    audioFontId: 'woodblock_low',
+    midi: 77,
   },
 }
 

@@ -9,7 +9,7 @@ import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import withMobileDialog from '@material-ui/core/withMobileDialog'
 
-import AudioFontConfig, { AudioFontId } from '../../audioFontsConfig'
+import { instrumentAudioFontConfigs, AudioFontId } from '../../audioFontsConfig'
 import { ClefType, InstrumentTransposingType } from '../../types'
 import {
   FormControl,
@@ -57,12 +57,12 @@ type AudioFontOption = {
   value: AudioFontId
 }
 
-const AudioFontOptions: AudioFontOption[] = AudioFontConfig.filter(
-  ({ id }) => id !== 'metronome' && id !== 'woodblock',
-).map(afc => ({
-  title: afc.title,
-  value: afc.id,
-}))
+const AudioFontOptions: AudioFontOption[] = instrumentAudioFontConfigs.map(
+  afc => ({
+    title: afc.title,
+    value: afc.id,
+  }),
+)
 
 type ClefTypeOption = {
   title: string

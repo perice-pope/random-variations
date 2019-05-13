@@ -38,7 +38,7 @@ import {
   IconButton,
   Hidden,
 } from '@material-ui/core'
-import { rhythmOptions } from '../../musicUtils'
+import { rhythmOptions, PercussionSoundConfigs } from '../../musicUtils'
 import Slider from '@material-ui/lab/Slider'
 import RhythmPreview from '../RhythmPreview'
 import { WithWidth } from '@material-ui/core/withWidth'
@@ -303,22 +303,19 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     // audioEngine.setAudioFont('woodblock')
     // audioEngine.setLoop(ticks)
     // audioEngine.setCountIn(4)
-    const audioFontId = 'metronome'
+    const audioFontId = 'cowbell'
     const metronomeChannelAudioContent: ChannelAudioContent<{
       staffTickIndex: number
     }> = {
       loop: {
         startAt: 0,
-        endAt: staffTicks.length - 1,
+        endAt: staffTicks.length,
       },
       startAt: 0,
       events: staffTicks.map(
         (tick, staffTickIndex) =>
           ({
-            sounds: tick.notes.map(note => ({
-              midi: note.midi,
-              audioFontId: 'metronome',
-            })),
+            sounds: tick.notes.map(note => PercussionSoundConfigs['cowbell']),
             data: { staffTickIndex },
           } as SoundEvent<{ staffTickIndex: number }>),
       ),

@@ -1,4 +1,4 @@
-import AudioFontsConfig, { AudioFontId } from '../audioFontsConfig'
+import { AudioFontId } from '../audioFontsConfig'
 import { observable } from 'mobx'
 import firebase from './firebase'
 import { ClefType, InstrumentTransposingType } from '../types'
@@ -20,7 +20,7 @@ class SettingsStore {
   @observable
   public instrumentTransposing: InstrumentTransposingType
   @observable
-  public audioFontId: AudioFontId = AudioFontsConfig[2].id
+  public audioFontId: AudioFontId = 'grand_piano_1'
   @observable
   public clefType: ClefType = 'treble'
 

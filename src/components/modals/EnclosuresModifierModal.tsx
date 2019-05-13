@@ -186,7 +186,7 @@ class EnclosuresModifierModal extends React.Component<
     }> = {
       loop: {
         startAt: 0,
-        endAt: staffTicks.length - 1,
+        endAt: staffTicks.length,
       },
       startAt: 0,
       events: staffTicks.map(

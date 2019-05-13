@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { ThemeProvider } from 'emotion-theming'
 import { css, cx } from 'react-emotion'
-import _ from 'lodash'
+import _, { some, values, keys, range } from 'lodash'
 import * as tonal from 'tonal'
 import memoizeOne from 'memoize-one'
 import { transpose } from 'tonal-distance'
@@ -21,6 +21,7 @@ import MuiButton from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import IconButton from '@material-ui/core/IconButton'
 import Hidden from '@material-ui/core/Hidden'
+import Slider from '@material-ui/lab/Slider'
 
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import ZoomInIcon from '@material-ui/icons/ZoomIn'
@@ -111,13 +112,19 @@ import {
   getConcertPitchMidi,
   getNoteNameAfterInstrumentTranspose,
   instrumentTransposingOptionsByType,
+  PercussionSoundConfigs,
 } from '../musicUtils'
-import AudioFontsConfig, { AudioFontId } from '../audioFontsConfig'
+import {
+  instrumentAudioFontConfigs,
+  percussionAudioFontConfigs,
+  AudioFontId,
+} from '../audioFontsConfig'
 import AudioEngine, {
   TickCallback,
   SoundEvent,
   ChannelAudioContent,
   ChannelConfig,
+  ChannelsAudioContent,
 } from '../services/audioEngine'
 import { AudioEngineContext } from './withAudioEngine'
 import firebase, { FirebaseContext } from '../services/firebase'
@@ -163,33 +170,29 @@ import TempoSettingsModal, {
   TempoSettingsFormValues,
 } from './modals/TempoSettingsModal'
 import { transparentize } from 'polished'
-import { channelId } from '../utils/channels';
+import { channelId } from '../utils/channels'
 
 const channelsInitialConfig: ChannelConfig[] = [
   {
     channelId: channelId.METRONOME,
-    audioFontId: 'metronome',
     volume: 1.0,
     isMuted: false,
     isSolo: false,
   },
   {
     channelId: channelId.RHYTHM,
-    audioFontId: 'drumkit',
-    volume: 1.0,
-    isMuted: false,
-    isSolo: false,
-  },
-  {
-    channelId: channelId.NOTES,
-    audioFontId: 'grand_piano_1',
     volume: 1.0,
     isMuted: false,
     isSolo: false,
   },
   {
     channelId: channelId.SUBDIVISION,
-    audioFontId: 'drumkit',
+    volume: 1.0,
+    isMuted: false,
+    isSolo: false,
+  },
+  {
+    channelId: channelId.NOTES,
     volume: 1.0,
     isMuted: false,
     isSolo: false,
@@ -472,10 +475,12 @@ class App extends React.Component<
     audioEngine.setTickCallback(this.audioEngineTickCallback)
 
     await audioEngine.loadAudioFont(settingsStore.audioFontId)
-    await audioEngine.loadAudioFont('drumkit')
-    await audioEngine.loadAudioFont('woodblock')
-    await audioEngine.loadAudioFont('metronome')
-    await audioEngine.loadAudioFont('grand_piano_1')
+    // Load all percussion sounds
+    await Promise.all(
+      percussionAudioFontConfigs.map(ac => audioEngine.loadAudioFont(ac.id)),
+    )
+    // Load grand piano instrument sound by default
+    // await audioEngine.loadAudioFont('grand_piano_1')
 
     this.updatePlaybackNotesFromActiveSession()
   }
@@ -657,26 +662,87 @@ class App extends React.Component<
     if (!activeSession) {
       return
     }
-    const { rhythm, bpm } = activeSession
-    const audioFontId = settingsStore.audioFontId
-    const staffTicks = this.getStaffTicksAfterInstrumentTransposing()
-    const notesChannelAudioContent: ChannelAudioContent<{ staffTickIndex: number}> = {
-      loop: {
+    const { rhythm, bpm, channelSettings } = activeSession
+    const notesStaffTicks = this.getStaffTicksAfterInstrumentTransposing()
+
+    const audioContent: ChannelsAudioContent<{ staffTickIndex: number }> = {
+      [channelId.NOTES]: {
+        loop: {
+          startAt: 0,
+          endAt: notesStaffTicks.length,
+        },
         startAt: 0,
-        endAt: staffTicks.length - 1,
+        events: notesStaffTicks.map(
+          (tick, staffTickIndex) =>
+            ({
+              sounds: tick.notes.map(note => ({
+                midi: note.midi,
+                audioFontId: settingsStore.audioFontId,
+              })),
+              data: { staffTickIndex },
+            } as SoundEvent<{ staffTickIndex: number }>),
+        ),
+        playbackRate: rhythm.divisions / rhythm.beats,
       },
-      startAt: 0,
-      events: staffTicks.map(
-        (tick, staffTickIndex) =>
-          ({
-            sounds: tick.notes.map(note => ({ midi: note.midi, audioFontId })),
-            data: { staffTickIndex },
-          } as SoundEvent<{ staffTickIndex: number }>),
-      ),
-      playbackRate: rhythm.divisions / rhythm.beats,
+      [channelId.RHYTHM]: {
+        loop: {
+          startAt: 0,
+          endAt: notesStaffTicks.length,
+        },
+        startAt: 0,
+        events: notesStaffTicks.map(
+          (tick, staffTickIndex) =>
+            ({
+              sounds: [PercussionSoundConfigs[channelSettings.rhythm.sound]],
+            } as SoundEvent<{ staffTickIndex: number }>),
+        ),
+        playbackRate: rhythm.divisions / rhythm.beats,
+      },
+      [channelId.SUBDIVISION]: {
+        loop: {
+          startAt: 0,
+          endAt: rhythm.divisions,
+        },
+        startAt: 0,
+        events: range(rhythm.divisions).map(
+          (tick, staffTickIndex) =>
+            ({
+              sounds: [
+                PercussionSoundConfigs[channelSettings.subdivision.sound],
+              ],
+            } as SoundEvent<{ staffTickIndex: number }>),
+        ),
+        playbackRate: rhythm.divisions,
+      },
+      [channelId.METRONOME]: {
+        loop: {
+          startAt: 0,
+          endAt: rhythm.beats,
+        },
+        startAt: 0,
+        events: range(rhythm.beats).map(
+          (tick, staffTickIndex) =>
+            ({
+              sounds: [PercussionSoundConfigs[channelSettings.metronome.sound]],
+            } as SoundEvent<{ staffTickIndex: number }>),
+        ),
+        playbackRate: 1,
+      },
     }
+
     audioEngine.setBpm(Math.max(1, bpm))
-    audioEngine.setAudioContent({ [channelId.NOTES]: notesChannelAudioContent })
+
+    let channelsUpdate = {}
+    keys(channelSettings).forEach(
+      channelId =>
+        (channelsUpdate[channelId] = {
+          isMuted: channelSettings[channelId].isMuted,
+          isSolo: channelSettings[channelId].isSolo,
+          volume: channelSettings[channelId].volume,
+        }),
+    )
+    audioEngine.updateChannels(channelsUpdate, true)
+    audioEngine.setAudioContent(audioContent)
   }
 
   /**
@@ -1382,6 +1448,7 @@ class App extends React.Component<
       metronomeEnabled,
       modifiers,
       instrumentTransposing,
+      channelSettings,
     } = sessionStore.activeSession
 
     const { staffTicks, tickLabels } = this.getStaffTicks()
@@ -2068,6 +2135,70 @@ class App extends React.Component<
                 <Toolbar variant="dense">{ToolbarContent}</Toolbar>
               </AppBar>
 
+              {/* TODO: make a nicer UI for the channel mixer */}
+              <div>
+                {['notes', 'metronome', 'rhythm', 'subdivision'].map(
+                  channelId => (
+                    <div key={channelId}>
+                      <span>{channelId}</span>
+                      <Button
+                        size="small"
+                        color={
+                          channelSettings[channelId].isMuted
+                            ? 'secondary'
+                            : 'default'
+                        }
+                        variant="text"
+                        onClick={() => {
+                          if (!sessionStore.activeSession) {
+                            return
+                          }
+                          sessionStore.activeSession.channelSettings[
+                            channelId
+                          ].isMuted = !channelSettings[channelId].isMuted
+                        }}
+                      >
+                        M
+                      </Button>
+                      <Button
+                        size="small"
+                        color={
+                          channelSettings[channelId].isSolo
+                            ? 'secondary'
+                            : 'default'
+                        }
+                        variant="text"
+                        onClick={() => {
+                          if (!sessionStore.activeSession) {
+                            return
+                          }
+                          sessionStore.activeSession.channelSettings[
+                            channelId
+                          ].isSolo = !channelSettings[channelId].isSolo
+                        }}
+                      >
+                        S
+                      </Button>
+
+                      <Slider
+                        value={channelSettings[channelId].volume}
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        onChange={(e, value) => {
+                          if (!sessionStore.activeSession) {
+                            return
+                          }
+                          sessionStore.activeSession.channelSettings[
+                            channelId
+                          ].volume = value
+                        }}
+                      />
+                    </div>
+                  ),
+                )}
+              </div>
+
               <Hidden mdUp implementation="js">
                 <SwipeableDrawer
                   variant="temporary"
@@ -2728,7 +2859,11 @@ smoothscroll.polyfill()
 // @ts-ignore
 window.notificationsStore = notificationsStore
 
-console.log('All supported audio fonts: ', _.map(AudioFontsConfig, 'title'))
+console.log(
+  'All supported audio fonts: ',
+  instrumentAudioFontConfigs.map(ac => ac.title),
+  percussionAudioFontConfigs.map(ac => ac.title),
+)
 
 const uiState = observable({
   isFullScreen: false,

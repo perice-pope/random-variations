@@ -8,9 +8,11 @@ export type AudioFontId =
   | 'sax_soprano_1'
   | 'trumpet_soft_1'
   | 'acoustic_guitar_1'
-  | 'metronome'
-  | 'woodblock'
-  | 'drumkit'
+  // Percussion
+  | 'bass_drum'
+  | 'snare_drum'
+  | 'woodblock_low'
+  | 'cowbell'
 
 export type AudioFontConfig = {
   // Machine-friendly unique ID
@@ -24,25 +26,48 @@ export type AudioFontConfig = {
   globalVarName: string
 }
 
-const audioFontsConfig: AudioFontConfig[] = ([
+// Percussion
+// For list of sounds see https://surikov.github.io/webaudiofontdata/sound/drums_0_SBLive_sf2Standard.html
+export const percussionAudioFontConfigs: AudioFontConfig[] = ([
   {
-    id: 'metronome',
-    title: 'Metronome',
-    name: '1130_SoundBlasterOld_sf2',
+    id: 'bass_drum',
+    title: 'Kick drum',
+    name: '35_0_SBLive_sf2',
     type: 'percussion',
   },
   {
-    id: 'drumkit',
-    title: 'Drumkit',
-    name: '1140_SoundBlasterOld_sf2',
+    id: 'snare_drum',
+    title: 'Snare drum',
+    name: '38_0_SBLive_sf2',
     type: 'percussion',
   },
   {
-    id: 'woodblock',
+    id: 'woodblock_low',
     title: 'Woodblock',
-    name: '1150_SoundBlasterOld_sf2',
+    name: '77_0_SBLive_sf2',
     type: 'percussion',
   },
+  {
+    id: 'cowbell',
+    title: 'Cowbell',
+    name: '56_0_SBLive_sf2',
+    type: 'percussion',
+  },
+] as ({
+  id: AudioFontId
+  title: string
+  name: string
+  type: AudioFontType
+})[]).map(afc => ({
+  id: afc.id,
+  title: afc.title,
+  url: process.env.PUBLIC_URL + `/audiofonts/128${afc.name}.js`,
+  globalVarName: `_drum_${afc.name}`,
+  type: afc.type,
+}))
+
+export const instrumentAudioFontConfigs: AudioFontConfig[] = ([
+  // Instruments
   {
     id: 'grand_piano_1',
     title: 'Grand Piano',
@@ -87,4 +112,7 @@ const audioFontsConfig: AudioFontConfig[] = ([
   type: afc.type,
 }))
 
-export default audioFontsConfig
+export const audioFontsConfig = [
+  ...percussionAudioFontConfigs,
+  ...instrumentAudioFontConfigs,
+]

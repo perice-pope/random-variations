@@ -156,6 +156,32 @@ export const createDefaultSession = () => {
       B: false,
     },
 
+    channelSettings: {
+      notes: {
+        isMuted: false,
+        isSolo: false,
+        volume: 1,
+      },
+      rhythm: {
+        sound: 'snare',
+        isMuted: false,
+        isSolo: false,
+        volume: 0.75,
+      },
+      subdivision: {
+        sound: 'woodblock',
+        isMuted: false,
+        isSolo: false,
+        volume: 0.75,
+      },
+      metronome: {
+        sound: 'cowbell',
+        isMuted: false,
+        isSolo: false,
+        volume: 1,
+      },
+    },
+
     bpm: 120,
     rests: 0,
     offset: 0,
