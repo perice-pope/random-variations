@@ -179,7 +179,7 @@ export default class AudioEngine {
     console.log('AudioEngine / playLoop')
     this.rescheduleSoundEventsAfterAudioContentUpdate()
 
-    Tone.Transport.start('+0.1')
+    Tone.Transport.start('+0')
 
     // Start all Tone's Sequences
     this.channels.forEach(ch => {
@@ -265,10 +265,10 @@ export default class AudioEngine {
   private rescheduleSoundEventsAfterAudioContentUpdate = () => {
     console.log('rescheduleSoundEventsAfterAudioContentUpdate')
 
-    const { channelSequence, channelContent, channels } = this
+    const { channelSequence, channels } = this
 
     channels.forEach(channel => {
-      const content = channelContent[channel.channelId]
+      const content = this.channelContent[channel.channelId]
       const events = content ? content.events : []
 
       if (!content) {
@@ -290,18 +290,17 @@ export default class AudioEngine {
               (isAnyChannelSoloing && channel.isSolo) ||
               (!isAnyChannelSoloing && !channel.isMuted)
 
-              
-              const content = channelContent[channel.channelId]
-              console.log(
-                'tick',
-                channel.channelId,
-                channel.volume,
-                channel,
-                isAnyChannelSoloing,
-                isChannelAudible,
-                content
-              )
-              if (!content) {
+            const content = this.channelContent[channel.channelId]
+            console.log(
+              'tick',
+              channel.channelId,
+              channel.volume,
+              channel,
+              isAnyChannelSoloing,
+              isChannelAudible,
+              content,
+            )
+            if (!content) {
               return
             }
 
@@ -321,18 +320,17 @@ export default class AudioEngine {
                   (event.volume || 1) *
                   (isChannelAudible ? 1 : 0)
 
-                  if (volume > 0) {
-
-                this.audioFontPlayer.queueChord(
-                  Tone.context,
-                  Tone.context.destination,
-                  this.audioFontCache[audioFontId],
-                  contextTime,
-                  midiNotes,
-                  duration,
-                  volume,
-                )
-                  }
+                if (volume > 0) {
+                  this.audioFontPlayer.queueChord(
+                    Tone.context,
+                    Tone.context.destination,
+                    this.audioFontCache[audioFontId],
+                    contextTime,
+                    midiNotes,
+                    duration,
+                    volume,
+                  )
+                }
               })
               // Call animation callback
               Tone.Draw.schedule(() => {
@@ -354,6 +352,7 @@ export default class AudioEngine {
         channelSequence[channel.channelId] = sequence
       } else {
         // Update sound events in the Sequence
+        sequence.removeAll()
         events
           .map((event, eventIndex) => ({ event, eventIndex }))
           .forEach((event, index) => {
@@ -367,6 +366,8 @@ export default class AudioEngine {
         sequence.loop = true
         sequence.loopStart = `0:${content.loop.startAt}`
         sequence.loopEnd = `0:${content.loop.endAt}`
+      } else {
+        sequence.loop = false
       }
     })
   }

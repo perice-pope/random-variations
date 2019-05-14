@@ -180,6 +180,12 @@ const channelsInitialConfig: ChannelConfig[] = [
     isSolo: false,
   },
   {
+    channelId: channelId.COUNT_IN,
+    volume: 1.0,
+    isMuted: false,
+    isSolo: false,
+  },
+  {
     channelId: channelId.RHYTHM,
     volume: 1.0,
     isMuted: false,
@@ -662,8 +668,17 @@ class App extends React.Component<
     if (!activeSession) {
       return
     }
-    const { rhythm, bpm, channelSettings } = activeSession
+    const {
+      rhythm,
+      bpm,
+      channelSettings,
+      offset,
+      countInEnabled,
+      countInCounts,
+    } = activeSession
     const notesStaffTicks = this.getStaffTicksAfterInstrumentTransposing()
+
+    const metronomeCountInBeats = countInEnabled ? countInCounts : 0
 
     const audioContent: ChannelsAudioContent<{ staffTickIndex: number }> = {
       [channelId.NOTES]: {
@@ -671,7 +686,7 @@ class App extends React.Component<
           startAt: 0,
           endAt: notesStaffTicks.length,
         },
-        startAt: 0,
+        startAt: metronomeCountInBeats + offset,
         events: notesStaffTicks.map(
           (tick, staffTickIndex) =>
             ({
@@ -689,7 +704,7 @@ class App extends React.Component<
           startAt: 0,
           endAt: notesStaffTicks.length,
         },
-        startAt: 0,
+        startAt: metronomeCountInBeats,
         events: notesStaffTicks.map(
           (tick, staffTickIndex) =>
             ({
@@ -703,7 +718,7 @@ class App extends React.Component<
           startAt: 0,
           endAt: rhythm.divisions,
         },
-        startAt: 0,
+        startAt: metronomeCountInBeats,
         events: range(rhythm.divisions).map(
           (tick, staffTickIndex) =>
             ({
@@ -719,11 +734,21 @@ class App extends React.Component<
           startAt: 0,
           endAt: rhythm.beats,
         },
-        startAt: 0,
+        startAt: metronomeCountInBeats,
         events: range(rhythm.beats).map(
-          (tick, staffTickIndex) =>
+          (tick, tickIndex) =>
             ({
               sounds: [PercussionSoundConfigs[channelSettings.metronome.sound]],
+            } as SoundEvent<{ staffTickIndex: number }>),
+        ),
+        playbackRate: 1,
+      },
+      [channelId.COUNT_IN]: {
+        startAt: 0,
+        events: range(metronomeCountInBeats).map(
+          (tick, tickIndex) =>
+            ({
+              sounds: [PercussionSoundConfigs['snare']],
             } as SoundEvent<{ staffTickIndex: number }>),
         ),
         playbackRate: 1,
@@ -1317,7 +1342,6 @@ class App extends React.Component<
       return
     }
     sessionStore.activeSession.bpm = values.bpm
-    sessionStore.activeSession.metronomeEnabled = values.metronomeEnabled
     sessionStore.activeSession.countInEnabled = values.countInEnabled
     sessionStore.activeSession.countInCounts = values.countInCounts
     sessionStore.activeSession.offset = values.offset
@@ -1694,7 +1718,7 @@ class App extends React.Component<
           >
             <MetronomeIcon
               fontSize="small"
-              color={metronomeEnabled ? 'secondary' : 'disabled'}
+              color="disabled"
               className={css(`margin-right: 5px;`)}
             />
             {`${bpm} BPM`}
@@ -2663,7 +2687,6 @@ class App extends React.Component<
             onSubmit={this.submitTempoParamsDialog}
             initialValues={_.pick(toJS(sessionStore.activeSession), [
               'bpm',
-              'metronomeEnabled',
               'countInEnabled',
               'countInCounts',
               'rests',

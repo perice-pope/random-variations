@@ -8,7 +8,6 @@ import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
 import TimerIcon from '@material-ui/icons/Timer'
-import MetronomeIcon from 'mdi-material-ui/Metronome'
 import PlayIcon from '@material-ui/icons/PlayArrow'
 import ArrowBackIcon from '@material-ui/icons/ArrowBack'
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward'
@@ -58,7 +57,6 @@ type Props = {
 
 export interface TempoSettingsFormValues {
   bpm: number
-  metronomeEnabled: boolean
   countInEnabled: boolean
   countInCounts: number
   rests: number
@@ -89,7 +87,6 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
   static getDefaultValues() {
     const values = _.pick(createDefaultSession(), [
       'bpm',
-      'metronomeEnabled',
       'countInEnabled',
       'countInCounts',
       'rests',
@@ -220,10 +217,6 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     this.values.countInEnabled = !Boolean(this.values.countInEnabled)
   }
 
-  private handleMetronomeToggle = () => {
-    this.values.metronomeEnabled = !Boolean(this.values.metronomeEnabled)
-  }
-
   private handleRestsChange = e => {
     this.inputValues.rests = e.target.value
     if (e.target.value) {
@@ -303,7 +296,6 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     // audioEngine.setAudioFont('woodblock')
     // audioEngine.setLoop(ticks)
     // audioEngine.setCountIn(4)
-    const audioFontId = 'cowbell'
     const metronomeChannelAudioContent: ChannelAudioContent<{
       staffTickIndex: number
     }> = {
@@ -333,7 +325,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
       return null
     }
 
-    const { bpm, rhythm, countInEnabled, metronomeEnabled } = this.values
+    const { bpm, rhythm, countInEnabled } = this.values
 
     let rhythmSliderValue = rhythmOptions.findIndex(
       ro => ro.beats === rhythm.beats && ro.divisions === rhythm.divisions,
@@ -356,23 +348,6 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
       >
         <TimerIcon fontSize="small" className={css(`margin-right: 0.5rem;`)} />
         {countInEnabled ? 'Count in on' : 'Count in off'}
-      </Button>
-    )
-    const ToggleMetronomeButton = (
-      <Button
-        color={metronomeEnabled ? 'secondary' : 'default'}
-        className={css(
-          `margin: 0.5rem; margin-left: 1rem; white-space: nowrap;`,
-        )}
-        onClick={this.handleMetronomeToggle}
-        variant="outlined"
-        size="small"
-      >
-        <MetronomeIcon
-          fontSize="small"
-          className={css(`margin-right: 0.5rem;`)}
-        />
-        {metronomeEnabled ? 'Metronome on' : 'Metronome off'}
       </Button>
     )
 
@@ -685,7 +660,6 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
               <Flex alignItems="center">
                 {TempoTextInput}
                 <span className={css(`flex: 1;`)} />
-                {ToggleMetronomeButton}
               </Flex>
               {TempoSliderInput}
             </Box>
