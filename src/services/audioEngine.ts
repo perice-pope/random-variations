@@ -38,6 +38,7 @@ export default class AudioEngine {
 
   // BPM of the metronome
   private bpm: number = 120
+  private volume: number = 1
 
   // Configs for Channels
   private channels: ChannelConfig[] = []
@@ -57,6 +58,22 @@ export default class AudioEngine {
   constructor() {
     Tone.Transport.bpm.value = this.bpm
     this.audioFontPlayer = new WebAudioFontPlayer()
+  }
+
+  public mute = () => {
+    Tone.Master.mute = true
+  }
+  public unmute = () => {
+    Tone.Master.mute = false
+  }
+
+  public isMuted = () => Tone.Master.mute
+
+  public getVolume = () => this.volume
+
+  public setVolume = (volume: number) => {
+    this.volume = volume
+    Tone.Master.volume.rampTo(volume, 100)
   }
 
   /**
@@ -196,7 +213,7 @@ export default class AudioEngine {
       sequence.start(`0:${sequenceOffset}`)
     })
 
-    Tone.Master.volume.rampTo(1, 100)
+    Tone.Master.volume.rampTo(this.volume, 100)
   }
 
   public stopLoop = (callback?: () => any) => {

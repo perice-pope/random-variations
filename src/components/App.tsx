@@ -245,6 +245,9 @@ class App extends React.Component<
       height: 0,
       width: 0,
 
+      masterMuted: false,
+      masterVolume: 1,
+
       notesStaffWidth: 0,
       contentWidth: 0,
       modifersContentWidth: 0,
@@ -485,8 +488,6 @@ class App extends React.Component<
     await Promise.all(
       percussionAudioFontConfigs.map(ac => audioEngine.loadAudioFont(ac.id)),
     )
-    // Load grand piano instrument sound by default
-    // await audioEngine.loadAudioFont('grand_piano_1')
 
     this.updatePlaybackNotesFromActiveSession()
   }
@@ -2221,6 +2222,37 @@ class App extends React.Component<
                     </div>
                   ),
                 )}
+
+                <div>
+                  <span>Master</span>
+                  <Button
+                    size="small"
+                    color={this.state.masterMuted ? 'secondary' : 'default'}
+                    variant="text"
+                    onClick={() => {
+                      const newMasterMuted = !this.state.masterMuted
+                      this.setState({ masterMuted: newMasterMuted })
+                      if (newMasterMuted) {
+                        audioEngine.mute()
+                      } else {
+                        audioEngine.unmute()
+                      }
+                    }}
+                  >
+                    M
+                  </Button>
+
+                  <Slider
+                    value={this.state.masterVolume}
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    onChange={(e, value) => {
+                      this.setState({ masterVolume: value })
+                      audioEngine.setVolume(value)
+                    }}
+                  />
+                </div>
               </div>
 
               <Hidden mdUp implementation="js">
@@ -2909,6 +2941,9 @@ type AppState = {
   isLoadingAudioFont: boolean
 
   isPlaying: boolean
+
+  masterMuted: boolean
+  masterVolume: number
 
   noteCardWithMouseOver?: NoteCardType
 
