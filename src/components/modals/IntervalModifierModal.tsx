@@ -231,7 +231,7 @@ class IntervalModifierModal extends React.Component<
         aria-labelledby="interval-modifier-dialog"
       >
         <DialogContent id="interval-modifier-dialog-content">
-          <Box>
+          <Box mt={2}>
             <Typography variant="h5">Interval type</Typography>
             <Box mt={2} mb={2}>
               <div

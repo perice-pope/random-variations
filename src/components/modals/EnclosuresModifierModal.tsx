@@ -244,7 +244,7 @@ class EnclosuresModifierModal extends React.Component<
         aria-labelledby="chromatic-approach-modifier-dialog"
       >
         <DialogContent>
-          <Box>
+          <Box mt={2}>
             <Typography variant="h5">Enclosures</Typography>
             <Typography variant="subtitle2">
               Add enclosure notes for the base note in each measure

@@ -19,7 +19,7 @@ import MuiButton from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import IconButton from '@material-ui/core/IconButton'
 import Hidden from '@material-ui/core/Hidden'
-import Slider from '@material-ui/lab/Slider'
+import Slider from './ui/Slider'
 
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import ZoomInIcon from '@material-ui/icons/ZoomIn'

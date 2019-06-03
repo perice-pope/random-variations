@@ -495,7 +495,7 @@ class ScaleModifierModal extends React.Component<
         aria-labelledby="scale-modifier-dialog"
       >
         <DialogContent id="scale-modifier-dialog-content">
-          <Box>
+          <Box mt={2}>
             <Typography variant="h6">Scale type</Typography>
 
             <Box mb={3}>

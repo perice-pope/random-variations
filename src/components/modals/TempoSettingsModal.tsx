@@ -32,13 +32,11 @@ import {
   Typography,
   Divider,
   InputAdornment,
-  Tooltip,
   withWidth,
   IconButton,
   Hidden,
 } from '@material-ui/core'
 import { rhythmOptions, PercussionSoundConfigs } from '../../musicUtils'
-import Slider from '@material-ui/lab/Slider'
 import RhythmPreview from '../RhythmPreview'
 import { WithWidth } from '@material-ui/core/withWidth'
 import AudioEngine, {
@@ -46,6 +44,8 @@ import AudioEngine, {
   SoundEvent,
 } from '../../services/audioEngine'
 import { channelId } from '../../utils/channels'
+import Slider from '../ui/Slider'
+import Tooltip from '../ui/Tooltip'
 
 type Props = {
   open: boolean
@@ -447,9 +447,6 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     const TempoSliderInput = (
       <Box mb={2} width={1}>
         <Slider
-          classes={{
-            container: css(`padding: 1rem;`),
-          }}
           value={bpm}
           min={1}
           max={400}
@@ -462,9 +459,6 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     const CountInSliderInput = (
       <Box mb={2} width={1}>
         <Slider
-          classes={{
-            container: css(`padding: 1rem;`),
-          }}
           disabled={!this.values.countInEnabled}
           value={this.values.countInCounts}
           min={0}
@@ -478,9 +472,6 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     const RestsSliderInput = (
       <Box mb={2} width={1}>
         <Slider
-          classes={{
-            container: css(`padding: 1rem;`),
-          }}
           value={this.values.rests}
           min={0}
           max={16}
@@ -493,9 +484,6 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     const OffsetSliderInput = (
       <Box mb={2} width={1}>
         <Slider
-          classes={{
-            container: css(`padding: 1rem;`),
-          }}
           value={this.values.offset}
           min={0}
           max={16}
@@ -508,9 +496,6 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
     const RhythmSliderInput = (
       <Box mb={2} width={1}>
         <Slider
-          classes={{
-            container: css(`padding: 1rem;`),
-          }}
           value={rhythmSliderValue}
           min={0}
           max={rhythmOptions.length - 1}
@@ -655,7 +640,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
           className={css(`overflow-x: hidden;`)}
         >
           <Box>
-            <Box>
+            <Box mt={2}>
               <Typography variant="h5">Session tempo</Typography>
               <Flex alignItems="center">
                 {TempoTextInput}

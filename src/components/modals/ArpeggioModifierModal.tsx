@@ -541,7 +541,7 @@ class ArpeggioModifierModal extends React.Component<
         aria-labelledby="arpeggio-modifier-dialog"
       >
         <DialogContent id="arpeggio-modifier-dialog-content">
-          <Box>
+          <Box mt={2}>
             <Typography variant="h6">Chord type</Typography>
             <Box mt={1}>
               <div

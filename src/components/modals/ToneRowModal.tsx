@@ -9,7 +9,6 @@ import DeleteIcon from '@material-ui/icons/Close'
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import Dialog from '@material-ui/core/Dialog'
-import Slider from '@material-ui/lab/Slider'
 import ArrowsIcon from '@material-ui/icons/Cached'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
@@ -23,6 +22,7 @@ import withMobileDialog, {
 
 import { Flex, Box } from '../ui'
 import Tooltip from '../ui/Tooltip'
+import Slider from '../ui/Slider'
 
 import { getColorForNote, arrayMove } from '../../utils'
 import { css, cx } from 'emotion'
@@ -474,9 +474,6 @@ class ToneRowModal extends React.Component<
 
             <Box mb={2}>
               <Slider
-                classes={{
-                  container: css(`padding: 1rem;`),
-                }}
                 value={notes.length}
                 min={1}
                 max={this.getMaxNumberOfNotesToAdd()}

@@ -286,10 +286,12 @@ class NoteSequenceModal extends React.Component<
         aria-labelledby="pick-note-dialog"
       >
         <DialogContent className={css(`overflow-x: hidden;`)}>
-          <Typography variant="h5">Add note sequence</Typography>
-          <Typography variant="subtitle2">
-            A sequence of notes with equal intervals in between
-          </Typography>
+          <Box mt={2}>
+            <Typography variant="h5">Add note sequence</Typography>
+            <Typography variant="subtitle2">
+              A sequence of notes with equal intervals in between
+            </Typography>
+          </Box>
 
           <Box mt={3}>
             <Typography

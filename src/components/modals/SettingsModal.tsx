@@ -155,7 +155,9 @@ class SettingsModal extends React.Component<
         aria-labelledby="settings-dialog"
       >
         <DialogContent>
-          <Typography variant="h5">Settings</Typography>
+          <Box mt={2}>
+            <Typography variant="h5">Settings</Typography>
+          </Box>
 
           <Box mt={2} mb={3}>
             <FormControl fullWidth className={css({ marginBottom: '1rem' })}>

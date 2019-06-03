@@ -15,7 +15,10 @@ import { DirectionsModifier } from '../../types'
 import { ChangeEvent } from 'react'
 import { Input, Typography, InputLabel } from '@material-ui/core'
 import { css } from 'react-emotion'
-import { patternDirectionOptions, patternDirectionByType } from '../../musicUtils'
+import {
+  patternDirectionOptions,
+  patternDirectionByType,
+} from '../../musicUtils'
 import { Flex } from '../ui/Flex'
 import { Box } from '../ui'
 import { Omit } from '../../utils'
@@ -104,10 +107,13 @@ class DirectionsModifierModal extends React.Component<
         aria-labelledby="direction-modifier-dialog"
       >
         <DialogContent id="direction-modifier-dialog-content">
-          <Typography variant="h5">Directions</Typography>
-          <Typography variant="subtitle2">
-            Change direction of note patterns in each measure
-          </Typography>
+          <Box mt={2}>
+            <Typography variant="h5">Directions</Typography>
+            <Typography variant="subtitle2">
+              Change direction of note patterns in each measure
+            </Typography>
+          </Box>
+
           <Box>
             <Box mt={3} mb={2}>
               {/* <Typography variant="overline">Pattern direction</Typography> */}
