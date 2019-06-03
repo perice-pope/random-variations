@@ -524,7 +524,6 @@ class App extends React.Component<
     const { modifiers, rests } = sessionStore.activeSession
     const { noteCards } = this.getNoteCards()
 
-    console.log('getStaffTicks')
     const { ticks: staffTicks, tickLabels } = this._generateStaffTicks(
       noteCards,
       modifiers,

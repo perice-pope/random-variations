@@ -72,6 +72,7 @@ export default class AudioEngine {
   public getVolume = () => this.volume
 
   public setVolume = (volume: number) => {
+    console.log('setVolume', volume)
     this.volume = volume
     Tone.Master.volume.rampTo(volume, 100)
   }

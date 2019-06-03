@@ -1370,8 +1370,6 @@ export const generateStaffTicks = ({
   let currentTickIndex = 0
   let currentDirectionIndex = 0
 
-  console.log('generateStaffTicks')
-
   noteCards.forEach((noteCard, noteCardIndex) => {
     let ticksForCard: StaffTick[] = [
       {
