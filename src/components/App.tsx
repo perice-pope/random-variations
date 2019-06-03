@@ -1674,7 +1674,7 @@ class App extends React.Component<
 
     const SessionParamsButton = (
       <Tooltip
-        title={'Tempo, rests and count-in settings'}
+        title={'Tempo & rhythm settings'}
         disableFocusListener
         disableTouchListener
       >
@@ -1836,11 +1836,11 @@ class App extends React.Component<
               label={`Chords: ${shortenString(modifiers.chords.chordType, 20)}`}
               onClick={this.openArpeggioAddingModal}
               onDelete={this.handleRemoveArpeggioClick}
-              deleteIcon={
-                <Tooltip variant="gray" title="Remove chords" placement="top">
-                  <DeleteIcon />
-                </Tooltip>
-              }
+              // deleteIcon={
+              //   <Tooltip variant="gray" title="Remove chords" placement="top">
+              //     <DeleteIcon />
+              //   </Tooltip>
+              // }
             />
           </Tooltip>
         )}
@@ -3013,7 +3013,7 @@ const MenuWidth = 280
 const styles = theme => ({
   root: {
     display: 'flex',
-    height: '100%',
+    height: '100vh',
     width: '100%',
     overflowX: 'hidden',
   },
