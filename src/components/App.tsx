@@ -1481,7 +1481,7 @@ class App extends React.Component<
 
     const isPhone = this.props.width === 'xs'
     const isMobile = this.props.width === 'xs' || this.props.width === 'sm'
-    console.log('props= ', this.props, isMobile)
+
     const shouldShowPlayButtonInContentContainer = !isPhone
 
     const baseNoteForPatternPreviewInDialogWindows = getNoteNameAfterInstrumentTranspose(
