@@ -169,7 +169,7 @@ import TempoSettingsModal, {
 } from './modals/TempoSettingsModal'
 import { transparentize } from 'polished'
 import { channelId } from '../utils/channels'
-import { CSSProperties } from '@material-ui/core/styles/withStyles';
+import { CSSProperties } from '@material-ui/core/styles/withStyles'
 
 const channelsInitialConfig: ChannelConfig[] = [
   {
@@ -1942,103 +1942,109 @@ class App extends React.Component<
     const isLoggedIn = currentUser && !currentUser.isAnonymous
 
     const channelsMixer = (
-      <div className={css(`padding-left: 1rem; padding-right: 1rem; margin-bottom: 2rem;`)}>
-                {['notes', 'metronome', 'rhythm', 'subdivision'].map(
-                  channelId => (
-                    <div key={channelId}  className={css(`margin: 1rem 0;`)}>
-                      <div  className={css(`display: flex; flex-direction: row; align-content: center;`)}>
-                      <span   className={css(`flex: 1;`)}>{_.capitalize(channelId)}</span>
-                      <Button
-                        size="small"
-                        color={
-                          channelSettings[channelId].isMuted
-                            ? 'secondary'
-                            : 'default'
-                        }
-                        variant="text"
-                        onClick={() => {
-                          if (!sessionStore.activeSession) {
-                            return
-                          }
-                          sessionStore.activeSession.channelSettings[
-                            channelId
-                          ].isMuted = !channelSettings[channelId].isMuted
-                        }}
-                      >
-                        M
-                      </Button>
-                      <Button
-                        size="small"
-                        color={
-                          channelSettings[channelId].isSolo
-                            ? 'secondary'
-                            : 'default'
-                        }
-                        variant="text"
-                        onClick={() => {
-                          if (!sessionStore.activeSession) {
-                            return
-                          }
-                          sessionStore.activeSession.channelSettings[
-                            channelId
-                          ].isSolo = !channelSettings[channelId].isSolo
-                        }}
-                      >
-                        S
-                      </Button>
-                      </div>
+      <div
+        className={css(
+          `padding-left: 1rem; padding-right: 1rem; margin-bottom: 2rem;`,
+        )}
+      >
+        {['notes', 'metronome', 'rhythm', 'subdivision'].map(channelId => (
+          <div key={channelId} className={css(`margin: 1rem 0;`)}>
+            <div
+              className={css(
+                `display: flex; flex-direction: row; align-content: center;`,
+              )}
+            >
+              <span className={css(`flex: 1;`)}>{_.capitalize(channelId)}</span>
+              <Button
+                size="small"
+                color={
+                  channelSettings[channelId].isMuted ? 'secondary' : 'default'
+                }
+                variant="text"
+                onClick={() => {
+                  if (!sessionStore.activeSession) {
+                    return
+                  }
+                  sessionStore.activeSession.channelSettings[
+                    channelId
+                  ].isMuted = !channelSettings[channelId].isMuted
+                }}
+              >
+                M
+              </Button>
+              <Button
+                size="small"
+                color={
+                  channelSettings[channelId].isSolo ? 'secondary' : 'default'
+                }
+                variant="text"
+                onClick={() => {
+                  if (!sessionStore.activeSession) {
+                    return
+                  }
+                  sessionStore.activeSession.channelSettings[
+                    channelId
+                  ].isSolo = !channelSettings[channelId].isSolo
+                }}
+              >
+                S
+              </Button>
+            </div>
 
-                      <Slider
-                        value={channelSettings[channelId].volume}
-                        min={0}
-                        max={1}
-                        step={0.05}
-                        onChange={(e, value) => {
-                          if (!sessionStore.activeSession) {
-                            return
-                          }
-                          sessionStore.activeSession.channelSettings[
-                            channelId
-                          ].volume = value
-                        }}
-                      />
-                    </div>
-                  ),
-                )}
+            <Slider
+              value={channelSettings[channelId].volume}
+              min={0}
+              max={1}
+              step={0.05}
+              onChange={(e, value) => {
+                if (!sessionStore.activeSession) {
+                  return
+                }
+                sessionStore.activeSession.channelSettings[
+                  channelId
+                ].volume = value
+              }}
+            />
+          </div>
+        ))}
 
-<div  className={css(`display: flex; flex-direction: row; align-content: center;`)}>
-<span   className={css(`flex: 1;`)}>
-                  <span>Master</span>
-                  <Button
-                    size="small"
-                    color={this.state.masterMuted ? 'secondary' : 'default'}
-                    variant="text"
-                    onClick={() => {
-                      const newMasterMuted = !this.state.masterMuted
-                      this.setState({ masterMuted: newMasterMuted })
-                      if (newMasterMuted) {
-                        audioEngine.mute()
-                      } else {
-                        audioEngine.unmute()
-                      }
-                    }}
-                  >
-                    M
-                  </Button>
-                  </span>
+        <div
+          className={css(
+            `display: flex; flex-direction: row; align-content: center;`,
+          )}
+        >
+          <span className={css(`flex: 1;`)}>
+            <span>Master</span>
+            <Button
+              size="small"
+              color={this.state.masterMuted ? 'secondary' : 'default'}
+              variant="text"
+              onClick={() => {
+                const newMasterMuted = !this.state.masterMuted
+                this.setState({ masterMuted: newMasterMuted })
+                if (newMasterMuted) {
+                  audioEngine.mute()
+                } else {
+                  audioEngine.unmute()
+                }
+              }}
+            >
+              M
+            </Button>
+          </span>
 
-                  <Slider
-                    value={this.state.masterVolume}
-                    min={0}
-                    max={1}
-                    step={0.05}
-                    onChange={(e, value) => {
-                      this.setState({ masterVolume: value })
-                      audioEngine.setVolume(value)
-                    }}
-                  />
-                </div>
-              </div>
+          <Slider
+            value={this.state.masterVolume}
+            min={0}
+            max={1}
+            step={0.05}
+            onChange={(e, value) => {
+              this.setState({ masterVolume: value })
+              audioEngine.setVolume(value)
+            }}
+          />
+        </div>
+      </div>
     )
 
     const MenuContent = (
@@ -2182,7 +2188,11 @@ class App extends React.Component<
                 <ListItemSecondaryAction>
                   <ButtonWithMenu
                     renderButton={props => (
-                      <IconButton aria-label="Open session menu" {...props} size="medium">
+                      <IconButton
+                        aria-label="Open session menu"
+                        {...props}
+                        size="medium"
+                      >
                         <MenuIcon />
                       </IconButton>
                     )}
@@ -2254,212 +2264,211 @@ class App extends React.Component<
     return (
       <>
         <MeasureScreenSize onUpdate={this.handleScreenSizeUpdate} fireOnMount>
-            <div className={classes.root}>
-              {/* Top Header */}
-              <AppBar
-                position="fixed"
-                className={cx(
-                  !isMobile && this.state.isMenuOpen && classes.appBarShift,
-                )}
+          <div className={classes.root}>
+            {/* Top Header */}
+            <AppBar
+              position="fixed"
+              className={cx(
+                !isMobile && this.state.isMenuOpen && classes.appBarShift,
+              )}
+            >
+              <Toolbar variant="dense">{ToolbarContent}</Toolbar>
+            </AppBar>
+
+            {/* Side menu: mobile */}
+            <Hidden mdUp implementation="js">
+              <SwipeableDrawer
+                variant="temporary"
+                anchor="left"
+                open={this.state.isMenuOpen}
+                onOpen={this.openMenu}
+                onClose={this.closeMenu}
+                classes={{
+                  paper: classes.drawerPaper,
+                }}
+                ModalProps={{
+                  keepMounted: true, // Better open performance on mobile.
+                }}
               >
-                <Toolbar variant="dense">{ToolbarContent}</Toolbar>
-              </AppBar>
+                {MenuContent}
+              </SwipeableDrawer>
+            </Hidden>
 
-              {/* Side menu: mobile */}
-              <Hidden mdUp implementation="js">
-                <SwipeableDrawer
-                  variant="temporary"
-                  anchor="left"
-                  open={this.state.isMenuOpen}
-                  onOpen={this.openMenu}
-                  onClose={this.closeMenu}
-                  classes={{
-                    paper: classes.drawerPaper,
-                  }}
-                  ModalProps={{
-                    keepMounted: true, // Better open performance on mobile.
-                  }}
-                >
-                  {MenuContent}
-                </SwipeableDrawer>
-              </Hidden>
-
-              {/* Side menu: desktop */}
-              <Hidden smDown implementation="js">
-                <Drawer
-                  className={classes.drawer}
-                  variant="persistent"
-                  anchor="left"
-                  open={this.state.isMenuOpen}
-                  classes={{
-                    paper: classes.drawerPaper,
-                  }}
-                >
-                  {MenuContent}
-                </Drawer>
-              </Hidden>
-
-              {/* Main content area (excluding keyboard) */}
-              <div
-                id="app-main-content"
-                className={cx(
-                  classes.content,
-                  !isMobile && classes.contentShifted,
-                  !isMobile && this.state.isMenuOpen && classes.contentShift,
-                  css(
-                    `margin-bottom: ${this.getPianoHeight() +
-                      10}px !important;`,
-                  ),
-                )}
+            {/* Side menu: desktop */}
+            <Hidden smDown implementation="js">
+              <Drawer
+                className={classes.drawer}
+                variant="persistent"
+                anchor="left"
+                open={this.state.isMenuOpen}
+                classes={{
+                  paper: classes.drawerPaper,
+                }}
               >
-                <Flex
-                  pt={[3, 3, 4]}
-                  flexDirection="column"
-                  flex={1}
-                  height={1}
-                  px={[3, 4, 4]}
-                  maxWidth={MaxLayoutWidth}
-                  width={1}
-                  id="app-content"
-                >
-                  {this.state.isPlaying && isPhone ? null : (
-                    <Flex
-                      alignItems="center"
-                      mb={3}
-                      width={1}
-                      flexWrap="wrap"
-                      justifyContent="center"
-                    >
-                      {shouldShowPlayButtonInContentContainer &&
-                        TogglePlaybackButton}
+                {MenuContent}
+              </Drawer>
+            </Hidden>
 
-                      <Box flex="1">{SessionControls}</Box>
-
-                      <Box
-                        className={css({ whiteSpace: 'nowrap' })}
-                        mb={1}
-                        mr={2}
-                      >
-                        {SessionActionsButton}
-                      </Box>
-                    </Flex>
-                  )}
-
+            {/* Main content area (excluding keyboard) */}
+            <div
+              id="app-main-content"
+              className={cx(
+                classes.content,
+                !isMobile && classes.contentShifted,
+                !isMobile && this.state.isMenuOpen && classes.contentShift,
+                css(
+                  `margin-bottom: ${this.getPianoHeight() + 10}px !important;`,
+                ),
+              )}
+            >
+              <Flex
+                pt={[3, 3, 4]}
+                flexDirection="column"
+                flex={1}
+                height={1}
+                px={[3, 4, 4]}
+                maxWidth={MaxLayoutWidth}
+                width={1}
+                id="app-content"
+              >
+                {this.state.isPlaying && isPhone ? null : (
                   <Flex
                     alignItems="center"
-                    justifyContent="center"
-                    flexDirection="column"
-                    maxHeight={400}
+                    mb={3}
                     width={1}
+                    flexWrap="wrap"
+                    justifyContent="center"
                   >
-                    <Grow
-                      in={this.state.isInitialized}
-                      timeout={{ enter: 5000 }}
-                      appear
-                    >
-                      <NoteCards
-                        notes={noteCards}
-                        perLineCount={this.state.height > 568 ? 6 : 6}
-                        activeNoteCardIndex={activeNoteCardIndex}
-                        onMouseOver={this.handleMouseOverNoteCard}
-                        onMouseLeave={this.handleMouseLeaveNoteCard}
-                        onEditNote={this.handleEditNote}
-                        onDeleteClick={this.handleDeleteCard}
-                        onCardsReorder={this.handleCardsReorder}
-                        onCardDraggedOut={this.handleDeleteCard}
-                      />
-                    </Grow>
+                    {shouldShowPlayButtonInContentContainer &&
+                      TogglePlaybackButton}
 
-                    <Fade in={this.state.isInitialized} appear>
-                      <Box
-                        px={[1, 2, 2]}
+                    <Box flex="1">{SessionControls}</Box>
+
+                    <Box
+                      className={css({ whiteSpace: 'nowrap' })}
+                      mb={1}
+                      mr={2}
+                    >
+                      {SessionActionsButton}
+                    </Box>
+                  </Flex>
+                )}
+
+                <Flex
+                  alignItems="center"
+                  justifyContent="center"
+                  flexDirection="column"
+                  maxHeight={400}
+                  width={1}
+                >
+                  <Grow
+                    in={this.state.isInitialized}
+                    timeout={{ enter: 5000 }}
+                    appear
+                  >
+                    <NoteCards
+                      notes={noteCards}
+                      perLineCount={this.state.height > 568 ? 6 : 6}
+                      activeNoteCardIndex={activeNoteCardIndex}
+                      onMouseOver={this.handleMouseOverNoteCard}
+                      onMouseLeave={this.handleMouseLeaveNoteCard}
+                      onEditNote={this.handleEditNote}
+                      onDeleteClick={this.handleDeleteCard}
+                      onCardsReorder={this.handleCardsReorder}
+                      onCardDraggedOut={this.handleDeleteCard}
+                    />
+                  </Grow>
+
+                  <Fade in={this.state.isInitialized} appear>
+                    <Box
+                      px={[1, 2, 2]}
+                      width={1}
+                      display={this.state.isPlaying ? 'none' : 'block'}
+                    >
+                      <Flex
+                        id="modifiers-container"
+                        flexDirection="row"
+                        alignItems="center"
+                        justifyContent="center"
                         width={1}
-                        display={this.state.isPlaying ? 'none' : 'block'}
+                        mt={[2, 2, 2]}
+                        mb={[2, 2, 2]}
                       >
-                        <Flex
-                          id="modifiers-container"
-                          flexDirection="row"
-                          alignItems="center"
-                          justifyContent="center"
-                          width={1}
-                          mt={[2, 2, 2]}
-                          mb={[2, 2, 2]}
-                        >
-                          <div>
-                            <AddEntityButton
-                              showHelpTooltip={
-                                noteCards.length === 0 &&
-                                !this.state.disableStartTooltips &&
-                                !(isMobile && this.state.isMenuOpen)
-                              }
-                              enableOnlyNote={noteCards.length === 0}
-                              onAddToneRowClick={this.openToneRowAddingModal}
-                              onAddNoteSequenceClick={
-                                this.openNoteSequenceAddingModal
-                              }
-                              onAddDirectionsClick={this.openDirectionsModal}
-                              onAddArpeggioClick={this.openArpeggioAddingModal}
-                              onAddScaleClick={this.openScalesModal}
-                              onAddEnclosuresClick={this.openEnclosuresModal}
-                              onAddIntervalsClick={this.openIntervalsModal}
-                              disableToneRow={noteCards.length >= MaxNoteCards}
-                              disableNoteSequence={noteCards.length > 0}
-                              disableDirections={
-                                modifiers.directions.enabled ||
-                                (!modifiers.scales.enabled &&
-                                  !modifiers.chords.enabled &&
-                                  !modifiers.intervals.enabled)
-                              }
-                              disableChords={
-                                modifiers.chords.enabled ||
-                                modifiers.scales.enabled ||
-                                modifiers.intervals.enabled
-                              }
-                              disableScales={
-                                modifiers.scales.enabled ||
-                                modifiers.chords.enabled ||
-                                modifiers.intervals.enabled
-                              }
-                              disableIntervals={
-                                modifiers.scales.enabled ||
-                                modifiers.chords.enabled ||
-                                modifiers.intervals.enabled
-                              }
-                              disableEnclosures={modifiers.enclosures.enabled}
-                              fabProps={{
-                                disabled: isPlaying,
-                                className: cx(
-                                  css({
-                                    marginRight: '10px',
-                                  }),
-                                ),
-                                classes: {
-                                  root: css(
-                                    `height: 50px;
+                        <div>
+                          <AddEntityButton
+                            showHelpTooltip={
+                              noteCards.length === 0 &&
+                              !this.state.disableStartTooltips &&
+                              !(isMobile && this.state.isMenuOpen)
+                            }
+                            enableOnlyNote={noteCards.length === 0}
+                            onAddToneRowClick={this.openToneRowAddingModal}
+                            onAddNoteSequenceClick={
+                              this.openNoteSequenceAddingModal
+                            }
+                            onAddDirectionsClick={this.openDirectionsModal}
+                            onAddArpeggioClick={this.openArpeggioAddingModal}
+                            onAddScaleClick={this.openScalesModal}
+                            onAddEnclosuresClick={this.openEnclosuresModal}
+                            onAddIntervalsClick={this.openIntervalsModal}
+                            disableToneRow={noteCards.length >= MaxNoteCards}
+                            disableNoteSequence={noteCards.length > 0}
+                            disableDirections={
+                              modifiers.directions.enabled ||
+                              (!modifiers.scales.enabled &&
+                                !modifiers.chords.enabled &&
+                                !modifiers.intervals.enabled)
+                            }
+                            disableChords={
+                              modifiers.chords.enabled ||
+                              modifiers.scales.enabled ||
+                              modifiers.intervals.enabled
+                            }
+                            disableScales={
+                              modifiers.scales.enabled ||
+                              modifiers.chords.enabled ||
+                              modifiers.intervals.enabled
+                            }
+                            disableIntervals={
+                              modifiers.scales.enabled ||
+                              modifiers.chords.enabled ||
+                              modifiers.intervals.enabled
+                            }
+                            disableEnclosures={modifiers.enclosures.enabled}
+                            fabProps={{
+                              disabled: isPlaying,
+                              className: cx(
+                                css({
+                                  marginRight: '10px',
+                                }),
+                              ),
+                              classes: {
+                                root: css(
+                                  `height: 50px;
                                     @media screen and (max-height: 400px) {
                                       height: 30px;
                                     }
                                     `,
-                                  ),
-                                },
-                              }}
-                            />
-                          </div>
-                          <Flex
-                            flex-direction="row"
-                            alignItems="center"
-                            flexWrap="wrap"
-                          >
-                            {ModifierChips}
-                          </Flex>
+                                ),
+                              },
+                            }}
+                          />
+                        </div>
+                        <Flex
+                          flex-direction="row"
+                          alignItems="center"
+                          flexWrap="wrap"
+                        >
+                          {ModifierChips}
                         </Flex>
-                      </Box>
-                    </Fade>
-                  </Flex>
+                      </Flex>
+                    </Box>
+                  </Fade>
+                </Flex>
 
-                  <div
-                    className={cx(
-                      css(`
+                <div
+                  className={cx(
+                    css(`
                         display: flex;
                         flex-direction: column;
                         flex: 1;
@@ -2467,12 +2476,12 @@ class App extends React.Component<
                           flex-direction: row-reverse;
                         }
                       `),
-                      this.state.isPlaying && css(`margin-top: 15px;`),
-                    )}
-                  >
-                    <div
-                      className={cx(
-                        css(`
+                    this.state.isPlaying && css(`margin-top: 15px;`),
+                  )}
+                >
+                  <div
+                    className={cx(
+                      css(`
                           display: flex;
                           justify-content: flex-end;
                           align-items: center;
@@ -2489,11 +2498,11 @@ class App extends React.Component<
                             font-size: 15px;
                           }
                         `),
-                        this.state.isPlaying && css(`display: none;`),
-                      )}
-                    >
-                      <span
-                        className={css(`
+                      this.state.isPlaying && css(`display: none;`),
+                    )}
+                  >
+                    <span
+                      className={css(`
                           flex: 1;
                           font-size: 0.7rem; 
                           margin-right: 0.8rem;
@@ -2512,20 +2521,19 @@ class App extends React.Component<
                               : '#f80054'
                           };
                         `)}
-                      >
-                        <span onClick={this.openSettingsModal}>
-                          {`Instrument Transpose: ${
-                            sessionStore.activeSession!
-                              .instrumentTransposing === 'C'
-                              ? 'OFF'
-                              : sessionStore.activeSession!
-                                  .instrumentTransposing
-                          }`}
-                        </span>
+                    >
+                      <span onClick={this.openSettingsModal}>
+                        {`Instrument Transpose: ${
+                          sessionStore.activeSession!.instrumentTransposing ===
+                          'C'
+                            ? 'OFF'
+                            : sessionStore.activeSession!.instrumentTransposing
+                        }`}
                       </span>
+                    </span>
 
-                      <div
-                        className={css(`
+                    <div
+                      className={css(`
                         @media screen and (max-height: 600px) and (min-width: 500px) {
                           display: flex;
                           flex-direction: column-reverse;
@@ -2535,47 +2543,47 @@ class App extends React.Component<
                           margin-left: 0.5rem;
                         }
                       `)}
-                      >
-                        <span
-                          className={css(
-                            `display: inline-block; width: 50px; white-space: nowrap;`,
-                          )}
-                        >{`x ${settingsStore.scaleZoomFactor}`}</span>
-                        <Tooltip title="Smaller font">
-                          <IconButton
-                            color="inherit"
-                            aria-label="Decrease font size"
-                            onClick={this.handleDecreaseZoomFactor}
-                          >
-                            <ZoomOutIcon />
-                          </IconButton>
-                        </Tooltip>
+                    >
+                      <span
+                        className={css(
+                          `display: inline-block; width: 50px; white-space: nowrap;`,
+                        )}
+                      >{`x ${settingsStore.scaleZoomFactor}`}</span>
+                      <Tooltip title="Smaller font">
+                        <IconButton
+                          color="inherit"
+                          aria-label="Decrease font size"
+                          onClick={this.handleDecreaseZoomFactor}
+                        >
+                          <ZoomOutIcon />
+                        </IconButton>
+                      </Tooltip>
 
-                        <Tooltip title="Larger font">
-                          <IconButton
-                            color="inherit"
-                            aria-label="Increase font size"
-                            onClick={this.handleIncreaseZoomFactor}
-                          >
-                            <ZoomInIcon />
-                          </IconButton>
-                        </Tooltip>
+                      <Tooltip title="Larger font">
+                        <IconButton
+                          color="inherit"
+                          aria-label="Increase font size"
+                          onClick={this.handleIncreaseZoomFactor}
+                        >
+                          <ZoomInIcon />
+                        </IconButton>
+                      </Tooltip>
 
-                        <Tooltip title="Notes staff settings">
-                          <IconButton
-                            color="inherit"
-                            aria-label="Change notes staff settings"
-                            onClick={this.openSettingsModal}
-                          >
-                            <SettingsIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </div>
+                      <Tooltip title="Notes staff settings">
+                        <IconButton
+                          color="inherit"
+                          aria-label="Change notes staff settings"
+                          onClick={this.openSettingsModal}
+                        >
+                          <SettingsIcon />
+                        </IconButton>
+                      </Tooltip>
                     </div>
+                  </div>
 
-                    <NotesStaff
-                      containerProps={{
-                        className: css(`
+                  <NotesStaff
+                    containerProps={{
+                      className: css(`
                           width: 100%; 
                           flex: 1; 
                           overflow-y: auto;
@@ -2594,52 +2602,52 @@ class App extends React.Component<
                             width: 0px;
                           }
                         `),
-                      }}
-                      innerContainerClassName={css(`
+                    }}
+                    innerContainerClassName={css(`
                         position: absolute;
                       `)}
-                      scale={notesStaffScaleFactor}
-                      clef={settingsStore.clefType}
-                      maxLines={notesStaffMaxLines}
-                      isPlaying={isPlaying}
-                      key={this.state.contentWidth}
-                      showEnd
-                      id="notation"
-                      ticks={staffTicks}
-                      tickLabels={
-                        settingsStore.showNoteNamesAboveStaff
-                          ? tickLabels
-                          : undefined
-                      }
-                      activeTickIndex={
-                        isPlaying ? activeStaffTickIndex : undefined
-                      }
-                      activeNoteLineAnimationTimeMs={this.getActiveNoteLineAnimationTimeMs()}
-                    />
-                  </div>
-                </Flex>
-              </div>
-
-              <div
-                className={cx(
-                  css(`position: fixed; bottom: 0;`),
-                  !isMobile &&
-                    this.state.isMenuOpen &&
-                    css(`margin-left: ${MenuWidth}px`),
-                )}
-              >
-                <PianoKeyboard
-                  width={
-                    this.state.width -
-                    (!isMobile && this.state.isMenuOpen ? MenuWidth : 0)
-                  }
-                  noteRange={this.getPianoNoteRange()}
-                  height={this.getPianoHeight()}
-                  getNoteColor={this.getPianoKeyboardNoteColor}
-                  getIsCirclesShown={this.getPianoKeyboardNoteShowCircle}
-                />
-              </div>
+                    scale={notesStaffScaleFactor}
+                    clef={settingsStore.clefType}
+                    maxLines={notesStaffMaxLines}
+                    isPlaying={isPlaying}
+                    key={this.state.contentWidth}
+                    showEnd
+                    id="notation"
+                    ticks={staffTicks}
+                    tickLabels={
+                      settingsStore.showNoteNamesAboveStaff
+                        ? tickLabels
+                        : undefined
+                    }
+                    activeTickIndex={
+                      isPlaying ? activeStaffTickIndex : undefined
+                    }
+                    activeNoteLineAnimationTimeMs={this.getActiveNoteLineAnimationTimeMs()}
+                  />
+                </div>
+              </Flex>
             </div>
+
+            <div
+              className={cx(
+                css(`position: fixed; bottom: 0;`),
+                !isMobile &&
+                  this.state.isMenuOpen &&
+                  css(`margin-left: ${MenuWidth}px`),
+              )}
+            >
+              <PianoKeyboard
+                width={
+                  this.state.width -
+                  (!isMobile && this.state.isMenuOpen ? MenuWidth : 0)
+                }
+                noteRange={this.getPianoNoteRange()}
+                height={this.getPianoHeight()}
+                getNoteColor={this.getPianoKeyboardNoteColor}
+                getIsCirclesShown={this.getPianoKeyboardNoteShowCircle}
+              />
+            </div>
+          </div>
 
           <SignInModal
             isOpen={this.state.signInModalIsOpen}
@@ -2887,7 +2895,7 @@ class App extends React.Component<
           value={{ audioEngine, audioFontId: settingsStore.audioFontId }}
         >
           <FirebaseContext.Provider value={firebase}>
-          <StylesProvider injectFirst>
+            <StylesProvider injectFirst>
               <>
                 <CssBaseline />
                 {process.env.NODE_ENV !== 'production' ? (
@@ -2895,19 +2903,20 @@ class App extends React.Component<
                 ) : null}
                 <ToastNotifications />
 
-                
-                  {this.state.isInitialized
-                    ? this.renderApp()
-                    : (
-                      <Flex
-                  height="100vh"
-                  width="100vw"
-                  alignItems="center"
-                  justifyContent="center"
-                  css="overflowX: hidden;"
-                  flexDirection="column"
-                >{this.renderLoader()}</Flex>)
-                    }
+                {this.state.isInitialized ? (
+                  this.renderApp()
+                ) : (
+                  <Flex
+                    height="100vh"
+                    width="100vw"
+                    alignItems="center"
+                    justifyContent="center"
+                    css="overflowX: hidden;"
+                    flexDirection="column"
+                  >
+                    {this.renderLoader()}
+                  </Flex>
+                )}
               </>
             </StylesProvider>
           </FirebaseContext.Provider>
@@ -2981,7 +2990,6 @@ type AppState = {
   noteSequenceAddingModalIsOpen: boolean
 }
 
-
 const audioEngine = new AudioEngine()
 // @ts-ignore
 window.audioEngine = audioEngine
@@ -3010,70 +3018,71 @@ const MaxNoteCards = 12
 const MaxLayoutWidth = 1400
 const MenuWidth = 280
 
-const styles = theme => ({
-  root: {
-    display: 'flex',
-    height: '100vh',
-    width: '100%',
-    overflowX: 'hidden',
-  },
-  appBar: {
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  appBarShift: {
-    width: `calc(100% - ${MenuWidth}px)`,
-    marginLeft: MenuWidth,
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  menuButton: {
-    marginLeft: 12,
-    marginRight: 20,
-  },
-  hide: {
-    display: 'none',
-  },
-  drawer: {
-    width: MenuWidth,
-    flexShrink: 0,
-  },
-  drawerPaper: {
-    width: MenuWidth,
-  },
-  drawerHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: '0 8px',
-    ...theme.mixins.toolbar,
-    justifyContent: 'flex-end',
-  },
-  content: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    flexGrow: 1,
-    paddingTop: theme.spacing.unit * 6,
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  contentShifted: {
-    marginLeft: -MenuWidth,
-  },
-  contentShift: {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: 0,
-  },
-} as {[k: string]: CSSProperties})
+const styles = theme =>
+  ({
+    root: {
+      display: 'flex',
+      height: '100vh',
+      width: '100%',
+      overflowX: 'hidden',
+    },
+    appBar: {
+      transition: theme.transitions.create(['margin', 'width'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+    appBarShift: {
+      width: `calc(100% - ${MenuWidth}px)`,
+      marginLeft: MenuWidth,
+      transition: theme.transitions.create(['margin', 'width'], {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
+    menuButton: {
+      marginLeft: 12,
+      marginRight: 20,
+    },
+    hide: {
+      display: 'none',
+    },
+    drawer: {
+      width: MenuWidth,
+      flexShrink: 0,
+    },
+    drawerPaper: {
+      width: MenuWidth,
+    },
+    drawerHeader: {
+      display: 'flex',
+      alignItems: 'center',
+      padding: '0 8px',
+      ...theme.mixins.toolbar,
+      justifyContent: 'flex-end',
+    },
+    content: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      flexGrow: 1,
+      paddingTop: theme.spacing.unit * 6,
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+    contentShifted: {
+      marginLeft: -MenuWidth,
+    },
+    contentShift: {
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: 0,
+    },
+  } as { [k: string]: CSSProperties })
 
 function toggleFullScreen() {
   var doc = window.document as any

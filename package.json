@@ -62,6 +62,7 @@
     "webaudiofont": "^2.5.26"
   },
   "scripts": {
+    "format": "NODE_ENV=production prettier --write \"src/**/*.{ts,tsx,js,jsx}\"",
     "script": "node ./scripts/convertScales.js",
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
