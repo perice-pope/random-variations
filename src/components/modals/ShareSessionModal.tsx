@@ -10,7 +10,7 @@ import {
   WhatsappIcon,
   EmailIcon,
 } from 'react-share'
-import Button, { default as MuButton } from '@material-ui/core/Button'
+import Button from '@material-ui/core/Button'
 import Dialog from '@material-ui/core/Dialog'
 import DialogActions from '@material-ui/core/DialogActions'
 import DialogContent from '@material-ui/core/DialogContent'
@@ -64,7 +64,8 @@ class ShareSessionModal extends React.Component<
 
         <DialogContent>
           <Box mb={3}>
-            <MuButton
+            <Button
+              // @ts-ignore
               component={props => (
                 <FacebookShareButton
                   url={link}
@@ -75,9 +76,10 @@ class ShareSessionModal extends React.Component<
               )}
             >
               <FacebookIcon round size={30} />
-            </MuButton>
+            </Button>
 
-            <MuButton
+            <Button
+              // @ts-ignore
               component={props => (
                 <WhatsappShareButton
                   url={link}
@@ -88,9 +90,10 @@ class ShareSessionModal extends React.Component<
               )}
             >
               <WhatsappIcon round size={30} />
-            </MuButton>
+            </Button>
 
-            <MuButton
+            <Button
+              // @ts-ignore
               component={props => (
                 <TwitterShareButton
                   url={link}
@@ -101,10 +104,11 @@ class ShareSessionModal extends React.Component<
               )}
             >
               <TwitterIcon round size={30} />
-            </MuButton>
+            </Button>
 
-            <MuButton
-              variant="flat"
+            <Button
+              variant="text"
+              // @ts-ignore
               component={props => (
                 <EmailShareButton
                   url={link}
@@ -116,7 +120,7 @@ class ShareSessionModal extends React.Component<
             >
               <EmailIcon round size={30} />
               <span className={css(`margin-left: 0.5rem;`)}>By email</span>
-            </MuButton>
+            </Button>
           </Box>
 
           <Divider light />
@@ -144,9 +148,9 @@ class ShareSessionModal extends React.Component<
         </DialogContent>
 
         <DialogActions>
-          <MuButton onClick={this.props.onClose} color="secondary">
+          <Button onClick={this.props.onClose} color="secondary">
             Go back
-          </MuButton>
+          </Button>
         </DialogActions>
       </Dialog>
     )

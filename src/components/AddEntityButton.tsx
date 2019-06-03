@@ -3,7 +3,7 @@ import * as React from 'react'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
 import AddIcon from '@material-ui/icons/Add'
-import Button, { ButtonProps } from '@material-ui/core/Button'
+import Fab, { FabProps } from '@material-ui/core/Fab'
 import { css } from 'emotion'
 import Tooltip from './ui/Tooltip'
 import { Hidden, Divider } from '@material-ui/core'
@@ -17,7 +17,7 @@ type AddEntityButtonProps = {
   onAddScaleClick: () => any
   onAddEnclosuresClick: () => any
   onAddDirectionsClick: () => any
-  buttonProps?: ButtonProps
+  fabProps?: FabProps
   enableOnlyNote?: boolean
   showHelpTooltip?: boolean
   disableChords?: boolean
@@ -58,7 +58,7 @@ export default class AddEntityButton extends React.Component<
       disableNoteSequence &&
       disableDirections
 
-    const buttonProps = this.props.buttonProps || {}
+    const buttonProps = this.props.fabProps || {}
 
     return (
       <ButtonWithMenu
@@ -85,17 +85,17 @@ export default class AddEntityButton extends React.Component<
             disableHoverListener={showHelpTooltip || false}
             disableTouchListener={showHelpTooltip || false}
           >
-            <Button
-              variant="extendedFab"
+            <Fab
               color="secondary"
               aria-label="Add"
               {...buttonProps}
               disabled={buttonProps.disabled || allOptionsAreDisabled}
               {...props}
+              variant="extended"
             >
               <AddIcon />
               <Hidden smDown>Add items</Hidden>
-            </Button>
+            </Fab>
           </Tooltip>
         )}
         renderMenu={props => (

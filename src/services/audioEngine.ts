@@ -308,15 +308,15 @@ export default class AudioEngine {
               (!isAnyChannelSoloing && !channel.isMuted)
 
             const content = this.channelContent[channel.channelId]
-            console.log(
-              'tick',
-              channel.channelId,
-              channel.volume,
-              channel,
-              isAnyChannelSoloing,
-              isChannelAudible,
-              content,
-            )
+            // console.log(
+            //   'tick',
+            //   channel.channelId,
+            //   channel.volume,
+            //   channel,
+            //   isAnyChannelSoloing,
+            //   isChannelAudible,
+            //   content,
+            // )
             if (!content) {
               return
             }

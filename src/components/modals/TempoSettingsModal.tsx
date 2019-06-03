@@ -668,7 +668,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
 
             <Box mt={3} mb={3}>
               <Typography variant="h5">Count-in</Typography>
-              <Typography variant="body2">
+              <Typography variant="body1">
                 Number of metronome clicks to play before playing the notes
               </Typography>
               <Flex alignItems="center">
@@ -683,14 +683,14 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
 
             <Box mt={3} mb={3}>
               <Typography variant="h5">Rests & offset</Typography>
-              <Typography variant="body2">
+              <Typography variant="body1">
                 Number of rest beats between note groups
               </Typography>
               {RestsTextInput}
               {RestsSliderInput}
 
               <Box mt={3}>
-                <Typography variant="body2">
+                <Typography variant="body1">
                   Number of rest beats before playing the first note (after
                   count-in clicks).
                 </Typography>
@@ -703,7 +703,7 @@ class TempoSettingsModal extends React.Component<Props & WithWidth> {
 
             <Box mt={3} mb={3}>
               <Typography variant="h5">Rhythm</Typography>
-              <Typography variant="body2">
+              <Typography variant="body1">
                 Control note duration of each event
               </Typography>
 

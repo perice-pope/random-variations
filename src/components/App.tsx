@@ -10,9 +10,7 @@ import { withRouter } from 'react-router-dom'
 import uuid from 'uuid/v4'
 import smoothscroll from 'smoothscroll-polyfill'
 
-import JssProvider from 'react-jss/lib/JssProvider'
-import { create } from 'jss'
-import { createGenerateClassName, jssPreset } from '@material-ui/core/styles'
+import { StylesProvider } from '@material-ui/styles'
 
 import CssBaseline from '@material-ui/core/CssBaseline'
 import AppBar from '@material-ui/core/AppBar'
@@ -171,6 +169,7 @@ import TempoSettingsModal, {
 } from './modals/TempoSettingsModal'
 import { transparentize } from 'polished'
 import { channelId } from '../utils/channels'
+import { CSSProperties } from '@material-ui/core/styles/withStyles';
 
 const channelsInitialConfig: ChannelConfig[] = [
   {
@@ -1481,6 +1480,7 @@ class App extends React.Component<
 
     const isPhone = this.props.width === 'xs'
     const isMobile = this.props.width === 'xs' || this.props.width === 'sm'
+    console.log('props= ', this.props, isMobile)
     const shouldShowPlayButtonInContentContainer = !isPhone
 
     const baseNoteForPatternPreviewInDialogWindows = getNoteNameAfterInstrumentTranspose(
@@ -1519,11 +1519,12 @@ class App extends React.Component<
               disableFocusListener
               disableTouchListener
             >
-              <IconButton color="default" {...props}>
+              <IconButton color="default" {...props} size="medium">
                 <MoreVertIcon />
               </IconButton>
             </Tooltip>
           ) : (
+            // @ts-ignore
             <Button
               className={css(`margin-left: 1rem;`)}
               color="default"
@@ -1940,6 +1941,106 @@ class App extends React.Component<
 
     const isLoggedIn = currentUser && !currentUser.isAnonymous
 
+    const channelsMixer = (
+      <div className={css(`padding-left: 1rem; padding-right: 1rem; margin-bottom: 2rem;`)}>
+                {['notes', 'metronome', 'rhythm', 'subdivision'].map(
+                  channelId => (
+                    <div key={channelId}  className={css(`margin: 1rem 0;`)}>
+                      <div  className={css(`display: flex; flex-direction: row; align-content: center;`)}>
+                      <span   className={css(`flex: 1;`)}>{_.capitalize(channelId)}</span>
+                      <Button
+                        size="small"
+                        color={
+                          channelSettings[channelId].isMuted
+                            ? 'secondary'
+                            : 'default'
+                        }
+                        variant="text"
+                        onClick={() => {
+                          if (!sessionStore.activeSession) {
+                            return
+                          }
+                          sessionStore.activeSession.channelSettings[
+                            channelId
+                          ].isMuted = !channelSettings[channelId].isMuted
+                        }}
+                      >
+                        M
+                      </Button>
+                      <Button
+                        size="small"
+                        color={
+                          channelSettings[channelId].isSolo
+                            ? 'secondary'
+                            : 'default'
+                        }
+                        variant="text"
+                        onClick={() => {
+                          if (!sessionStore.activeSession) {
+                            return
+                          }
+                          sessionStore.activeSession.channelSettings[
+                            channelId
+                          ].isSolo = !channelSettings[channelId].isSolo
+                        }}
+                      >
+                        S
+                      </Button>
+                      </div>
+
+                      <Slider
+                        value={channelSettings[channelId].volume}
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        onChange={(e, value) => {
+                          if (!sessionStore.activeSession) {
+                            return
+                          }
+                          sessionStore.activeSession.channelSettings[
+                            channelId
+                          ].volume = value
+                        }}
+                      />
+                    </div>
+                  ),
+                )}
+
+<div  className={css(`display: flex; flex-direction: row; align-content: center;`)}>
+<span   className={css(`flex: 1;`)}>
+                  <span>Master</span>
+                  <Button
+                    size="small"
+                    color={this.state.masterMuted ? 'secondary' : 'default'}
+                    variant="text"
+                    onClick={() => {
+                      const newMasterMuted = !this.state.masterMuted
+                      this.setState({ masterMuted: newMasterMuted })
+                      if (newMasterMuted) {
+                        audioEngine.mute()
+                      } else {
+                        audioEngine.unmute()
+                      }
+                    }}
+                  >
+                    M
+                  </Button>
+                  </span>
+
+                  <Slider
+                    value={this.state.masterVolume}
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    onChange={(e, value) => {
+                      this.setState({ masterVolume: value })
+                      audioEngine.setVolume(value)
+                    }}
+                  />
+                </div>
+              </div>
+    )
+
     const MenuContent = (
       <>
         <div className={classes.drawerHeader}>
@@ -1948,10 +2049,12 @@ class App extends React.Component<
           </IconButton>
         </div>
         <Divider />
+
         <List>
           {isSignedIn ? (
             <ButtonWithMenu
               renderButton={props => (
+                // @ts-ignore
                 <ListItem button {...props}>
                   <ListItemAvatar>
                     <Avatar
@@ -2010,6 +2113,10 @@ class App extends React.Component<
 
         <Divider />
 
+        {channelsMixer}
+
+        <Divider />
+
         <List dense className={css({ backgroundColor: 'white' })}>
           <ListSubheader
             className={css({
@@ -2035,10 +2142,8 @@ class App extends React.Component<
           </ListSubheader>
           {!isLoggedIn && (
             <>
-              <ListItem>
-                Please sign in to be able to store your practice sessions:
-              </ListItem>
-              <ListItem>
+              <ListItemText primary="Please sign in to be able to store your practice sessions:" />
+              <ListItem button={true}>
                 <MuiButton
                   // color="primary"
                   color="secondary"
@@ -2077,7 +2182,7 @@ class App extends React.Component<
                 <ListItemSecondaryAction>
                   <ButtonWithMenu
                     renderButton={props => (
-                      <IconButton aria-label="Open session menu" {...props}>
+                      <IconButton aria-label="Open session menu" {...props} size="medium">
                         <MenuIcon />
                       </IconButton>
                     )}
@@ -2149,8 +2254,8 @@ class App extends React.Component<
     return (
       <>
         <MeasureScreenSize onUpdate={this.handleScreenSizeUpdate} fireOnMount>
-          <Fade in appear timeout={{ enter: 1000 }}>
             <div className={classes.root}>
+              {/* Top Header */}
               <AppBar
                 position="fixed"
                 className={cx(
@@ -2160,101 +2265,7 @@ class App extends React.Component<
                 <Toolbar variant="dense">{ToolbarContent}</Toolbar>
               </AppBar>
 
-              {/* TODO: make a nicer UI for the channel mixer */}
-              <div>
-                {['notes', 'metronome', 'rhythm', 'subdivision'].map(
-                  channelId => (
-                    <div key={channelId}>
-                      <span>{channelId}</span>
-                      <Button
-                        size="small"
-                        color={
-                          channelSettings[channelId].isMuted
-                            ? 'secondary'
-                            : 'default'
-                        }
-                        variant="text"
-                        onClick={() => {
-                          if (!sessionStore.activeSession) {
-                            return
-                          }
-                          sessionStore.activeSession.channelSettings[
-                            channelId
-                          ].isMuted = !channelSettings[channelId].isMuted
-                        }}
-                      >
-                        M
-                      </Button>
-                      <Button
-                        size="small"
-                        color={
-                          channelSettings[channelId].isSolo
-                            ? 'secondary'
-                            : 'default'
-                        }
-                        variant="text"
-                        onClick={() => {
-                          if (!sessionStore.activeSession) {
-                            return
-                          }
-                          sessionStore.activeSession.channelSettings[
-                            channelId
-                          ].isSolo = !channelSettings[channelId].isSolo
-                        }}
-                      >
-                        S
-                      </Button>
-
-                      <Slider
-                        value={channelSettings[channelId].volume}
-                        min={0}
-                        max={1}
-                        step={0.05}
-                        onChange={(e, value) => {
-                          if (!sessionStore.activeSession) {
-                            return
-                          }
-                          sessionStore.activeSession.channelSettings[
-                            channelId
-                          ].volume = value
-                        }}
-                      />
-                    </div>
-                  ),
-                )}
-
-                <div>
-                  <span>Master</span>
-                  <Button
-                    size="small"
-                    color={this.state.masterMuted ? 'secondary' : 'default'}
-                    variant="text"
-                    onClick={() => {
-                      const newMasterMuted = !this.state.masterMuted
-                      this.setState({ masterMuted: newMasterMuted })
-                      if (newMasterMuted) {
-                        audioEngine.mute()
-                      } else {
-                        audioEngine.unmute()
-                      }
-                    }}
-                  >
-                    M
-                  </Button>
-
-                  <Slider
-                    value={this.state.masterVolume}
-                    min={0}
-                    max={1}
-                    step={0.05}
-                    onChange={(e, value) => {
-                      this.setState({ masterVolume: value })
-                      audioEngine.setVolume(value)
-                    }}
-                  />
-                </div>
-              </div>
-
+              {/* Side menu: mobile */}
               <Hidden mdUp implementation="js">
                 <SwipeableDrawer
                   variant="temporary"
@@ -2273,6 +2284,7 @@ class App extends React.Component<
                 </SwipeableDrawer>
               </Hidden>
 
+              {/* Side menu: desktop */}
               <Hidden smDown implementation="js">
                 <Drawer
                   className={classes.drawer}
@@ -2287,7 +2299,9 @@ class App extends React.Component<
                 </Drawer>
               </Hidden>
 
+              {/* Main content area (excluding keyboard) */}
               <div
+                id="app-main-content"
                 className={cx(
                   classes.content,
                   !isMobile && classes.contentShifted,
@@ -2412,7 +2426,7 @@ class App extends React.Component<
                                 modifiers.intervals.enabled
                               }
                               disableEnclosures={modifiers.enclosures.enabled}
-                              buttonProps={{
+                              fabProps={{
                                 disabled: isPlaying,
                                 className: cx(
                                   css({
@@ -2420,7 +2434,7 @@ class App extends React.Component<
                                   }),
                                 ),
                                 classes: {
-                                  fab: css(
+                                  root: css(
                                     `height: 50px;
                                     @media screen and (max-height: 400px) {
                                       height: 30px;
@@ -2626,7 +2640,6 @@ class App extends React.Component<
                 />
               </div>
             </div>
-          </Fade>
 
           <SignInModal
             isOpen={this.state.signInModalIsOpen}
@@ -2874,7 +2887,7 @@ class App extends React.Component<
           value={{ audioEngine, audioFontId: settingsStore.audioFontId }}
         >
           <FirebaseContext.Provider value={firebase}>
-            <JssProvider jss={jss} generateClassName={generateClassName}>
+          <StylesProvider injectFirst>
               <>
                 <CssBaseline />
                 {process.env.NODE_ENV !== 'production' ? (
@@ -2882,31 +2895,27 @@ class App extends React.Component<
                 ) : null}
                 <ToastNotifications />
 
-                <Flex
+                
+                  {this.state.isInitialized
+                    ? this.renderApp()
+                    : (
+                      <Flex
                   height="100vh"
                   width="100vw"
                   alignItems="center"
                   justifyContent="center"
                   css="overflowX: hidden;"
                   flexDirection="column"
-                >
-                  {this.state.isInitialized
-                    ? this.renderApp()
-                    : this.renderLoader()}
-                </Flex>
+                >{this.renderLoader()}</Flex>)
+                    }
               </>
-            </JssProvider>
+            </StylesProvider>
           </FirebaseContext.Provider>
         </AudioEngineContext.Provider>
       </ThemeProvider>
     )
   }
 }
-
-// @ts-ignore
-export default withStyles(styles, { withTheme: true })(
-  withWidth()(withRouter(App)),
-)
 
 globalStyles()
 smoothscroll.polyfill()
@@ -2972,17 +2981,6 @@ type AppState = {
   noteSequenceAddingModalIsOpen: boolean
 }
 
-// This is needed to ensure the right CSS script tags insertion order to ensure
-// that Material UI's CSS plays nicely with CSS generated by the "emotion" CSS-in-JS library.
-// See this: https://material-ui.com/customization/css-in-js/#css-injection-order
-const generateClassName = createGenerateClassName({
-  productionPrefix: 'mu-jss-',
-})
-const jss = create({
-  ...jssPreset(),
-  // We define a custom insertion point that JSS will look for injecting the styles in the DOM.
-  insertionPoint: document.getElementById('jss-insertion-point') as HTMLElement,
-})
 
 const audioEngine = new AudioEngine()
 // @ts-ignore
@@ -3075,7 +3073,7 @@ const styles = theme => ({
     }),
     marginLeft: 0,
   },
-})
+} as {[k: string]: CSSProperties})
 
 function toggleFullScreen() {
   var doc = window.document as any
@@ -3109,3 +3107,7 @@ function toggleFullScreen() {
     uiState.isFullScreen = false
   }
 }
+
+export default withStyles(styles, { withTheme: true })(
+  withWidth()(withRouter(App)),
+)

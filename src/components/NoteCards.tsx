@@ -268,7 +268,7 @@ const SortableNoteCard = SortableElement(
                   </MenuItem>
                 )}
 
-                <MenuItem autoFocus onClick={this.handleEditClick}>
+                <MenuItem onClick={this.handleEditClick}>
                   <ListItemIcon>
                     <EditIcon color="action" />
                   </ListItemIcon>

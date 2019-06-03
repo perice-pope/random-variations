@@ -13,6 +13,7 @@ import {
 
 import { ArpeggioPattern, ArpeggioPatternElement } from '../types'
 import { Button, Menu, MenuItem } from '@material-ui/core'
+import Fab from '@material-ui/core/Fab'
 import { css, cx } from 'react-emotion'
 import Tooltip from './ui/Tooltip'
 import { Flex } from './ui/Flex'
@@ -70,7 +71,6 @@ const SortablePatternElement = SortableElement(
             onClose={() => setMenuOpen(false)}
           >
             <MenuItem
-              autoFocus
               onClick={() => {
                 onItemNoteMute(index, !item.muted)
                 setMenuOpen(false)
@@ -79,7 +79,6 @@ const SortablePatternElement = SortableElement(
               {item.muted ? 'Unmute' : 'Mute'}
             </MenuItem>
             <MenuItem
-              autoFocus
               onClick={() => {
                 onItemNoteDelete(index)
                 setMenuOpen(false)
@@ -311,16 +310,15 @@ class PatternEditor extends React.Component<PatternEditorProps> {
         />
         {pattern.items.length < (maxPatternLength || 16) && (
           <Tooltip title="Add note">
-            <Button
+            <Fab
               className={css({ minWidth: '40px', marginLeft: '1rem' })}
-              variant="fab"
               color="secondary"
               size="small"
               aria-label="Add"
               onClick={this.handleAddNoteToPattern}
             >
               <AddIcon fontSize="small" />
-            </Button>
+            </Fab>
           </Tooltip>
         )}
       </div>
