@@ -524,6 +524,7 @@ class App extends React.Component<
     const { modifiers, rests } = sessionStore.activeSession
     const { noteCards } = this.getNoteCards()
 
+    console.log('getStaffTicks')
     const { ticks: staffTicks, tickLabels } = this._generateStaffTicks(
       noteCards,
       modifiers,
@@ -1119,9 +1120,12 @@ class App extends React.Component<
     values: ArpeggioModifierModalSubmitValues,
   ) => {
     if (sessionStore.activeSession) {
-      sessionStore.activeSession.modifiers.chords = {
-        ...values,
-        enabled: true,
+      sessionStore.activeSession.modifiers = {
+        ...sessionStore.activeSession.modifiers,
+        chords: {
+          ...values,
+          enabled: true,
+        },
       }
     }
     this.closeArpeggioAddingModal()
@@ -1131,9 +1135,12 @@ class App extends React.Component<
     values: DirectionsModifierModalSubmitValues,
   ) => {
     if (sessionStore.activeSession) {
-      sessionStore.activeSession.modifiers.directions = {
-        ...values,
-        enabled: true,
+      sessionStore.activeSession.modifiers = {
+        ...sessionStore.activeSession.modifiers,
+        directions: {
+          ...values,
+          enabled: true,
+        },
       }
     }
     this.closeDirectionsModal()
@@ -1143,9 +1150,12 @@ class App extends React.Component<
     values: ScaleModifierModalSubmitValues,
   ) => {
     if (sessionStore.activeSession) {
-      sessionStore.activeSession.modifiers.scales = {
-        ...values,
-        enabled: true,
+      sessionStore.activeSession.modifiers = {
+        ...sessionStore.activeSession.modifiers,
+        scales: {
+          ...values,
+          enabled: true,
+        },
       }
     }
     this.closeScalesModal()
@@ -1155,9 +1165,12 @@ class App extends React.Component<
     values: IntervalModifierModalSubmitValues,
   ) => {
     if (sessionStore.activeSession) {
-      sessionStore.activeSession.modifiers.intervals = {
-        ...values,
-        enabled: true,
+      sessionStore.activeSession.modifiers = {
+        ...sessionStore.activeSession.modifiers,
+        intervals: {
+          ...values,
+          enabled: true,
+        },
       }
     }
 
@@ -1170,9 +1183,12 @@ class App extends React.Component<
     type: EnclosuresType
   }) => {
     if (sessionStore.activeSession) {
-      sessionStore.activeSession.modifiers.enclosures = {
-        enclosure: enclosureByEnclosureType[type],
-        enabled: true,
+      sessionStore.activeSession.modifiers = {
+        ...sessionStore.activeSession.modifiers,
+        enclosures: {
+          enclosure: enclosureByEnclosureType[type],
+          enabled: true,
+        },
       }
     }
     this.closeEnclosuresModal()
@@ -1180,31 +1196,61 @@ class App extends React.Component<
 
   private handleRemoveArpeggioClick = () => {
     if (sessionStore.activeSession) {
-      sessionStore.activeSession.modifiers.chords.enabled = false
+      sessionStore.activeSession.modifiers = {
+        ...sessionStore.activeSession.modifiers,
+        chords: {
+          ...sessionStore.activeSession.modifiers.chords,
+          enabled: false,
+        },
+      }
     }
   }
 
   private handleRemoveDirectionsClick = () => {
     if (sessionStore.activeSession) {
-      sessionStore.activeSession.modifiers.directions.enabled = false
+      sessionStore.activeSession.modifiers = {
+        ...sessionStore.activeSession.modifiers,
+        directions: {
+          ...sessionStore.activeSession.modifiers.directions,
+          enabled: false,
+        },
+      }
     }
   }
 
   private handleRemoveScalesClick = () => {
     if (sessionStore.activeSession) {
-      sessionStore.activeSession.modifiers.scales.enabled = false
+      sessionStore.activeSession.modifiers = {
+        ...sessionStore.activeSession.modifiers,
+        scales: {
+          ...sessionStore.activeSession.modifiers.scales,
+          enabled: false,
+        },
+      }
     }
   }
 
   private handleRemoveIntervalsClick = () => {
     if (sessionStore.activeSession) {
-      sessionStore.activeSession.modifiers.intervals.enabled = false
+      sessionStore.activeSession.modifiers = {
+        ...sessionStore.activeSession.modifiers,
+        intervals: {
+          ...sessionStore.activeSession.modifiers.intervals,
+          enabled: false,
+        },
+      }
     }
   }
 
   private handleRemoveEnclosuresClick = () => {
     if (sessionStore.activeSession) {
-      sessionStore.activeSession.modifiers.enclosures.enabled = false
+      sessionStore.activeSession.modifiers = {
+        ...sessionStore.activeSession.modifiers,
+        enclosures: {
+          ...sessionStore.activeSession.modifiers.enclosures,
+          enabled: false,
+        },
+      }
     }
   }
 
