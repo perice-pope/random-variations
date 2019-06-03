@@ -189,7 +189,6 @@ export const createDefaultSession = () => {
 
     countInCounts: 4,
     countInEnabled: true,
-    metronomeEnabled: true,
 
     modifiers: {
       directions: {

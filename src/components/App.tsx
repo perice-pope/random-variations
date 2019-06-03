@@ -1470,7 +1470,6 @@ class App extends React.Component<
       rests,
       countInCounts,
       countInEnabled,
-      metronomeEnabled,
       modifiers,
       instrumentTransposing,
       channelSettings,

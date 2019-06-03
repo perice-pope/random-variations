@@ -297,7 +297,6 @@ export interface Session {
   // Number of metronome clicks to play before playing notes
   countInCounts: number
   countInEnabled: boolean
-  metronomeEnabled: boolean
 
   noteCards: SessionNoteCard[]
   modifiers: NoteModifiers
