@@ -15,6 +15,7 @@ const Tooltip: React.SFC<
       disableFocusListener
       classes={{
         tooltip: css({
+          zIndex: 1000000000000,
           fontSize: '1rem',
           background: variant === 'gray' ? '#888' : '#3f51b5',
           userSelect: 'none',

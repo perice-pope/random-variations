@@ -28,6 +28,7 @@ import SettingsIcon from '@material-ui/icons/Settings'
 import PlayIcon from '@material-ui/icons/PlayArrow'
 import StopIcon from '@material-ui/icons/Stop'
 import MenuIcon from '@material-ui/icons/Menu'
+import HelpIcon from '@material-ui/icons/Help'
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 import DeleteIcon from '@material-ui/icons/Close'
 import PlusIcon from '@material-ui/icons/Add'
@@ -1800,6 +1801,31 @@ class App extends React.Component<
             ) : null}
           </Flex>
         </Flex>
+
+        <ButtonWithMenu
+          closeAfterClick={false}
+          renderButton={props => (
+            // @ts-ignore
+            <Tooltip
+              title="Tutorials and Help..."
+              disableFocusListener
+              disableTouchListener
+            >
+              <IconButton color="inherit" {...props} size="medium">
+                <HelpIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+          renderMenu={props => (
+            <Menu {...props}>
+              <MenuItem>Getting Started</MenuItem>
+              <MenuItem>Tutorial link #1</MenuItem>
+              <MenuItem>Tutorial link #2</MenuItem>
+              <Divider />
+              <MenuItem>Questions? Ask us</MenuItem>
+            </Menu>
+          )}
+        />
       </>
     )
 
@@ -1836,11 +1862,11 @@ class App extends React.Component<
               label={`Chords: ${shortenString(modifiers.chords.chordType, 20)}`}
               onClick={this.openArpeggioAddingModal}
               onDelete={this.handleRemoveArpeggioClick}
-              // deleteIcon={
-              //   <Tooltip variant="gray" title="Remove chords" placement="top">
-              //     <DeleteIcon />
-              //   </Tooltip>
-              // }
+              deleteIcon={
+                <Tooltip variant="gray" title="Remove chords" placement="top">
+                  <DeleteIcon />
+                </Tooltip>
+              }
             />
           </Tooltip>
         )}
@@ -1944,105 +1970,122 @@ class App extends React.Component<
     const channelsMixer = (
       <div
         className={css(
-          `padding-left: 1rem; padding-right: 1rem; margin-bottom: 2rem;`,
+          `padding-left: 1rem; padding-right: 1rem; margin-top: 1rem; margin-bottom: 1rem;`,
         )}
       >
         {['notes', 'metronome', 'rhythm', 'subdivision'].map(channelId => (
-          <div key={channelId} className={css(`margin: 1rem 0;`)}>
+          <div key={channelId} className={css(``)}>
+            <span className={css(`flex: 1;`)}>{_.capitalize(channelId)}</span>
+
             <div
               className={css(
                 `display: flex; flex-direction: row; align-content: center;`,
               )}
             >
-              <span className={css(`flex: 1;`)}>{_.capitalize(channelId)}</span>
-              <Button
-                size="small"
-                color={
-                  channelSettings[channelId].isMuted ? 'secondary' : 'default'
-                }
-                variant="text"
-                onClick={() => {
+              <Slider
+                value={channelSettings[channelId].volume}
+                min={0}
+                className={css(`width: 165px; margin-right: 1rem;`)}
+                max={1}
+                step={0.05}
+                onChange={(e, value) => {
                   if (!sessionStore.activeSession) {
                     return
                   }
                   sessionStore.activeSession.channelSettings[
                     channelId
-                  ].isMuted = !channelSettings[channelId].isMuted
+                  ].volume = value
                 }}
-              >
-                M
-              </Button>
-              <Button
-                size="small"
-                color={
-                  channelSettings[channelId].isSolo ? 'secondary' : 'default'
-                }
-                variant="text"
-                onClick={() => {
-                  if (!sessionStore.activeSession) {
-                    return
-                  }
-                  sessionStore.activeSession.channelSettings[
-                    channelId
-                  ].isSolo = !channelSettings[channelId].isSolo
-                }}
-              >
-                S
-              </Button>
-            </div>
+              />
 
+              <Tooltip
+                title={channelSettings[channelId].isMuted ? 'Unmute' : 'Mute'}
+              >
+                <Button
+                  size="small"
+                  color={
+                    channelSettings[channelId].isMuted ? 'secondary' : 'default'
+                  }
+                  className={css(`min-width: unset;`)}
+                  variant="text"
+                  onClick={() => {
+                    if (!sessionStore.activeSession) {
+                      return
+                    }
+                    sessionStore.activeSession.channelSettings[
+                      channelId
+                    ].isMuted = !channelSettings[channelId].isMuted
+                  }}
+                >
+                  M
+                </Button>
+              </Tooltip>
+
+              <Tooltip
+                title={channelSettings[channelId].isSolo ? 'Un-solo' : 'Solo'}
+              >
+                <Button
+                  className={css(`min-width: unset;`)}
+                  size="small"
+                  color={
+                    channelSettings[channelId].isSolo ? 'secondary' : 'default'
+                  }
+                  variant="text"
+                  onClick={() => {
+                    if (!sessionStore.activeSession) {
+                      return
+                    }
+                    sessionStore.activeSession.channelSettings[
+                      channelId
+                    ].isSolo = !channelSettings[channelId].isSolo
+                  }}
+                >
+                  S
+                </Button>
+              </Tooltip>
+            </div>
+          </div>
+        ))}
+
+        <div>
+          <div>Master</div>
+          <div
+            className={css(
+              `display: flex; flex-direction: row; align-content: center;`,
+            )}
+          >
             <Slider
-              value={channelSettings[channelId].volume}
+              value={this.state.masterVolume}
+              className={css(`width: 165px; margin-right: 1rem;`)}
               min={0}
               max={1}
               step={0.05}
               onChange={(e, value) => {
-                if (!sessionStore.activeSession) {
-                  return
-                }
-                sessionStore.activeSession.channelSettings[
-                  channelId
-                ].volume = value
+                this.setState({ masterVolume: value })
+                audioEngine.setVolume(value)
               }}
             />
+
+            <Tooltip title={this.state.masterMuted ? 'Unmute' : 'Mute'}>
+              <Button
+                className={css(`min-width: unset;`)}
+                size="small"
+                color={this.state.masterMuted ? 'secondary' : 'default'}
+                variant="text"
+                onClick={() => {
+                  const newMasterMuted = !this.state.masterMuted
+                  this.setState({ masterMuted: newMasterMuted })
+                  if (newMasterMuted) {
+                    audioEngine.mute()
+                  } else {
+                    audioEngine.unmute()
+                  }
+                }}
+              >
+                M
+              </Button>
+            </Tooltip>
           </div>
-        ))}
-
-        <div
-          className={css(
-            `display: flex; flex-direction: row; align-content: center;`,
-          )}
-        >
-          <span className={css(`flex: 1;`)}>
-            <span>Master</span>
-            <Button
-              size="small"
-              color={this.state.masterMuted ? 'secondary' : 'default'}
-              variant="text"
-              onClick={() => {
-                const newMasterMuted = !this.state.masterMuted
-                this.setState({ masterMuted: newMasterMuted })
-                if (newMasterMuted) {
-                  audioEngine.mute()
-                } else {
-                  audioEngine.unmute()
-                }
-              }}
-            >
-              M
-            </Button>
-          </span>
-
-          <Slider
-            value={this.state.masterVolume}
-            min={0}
-            max={1}
-            step={0.05}
-            onChange={(e, value) => {
-              this.setState({ masterVolume: value })
-              audioEngine.setVolume(value)
-            }}
-          />
         </div>
       </div>
     )
