@@ -43,10 +43,14 @@ import {
 } from './types'
 import sessionStore from './services/sessionStore'
 import { SoundConfig } from './services/audioEngine.js'
+import { capitalize } from 'lodash'
 
 // MIDI numbers for (percussion) sounds
 // Source: https://usermanuals.finalemusic.com/SongWriter2012Win/Content/PercussionMaps.htm
 export type PercussionSoundId = 'snare' | 'cowbell' | 'woodblock'
+
+export const getPercussionSoundName = (soundId: PercussionSoundId): string =>
+  capitalize(soundId)
 
 export const PercussionSoundConfigs: {
   [key in PercussionSoundId]: SoundConfig
@@ -64,6 +68,10 @@ export const PercussionSoundConfigs: {
     midi: 77,
   },
 }
+
+export const allPercussionSounds = Object.keys(
+  PercussionSoundConfigs,
+) as PercussionSoundId[]
 
 /**
  * E.g. "Db4" -> "C#4", "Db" -> "C#"

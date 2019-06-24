@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 export type AudioFont = any
 
 export type AudioFontType = 'percussion' | 'instrument'
@@ -111,6 +113,11 @@ export const instrumentAudioFontConfigs: AudioFontConfig[] = ([
   globalVarName: `_tone_${afc.name}`,
   type: afc.type,
 }))
+
+export const instrumentAudioFontConfigsById = _.keyBy(
+  instrumentAudioFontConfigs,
+  'id',
+)
 
 export const audioFontsConfig = [
   ...percussionAudioFontConfigs,

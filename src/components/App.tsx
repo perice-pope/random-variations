@@ -41,6 +41,9 @@ import CloudDownloadIcon from '@material-ui/icons/CloudDownload'
 import SaveIcon from '@material-ui/icons/Save'
 import FullscreenIcon from '@material-ui/icons/Fullscreen'
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit'
+import MusicNoteIcon from '@material-ui/icons/MusicNote'
+import VolumeMuteIcon from '@material-ui/icons/VolumeMute'
+import VolumeUpIcon from '@material-ui/icons/VolumeUp'
 import ArrowsIcon from '@material-ui/icons/Cached'
 import TimerIcon from '@material-ui/icons/Timer'
 import MetronomeIcon from 'mdi-material-ui/Metronome'
@@ -112,11 +115,14 @@ import {
   getNoteNameAfterInstrumentTranspose,
   instrumentTransposingOptionsByType,
   PercussionSoundConfigs,
+  allPercussionSounds,
+  getPercussionSoundName,
 } from '../musicUtils'
 import {
   instrumentAudioFontConfigs,
   percussionAudioFontConfigs,
   AudioFontId,
+  instrumentAudioFontConfigsById,
 } from '../audioFontsConfig'
 import AudioEngine, {
   TickCallback,
@@ -848,13 +854,18 @@ class App extends React.Component<
     return getNoteCardsFromSessionCards(sessionStore.activeSession.noteCards)
   }
 
-  private handleAudioFontChanged = async (audioFontId: AudioFontId) => {
+  private handleAudioFontChanged = async (
+    audioFontId: AudioFontId,
+    playPreview = true,
+  ) => {
     await this.loadAndSetAudioFont(audioFontId)
-    audioEngine.playSingleSound(
-      { midi: tonal.Note.midi('C4') as number, audioFontId },
-      1,
-      0.5,
-    )
+    if (playPreview) {
+      audioEngine.playSingleSound(
+        { midi: tonal.Note.midi('C4') as number, audioFontId },
+        1,
+        0.5,
+      )
+    }
   }
 
   private handleMouseOverNoteCard = (index: number) => {
@@ -2011,7 +2022,10 @@ class App extends React.Component<
 
     const isLoggedIn = currentUser && !currentUser.isAnonymous
 
-    const channelsMixer = (
+    const activeSession = sessionStore.activeSession
+    const currentAudioFontConfig =
+      instrumentAudioFontConfigsById[settingsStore.audioFontId]
+    const channelsMixer = activeSession ? (
       <div
         className={css(
           `padding-left: 1rem; padding-right: 1rem; margin-top: 1rem; margin-bottom: 1rem;`,
@@ -2019,33 +2033,28 @@ class App extends React.Component<
       >
         {['notes', 'metronome', 'rhythm', 'subdivision'].map(channelId => (
           <div key={channelId} className={css(``)}>
-            <span className={css(`flex: 1;`)}>{_.capitalize(channelId)}</span>
+            <span className={css(`flex: 1; display: flex; flex-wrap: nowrap;`)}>
+              <div className={css(`flex: 1;`)}>{_.capitalize(channelId)}</div>
+              <div className={css(`color: #aaa; font-size: 0.9em;`)}>
+                {channelId === 'notes'
+                  ? currentAudioFontConfig.title
+                  : getPercussionSoundName(
+                      activeSession.channelSettings[channelId].sound,
+                    )}
+              </div>
+            </span>
 
             <div
               className={css(
                 `display: flex; flex-direction: row; align-content: center;`,
               )}
             >
-              <Slider
-                value={channelSettings[channelId].volume}
-                min={0}
-                className={css(`width: 165px; margin-right: 1rem;`)}
-                max={1}
-                step={0.05}
-                onChange={(e, value) => {
-                  if (!sessionStore.activeSession) {
-                    return
-                  }
-                  sessionStore.activeSession.channelSettings[
-                    channelId
-                  ].volume = value
-                }}
-              />
-
               <Tooltip
-                title={channelSettings[channelId].isMuted ? 'Unmute' : 'Mute'}
+                title={`${
+                  channelSettings[channelId].isMuted ? 'Unmute' : 'Mute'
+                } ${_.capitalize(channelId)}`}
               >
-                <Button
+                <MuiButton
                   size="small"
                   color={
                     channelSettings[channelId].isMuted ? 'secondary' : 'default'
@@ -2062,14 +2071,18 @@ class App extends React.Component<
                   }}
                 >
                   M
-                </Button>
+                </MuiButton>
               </Tooltip>
 
               <Tooltip
-                title={channelSettings[channelId].isSolo ? 'Un-solo' : 'Solo'}
+                title={`${
+                  channelSettings[channelId].isSolo
+                    ? 'Turn solo off for '
+                    : 'Solo'
+                } ${_.capitalize(channelId)}`}
               >
-                <Button
-                  className={css(`min-width: unset;`)}
+                <MuiButton
+                  className={css(`min-width: unset; margin-right: 0.5rem;`)}
                   size="small"
                   color={
                     channelSettings[channelId].isSolo ? 'secondary' : 'default'
@@ -2085,9 +2098,79 @@ class App extends React.Component<
                   }}
                 >
                   S
-                </Button>
+                </MuiButton>
               </Tooltip>
+
+              <Slider
+                value={channelSettings[channelId].volume}
+                disabled={channelSettings[channelId].isMuted}
+                min={0}
+                className={css(`width: 165px; margin-right: 1rem;`)}
+                max={1}
+                step={0.05}
+                onChange={(e, value) => {
+                  if (!sessionStore.activeSession) {
+                    return
+                  }
+                  sessionStore.activeSession.channelSettings[
+                    channelId
+                  ].volume = value
+                }}
+              />
+
+              <ButtonWithMenu
+                renderButton={props => (
+                  <Tooltip
+                    title={
+                      channelId === 'notes'
+                        ? 'Choose instrument sound'
+                        : `Choose sound for ${_.capitalize(channelId)}`
+                    }
+                  >
+                    <IconButton
+                      aria-label="Choose sound"
+                      {...props}
+                      size="small"
+                    >
+                      <MusicNoteIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                renderMenu={props => (
+                  <Menu id={`channel-sound-${channelId}`} {...props}>
+                    {channelId === 'notes'
+                      ? instrumentAudioFontConfigs.map(({ title, id }) => (
+                          <MenuItem
+                            key={id}
+                            onClick={async () => {
+                              await this.handleAudioFontChanged(id, false)
+                              settingsStore.audioFontId = id
+                              this.updatePlaybackNotesFromActiveSession()
+                            }}
+                          >
+                            {instrumentAudioFontConfigsById[id].title}
+                            {/* TODO: show the active sound */}
+                          </MenuItem>
+                        ))
+                      : allPercussionSounds.map(percussionSoundId => (
+                          <MenuItem
+                            key={percussionSoundId}
+                            onClick={() => {
+                              activeSession.channelSettings[
+                                channelId
+                              ].sound = percussionSoundId
+                            }}
+                          >
+                            {getPercussionSoundName(percussionSoundId)}
+                            {/* TODO: show the active sound */}
+                          </MenuItem>
+                        ))}
+                  </Menu>
+                )}
+              />
             </div>
+
+            <Divider className={css(`margin: 0.5rem 0;`)} />
           </div>
         ))}
 
@@ -2098,20 +2181,12 @@ class App extends React.Component<
               `display: flex; flex-direction: row; align-content: center;`,
             )}
           >
-            <Slider
-              value={this.state.masterVolume}
-              className={css(`width: 165px; margin-right: 1rem;`)}
-              min={0}
-              max={1}
-              step={0.05}
-              onChange={(e, value) => {
-                this.setState({ masterVolume: value })
-                audioEngine.setVolume(value)
-              }}
-            />
-
-            <Tooltip title={this.state.masterMuted ? 'Unmute' : 'Mute'}>
-              <Button
+            <Tooltip
+              title={
+                this.state.masterMuted ? 'Unmute everything' : 'Mute everything'
+              }
+            >
+              <MuiButton
                 className={css(`min-width: unset;`)}
                 size="small"
                 color={this.state.masterMuted ? 'secondary' : 'default'}
@@ -2127,12 +2202,25 @@ class App extends React.Component<
                 }}
               >
                 M
-              </Button>
+              </MuiButton>
             </Tooltip>
+
+            <Slider
+              value={this.state.masterVolume}
+              className={css(`width: 165px; margin-right: 1rem;`)}
+              min={0}
+              max={1}
+              disabled={this.state.masterMuted}
+              step={0.05}
+              onChange={(e, value) => {
+                this.setState({ masterVolume: value })
+                audioEngine.setVolume(value)
+              }}
+            />
           </div>
         </div>
       </div>
-    )
+    ) : null
 
     const MenuContent = (
       <>
@@ -2222,14 +2310,14 @@ class App extends React.Component<
             <span className={css({ flex: 1 })}>{'My sessions '}</span>
             {isLoggedIn && (
               <Tooltip title="Create a new session">
-                <Button
+                <MuiButton
                   variant="text"
                   onClick={this.handleCreateNewSessionClick}
                   color="secondary"
                 >
                   <PlusIcon />
                   {' New'}
-                </Button>
+                </MuiButton>
               </Tooltip>
             )}
           </ListSubheader>
