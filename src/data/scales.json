@@ -1,0 +1,8490 @@
+[
+  {
+    "name": "ionian",
+    "notes": "C D E F G A B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "major mode 1"
+  },
+  {
+    "name": "dorian",
+    "notes": "C D Eb F G A Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "major mode 2"
+  },
+  {
+    "name": "phrygian",
+    "notes": "C Db Eb F G Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "major mode 3"
+  },
+  {
+    "name": "lydian",
+    "notes": "C D E F# G A B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "major mode 4"
+  },
+  {
+    "name": "mixolydian",
+    "notes": "C D E F G A Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "major mode 5"
+  },
+  {
+    "name": "aeolian natural minor",
+    "notes": "C D Eb F G Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "major mode 6"
+  },
+  {
+    "name": "locrian",
+    "notes": "C Db Eb F Gb Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      6,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5d",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "major mode 7"
+  },
+  {
+    "name": "harmonic major",
+    "notes": "C D E F G Ab B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "5P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "harmonic major mode 1"
+  },
+  {
+    "name": "dorian b 5 zangula",
+    "notes": "C D Eb F Gb A Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      6,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "5d",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "harmonic major mode 2"
+  },
+  {
+    "name": "phrygian b 4",
+    "notes": "C Db Eb Fb G Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4d",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "harmonic major mode 3"
+  },
+  {
+    "name": "lydian b 3",
+    "notes": "C D Eb F# G A B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      6,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4A",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "harmonic major mode 4"
+  },
+  {
+    "name": "mixolydian b 2",
+    "notes": "C Db E F G A Bb C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "4P",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "harmonic major mode 5"
+  },
+  {
+    "name": "lydian 2 5",
+    "notes": "C D# E F# G# A B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      6,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4A",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "harmonic major mode 6"
+  },
+  {
+    "name": "locrian b 7",
+    "notes": "C Db Eb F Gb Ab Bbb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      6,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5d",
+      "6m",
+      "7d",
+      "8P"
+    ],
+    "mode": "harmonic major mode 7"
+  },
+  {
+    "name": "melodic minor",
+    "notes": "C D Eb F G A B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "melodic minor mode 1"
+  },
+  {
+    "name": "dorian b 2",
+    "notes": "C Db Eb F G A Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "melodic minor mode 2"
+  },
+  {
+    "name": "lydian augmented",
+    "notes": "C D E F# G# A B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "melodic minor mode 3"
+  },
+  {
+    "name": "lydian dominant",
+    "notes": "C D E F# G A Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "melodic minor mode 4"
+  },
+  {
+    "name": "mixolydian b 6 hindu",
+    "notes": "C D E F G Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "melodic minor mode 5"
+  },
+  {
+    "name": "locrian 2",
+    "notes": "C D Eb F Gb Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      6,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "5d",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "melodic minor mode 6"
+  },
+  {
+    "name": "super locrian altered scale",
+    "notes": "C Db Eb Fb Gb Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      6,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4d",
+      "5d",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "melodic minor mode 7"
+  },
+  {
+    "name": "harmonic minor",
+    "notes": "C D Eb F G Ab B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "5P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "harmonic minor mode 1"
+  },
+  {
+    "name": "locrian 6 hijazi",
+    "notes": "C Db Eb F Gb A Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      6,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5d",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "harmonic minor mode 2"
+  },
+  {
+    "name": "ionian 5",
+    "notes": "C D E F G# A B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "harmonic minor mode 3"
+  },
+  {
+    "name": "dorian 4 ukrainian hungarian",
+    "notes": "C D Eb F# G A Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      6,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4A",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "harmonic minor mode 4"
+  },
+  {
+    "name": "phrygian 3 phyrgian dominant spanish gypsy hebrew",
+    "notes": "C Db E F G Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "4P",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "harmonic minor mode 5"
+  },
+  {
+    "name": "lydian 2 maqam mustar",
+    "notes": "C D# E F# G A B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      6,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4A",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "harmonic minor mode 6"
+  },
+  {
+    "name": "locrian b 4 b 7",
+    "notes": "C Db Eb Fb Gb Ab Bbb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      6,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4d",
+      "5d",
+      "6m",
+      "7d",
+      "8P"
+    ],
+    "mode": "harmonic minor mode 7"
+  },
+  {
+    "name": "double harmonic byzantine persian",
+    "notes": "C Db E F G Ab B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "4P",
+      "5P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "double harmonic mode 1"
+  },
+  {
+    "name": "yusef synthetic 2",
+    "notes": "C D# E F# G A# B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      6,
+      7,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4A",
+      "5P",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "double harmonic mode 2"
+  },
+  {
+    "name": "double harmonic mode 3",
+    "notes": "C Db Eb Fb G Ab Abb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      7,
+      8,
+      7,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4d",
+      "5P",
+      "6m",
+      "6d",
+      "8P"
+    ],
+    "mode": "double harmonic mode 3"
+  },
+  {
+    "name": "lydian b 3 b 6 hungarian gypsy egyptian",
+    "notes": "C D Eb F# G Ab B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      6,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4A",
+      "5P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "double harmonic mode 4"
+  },
+  {
+    "name": "double harmonic mode 5",
+    "notes": "C Db E F Gb A Bb C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      6,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "4P",
+      "5d",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "double harmonic mode 5"
+  },
+  {
+    "name": "double harmonic mode 6",
+    "notes": "C D# E F G# A B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      5,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4P",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "double harmonic mode 6"
+  },
+  {
+    "name": "double harmonic mode 7",
+    "notes": "C Db Ebb F Gb Ab Bbb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      5,
+      6,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3d",
+      "4P",
+      "5d",
+      "6m",
+      "7d",
+      "8P"
+    ],
+    "mode": "double harmonic mode 7"
+  },
+  {
+    "name": "chromatic",
+    "notes": "C C# D D# E F F# G G# A A# B C",
+    "semitones": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "2A",
+      "3M",
+      "4P",
+      "4A",
+      "5P",
+      "5A",
+      "6M",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": ""
+  },
+  {
+    "name": "chinese twelve tone scale",
+    "notes": "C G D A E B F# C# Ab Eb Bb F C",
+    "semitones": [
+      0,
+      7,
+      2,
+      9,
+      4,
+      11,
+      6,
+      1,
+      8,
+      3,
+      10,
+      5,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "5P",
+      "2M",
+      "6M",
+      "3M",
+      "7M",
+      "4A",
+      "1A",
+      "6m",
+      "3m",
+      "7m",
+      "4P",
+      "8P"
+    ],
+    "mode": ""
+  },
+  {
+    "name": "algerian",
+    "notes": "C D Eb F F# G Ab B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "4A",
+      "5P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "algerian mode 1"
+  },
+  {
+    "name": "algerian mode 2",
+    "notes": "C Db Eb E F Gb A Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      6,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "3M",
+      "4P",
+      "5d",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "algerian mode 2"
+  },
+  {
+    "name": "algerian mode 3",
+    "notes": "C D Eb E F G# A B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      5,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "3M",
+      "4P",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "algerian mode 3"
+  },
+  {
+    "name": "algerian mode 4",
+    "notes": "C C# D Eb F# G A Bb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      3,
+      6,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3m",
+      "4A",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "algerian mode 4"
+  },
+  {
+    "name": "algerian mode 5",
+    "notes": "C C# D F F# G# A B C",
+    "semitones": [
+      0,
+      1,
+      2,
+      5,
+      6,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "4P",
+      "4A",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "algerian mode 5"
+  },
+  {
+    "name": "algerian mode 6",
+    "notes": "C C# E F G Ab Bb B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      7,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "3M",
+      "4P",
+      "5P",
+      "6m",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "algerian mode 6"
+  },
+  {
+    "name": "algerian mode 7",
+    "notes": "C D# E F# G A Bb B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      6,
+      7,
+      9,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4A",
+      "5P",
+      "6M",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "algerian mode 7"
+  },
+  {
+    "name": "algerian mode 8",
+    "notes": "C Db Eb Fb Gb G Ab A C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4d",
+      "5d",
+      "5P",
+      "6m",
+      "6M",
+      "8P"
+    ],
+    "mode": "algerian mode 8"
+  },
+  {
+    "name": "asymmetrically expanded ionian scale",
+    "notes": "C D E F# G# A Bb B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "5A",
+      "6M",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "asymmetrically expanded ionian scale mode 1"
+  },
+  {
+    "name": "asymmetrically expanded ionian scale mode 2",
+    "notes": "C D E F# G G# A Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "5P",
+      "5A",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "asymmetrically expanded ionian scale mode 2"
+  },
+  {
+    "name": "asymmetrically expanded ionian scale mode 3",
+    "notes": "C D E F F# G Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "4A",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "asymmetrically expanded ionian scale mode 3"
+  },
+  {
+    "name": "asymmetrically expanded ionian scale mode 4",
+    "notes": "C D Eb E F F# Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "3M",
+      "4P",
+      "4A",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "asymmetrically expanded ionian scale mode 4"
+  },
+  {
+    "name": "asymmetrically expanded ionian scale mode 5",
+    "notes": "C C# D Eb E F# G# Bb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      6,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3m",
+      "3M",
+      "4A",
+      "5A",
+      "7m",
+      "8P"
+    ],
+    "mode": "asymmetrically expanded ionian scale mode 5"
+  },
+  {
+    "name": "asymmetrically expanded ionian scale mode 6",
+    "notes": "C C# D Eb F G A B C",
+    "semitones": [
+      0,
+      1,
+      2,
+      3,
+      5,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3m",
+      "4P",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "asymmetrically expanded ionian scale mode 6"
+  },
+  {
+    "name": "asymmetrically expanded ionian scale mode 7",
+    "notes": "C C# D E F# G# Bb B C",
+    "semitones": [
+      0,
+      1,
+      2,
+      4,
+      6,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3M",
+      "4A",
+      "5A",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "asymmetrically expanded ionian scale mode 7"
+  },
+  {
+    "name": "asymmetrically expanded ionian scale mode 8",
+    "notes": "C Db Eb F G A Bb B C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      7,
+      9,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5P",
+      "6M",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "asymmetrically expanded ionian scale mode 8"
+  },
+  {
+    "name": "buzurg",
+    "notes": "C Db E F F# G Ab B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      6,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "4P",
+      "4A",
+      "5P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "buzurg mode 1"
+  },
+  {
+    "name": "buzurg mode 2",
+    "notes": "C D# E F F# G A# B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      5,
+      6,
+      7,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4P",
+      "4A",
+      "5P",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "buzurg mode 2"
+  },
+  {
+    "name": "buzurg mode 3",
+    "notes": "C Db D Eb Fb G Ab A C",
+    "semitones": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      7,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "2M",
+      "3m",
+      "4d",
+      "5P",
+      "6m",
+      "6M",
+      "8P"
+    ],
+    "mode": "buzurg mode 3"
+  },
+  {
+    "name": "yusef synthetic 7",
+    "notes": "C C# D Eb F# G Ab B C",
+    "semitones": [
+      0,
+      1,
+      2,
+      3,
+      6,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3m",
+      "4A",
+      "5P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "buzurg mode 4"
+  },
+  {
+    "name": "buzurg mode 5",
+    "notes": "C C# D F F# G A# B C",
+    "semitones": [
+      0,
+      1,
+      2,
+      5,
+      6,
+      7,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "4P",
+      "4A",
+      "5P",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "buzurg mode 5"
+  },
+  {
+    "name": "buzurg mode 6",
+    "notes": "C Db E F Gb A Bb B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      6,
+      9,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "4P",
+      "5d",
+      "6M",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "buzurg mode 6"
+  },
+  {
+    "name": "buzurg mode 7",
+    "notes": "C D# E F G# A A# B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      5,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4P",
+      "5A",
+      "6M",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "buzurg mode 7"
+  },
+  {
+    "name": "buzurg mode 8",
+    "notes": "C C# E F F# G G# A C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "3M",
+      "4P",
+      "4A",
+      "5P",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "buzurg mode 8"
+  },
+  {
+    "name": "eight tone spanish",
+    "notes": "C Db Eb E F Gb Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      6,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "3M",
+      "4P",
+      "5d",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "eight tone spanish mode 1"
+  },
+  {
+    "name": "eight tone spanish mode 2",
+    "notes": "C D Eb E F G A B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      5,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "3M",
+      "4P",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "eight tone spanish mode 2"
+  },
+  {
+    "name": "eight tone spanish mode 3",
+    "notes": "C C# D Eb F G A Bb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      3,
+      5,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3m",
+      "4P",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "eight tone spanish mode 3"
+  },
+  {
+    "name": "eight tone spanish mode 4",
+    "notes": "C C# D E F# G# A B C",
+    "semitones": [
+      0,
+      1,
+      2,
+      4,
+      6,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3M",
+      "4A",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "eight tone spanish mode 4"
+  },
+  {
+    "name": "bebop phrygian",
+    "notes": "C Db Eb F G Ab Bb B C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      7,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5P",
+      "6m",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "eight tone spanish mode 5"
+  },
+  {
+    "name": "bebop lydian dominant",
+    "notes": "C D E F# G A Bb B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      7,
+      9,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "5P",
+      "6M",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "eight tone spanish mode 6"
+  },
+  {
+    "name": "eight tone spanish mode 7",
+    "notes": "C D E F G Ab A Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      7,
+      8,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "5P",
+      "6m",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "eight tone spanish mode 7"
+  },
+  {
+    "name": "eight tone spanish mode 8",
+    "notes": "C D Eb F Gb G Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "5d",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "eight tone spanish mode 8"
+  },
+  {
+    "name": "bebop major",
+    "notes": "C D E F G G# A B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      7,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "5P",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "bebop major mode 1"
+  },
+  {
+    "name": "bebop major mode 2",
+    "notes": "C D Eb F F# G A Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      6,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "4A",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "bebop major mode 2"
+  },
+  {
+    "name": "bebop major mode 3",
+    "notes": "C Db Eb E F G Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "3M",
+      "4P",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "bebop major mode 3"
+  },
+  {
+    "name": "bebop major mode 4",
+    "notes": "C D D# E F# G A B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      6,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "2A",
+      "3M",
+      "4A",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "bebop major mode 4"
+  },
+  {
+    "name": "bebop major mode 5",
+    "notes": "C C# D E F G A Bb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      4,
+      5,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3M",
+      "4P",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "bebop major mode 5"
+  },
+  {
+    "name": "bebop major mode 6",
+    "notes": "C C# D# E F# G# A B C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      6,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2A",
+      "3M",
+      "4A",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "bebop major mode 6"
+  },
+  {
+    "name": "bebop natural minor isfahan 2",
+    "notes": "C D Eb F G Ab Bb B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      7,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "5P",
+      "6m",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "bebop major mode 7"
+  },
+  {
+    "name": "bebop major mode 8",
+    "notes": "C Db Eb F Gb Ab A Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      6,
+      8,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5d",
+      "6m",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "bebop major mode 8"
+  },
+  {
+    "name": "bebop dominant",
+    "notes": "C D E F G A Bb B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      7,
+      9,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "5P",
+      "6M",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "bebop dominant mode 1"
+  },
+  {
+    "name": "bebop dominant mode 2",
+    "notes": "C D Eb F G Ab A Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      7,
+      8,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "5P",
+      "6m",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "bebop dominant mode 2"
+  },
+  {
+    "name": "bebop dominant mode 3",
+    "notes": "C Db Eb F Gb G Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      6,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5d",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "bebop dominant mode 3"
+  },
+  {
+    "name": "bebop dominant mode 4",
+    "notes": "C D E F F# G A B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      6,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "4A",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "bebop dominant mode 4"
+  },
+  {
+    "name": "bebop dominant mode 5",
+    "notes": "C D Eb E F G A Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      5,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "3M",
+      "4P",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "bebop dominant mode 5"
+  },
+  {
+    "name": "bebop dominant mode 6",
+    "notes": "C Db D Eb F G Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      3,
+      5,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "2M",
+      "3m",
+      "4P",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "bebop dominant mode 6"
+  },
+  {
+    "name": "bebop dominant mode 7",
+    "notes": "C C# D E F# G A B C",
+    "semitones": [
+      0,
+      1,
+      2,
+      4,
+      6,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3M",
+      "4A",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "bebop dominant mode 7"
+  },
+  {
+    "name": "bebop locrian iraq",
+    "notes": "C Db Eb F Gb Ab Bb B C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      6,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5d",
+      "6m",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "bebop dominant mode 8"
+  },
+  {
+    "name": "bebop dorian isfahan 1",
+    "notes": "C D Eb F G A Bb B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      7,
+      9,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "5P",
+      "6M",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "bebop dorian mode 1"
+  },
+  {
+    "name": "bebop dorian mode 2",
+    "notes": "C Db Eb F G Ab A Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      7,
+      8,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5P",
+      "6m",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "bebop dorian mode 2"
+  },
+  {
+    "name": "bebop lydian",
+    "notes": "C D E F# G G# A B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      7,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "5P",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "bebop dorian mode 3"
+  },
+  {
+    "name": "bebop dorian mode 4",
+    "notes": "C D E F F# G A Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      6,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "4A",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "bebop dorian mode 4"
+  },
+  {
+    "name": "bebop dorian mode 5",
+    "notes": "C D Eb E F G Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      5,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "3M",
+      "4P",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "bebop dorian mode 5"
+  },
+  {
+    "name": "bebop dorian mode 6",
+    "notes": "C Db D Eb F Gb Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      3,
+      5,
+      6,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "2M",
+      "3m",
+      "4P",
+      "5d",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "bebop dorian mode 6"
+  },
+  {
+    "name": "bebop dorian mode 7",
+    "notes": "C C# D E F G A B C",
+    "semitones": [
+      0,
+      1,
+      2,
+      4,
+      5,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3M",
+      "4P",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "bebop dorian mode 7"
+  },
+  {
+    "name": "bebop altered",
+    "notes": "C C# D# E F# G# A# B C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      6,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2A",
+      "3M",
+      "4A",
+      "5A",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "bebop dorian mode 8"
+  },
+  {
+    "name": "bebop melodic minor",
+    "notes": "C D Eb F G G# A B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      7,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "5P",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "bebop melodic minor mode 1"
+  },
+  {
+    "name": "bebop melodic minor mode 2",
+    "notes": "C Db Eb F F# G A Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      6,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "4A",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "bebop melodic minor mode 2"
+  },
+  {
+    "name": "bebop melodic minor mode 3",
+    "notes": "C D E F F# G# A B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      6,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "4A",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "bebop melodic minor mode 3"
+  },
+  {
+    "name": "bebop melodic minor mode 4",
+    "notes": "C D D# E F# G A Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      6,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "2A",
+      "3M",
+      "4A",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "bebop melodic minor mode 4"
+  },
+  {
+    "name": "bebop melodic minor mode 5",
+    "notes": "C C# D E F G Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      4,
+      5,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3M",
+      "4P",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "bebop melodic minor mode 5"
+  },
+  {
+    "name": "bebop melodic minor mode 6",
+    "notes": "C C# D# E F# G A B C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      6,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2A",
+      "3M",
+      "4A",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "bebop melodic minor mode 6"
+  },
+  {
+    "name": "bebop half diminished",
+    "notes": "C D Eb F Gb Ab Bb B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      6,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "5d",
+      "6m",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "bebop melodic minor mode 7"
+  },
+  {
+    "name": "bebop melodic minor mode 8",
+    "notes": "C C# D# E F# G# A Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      6,
+      8,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2A",
+      "3M",
+      "4A",
+      "5A",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "bebop melodic minor mode 8"
+  },
+  {
+    "name": "hungarian blue scale",
+    "notes": "C D Eb F F# G# A C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      6,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "4A",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "hungarian blue scale mode 1"
+  },
+  {
+    "name": "hungarian blue scale mode 2",
+    "notes": "C C# D# E F# G Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      6,
+      7,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2A",
+      "3M",
+      "4A",
+      "5P",
+      "7m",
+      "8P"
+    ],
+    "mode": "hungarian blue scale mode 2"
+  },
+  {
+    "name": "hungarian blue scale mode 3",
+    "notes": "C D Eb F F# A Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      6,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "4A",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "hungarian blue scale mode 3"
+  },
+  {
+    "name": "hungarian blue scale mode 4",
+    "notes": "C C# D# E G A Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2A",
+      "3M",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "hungarian blue scale mode 4"
+  },
+  {
+    "name": "hungarian blue scale mode 5",
+    "notes": "C D Eb F# G# A B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      6,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4A",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "hungarian blue scale mode 5"
+  },
+  {
+    "name": "hungarian blue scale mode 6",
+    "notes": "C C# E F# G A Bb C",
+    "semitones": [
+      0,
+      1,
+      4,
+      6,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "3M",
+      "4A",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "hungarian blue scale mode 6"
+  },
+  {
+    "name": "hungarian blue scale mode 7",
+    "notes": "C Eb F F# G# A B C",
+    "semitones": [
+      0,
+      3,
+      5,
+      6,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4P",
+      "4A",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "hungarian blue scale mode 7"
+  },
+  {
+    "name": "zirafkand locrian harmonic",
+    "notes": "C Db Eb F Gb Ab B C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      6,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5d",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "zirafkand mode 1"
+  },
+  {
+    "name": "zirafkand mode 2",
+    "notes": "C D E F G A# B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      7,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "5P",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "zirafkand mode 2"
+  },
+  {
+    "name": "zirafkand mode 3",
+    "notes": "C D Eb F G# A Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      8,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "5A",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "zirafkand mode 3"
+  },
+  {
+    "name": "zirafkand mode 4",
+    "notes": "C Db Eb F# G Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      6,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4A",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "zirafkand mode 4"
+  },
+  {
+    "name": "zirafkand mode 5",
+    "notes": "C D F F# G A B C",
+    "semitones": [
+      0,
+      2,
+      5,
+      6,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4P",
+      "4A",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "zirafkand mode 5"
+  },
+  {
+    "name": "zirafkand mode 6",
+    "notes": "C D# E F G A Bb C",
+    "semitones": [
+      0,
+      3,
+      4,
+      5,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4P",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "zirafkand mode 6"
+  },
+  {
+    "name": "zirafkand mode 7",
+    "notes": "C C# D E F# G A C",
+    "semitones": [
+      0,
+      1,
+      2,
+      4,
+      6,
+      7,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3M",
+      "4A",
+      "5P",
+      "6M",
+      "8P"
+    ],
+    "mode": "zirafkand mode 7"
+  },
+  {
+    "name": "whole tone bebop leading whole tone",
+    "notes": "C D E F# G# A# B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "5A",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "leading whole tone mode 1"
+  },
+  {
+    "name": "whole tone bebop mode 2",
+    "notes": "C D E F# G# A Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "5A",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "leading whole tone mode 2"
+  },
+  {
+    "name": "lydian minor",
+    "notes": "C D E F# G Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "leading whole tone mode 3"
+  },
+  {
+    "name": "major locrian arabic",
+    "notes": "C D E F Gb Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      6,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "5d",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "leading whole tone mode 4"
+  },
+  {
+    "name": "whole tone bebop mode 5",
+    "notes": "C D Eb Fb Gb Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      6,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4d",
+      "5d",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "leading whole tone mode 5"
+  },
+  {
+    "name": "whole tone bebop mode 6",
+    "notes": "C C# D E F# Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      4,
+      6,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3M",
+      "4A",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "leading whole tone mode 6"
+  },
+  {
+    "name": "neapolitan major",
+    "notes": "C Db Eb F G A B C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "leading whole tone mode 7"
+  },
+  {
+    "name": "neapolitan minor harmonic phrygian",
+    "notes": "C Db Eb F G Ab B C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "harmonic phyrgian mode 1"
+  },
+  {
+    "name": "harmonic phrygian mode 2",
+    "notes": "C D E F# G A# B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      7,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "5P",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "harmonic phyrgian mode 2"
+  },
+  {
+    "name": "yusef synthetic 4",
+    "notes": "C D E F G# A Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      8,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "5A",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "harmonic phyrgian mode 3"
+  },
+  {
+    "name": "harmonic phrygian mode 4",
+    "notes": "C D Eb F# G Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      6,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4A",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "harmonic phyrgian mode 4"
+  },
+  {
+    "name": "rahawi",
+    "notes": "C Db E F Gb Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      6,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "4P",
+      "5d",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "harmonic phyrgian mode 5"
+  },
+  {
+    "name": "harmonic phrygian mode 6",
+    "notes": "C D# E F G A B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      5,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4P",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "harmonic phyrgian mode 6"
+  },
+  {
+    "name": "harmonic phrygian mode 7",
+    "notes": "C C# D E F# G# A C",
+    "semitones": [
+      0,
+      1,
+      2,
+      4,
+      6,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3M",
+      "4A",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "harmonic phyrgian mode 7"
+  },
+  {
+    "name": "lydian harmonic",
+    "notes": "C D E F# G Ab B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "5P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "lydian harmonic mode 1"
+  },
+  {
+    "name": "dominant b 5",
+    "notes": "C D E F Gb A Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      6,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "5d",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "lydian harmonic mode 2"
+  },
+  {
+    "name": "aeolian diminished 4",
+    "notes": "C D Eb Fb G Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4d",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "lydian harmonic mode 3"
+  },
+  {
+    "name": "locrian b 3",
+    "notes": "C C# D F Gb Ab Bb",
+    "semitones": [
+      0,
+      1,
+      2,
+      5,
+      6,
+      8,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "4P",
+      "5d",
+      "6m",
+      "8P"
+    ],
+    "mode": "lydian harmonic mode 4"
+  },
+  {
+    "name": "major b 2",
+    "notes": "C Db E F G A B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "4P",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "lydian harmonic mode 5"
+  },
+  {
+    "name": "lydian 2 5 6",
+    "notes": "C D# E F# G# A# B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      6,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4A",
+      "5A",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "lydian harmonic mode 6"
+  },
+  {
+    "name": "phrygian b 7",
+    "notes": "C Db Eb F G Ab A C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      7,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5P",
+      "6m",
+      "6M",
+      "8P"
+    ],
+    "mode": "lydian harmonic mode 7"
+  },
+  {
+    "name": "noh",
+    "notes": "C D F G G# A B C",
+    "semitones": [
+      0,
+      2,
+      5,
+      7,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4P",
+      "5P",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "noh mode 1"
+  },
+  {
+    "name": "noh mode 2",
+    "notes": "C Eb F F# G A Bb C",
+    "semitones": [
+      0,
+      3,
+      5,
+      6,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4P",
+      "4A",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "noh mode 2"
+  },
+  {
+    "name": "noh mode 3",
+    "notes": "C D D# E F# G A C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      6,
+      7,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "2A",
+      "3M",
+      "4A",
+      "5P",
+      "6M",
+      "8P"
+    ],
+    "mode": "noh mode 3"
+  },
+  {
+    "name": "noh mode 4",
+    "notes": "C C# D E F G Bb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      4,
+      5,
+      7,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3M",
+      "4P",
+      "5P",
+      "7m",
+      "8P"
+    ],
+    "mode": "noh mode 4"
+  },
+  {
+    "name": "noh mode 5",
+    "notes": "C C# D# E F# A B C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      6,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2A",
+      "3M",
+      "4A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "noh mode 5"
+  },
+  {
+    "name": "noh mode 6",
+    "notes": "C D Eb F Ab Bb B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "6m",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "noh mode 6"
+  },
+  {
+    "name": "noh mode 7",
+    "notes": "C Db Eb Gb Ab A Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      6,
+      8,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "5d",
+      "6m",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "noh mode 7"
+  },
+  {
+    "name": "sri purvi",
+    "notes": "C Db E F# G Ab B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      6,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "4A",
+      "5P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "sri mode 1"
+  },
+  {
+    "name": "sri mode 2",
+    "notes": "C Eb F F# G A# B C",
+    "semitones": [
+      0,
+      3,
+      5,
+      6,
+      7,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4P",
+      "4A",
+      "5P",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "sri mode 2"
+  },
+  {
+    "name": "sri mode 3",
+    "notes": "C D Eb Fb G Ab A C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      7,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4d",
+      "5P",
+      "6m",
+      "6M",
+      "8P"
+    ],
+    "mode": "sri mode 3"
+  },
+  {
+    "name": "sri mode 4",
+    "notes": "C C# D F F# G Bb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      5,
+      6,
+      7,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "4P",
+      "4A",
+      "5P",
+      "7m",
+      "8P"
+    ],
+    "mode": "sri mode 4"
+  },
+  {
+    "name": "sri mode 5",
+    "notes": "C Db E F Gb A B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      6,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "4P",
+      "5d",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "sri mode 5"
+  },
+  {
+    "name": "sri mode 6",
+    "notes": "C D# E F G# A# B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      5,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4P",
+      "5A",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "sri mode 6"
+  },
+  {
+    "name": "sri mode 7",
+    "notes": "C C# D F G Ab A C",
+    "semitones": [
+      0,
+      1,
+      2,
+      5,
+      7,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "4P",
+      "5P",
+      "6m",
+      "6M",
+      "8P"
+    ],
+    "mode": "sri mode 7"
+  },
+  {
+    "name": "todi",
+    "notes": "C Db Eb F# G Ab B C",
+    "semitones": [
+      0,
+      1,
+      3,
+      6,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4A",
+      "5P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "todi mode 1"
+  },
+  {
+    "name": "todi mode 2",
+    "notes": "C D F F# G A# B C",
+    "semitones": [
+      0,
+      2,
+      5,
+      6,
+      7,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4P",
+      "4A",
+      "5P",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "todi mode 2"
+  },
+  {
+    "name": "todi mode 3",
+    "notes": "C D# E F G# A Bb",
+    "semitones": [
+      0,
+      3,
+      4,
+      5,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4P",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "todi mode 3"
+  },
+  {
+    "name": "todi mode 4",
+    "notes": "C C# D E# F# G A C",
+    "semitones": [
+      0,
+      1,
+      2,
+      5,
+      6,
+      7,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3A",
+      "4A",
+      "5P",
+      "6M",
+      "8P"
+    ],
+    "mode": "todi mode 4"
+  },
+  {
+    "name": "todi mode 5",
+    "notes": "C Db E F Gb Ab B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      6,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "4P",
+      "5d",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "todi mode 5"
+  },
+  {
+    "name": "todi mode 6",
+    "notes": "C D# E F G A# B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      5,
+      7,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4P",
+      "5P",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "todi mode 6"
+  },
+  {
+    "name": "todi mode 7",
+    "notes": "C C# D E G G# A C",
+    "semitones": [
+      0,
+      1,
+      2,
+      4,
+      7,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3M",
+      "5P",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "todi mode 7"
+  },
+  {
+    "name": "enigmatic 1",
+    "notes": "C Db E Gb Ab Bb B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      6,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "5d",
+      "6m",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "enigmatic 1 mode 1"
+  },
+  {
+    "name": "enigmatic 1 mode 2",
+    "notes": "C Eb F G A A# B C",
+    "semitones": [
+      0,
+      3,
+      5,
+      7,
+      9,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4P",
+      "5P",
+      "6M",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "enigmatic 1 mode 2"
+  },
+  {
+    "name": "enigmatic 1 mode 3",
+    "notes": "C D E F# G G# A C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      7,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "5P",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "enigmatic 1 mode 3"
+  },
+  {
+    "name": "enigmatic 1 mode 4",
+    "notes": "C D E F F# G Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      6,
+      7,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "4A",
+      "5P",
+      "7m",
+      "8P"
+    ],
+    "mode": "enigmatic 1 mode 4"
+  },
+  {
+    "name": "enigmatic 1 mode 5",
+    "notes": "C D D# E F Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      5,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "2A",
+      "3M",
+      "4P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "enigmatic 1 mode 5"
+  },
+  {
+    "name": "enigmatic 1 mode 6",
+    "notes": "C C# D Eb Gb Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      3,
+      6,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3m",
+      "5d",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "enigmatic 1 mode 6"
+  },
+  {
+    "name": "enigmatic 1 mode 7",
+    "notes": "C C# D F G A B C",
+    "semitones": [
+      0,
+      1,
+      2,
+      5,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "4P",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "enigmatic 1 mode 7"
+  },
+  {
+    "name": "enigmatic 2",
+    "notes": "C Db E F Ab Bb B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "4P",
+      "6m",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "enigmatic 2 mode 1"
+  },
+  {
+    "name": "enigmatic 2 mode 2",
+    "notes": "C D# E G A A# B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      7,
+      9,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "5P",
+      "6M",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "enigmatic 2 mode 2"
+  },
+  {
+    "name": "enigmatic 2 mode 3",
+    "notes": "C C# E F# G G# A C",
+    "semitones": [
+      0,
+      1,
+      4,
+      6,
+      7,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "3M",
+      "4A",
+      "5P",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "enigmatic 2 mode 3"
+  },
+  {
+    "name": "enigmatic 2 mode 4",
+    "notes": "C Eb F F# G Ab B C",
+    "semitones": [
+      0,
+      3,
+      5,
+      6,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4P",
+      "4A",
+      "5P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "enigmatic 2 mode 4"
+  },
+  {
+    "name": "enigmatic 2 mode 5",
+    "notes": "C D D# E F G# A C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      5,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "2A",
+      "3M",
+      "4P",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "enigmatic 2 mode 5"
+  },
+  {
+    "name": "enigmatic 2 mode 6",
+    "notes": "C C# D Eb F# G Bb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      3,
+      6,
+      7,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3m",
+      "4A",
+      "5P",
+      "7m",
+      "8P"
+    ],
+    "mode": "enigmatic 2 mode 6"
+  },
+  {
+    "name": "enigmatic 2 mode 7",
+    "notes": "C C# D F F# A B C",
+    "semitones": [
+      0,
+      1,
+      2,
+      5,
+      6,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "4P",
+      "4A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "enigmatic 2 mode 7"
+  },
+  {
+    "name": "blues scale",
+    "notes": "C Eb F F# G Bb C",
+    "semitones": [
+      0,
+      3,
+      5,
+      6,
+      7,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4P",
+      "4A",
+      "5P",
+      "7m",
+      "8P"
+    ],
+    "mode": "blues scale mode 1"
+  },
+  {
+    "name": "major blues scale",
+    "notes": "C D Eb E G A C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      7,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "3M",
+      "5P",
+      "6M",
+      "8P"
+    ],
+    "mode": "blues scale mode 2"
+  },
+  {
+    "name": "blues scale mode 3",
+    "notes": "C C# D F G Bb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      5,
+      7,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "4P",
+      "5P",
+      "7m",
+      "8P"
+    ],
+    "mode": "blues scale mode 3"
+  },
+  {
+    "name": "marwa",
+    "notes": "C C# E F# A B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      6,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "3M",
+      "4A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "blues scale mode 4"
+  },
+  {
+    "name": "blues scale mode 5",
+    "notes": "C Eb F Ab Bb B C",
+    "semitones": [
+      0,
+      3,
+      5,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4P",
+      "6m",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "blues scale mode 5"
+  },
+  {
+    "name": "blues scale mode 6",
+    "notes": "C D F G G# A C",
+    "semitones": [
+      0,
+      2,
+      5,
+      7,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4P",
+      "5P",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "blues scale mode 6"
+  },
+  {
+    "name": "1 prometheus",
+    "notes": "C D E F# A Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "prometheus mode 1"
+  },
+  {
+    "name": "2 prometheus mode 2",
+    "notes": "C D E G Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "prometheus mode 2"
+  },
+  {
+    "name": "3 prometheus mode 3",
+    "notes": "C D F Gb Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      5,
+      6,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4P",
+      "5d",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "prometheus mode 3"
+  },
+  {
+    "name": "4 prometheus mode 4",
+    "notes": "C D# E F# Ab Bb C",
+    "semitones": [
+      0,
+      3,
+      4,
+      6,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4A",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "prometheus mode 4"
+  },
+  {
+    "name": "5 prometheus mode 5",
+    "notes": "C Db Eb F G A C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      7,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5P",
+      "6M",
+      "8P"
+    ],
+    "mode": "prometheus mode 5"
+  },
+  {
+    "name": "6 prometheus mode 6",
+    "notes": "C D E F# G# B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "5A",
+      "7M",
+      "8P"
+    ],
+    "mode": "prometheus mode 6"
+  },
+  {
+    "name": "sho 1",
+    "notes": "C D Eb F G A C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      7,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "5P",
+      "6M",
+      "8P"
+    ],
+    "mode": "sho 1 mode 1"
+  },
+  {
+    "name": "sho 1 mode 2",
+    "notes": "C Db Eb F G Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      7,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5P",
+      "7m",
+      "8P"
+    ],
+    "mode": "sho 1 mode 2"
+  },
+  {
+    "name": "sho 1 mode 3",
+    "notes": "C D E F# A B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "sho 1 mode 3"
+  },
+  {
+    "name": "sho 1 mode 4",
+    "notes": "C D E G A Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "sho 1 mode 4"
+  },
+  {
+    "name": "sho 1 mode 5",
+    "notes": "C D F G Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      5,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4P",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "sho 1 mode 5"
+  },
+  {
+    "name": "sho 1 mode 6",
+    "notes": "C Eb F Gb Ab Bb C",
+    "semitones": [
+      0,
+      3,
+      5,
+      6,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4P",
+      "5d",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "sho 1 mode 6"
+  },
+  {
+    "name": "sho 2",
+    "notes": "C Db Eb Fb Gb Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      6,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4d",
+      "5d",
+      "7m",
+      "8P"
+    ],
+    "mode": "sho 2 mode 1"
+  },
+  {
+    "name": "sho 2 mode 2",
+    "notes": "C D Eb F A B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "sho 2 mode 2"
+  },
+  {
+    "name": "sho 2 mode 3",
+    "notes": "C Db Eb G A Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "sho 2 mode 3"
+  },
+  {
+    "name": "sho 2 mode 4",
+    "notes": "C D F# G# A B C",
+    "semitones": [
+      0,
+      2,
+      6,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4A",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "sho 2 mode 4"
+  },
+  {
+    "name": "sho 2 mode 5",
+    "notes": "C E F# G A Bb C",
+    "semitones": [
+      0,
+      4,
+      6,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3M",
+      "4A",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "sho 2 mode 5"
+  },
+  {
+    "name": "sho 2 mode 6",
+    "notes": "C D Eb F Gb Ab A",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      6,
+      8,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "5d",
+      "6m",
+      "8P"
+    ],
+    "mode": "sho 2 mode 6"
+  },
+  {
+    "name": "major pentatonic",
+    "notes": "C D E G A C",
+    "semitones": [
+      0,
+      2,
+      4,
+      7,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "5P",
+      "6M",
+      "8P"
+    ],
+    "mode": "major pentatonic mode 1"
+  },
+  {
+    "name": "major pentatonic mode 2",
+    "notes": "C D F G Bb C",
+    "semitones": [
+      0,
+      2,
+      5,
+      7,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4P",
+      "5P",
+      "7m",
+      "8P"
+    ],
+    "mode": "major pentatonic mode 2"
+  },
+  {
+    "name": "major pentatonic mode 3",
+    "notes": "C Eb F Ab Bb C",
+    "semitones": [
+      0,
+      3,
+      5,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "major pentatonic mode 3"
+  },
+  {
+    "name": "banshiki cho",
+    "notes": "C D F G A C",
+    "semitones": [
+      0,
+      2,
+      5,
+      7,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4P",
+      "5P",
+      "6M",
+      "8P"
+    ],
+    "mode": "major pentatonic mode 4"
+  },
+  {
+    "name": "minor pentatonic",
+    "notes": "C Eb F G Bb C",
+    "semitones": [
+      0,
+      3,
+      5,
+      7,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4P",
+      "5P",
+      "7m",
+      "8P"
+    ],
+    "mode": "major pentatonic mode 5"
+  },
+  {
+    "name": "kansas city kumoi",
+    "notes": "C D Eb G A C",
+    "semitones": [
+      0,
+      2,
+      3,
+      7,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "5P",
+      "6M",
+      "8P"
+    ],
+    "mode": "kansas city mode 1"
+  },
+  {
+    "name": "in sen",
+    "notes": "C Db F G Bb C",
+    "semitones": [
+      0,
+      1,
+      5,
+      7,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "4P",
+      "5P",
+      "7m",
+      "8P"
+    ],
+    "mode": "kansas city mode 2"
+  },
+  {
+    "name": "kansas city mode 3",
+    "notes": "C E F# A B C",
+    "semitones": [
+      0,
+      4,
+      6,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3M",
+      "4A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "kansas city mode 3"
+  },
+  {
+    "name": "kansas city mode 4",
+    "notes": "C D F G Ab C",
+    "semitones": [
+      0,
+      2,
+      5,
+      7,
+      8,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4P",
+      "5P",
+      "6m",
+      "8P"
+    ],
+    "mode": "kansas city mode 4"
+  },
+  {
+    "name": "kansas city mode 5",
+    "notes": "C Eb F Gb Bb C",
+    "semitones": [
+      0,
+      3,
+      5,
+      6,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4P",
+      "5d",
+      "7m",
+      "8P"
+    ],
+    "mode": "kansas city mode 5"
+  },
+  {
+    "name": "augmented pentatonic major pentatonic b 6",
+    "notes": "C D E G Ab C",
+    "semitones": [
+      0,
+      2,
+      4,
+      7,
+      8,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "5P",
+      "6m",
+      "8P"
+    ],
+    "mode": "augmented pentatonic mode 1"
+  },
+  {
+    "name": "augmented pentatonic mode 2",
+    "notes": "C D F Gb Bb C",
+    "semitones": [
+      0,
+      2,
+      5,
+      6,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4P",
+      "5d",
+      "7m",
+      "8P"
+    ],
+    "mode": "augmented pentatonic mode 2"
+  },
+  {
+    "name": "altered pentatonic",
+    "notes": "C Eb E Ab Bb C",
+    "semitones": [
+      0,
+      3,
+      4,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "3M",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "augmented pentatonic mode 3"
+  },
+  {
+    "name": "augmented pentatonic mode 4",
+    "notes": "C Db F G A C",
+    "semitones": [
+      0,
+      1,
+      5,
+      7,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "4P",
+      "5P",
+      "6M",
+      "8P"
+    ],
+    "mode": "augmented pentatonic mode 4"
+  },
+  {
+    "name": "augmented pentatonic mode 5",
+    "notes": "C E F# G# B C",
+    "semitones": [
+      0,
+      4,
+      6,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3M",
+      "4A",
+      "5A",
+      "7M",
+      "8P"
+    ],
+    "mode": "augmented pentatonic mode 5"
+  },
+  {
+    "name": "hirajoshi akebono",
+    "notes": "C D Eb G Ab C",
+    "semitones": [
+      0,
+      2,
+      3,
+      7,
+      8,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "5P",
+      "6m",
+      "8P"
+    ],
+    "mode": "kojo no tsuki mode 1"
+  },
+  {
+    "name": "iwato",
+    "notes": "C Db F Gb Bb C",
+    "semitones": [
+      0,
+      1,
+      5,
+      6,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "4P",
+      "5d",
+      "7m",
+      "8P"
+    ],
+    "mode": "kojo no tsuki mode 2"
+  },
+  {
+    "name": "kumoi",
+    "notes": "C E F A B C",
+    "semitones": [
+      0,
+      4,
+      5,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3M",
+      "4P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "kojo no tsuki mode 3"
+  },
+  {
+    "name": "hon kumoi shiouzhi",
+    "notes": "C Db F G Ab C",
+    "semitones": [
+      0,
+      1,
+      5,
+      7,
+      8,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "4P",
+      "5P",
+      "6m",
+      "8P"
+    ],
+    "mode": "kojo no tsuki mode 4"
+  },
+  {
+    "name": "chinese japanese",
+    "notes": "C E F# G B C",
+    "semitones": [
+      0,
+      4,
+      6,
+      7,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3M",
+      "4A",
+      "5P",
+      "7M",
+      "8P"
+    ],
+    "mode": "kojo no tsuki mode 5"
+  },
+  {
+    "name": "pygmy yo",
+    "notes": "C D Eb G Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      7,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "5P",
+      "7m",
+      "8P"
+    ],
+    "mode": "five note pygmy scale of rwanda mode 1"
+  },
+  {
+    "name": "pygmy mode 2",
+    "notes": "C Db F Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      5,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "4P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "five note pygmy scale of rwanda mode 2"
+  },
+  {
+    "name": "pgymy mode 3",
+    "notes": "C E G A B C",
+    "semitones": [
+      0,
+      4,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3M",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "five note pygmy scale of rwanda mode 3"
+  },
+  {
+    "name": "pgymy mode 4",
+    "notes": "C Eb F G Ab C",
+    "semitones": [
+      0,
+      3,
+      5,
+      7,
+      8,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4P",
+      "5P",
+      "6m",
+      "8P"
+    ],
+    "mode": "five note pygmy scale of rwanda mode 4"
+  },
+  {
+    "name": "pgymy mode 5",
+    "notes": "C D E F A C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "6M",
+      "8P"
+    ],
+    "mode": "five note pygmy scale of rwanda mode 5"
+  },
+  {
+    "name": "jog",
+    "notes": "C D F# G A C",
+    "semitones": [
+      0,
+      2,
+      6,
+      7,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4A",
+      "5P",
+      "6M",
+      "8P"
+    ],
+    "mode": "jog mode 1"
+  },
+  {
+    "name": "jog mode 2",
+    "notes": "C E F G Bb C",
+    "semitones": [
+      0,
+      4,
+      5,
+      7,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3M",
+      "4P",
+      "5P",
+      "7m",
+      "8P"
+    ],
+    "mode": "jog mode 2"
+  },
+  {
+    "name": "jog mode 3",
+    "notes": "C Db Eb Gb Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      6,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "5d",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "jog mode 3"
+  },
+  {
+    "name": "jog mode 4",
+    "notes": "C D F G B C",
+    "semitones": [
+      0,
+      2,
+      5,
+      7,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4P",
+      "5P",
+      "7M",
+      "8P"
+    ],
+    "mode": "jog mode 4"
+  },
+  {
+    "name": "jog mode 5",
+    "notes": "C Eb F A Bb C",
+    "semitones": [
+      0,
+      3,
+      5,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "jog mode 5"
+  },
+  {
+    "name": "hansa dhwani",
+    "notes": "C D E G B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      7,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "5P",
+      "7M",
+      "8P"
+    ],
+    "mode": "hansa dhwani mode 1"
+  },
+  {
+    "name": "hansa dhwani mode 2",
+    "notes": "C D F A Bb C",
+    "semitones": [
+      0,
+      2,
+      5,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "hansa dhwani mode 2"
+  },
+  {
+    "name": "hansa dhwani mode 3",
+    "notes": "C Eb G Ab Bb C",
+    "semitones": [
+      0,
+      3,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "hansa dhwani mode 3"
+  },
+  {
+    "name": "hansa dhwani mode 4",
+    "notes": "C E F G A C",
+    "semitones": [
+      0,
+      4,
+      5,
+      7,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3M",
+      "4P",
+      "5P",
+      "6M",
+      "8P"
+    ],
+    "mode": "hansa dhwani mode 4"
+  },
+  {
+    "name": "hansa dhwani mode 5",
+    "notes": "C Db Eb F Ab C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      8,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "6m",
+      "8P"
+    ],
+    "mode": "hansa dhwani mode 5"
+  },
+  {
+    "name": "yusef synthetic 3",
+    "notes": "C D F F# G Bb B C",
+    "semitones": [
+      0,
+      2,
+      5,
+      6,
+      7,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4P",
+      "4A",
+      "5P",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 3 mode 2",
+    "notes": "C D# E F G# A Bb C",
+    "semitones": [
+      0,
+      3,
+      4,
+      5,
+      8,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4P",
+      "5A",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 3 mode 3",
+    "notes": "C C# D F F# G A C",
+    "semitones": [
+      0,
+      1,
+      2,
+      5,
+      6,
+      7,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "4P",
+      "4A",
+      "5P",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 3 mode 4",
+    "notes": "C C# E F F# G# B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      6,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "3M",
+      "4P",
+      "4A",
+      "5A",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 3 mode 5",
+    "notes": "C D# E F G Bb B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      5,
+      7,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4P",
+      "5P",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 3 mode 6",
+    "notes": "C C# D E G G# A C",
+    "semitones": [
+      0,
+      1,
+      2,
+      4,
+      7,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3M",
+      "5P",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 3 mode 7",
+    "notes": "C C# D# F# G G# B C",
+    "semitones": [
+      0,
+      1,
+      3,
+      6,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2A",
+      "4A",
+      "5P",
+      "5A",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 5",
+    "notes": "C D Eb E G Ab Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "3M",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 5 mode 2",
+    "notes": "C C# D F Gb Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      5,
+      6,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "4P",
+      "5d",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 5 mode 3",
+    "notes": "C C# E F G A B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "3M",
+      "4P",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 5 mode 4",
+    "notes": "C Eb Fb Gb Ab Bb B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      6,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4d",
+      "5d",
+      "6m",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 5 mode 5",
+    "notes": "C C# E F G A B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "3M",
+      "4P",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 5 mode 6",
+    "notes": "C Db Eb F G G# A C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      7,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "5P",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 5 mode 7",
+    "notes": "C D E F# G G# B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "5P",
+      "5A",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 6",
+    "notes": "C D Eb E G G# A C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      7,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "3M",
+      "5P",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 6 mode 2",
+    "notes": "C C# D F F# G Bb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      5,
+      6,
+      7,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "4P",
+      "4A",
+      "5P",
+      "7m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 6 mode 3",
+    "notes": "C C# E F F# A B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      6,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "3M",
+      "4P",
+      "4A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 6 mode 4",
+    "notes": "C Eb E F Ab Bb B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      5,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "3M",
+      "4P",
+      "6m",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 6 mode 5",
+    "notes": "C C# D F G G# A C",
+    "semitones": [
+      0,
+      1,
+      2,
+      5,
+      7,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "4P",
+      "5P",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 6 mode 6",
+    "notes": "C C# E F# G G# B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      6,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "3M",
+      "4A",
+      "5P",
+      "5A",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 6 mode 7",
+    "notes": "C Eb F F# G Bb B C",
+    "semitones": [
+      0,
+      3,
+      5,
+      6,
+      7,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4P",
+      "4A",
+      "5P",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 8",
+    "notes": "C D Eb F G# A B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 8 mode 2",
+    "notes": "C Db Eb F# G A Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      6,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4A",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 8 mode 3",
+    "notes": "C D F F# G# A B C",
+    "semitones": [
+      0,
+      2,
+      5,
+      6,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4P",
+      "4A",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 8 mode 4",
+    "notes": "C D# E F# G A Bb C",
+    "semitones": [
+      0,
+      3,
+      4,
+      6,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4A",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 8 mode 5",
+    "notes": "C C# D# E F# G A C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      6,
+      7,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2A",
+      "3M",
+      "4A",
+      "5P",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 8 mode 6",
+    "notes": "C D Eb F F# G# B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      6,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "4A",
+      "5A",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 8 mode 7",
+    "notes": "C C# D# E F# G A C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      6,
+      7,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2A",
+      "3M",
+      "4A",
+      "5P",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 9",
+    "notes": "C C# D# E G# A B C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2A",
+      "3M",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 9 mode 2",
+    "notes": "C D Eb G Ab Bb B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      7,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "5P",
+      "6m",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 9 mode 3",
+    "notes": "C Db F F# G# A B C",
+    "semitones": [
+      0,
+      1,
+      5,
+      6,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "4P",
+      "4A",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 9 mode 4",
+    "notes": "C E F G G# A B C",
+    "semitones": [
+      0,
+      4,
+      5,
+      7,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3M",
+      "4P",
+      "5P",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 9 mode 5",
+    "notes": "C Db Eb E F G Ab C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      7,
+      8,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "3M",
+      "4P",
+      "5P",
+      "6m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 9 mode 6",
+    "notes": "C D D# E F# G B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      6,
+      7,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "2A",
+      "3M",
+      "4A",
+      "5P",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 9 mode 7",
+    "notes": "C C# D E F A Bb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      4,
+      5,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3M",
+      "4P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 10",
+    "notes": "C D F G Ab B C",
+    "semitones": [
+      0,
+      2,
+      5,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4P",
+      "5P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 10 mode 2",
+    "notes": "C Eb F Gb A Bb C",
+    "semitones": [
+      0,
+      3,
+      5,
+      6,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4P",
+      "5d",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 10 mode 3",
+    "notes": "C D Eb F# G A C",
+    "semitones": [
+      0,
+      2,
+      3,
+      6,
+      7,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4A",
+      "5P",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 10 mode 4",
+    "notes": "C Db E F A Bb C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "4P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 10 mode 5",
+    "notes": "C D# E F# A B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      6,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 10 mode 6",
+    "notes": "C Db Eb Gb Ab A C",
+    "semitones": [
+      0,
+      1,
+      3,
+      6,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "5d",
+      "6m",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 11 mode 1",
+    "notes": "C Eb F# G B C",
+    "semitones": [
+      0,
+      3,
+      6,
+      7,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4A",
+      "5P",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 11 mode 2",
+    "notes": "C D# E G# A C",
+    "semitones": [
+      0,
+      3,
+      4,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 11 mode 3",
+    "notes": "C Db F F# A C",
+    "semitones": [
+      0,
+      1,
+      5,
+      6,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "4P",
+      "4A",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 11 mode 4",
+    "notes": "C E F Ab B C",
+    "semitones": [
+      0,
+      4,
+      5,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3M",
+      "4P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 11 mode 5",
+    "notes": "C Db E G Ab C",
+    "semitones": [
+      0,
+      1,
+      4,
+      7,
+      8,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "5P",
+      "6m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 12",
+    "notes": "C E G Ab B C",
+    "semitones": [
+      0,
+      4,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3M",
+      "5P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 12 mode 2",
+    "notes": "C D# E G Ab C",
+    "semitones": [
+      0,
+      3,
+      4,
+      7,
+      8,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "5P",
+      "6m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 12 mode 3",
+    "notes": "C Db E F A C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "4P",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 12 mode 4",
+    "notes": "C D# E G# B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "5A",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 12 mode 5",
+    "notes": "C Db F G# A C",
+    "semitones": [
+      0,
+      1,
+      5,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "4P",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 13",
+    "notes": "C Db F G# A C",
+    "semitones": [
+      0,
+      1,
+      5,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "4P",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 13 mode 2",
+    "notes": "C E G Ab B C",
+    "semitones": [
+      0,
+      4,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3M",
+      "5P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 13 mode 3",
+    "notes": "C D# E G Ab C",
+    "semitones": [
+      0,
+      3,
+      4,
+      7,
+      8,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "5P",
+      "6m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 13 mode 4",
+    "notes": "C Db E F A C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "4P",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 13 mode 5",
+    "notes": "C D# E G# B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "5A",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 14",
+    "notes": "C F# A Bb B C",
+    "semitones": [
+      0,
+      6,
+      9,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "4A",
+      "6M",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 14 mode 2",
+    "notes": "C D# E F F# C",
+    "semitones": [
+      0,
+      3,
+      4,
+      5,
+      6,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4P",
+      "4A",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 14 mode 3",
+    "notes": "C C# D Eb A C",
+    "semitones": [
+      0,
+      1,
+      2,
+      3,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3m",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 14 mode 4",
+    "notes": "C C# D Ab B C",
+    "semitones": [
+      0,
+      1,
+      2,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 14 mode 5",
+    "notes": "C C# G Bb B C",
+    "semitones": [
+      0,
+      1,
+      7,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "5P",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 15",
+    "notes": "C Eb G A# B C",
+    "semitones": [
+      0,
+      3,
+      7,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "5P",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 15 mode 2",
+    "notes": "C E G G# A C",
+    "semitones": [
+      0,
+      4,
+      7,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3M",
+      "5P",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 15 mode 3",
+    "notes": "C D# E F Ab C",
+    "semitones": [
+      0,
+      3,
+      4,
+      5,
+      8,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4P",
+      "6m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 15 mode 4",
+    "notes": "C C# D F A C",
+    "semitones": [
+      0,
+      1,
+      2,
+      5,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "4P",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 15 mode 5",
+    "notes": "C C# E G# B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "3M",
+      "5A",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 16",
+    "notes": "C Db Ab B C",
+    "semitones": [
+      0,
+      1,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 16 mode 2",
+    "notes": "C G Bb B C",
+    "semitones": [
+      0,
+      7,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "5P",
+      "7m",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 16 mode 3",
+    "notes": "C D# E F C",
+    "semitones": [
+      0,
+      3,
+      4,
+      5,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4P",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 16 mode 4",
+    "notes": "C C# D A C",
+    "semitones": [
+      0,
+      1,
+      2,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 17",
+    "notes": "C Db F Gb C",
+    "semitones": [
+      0,
+      1,
+      5,
+      6,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "4P",
+      "5d",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 17 mode 2",
+    "notes": "C E F B C",
+    "semitones": [
+      0,
+      4,
+      5,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3M",
+      "4P",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 17 mode 3",
+    "notes": "C Db G Ab C",
+    "semitones": [
+      0,
+      1,
+      7,
+      8,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "5P",
+      "6m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 17 mode 4",
+    "notes": "C F# G B C",
+    "semitones": [
+      0,
+      6,
+      7,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "4A",
+      "5P",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 18",
+    "notes": "C Eb F Gb C",
+    "semitones": [
+      0,
+      3,
+      5,
+      6,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4P",
+      "5d",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 18 mode 2",
+    "notes": "C D Eb A C",
+    "semitones": [
+      0,
+      2,
+      3,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 18 mode 3",
+    "notes": "C Db G Bb C",
+    "semitones": [
+      0,
+      1,
+      7,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "5P",
+      "7m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 18 mode 4",
+    "notes": "C F# A B C",
+    "semitones": [
+      0,
+      6,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "4A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 19",
+    "notes": "C E G Ab C",
+    "semitones": [
+      0,
+      4,
+      7,
+      8,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3M",
+      "5P",
+      "6m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 19 mode 2",
+    "notes": "C D# E Ab C",
+    "semitones": [
+      0,
+      3,
+      4,
+      8,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "6m",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 19 mode 3",
+    "notes": "C Db F A C",
+    "semitones": [
+      0,
+      1,
+      5,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "4P",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 19 mode 4",
+    "notes": "C E G# B C",
+    "semitones": [
+      0,
+      4,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3M",
+      "5A",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 20",
+    "notes": "C Db E F C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "4P",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 20 mode 2",
+    "notes": "C D# E B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 20 mode 3",
+    "notes": "C Db G# A C",
+    "semitones": [
+      0,
+      1,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "yusef synthetic 20 mode 4",
+    "notes": "C G Ab B C",
+    "semitones": [
+      0,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "5P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "synthetic"
+  },
+  {
+    "name": "augmented mode 1",
+    "notes": "C D# E G Ab B C",
+    "semitones": [
+      0,
+      3,
+      4,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "5P",
+      "6m",
+      "7M",
+      "8P"
+    ],
+    "mode": "symmetrical"
+  },
+  {
+    "name": "augmented mode 2",
+    "notes": "C Db E F G# A C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3M",
+      "4P",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "symmetrical"
+  },
+  {
+    "name": "whole tone messiaen 1",
+    "notes": "C D E F# A Bb C",
+    "semitones": [
+      0,
+      2,
+      4,
+      6,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4A",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "diminished 1 messiaen 2 mode 1",
+    "notes": "C C# D# E F# G A Bb C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      6,
+      7,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2A",
+      "3M",
+      "4A",
+      "5P",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "diminished 2 messiaen 2 mode 2",
+    "notes": "C D Eb F F# G# A B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      5,
+      6,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4P",
+      "4A",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "messiaen 3 mode 1",
+    "notes": "C D D# E F# G G# A# B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "2A",
+      "3M",
+      "4A",
+      "5P",
+      "5A",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "messiaen 3 mode 2",
+    "notes": "C C# D E F F# G# A Bb",
+    "semitones": [
+      0,
+      1,
+      2,
+      4,
+      5,
+      6,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3M",
+      "4P",
+      "4A",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "messiaen 3 mode 3",
+    "notes": "C C# D# E F G G# A B C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      7,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2A",
+      "3M",
+      "4P",
+      "5P",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "messiaen 4 yusef synthetic 1",
+    "notes": "C C# D F F# G G# B C",
+    "semitones": [
+      0,
+      1,
+      2,
+      5,
+      6,
+      7,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "4P",
+      "4A",
+      "5P",
+      "5A",
+      "7M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "messiaen 4 mode 2",
+    "notes": "C C# E F F# G A# B C",
+    "semitones": [
+      0,
+      1,
+      4,
+      5,
+      6,
+      7,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "3M",
+      "4P",
+      "4A",
+      "5P",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "messiaen 4 mode 3",
+    "notes": "C D# E F F# A A# B",
+    "semitones": [
+      0,
+      3,
+      4,
+      5,
+      6,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4P",
+      "4A",
+      "6M",
+      "6A",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "messiaen 4 mode 4",
+    "notes": "C C# D D# F# G G# A C",
+    "semitones": [
+      0,
+      1,
+      2,
+      3,
+      6,
+      7,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "2A",
+      "4A",
+      "5P",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "messiaen 5 mode 1",
+    "notes": "C Db F F# G B C",
+    "semitones": [
+      0,
+      1,
+      5,
+      6,
+      7,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "4P",
+      "4A",
+      "5P",
+      "7M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "messiaen 5 mode 2",
+    "notes": "C F E F# A# B C",
+    "semitones": [
+      0,
+      5,
+      4,
+      6,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "4P",
+      "3M",
+      "4A",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "tritone semi messiaen 5 mode 3",
+    "notes": "C C# D F# G Ab C",
+    "semitones": [
+      0,
+      1,
+      2,
+      6,
+      7,
+      8,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "4A",
+      "5P",
+      "6m",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "messiaen 6 mode 1",
+    "notes": "C D E F F# G# A# B C",
+    "semitones": [
+      0,
+      2,
+      4,
+      5,
+      6,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3M",
+      "4P",
+      "4A",
+      "5A",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "messiaen 6 mode 2",
+    "notes": "C D D# E F# G# A Bb C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      6,
+      8,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "2A",
+      "3M",
+      "4A",
+      "5A",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "messiaen 6 mode 3",
+    "notes": "C C# D E F# G Ab Bb C",
+    "semitones": [
+      0,
+      1,
+      2,
+      4,
+      6,
+      7,
+      8,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3M",
+      "4A",
+      "5P",
+      "6m",
+      "7m",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "messiaen 6 mode 4",
+    "notes": "C Db Eb F F# G A B C",
+    "semitones": [
+      0,
+      1,
+      3,
+      5,
+      6,
+      7,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4P",
+      "4A",
+      "5P",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "messiaen 7 mode 1",
+    "notes": "C C# D Eb F F# G G# A B C",
+    "semitones": [
+      0,
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3m",
+      "4P",
+      "4A",
+      "5P",
+      "5A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "messiaen 7 mode 2",
+    "notes": "C C# D E F F# G G# A# B C",
+    "semitones": [
+      0,
+      1,
+      2,
+      4,
+      5,
+      6,
+      7,
+      8,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2M",
+      "3M",
+      "4P",
+      "4A",
+      "5P",
+      "5A",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "messiaen 7 mode 3",
+    "notes": "C C# D# E F F# G A A# B C",
+    "semitones": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      6,
+      7,
+      9,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "2A",
+      "3M",
+      "4P",
+      "4A",
+      "5P",
+      "6M",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "messiaen 7 mode 4",
+    "notes": "C D D# E F F# G# A A# B C",
+    "semitones": [
+      0,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "2A",
+      "3M",
+      "4P",
+      "4A",
+      "5A",
+      "6M",
+      "6A",
+      "7M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "truncated messiaen 2 mode 2 ver a mode 1",
+    "notes": "C Eb F F# A B C",
+    "semitones": [
+      0,
+      3,
+      5,
+      6,
+      9,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "3m",
+      "4P",
+      "4A",
+      "6M",
+      "7M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "truncated messiaen 2 mode 2 ver a mode 2",
+    "notes": "C D Eb F# G# A C",
+    "semitones": [
+      0,
+      2,
+      3,
+      6,
+      8,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "3m",
+      "4A",
+      "5A",
+      "6M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "tritone scale",
+    "notes": "C C# E F# G Bb C",
+    "semitones": [
+      0,
+      1,
+      4,
+      6,
+      7,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "1A",
+      "3M",
+      "4A",
+      "5P",
+      "7m",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "truncated messiaen 2 mode 2 ver b mode 1",
+    "notes": "C D F F# G# B C",
+    "semitones": [
+      0,
+      2,
+      5,
+      6,
+      8,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2M",
+      "4P",
+      "4A",
+      "5A",
+      "7M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "truncated messiaen 2 mode 2 ver b mode 2",
+    "notes": "C D# E F# A Bb C",
+    "semitones": [
+      0,
+      3,
+      4,
+      6,
+      9,
+      10,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2A",
+      "3M",
+      "4A",
+      "6M",
+      "7m",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "truncated messiaen 2 mode 2 ver b mode 3",
+    "notes": "C Db Eb F# G A C",
+    "semitones": [
+      0,
+      1,
+      3,
+      6,
+      7,
+      9,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "3m",
+      "4A",
+      "5P",
+      "6M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "truncated messiaen 5 mode 1",
+    "notes": "C Db F# G C",
+    "semitones": [
+      0,
+      1,
+      6,
+      7,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "2m",
+      "4A",
+      "5P",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "truncated messiaen 5 mode 2",
+    "notes": "C F F# B C",
+    "semitones": [
+      0,
+      5,
+      6,
+      11,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "4P",
+      "4A",
+      "7M",
+      "8P"
+    ],
+    "mode": "symmetrical messiaen"
+  },
+  {
+    "name": "triple diminished",
+    "notes": "C B C# D# - D C# Eb F - E Eb F G - F# F G A - Ab G A B - Bb A B C# - C",
+    "semitones": [
+      0,
+      11,
+      1,
+      3,
+      null,
+      2,
+      1,
+      3,
+      5,
+      null,
+      4,
+      3,
+      5,
+      7,
+      null,
+      6,
+      5,
+      7,
+      9,
+      null,
+      8,
+      7,
+      9,
+      11,
+      null,
+      10,
+      9,
+      11,
+      1,
+      null,
+      12
+    ],
+    "intervals": [
+      "1P",
+      "7M",
+      "1A",
+      "2A",
+      null,
+      "2M",
+      "1A",
+      "3m",
+      "4P",
+      null,
+      "3M",
+      "3m",
+      "4P",
+      "5P",
+      null,
+      "4A",
+      "4P",
+      "5P",
+      "6M",
+      null,
+      "6m",
+      "5P",
+      "6M",
+      "7M",
+      null,
+      "7m",
+      "6M",
+      "7M",
+      "1A",
+      null,
+      "8P"
+    ],
+    "mode": "non octave based"
+  }
+]

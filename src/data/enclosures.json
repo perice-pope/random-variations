@@ -1,0 +1,182 @@
+[
+  {
+    "type": "one up",
+    "title": "One up",
+    "semitones": [
+      1
+    ]
+  },
+  {
+    "type": "one down",
+    "title": "One down",
+    "semitones": [
+      -1
+    ]
+  },
+  {
+    "type": "two up",
+    "title": "Two up",
+    "semitones": [
+      2,
+      1
+    ]
+  },
+  {
+    "type": "two down",
+    "title": "Two down",
+    "semitones": [
+      -2,
+      -1
+    ]
+  },
+  {
+    "type": "one up, one down",
+    "title": "One up, one down",
+    "semitones": [
+      1,
+      -1
+    ]
+  },
+  {
+    "type": "one down, one up",
+    "title": "One down, one up",
+    "semitones": [
+      -1,
+      1
+    ]
+  },
+  {
+    "type": "three up",
+    "title": "Three up",
+    "semitones": [
+      3,
+      2,
+      1
+    ]
+  },
+  {
+    "type": "three down",
+    "title": "Three down",
+    "semitones": [
+      -3,
+      -2,
+      -1
+    ]
+  },
+  {
+    "type": "two up, one down",
+    "title": "Two up, one down",
+    "semitones": [
+      2,
+      1,
+      -1
+    ]
+  },
+  {
+    "type": "two down, one up",
+    "title": "Two down, one up",
+    "semitones": [
+      -2,
+      -1,
+      1
+    ]
+  },
+  {
+    "type": "one up, two down",
+    "title": "One up, two down",
+    "semitones": [
+      1,
+      -2,
+      -1
+    ]
+  },
+  {
+    "type": "one down, two up",
+    "title": "One down, two up",
+    "semitones": [
+      -1,
+      2,
+      1
+    ]
+  },
+  {
+    "type": "four up",
+    "title": "Four up",
+    "semitones": [
+      4,
+      3,
+      2,
+      1
+    ]
+  },
+  {
+    "type": "four down",
+    "title": "Four down",
+    "semitones": [
+      -4,
+      -3,
+      -2,
+      -1
+    ]
+  },
+  {
+    "type": "three up, one down",
+    "title": "Three up, one down",
+    "semitones": [
+      3,
+      2,
+      1,
+      -1
+    ]
+  },
+  {
+    "type": "three down, one up",
+    "title": "Three down, one up",
+    "semitones": [
+      -3,
+      -2,
+      -1,
+      1
+    ]
+  },
+  {
+    "type": "two up, two down",
+    "title": "Two up, two down",
+    "semitones": [
+      2,
+      1,
+      -2,
+      -1
+    ]
+  },
+  {
+    "type": "two down, two up",
+    "title": "Two down, two up",
+    "semitones": [
+      -2,
+      -1,
+      2,
+      1
+    ]
+  },
+  {
+    "type": "one up, three down",
+    "title": "One up, three down",
+    "semitones": [
+      1,
+      -3,
+      -2,
+      -1
+    ]
+  },
+  {
+    "type": "one down, three up",
+    "title": "One down, three up",
+    "semitones": [
+      -1,
+      3,
+      2,
+      1
+    ]
+  }
+]
