@@ -26,6 +26,7 @@ import {
   getEnharmonicVersionForNote,
   getConcertPitchMidi,
 } from '../musicUtils'
+import { getColorForNote } from '../utils';
 import sessionStore from '../services/sessionStore'
 
 const FlipperAlignCenter = styled(Flipper)`
