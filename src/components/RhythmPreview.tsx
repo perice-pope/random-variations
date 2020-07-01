@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as _ from 'lodash'
-import * as Vex from 'vexflow'
+import Vex from 'vexflow'
 import { css, cx } from 'react-emotion'
 
 import { Box } from './ui'

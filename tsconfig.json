@@ -39,5 +39,5 @@
     "public"
   ],
   
-  "include": ["src"]
+  "include": ["src/dummy_tsc_source.ts"]
 }

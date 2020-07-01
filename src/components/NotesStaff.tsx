@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as _ from 'lodash'
 import * as tonal from 'tonal'
-import * as Vex from 'vexflow'
+import Vex from 'vexflow'
 import { css, cx } from 'react-emotion'
 import { darken, getLuminance } from 'polished'
 

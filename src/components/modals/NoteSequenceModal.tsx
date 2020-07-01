@@ -33,7 +33,7 @@ import {
   SemitonesToIntervalNameMap,
   getNotePitchClassWithSharp,
 } from '../../musicUtils'
-import Slider from '@material-ui/lab/Slider'
+import Slider from '@material-ui/core/Slider'
 import { InstrumentTransposingType } from '../../types'
 
 type NoteSequenceModalProps = {

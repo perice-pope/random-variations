@@ -58,7 +58,7 @@ export default class AddEntityButton extends React.Component<
       disableNoteSequence &&
       disableDirections
 
-    const buttonProps = this.props.fabProps || {}
+    const buttonProps = this.props.fabProps || { disabled: false }
 
     return (
       <ButtonWithMenu

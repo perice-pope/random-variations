@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { css } from 'emotion'
 
-import MuSlider, { SliderProps } from '@material-ui/lab/Slider'
+import MuSlider, { SliderProps } from '@material-ui/core/Slider'
 import _ from 'lodash'
 
 const Slider: React.SFC<SliderProps> = ({ ...props }) => (
