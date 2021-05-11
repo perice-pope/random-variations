@@ -27,7 +27,7 @@
     "javascript-time-ago": "^1.0.32",
     "jquery": "^3.3.1",
     "jss": "^9.8.7",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.21",
     "mdi-material-ui": "^5.5.0",
     "memoize-one": "^4.0.3",
     "midi-writer-js": "^1.5.2",
